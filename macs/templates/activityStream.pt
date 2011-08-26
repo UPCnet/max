@@ -1,0 +1,15 @@
+<!doctype html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
+<body>
+    <metal:main fill-slot="main">
+    
+<!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
+
+    <div class="activityBox">
+        <textarea class="twitter-anywhere-tweet-box-editor" style="width: 482px; height: 56px;"></textarea>
+    </div>
+    
+    </metal:main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+<head>Macros</head>
+<body>
+    <!-- The status message macro -->    
+    <div metal:define-macro="statusMessage"
+		 tal:define="messages api.statusMessage"
+         tal:condition="messages"
+         id="statusbox" class="row">
+		<div class ="cell width-8  position-4">
+			<div id="statusBar">
+				<tal:block repeat="message messages">
+					<div class="statusBar-body">
+						<img src="/static/info.png" alt="" />
+						<h3>Information</h3>
+					    <p tal:content='message'>The Status Message</p>
+					</div>
+					<div class="statusBar-bottom">
+					</div>
+				</tal:block>
+			</div>
+		</div>
+ 	</div>
+
+</body>
+</html>
