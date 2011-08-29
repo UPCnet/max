@@ -3,8 +3,8 @@ import json
 import time
 
 # server = 'capricornius2.upc.es'
-# server = 'macs.beta.upcnet.es'
-server = 'localhost:6543'
+server = 'macs.beta.upcnet.es'
+# server = 'localhost:6543'
 
 t0 = time.time()
 req = httplib2.Http()

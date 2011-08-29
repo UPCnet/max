@@ -6,10 +6,13 @@
     
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
 
-    <div class="activityBox">
-        <textarea class="twitter-anywhere-tweet-box-editor" style="width: 482px; height: 56px;"></textarea>
+    <div class="row">
+        <div class="cell width-4 position-3">
+            
+                <textarea class="activityBox"></textarea>
+            
+        </div>
     </div>
-    
     </metal:main>
 </body>
 </html>
