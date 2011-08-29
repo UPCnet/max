@@ -51,8 +51,11 @@ def getActivity(context, request):
     activities = []
     cursor = context.db.activity.find(actor).limit(10)
     activities = [activity for activity in cursor]
-    collection['totalItems'] = len(activities)
+    # collection['totalItems'] = len(activities)
     collection['items'] = activities
 
+    # Code the response with the encoder from BSON and return it with the appropiate content-type
     collection = json.dumps(collection, default=json_util.default)
-    return Response(collection)
+    response = Response(collection)
+    response.content_type = 'application/json'
+    return response
