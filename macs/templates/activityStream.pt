@@ -7,10 +7,13 @@
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
 
     <div class="row">
-        <div class="cell width-4 position-3">
-            
+        <div class="cell width-6 position-3">
+            <div id="activityContainer">
                 <textarea class="activityBox"></textarea>
-            
+            </div>
+            <div class="button-container">
+                <button>Envia</button>
+            </div>
         </div>
     </div>
     </metal:main>
