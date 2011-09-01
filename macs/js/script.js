@@ -32,7 +32,7 @@ $(document).ready(function() {
             data: JSON.parse('{"actor.id":"victor"}'),
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
-                        $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + v + '</p>') })
+                        $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
                         // alert(JSON.stringify(data));
                     }
     });
