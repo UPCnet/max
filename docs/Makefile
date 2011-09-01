@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = /var/plone/python2.6/bin/sphinx-build
 PAPER         =
 BUILDDIR      = _build
 
