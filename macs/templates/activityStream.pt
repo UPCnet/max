@@ -8,12 +8,19 @@
 
     <div class="row">
         <div class="cell width-6 position-3">
-            <div id="activityContainer">
+            <div id="activityBoxContainer">
                 <textarea class="activityBox"></textarea>
             </div>
             <div class="button-container">
-                <button>Envia</button>
+                <button class="send">Envia</button>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cell width-6 position-3">
+            <section id="activityContainer">
+
+            </section>
         </div>
     </div>
     </metal:main>

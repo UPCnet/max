@@ -8,6 +8,8 @@ from bson import json_util
 from macs.resources import Root
 from macs.views.api import TemplateAPI
 
+import time
+from rfc3339 import rfc3339
 
 @view_config(context=Root, request_method='POST', name="activity")
 def addActivity(context, request):
@@ -25,6 +27,10 @@ def addActivity(context, request):
 
     # TODO: Check if data sent is consistent and consistent with JSON activitystrea.ms standard specs
 
+    # Set published
+    published = rfc3339(time.time())
+    data['published'] = published
+
     # Insert activity in the database
     context.db.activity.insert(data)
     return HTTPOk()
@@ -32,13 +38,18 @@ def addActivity(context, request):
 
 @view_config(context=Root, request_method='GET', name="activity")
 def getActivity(context, request):
+    # import ipdb; ipdb.set_trace( )
     if request.content_type != 'application/json':
         return HTTPBadRequest()
     # TODO: Do more consistency, syntax and format checks of sent data
-    try:
-        data = json.loads(request.body)
-    except:
-        return HTTPBadRequest()
+    if request.params.has_key(u'actor.id'):
+        data = {}
+        data['actor.id'] = request.params.get(u'actor.id')
+    else:
+        try:
+            data = json.loads(request.body)
+        except:
+            return HTTPBadRequest()
 
     # TODO: Do additional check about the content of the data (eg: 'author' is a valid system username)
     actor = {}

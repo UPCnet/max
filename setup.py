@@ -15,6 +15,7 @@ requires = [
     'zope.sqlalchemy',
     'pyramid_who',
     'pymongo',
+    'rfc3339',
     ]
 
 if sys.version_info[:3] < (2,5,0):
