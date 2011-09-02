@@ -25,6 +25,7 @@ $(document).ready(function() {
              });
 
         $(".activityBox").val("");
+        reloadActivity();
     });
 
     $.ajax({type:'GET',
@@ -41,7 +42,18 @@ $(document).ready(function() {
 
 });
 
-
+function reloadActivity () {
+    $.ajax({type:'GET',
+            url:'http://localhost:6543/activity',
+            data: JSON.parse('{"actor.id":"victor"}'),
+            contentType: 'application/json; charset=utf-8',
+            success: function(data) {
+                        $('#activityContainer').children().remove();
+                        $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
+                        // alert(JSON.stringify(data));
+                    }
+    });    
+}
 
 
 
