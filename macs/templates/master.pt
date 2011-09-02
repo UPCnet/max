@@ -46,6 +46,9 @@
           <div class="cell width-4 position-4">
             <h1>MACS - Prova de concepte</h1>          
           </div>
+          <div class="cell width-1 position-10">
+            <a href="http://macs.beta.upcnet.es/documentacio">Documentació</a>
+          </div>
       </div>
     </header>
 
