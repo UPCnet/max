@@ -11,6 +11,7 @@ from macs.views.api import TemplateAPI
 import time
 from rfc3339 import rfc3339
 
+
 @view_config(context=Root, request_method='POST', name="activity")
 def addActivity(context, request):
     # import ipdb; ipdb.set_trace()
@@ -36,9 +37,8 @@ def addActivity(context, request):
     return HTTPOk()
 
 
-@view_config(context=Root, request_method='GET', name="activity")
+@view_config(context=Root, request_method='GET', name="user_activity")
 def getActivity(context, request):
-    # import ipdb; ipdb.set_trace( )
     if request.content_type != 'application/json':
         return HTTPBadRequest()
     # TODO: Do more consistency, syntax and format checks of sent data

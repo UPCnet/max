@@ -34,9 +34,9 @@ A mode d'exemple, aquí teniu aquest script Python que realitza una prova de cà
                   headers={'Content-Type': 'application/json'})
     print "%.3f segons" % (time.time()-t0)
 
-.. http:get:: /activity
+.. http:get:: /user_activity
 
-    http://macs.beta.upcnet.es/activity (via GET)
+    http://macs.beta.upcnet.es/user_activity (via GET)
 
     Pren un objecte JSON amb el contingut de la consulta a realitzar i retorna un objecte JSON, amb tots els resultats de la query especificada en el request.
 
@@ -54,7 +54,7 @@ Per ara la query només funciona amb una cerca per autor de l'activitat, aquest 
     req = httplib2.Http()
     data = {'actor.id': 'victor'}
     data_json = json.dumps(data)
-    resp = req.request("http://%s/activity" % server,
+    resp = req.request("http://%s/user_activity" % server,
               "GET",
               data_json,
               headers={'Content-Type': 'application/json'})
