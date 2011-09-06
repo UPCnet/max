@@ -27,6 +27,8 @@ Aquests són els camps imprescindibles per a complir amb l'especificació, poden
 Comentaris a una activitat
 --------------------------
 
+http://activitystrea.ms/specs/json/replies/1.0/
+
 Generació d'activitat sota un context
 -------------------------------------
 
