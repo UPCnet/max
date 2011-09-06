@@ -17,7 +17,7 @@ L'activitat generada per l'usuari més simple i comú::
         "object": {
             "objectType": "note",
             "content": "Avui sera un gran dia!"
-        }
+        },
         "published": "2011-08-31T13:45:55Z"
     }
 
