@@ -19,7 +19,7 @@ $(document).ready(function() {
         data['object']['content'] = content;
 
         $.ajax({type:'POST',
-                 url: 'http://localhost:6543/activity',
+                 url: '/activity',
                  data: JSON.stringify(data),
                  contentType: 'application/json; charset=utf-8'
              });
@@ -29,7 +29,7 @@ $(document).ready(function() {
     });
 
     $.ajax({type:'GET',
-            url:'http://localhost:6543/user_activity',
+            url:'/user_activity',
             data: JSON.parse('{"actor.id":"victor"}'),
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
@@ -44,7 +44,7 @@ $(document).ready(function() {
 
 function reloadActivity () {
     $.ajax({type:'GET',
-            url:'http://localhost:6543/user_activity',
+            url:'/user_activity',
             data: JSON.parse('{"actor.id":"victor"}'),
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
