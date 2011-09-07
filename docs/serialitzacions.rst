@@ -1,7 +1,7 @@
 Serialitzacions i estructures JSON
 ==================================
 
-En aquest document s'exposen una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles que s'utilitzen en MACS.
+En aquest document s'exposen una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles que s'utilitzen en MACS. Aquestes serialitzacions són les dades JSON que s'afegeixen finalment en la base de dades de la aplicació.
 
 Canvi d'estatus d'usuari
 ------------------------

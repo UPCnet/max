@@ -22,7 +22,7 @@ def addActivity(context, request):
         return HTTPBadRequest()
 
     try:
-        checkData(data)
+        checkDataActivity(data)
     except:
         return HTTPBadRequest()
 
@@ -75,6 +75,32 @@ def getUserActivity(context, request):
     return response
 
 
+@view_config(context=Root, request_method='POST', name="comment")
+def addComment(context, request):
+    # import ipdb; ipdb.set_trace()
+    try:
+        checkRequestConsistency(request)
+        data = extractPostData(request)
+    except:
+        return HTTPBadRequest()
+
+    try:
+        checkDataComment(data)
+    except:
+        return HTTPBadRequest()
+
+    # TODO: Do additional check about the content of the data (eg: 'author' is a valid system username)
+    # and not comment in data
+
+    # Set published date format
+    published = rfc3339(time.time())
+    data['published'] = published
+
+    # Insert activity in the database
+    context.db.activity.insert(data)
+    return HTTPOk()    
+
+
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':
         raise
@@ -88,7 +114,13 @@ def extractPostData(request):
     # TODO: Do more syntax and format checks of sent data
 
 
-def checkData(data):
+def checkDataActivity(data):
+    if not 'actor' in data:
+        raise
+    # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
+
+
+def checkDataComment(data):
     if not 'actor' in data:
         raise
     # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
