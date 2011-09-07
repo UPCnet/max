@@ -98,7 +98,7 @@ def addComment(context, request):
 
     # Insert activity in the database
     context.db.activity.insert(data)
-    return HTTPOk()    
+    return HTTPOk()
 
 
 def checkRequestConsistency(request):

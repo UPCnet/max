@@ -27,7 +27,53 @@ Aquests són els camps imprescindibles per a complir amb l'especificació, poden
 Comentaris a una activitat
 --------------------------
 
-http://activitystrea.ms/specs/json/replies/1.0/
+Quan es genera un comentari han de passar dues coses: La primera, crear un registre d'activitat nou que guardi els detalls de la nova activitat (comentar). Després, cal actualitzar el registre original a la que fa referència el comentari.
+
+Per més informació, veure la especificació encara en draft: http://activitystrea.ms/specs/json/replies/1.0/
+
+Aquest és l'esquema de la nova activitat comentari::
+
+    {
+        "actor": {
+            "objectType" : "person",
+            "id":"victor"
+        },
+        "verb": "post",
+        "object": {
+            "objectType": "comment",
+            "content": "<p>This is a comment</p>",
+            "inReplyTo": [
+              {
+                "objectType": "note",
+                "id": "http://example.org/objects/123",
+                "displayName": "A simple note"
+              }
+            ]
+        },
+        "published": "2011-08-31T13:45:55Z"
+    }
+
+Aquest és l'esquema de l'objecte al que fa referència::
+
+    {
+        "actor": {
+            "objectType" : "person",
+            "id":"victor"
+        },
+        "verb": "post",
+        "object": {
+            "objectType": "note",
+            "content": "Avui sera un gran dia!"
+        },
+        "replies": {
+            "totalItems": 10,
+            "items": ["_id":"*id_del_comentari1*",
+                      "_id":"*id_del_comentari2*",
+            ]
+        }
+
+        "published": "2011-08-31T13:45:55Z"
+    }
 
 Generació d'activitat sota un context
 -------------------------------------
