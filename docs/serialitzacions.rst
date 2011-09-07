@@ -1,7 +1,11 @@
 Serialitzacions i estructures JSON
 ==================================
 
-En aquest document s'exposen una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles que s'utilitzen en MACS. Aquestes serialitzacions són les dades JSON que s'afegeixen finalment en la base de dades de la aplicació.
+En aquest document s'exposa una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles utilitzades en MACS.
+
+.. note::
+
+    Aquestes serialitzacions són les dades JSON que s'afegeixen finalment en la base de dades de la aplicació. Encara que poden ser similars, en cap moment es refereixen al cos JSON que s'utilitza en les crides a serveis REST.
 
 Canvi d'estatus d'usuari
 ------------------------
@@ -27,7 +31,7 @@ Aquests són els camps imprescindibles per a complir amb l'especificació, poden
 Comentaris a una activitat
 --------------------------
 
-Quan es genera un comentari han de passar dues coses: La primera, crear un registre d'activitat nou que guardi els detalls de la nova activitat (comentar). Després, cal actualitzar el registre original a la que fa referència el comentari.
+Quan es genera un comentari han de passar dues coses: La primera, crear un registre d'activitat nou que guardi els detalls de la nova activitat (comentari). Després, cal actualitzar el registre original a la que fa referència el comentari.
 
 Per més informació, veure la especificació encara en draft: http://activitystrea.ms/specs/json/replies/1.0/
 
@@ -66,12 +70,30 @@ Aquest és l'esquema de l'objecte al que fa referència::
             "content": "Avui sera un gran dia!"
         },
         "replies": {
-            "totalItems": 10,
-            "items": ["_id":"*id_del_comentari1*",
-                      "_id":"*id_del_comentari2*",
+            "totalItems": 2,
+            "items": [
+                {
+                    "_id":"4134231423412344",
+                    "objectType": "comment",
+                    "author": {
+                        "objectType" : "person",
+                        "id":"victor"
+                    },
+                    "content": "<p>This is a comment</p>",
+                    "published": "2011-08-31T13:45:55Z"
+                },
+                {
+                    "_id":"4134231423412346",
+                    "objectType": "comment",
+                    "author": {
+                        "objectType" : "person",
+                        "id":"victor"
+                    },
+                    "content": "<p>This is another comment</p>",
+                    "published": "2011-08-31T13:50:55Z"
+                }        
             ]
-        }
-
+        },
         "published": "2011-08-31T13:45:55Z"
     }
 
@@ -86,7 +108,7 @@ Aleshores, posteriorment, es poden fer peticions de fil d'activitat per context,
 Canvi d'estatus d'usuari sota un context
 ----------------------------------------
 
-Aquesta seria la sintaxi d'aquest tipus d'activitat:
+Aquesta seria la sintaxi d'aquest tipus d'activitat::
 
     {
         "actor": {
@@ -103,7 +125,7 @@ Aquesta seria la sintaxi d'aquest tipus d'activitat:
             "id": "ASSIG123456",
             "displayName": "Introduccio als computadors",
             "url": "http://atenea.upc.edu/introcomp"
-        }
+        },
         "published": "2011-09-06T13:45:55Z"
     }
 

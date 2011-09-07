@@ -10,6 +10,7 @@ from macs.views.api import TemplateAPI
 
 import time
 from rfc3339 import rfc3339
+from copy import deepcopy
 
 
 @view_config(context=Root, request_method='POST', name="activity")
@@ -57,6 +58,11 @@ def getUserActivity(context, request):
     actor = {}
     actor['actor.id'] = data['actor.id']
 
+    # Add comments infrastructure from the begginning
+    data['replies'] = {}
+    data['replies']['totalItems'] = 0
+    data['replies']['items'] = []
+
     # (Change to the user_timeline method):
     # Search the database for the public TL of the user (or activity context) specified in JSON activitystrea.ms standard specs
 
@@ -98,6 +104,13 @@ def addComment(context, request):
 
     # Insert activity in the database
     context.db.activity.insert(data)
+
+    # Search for the referenced activity by id and update his replies.items field
+    comment = deepcopy(data)
+    del comment['verb']
+    del comment['object']['inReplyTo']
+    context.db.activity.update(data['object']['inReplyTo'][0], {'$push': {'replies.items': comment}})
+
     return HTTPOk()
 
 
@@ -109,7 +122,7 @@ def checkRequestConsistency(request):
 
 
 def extractPostData(request):
-    return json.loads(request.body)
+    return json.loads(request.body, object_hook=json_util.object_hook)
 
     # TODO: Do more syntax and format checks of sent data
 

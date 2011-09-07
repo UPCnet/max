@@ -4,6 +4,9 @@ from pyramid import testing
 from pyramid.testing import DummyRequest
 
 import json
+from bson import json_util
+
+import pymongo
 
 
 class DummyRequestREST(DummyRequest):
@@ -23,8 +26,12 @@ class TestMacsREST(unittest.TestCase):
         self.config = testing.setUp(settings=testSettings)
 
     def tearDown(self):
+        # Esborrar les dades de la BBDD de Test al finalitzar
+        db_uri = testSettings['mongodb.url']
+        conn = pymongo.Connection(db_uri)
+        conn.drop_database(testSettings['mongodb.db_name'])
+
         testing.tearDown()
-        # TODO: Esborrar les dades de la BBDD de Test al finalitzar
 
     def _makeOne(self, request):
         from macs.resources import Root
@@ -40,7 +47,6 @@ class TestMacsREST(unittest.TestCase):
         request.body = data_json
         result = getUserActivity(root, request)
         self.assertEqual(result.status, '200 OK')
-        print result.body
         self.assertTrue(isinstance(result.body, str))
 
     def test_getUserActivityQuery(self):
@@ -62,6 +68,34 @@ class TestMacsREST(unittest.TestCase):
         request.content_type = 'application/json'
         request.body = data_json
         result = addActivity(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
+    def test_addComment(self):
+        from macs.views.rest import addActivity, addComment
+        from macs.activityDemos import user_status, user_comment
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+
+        data_activity = user_status
+        data_comment = user_comment
+
+        data_json = json.dumps(data_activity)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = addActivity(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
+        inreplyto = root.db.activity.find_one({'actor.id': 'victor'}, {'_id': 1})
+
+        del data_comment['object']['inReplyTo']
+        data_comment['object']['inReplyTo'] = []
+        data_comment['object']['inReplyTo'].append(inreplyto)
+        data_json = json.dumps(data_comment, default=json_util.default)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = addComment(root, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
 
