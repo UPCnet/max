@@ -28,9 +28,11 @@ $(document).ready(function() {
         reloadActivity();
     });
 
+    timeline_query = {"actor.id": username};
+
     $.ajax({type:'GET',
             url:'/user_activity',
-            data: JSON.parse('{"actor.id":"victor"}'),
+            data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
                         $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })

@@ -17,3 +17,10 @@ def rootView(context, request):
     api = TemplateAPI(context, request, page_title)
     aapi = activityAPI(context, request)
     return dict(api=api, aapi=aapi)
+
+
+@view_config(name='js_variables.js', context=Root, renderer='macs:templates/js_variables.js.pt', permission='restricted')
+def js_variables(context, request):
+
+    variables = {'username': authenticated_userid(request)}
+    return dict(variables=variables)

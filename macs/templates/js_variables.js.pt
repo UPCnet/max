@@ -1,0 +1,2 @@
+
+var username = '<tal:block replace="variables.username" />';
