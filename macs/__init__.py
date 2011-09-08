@@ -30,14 +30,16 @@ def main(global_config, **settings):
     config.add_static_view('static', 'macs:static')
     config.add_static_view('css', 'macs:css')
     config.add_static_view('js', 'macs:js')
-    config.add_route('login', '/login',
-                     view='macs.views.login.login',
-                     view_renderer='macs:templates/login.pt')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
+    config.add_view('macs.views.login.login', route_name='login',
+                     renderer='macs:templates/login.pt')
+    config.add_view('macs.views.login.logout', route_name='logout')
     config.add_view('macs.views.login.login',
-                     renderer='macs:templates/login.pt',
-                     context='pyramid.exceptions.Forbidden')
-    config.add_route('logout', '/logout',
-                     view='macs.views.login.logout')
+                    context='pyramid.httpexceptions.HTTPForbidden',
+                    renderer='macs:templates/login.pt')
+
+    config.add_route('activity', '/activity/{id}')
 
     config.scan('macs')
 

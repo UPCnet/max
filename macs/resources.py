@@ -1,8 +1,13 @@
 import pymongo
+from pyramid.security import Everyone, Allow, Authenticated
 
 
 class Root(object):
     __parent__ = __name__ = None
+    __acl__ = [
+        (Allow, Everyone, 'anonymous'),
+        (Allow, Authenticated, 'restricted'),
+        ]
 
     def __init__(self, request):
         self.request = request

@@ -43,11 +43,13 @@
   <div id="container">
     <header>
       <div class="row">
-          <div class="cell width-4 position-4">
-            <h1>MACS - Prova de concepte</h1>          
-          </div>
-          <div class="cell width-1 position-10">
-            <a href="http://macs.beta.upcnet.es/docs">Documentació</a>
+          <div class ="cell width-6  position-3">
+              <!-- ToolBar Links -->
+              <ul id="toolbox" tal:condition="api.authenticatedUser">
+                  <li><a href="/editProfile" tal:content="api.authenticatedUser"></a></li>
+                  <li><a href="http://macs.beta.upcnet.es/docs">Documentació</a></li>
+                  <li><a href="/logout">Logout</a></li>
+              </ul>
           </div>
       </div>
     </header>

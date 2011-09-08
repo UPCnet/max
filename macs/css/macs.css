@@ -1,5 +1,11 @@
+/*#container {
+width:960px;
+margin: 0 auto;
+}*/
+
 header {margin: 30px 0 30px 0;}
 header h1 {margin: 0 0 30px 0; font-size: 20px}
+#main h1 {margin: 0 0 10px 0; font-size: 20px}
 .activityBox{
     border: 1px solid #CCCCCC;
     border-radius: 4px 4px 4px 4px;
@@ -7,14 +13,16 @@ header h1 {margin: 0 0 30px 0; font-size: 20px}
     color: #222222;
     height: 56px;
     width: 495px;
+    padding: 5px 5px 5px 5px;
 }
 
 #activity button { text-align: right;}
-.button-container {margin-top: 10px; text-align: right; width: 495px;}
+.button-container {margin-top: 10px; text-align: right; width: 508px;}
 
 textarea:focus {
 	border-color: rgba(82, 168, 236, 0.75);
     box-shadow: 0 0 8px rgba(82, 168, 236, 0.5);
+    padding: 5px 5px 5px 5px;
 }
 
 /* Login */
@@ -88,7 +96,9 @@ textarea:focus {
 
 #toolbox{
     list-style: none outside none;
-    border: 2px solid #C0C2C5;
+    border-left: 6px solid rgba(82, 168, 236, 0.75);
+    margin: 0 0 20px 0;
+    height: 20px;
 }
 #toolbox li{
     display: inline;
@@ -96,4 +106,5 @@ textarea:focus {
 }
 #toolbox li a{
     text-decoration: none;
+    color: #2779AA;
 }

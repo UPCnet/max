@@ -7,6 +7,8 @@ from pyramid.security import forget
 
 from urlparse import urljoin
 
+import datetime
+
 
 def _fixup_came_from(request, came_from):
     if came_from is None:
@@ -82,6 +84,22 @@ def login(context, request):
             remember_headers = auth_tkt.remember(request.environ, credentials)
         else:
             remember_headers = []
+
+        # If it's the first time the user log in the system, then create the local user structure
+
+        user = context.db.users.find_one({'username': userid})
+
+        if user:
+            # User exist in database, update login time and continue
+            user['last_login'] = datetime.datetime.now()
+            context.db.users.save(user)
+        else:
+            # No userid found in the database, then create an instance
+            newuser = {'username': userid, 'last_login': datetime.datetime.now()}
+            context.db.users.save(newuser)
+
+            # In case it's needed to redirect the new user to his/her profilepage
+            # return HTTPFound(headers=remember_headers, location='%s/editProfile' % request.application_url)
 
         return HTTPFound(headers=remember_headers, location=came_from)
 

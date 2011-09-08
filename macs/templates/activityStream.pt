@@ -5,6 +5,11 @@
     <metal:main fill-slot="main">
     
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
+        <div class="row">
+            <div class="cell width-6 position-3">
+                <h1>MACS - Prova de concepte</h1>          
+            </div>
+        </div>
 
     <div class="row">
         <div class="cell width-6 position-3">
