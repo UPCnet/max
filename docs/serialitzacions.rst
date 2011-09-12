@@ -97,6 +97,57 @@ Aquest és l'esquema de l'objecte al que fa referència::
         "published": "2011-08-31T13:45:55Z"
     }
 
+Seguir (*follow*) a un usuari
+-----------------------------
+
+Un usuari pot decidir seguir a un altre usuari i així l'activitat d'aquest usuari passarà a aparèixer en el timeline de l'usuari que te la voluntat d'iniciar l'acció de seguiment.
+
+.. note::
+
+    Hi han dos timelines públics que es poden demanar al sistema: el timeline d'activitat d'usuari (sovint anomenada home_timeline i que només mostra directament l'activitat generada per ell) i el que aglutina tota l'activitat adreçada a l'usuari (inclou l'activitat del home_timeline, l'activitat a la que està subscrita l'usuari).
+
+Cada cop que un usuari segueix a un altre, es genera una activitat informant d'aquest canvi i es guarda la relació a la base de dades. Aquest és l'esquema de l'objecte activitat::
+
+    {
+        "actor": {
+            "objectType" : "person",
+            "id":"victor"
+        },
+        "verb": "follow",
+        "object": {
+            "objectType" : "person",
+            "id":"javier"
+        },
+        "published": "2011-08-31T13:45:55Z"
+    }
+
+Subscriure's (*follow*) a un context
+------------------------------------
+
+Un usuari pot decidir seguir l'activitat generada per un context (veure apartat següent). Cada context ha de tindre una URI (o IRI) que l'identifiqui unívocament.
+
+Cada cop que un usuari es subscriu a un context, es genera una activitat informant d'aquest canvi i es guarda la relació a la base de dades. Aquest és l'esquema de l'objecte activitat::
+
+    {
+        "actor": {
+            "objectType" : "person",
+            "id":"victor"
+        },
+        "verb": "follow",
+        "object": {
+            "objectType": "service"
+            "id": "ASSIG123456",
+            "displayName": "Introduccio als computadors",
+            "url": "http://atenea.upc.edu/introcomp"
+        },
+        "published": "2011-08-31T13:45:55Z"
+    }
+
+.. note:
+
+    No s'ha pogut trobar un tipus d'objecte més adient que el de "service" per identificar a un context. En tot cas és susceptible de que es pugui determinar un altre més adient en posteriors revisions.
+
+
 Generació d'activitat sota un context
 -------------------------------------
 

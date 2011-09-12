@@ -1,2 +1,3 @@
 
 var username = '<tal:block replace="variables.username" />';
+var userid = '<tal:block replace="variables.userid" />';

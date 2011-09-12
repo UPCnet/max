@@ -22,5 +22,10 @@ def rootView(context, request):
 @view_config(name='js_variables.js', context=Root, renderer='macs:templates/js_variables.js.pt', permission='restricted')
 def js_variables(context, request):
 
-    variables = {'username': authenticated_userid(request)}
+    username = authenticated_userid(request)
+    userid = context.db.users.find_one({'username': username}, {'_id': 1})
+
+    variables = {'username': username,
+                 'userid': str(userid['_id']),
+    }
     return dict(variables=variables)

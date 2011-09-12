@@ -6,6 +6,7 @@ $(document).ready(function() {
 
     $("button").button();
 
+    // Send the activity
     $("button.send").click(function() {
         content = $(".activityBox").val();
         data = {};
@@ -28,6 +29,7 @@ $(document).ready(function() {
         reloadActivity();
     });
 
+    // Fill the last activity in the #activityContainer
     timeline_query = {"actor.id": username};
 
     $.ajax({type:'GET',
@@ -40,7 +42,6 @@ $(document).ready(function() {
                     }
     });
 
-    // function getUser() { var user = {}; return user}
 
 });
 
