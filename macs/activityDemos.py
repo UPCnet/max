@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # ===============================================================
 # Format com deurien estar guardades les dades a la base de dades
 # ===============================================================
@@ -46,7 +47,7 @@ user_status = {
     "verb": "post",
     "object": {
         "objectType": "note",
-        "content": "Avui sera un gran dia!"
+        "content": "<p>Testejant la creació d'un canvi d'estatus</p>"
     },
 }
 
@@ -67,4 +68,3 @@ user_comment = {
             ]
         },
     }
-

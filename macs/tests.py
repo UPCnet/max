@@ -9,7 +9,6 @@ from bson import json_util
 
 from macs.activityDemos import demostatus, demouser1, demouser2
 
-from copy import deepcopy
 
 class DummyRequestREST(DummyRequest):
     """ Enriquim la classe DummyRequest per a que tingui la propietat content_type """
@@ -39,7 +38,7 @@ class TestMacsREST(unittest.TestCase):
         # Esborrar les dades de la BBDD de Test al finalitzar
         db_uri = testSettings['mongodb.url']
         conn = pymongo.Connection(db_uri)
-        conn.drop_database(testSettings['mongodb.db_name'])
+        #conn.drop_database(testSettings['mongodb.db_name'])
 
         testing.tearDown()
 
@@ -108,60 +107,3 @@ class TestMacsREST(unittest.TestCase):
         result = addComment(root, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
-
-
-# def _initTestingDB():
-#     from sqlalchemy import create_engine
-#     from macs.models import initialize_sql
-#     session = initialize_sql(create_engine('sqlite://'))
-#     return session
-
-# class TestMyRoot(unittest.TestCase):
-#     def setUp(self):
-#         self.config = testing.setUp()
-#         #self.session = _initTestingDB()
-
-#     def tearDown(self):
-#         testing.tearDown()
-#         #self.session.remove()
-
-#     def _makeOne(self):
-#         from macs.models import MyRoot
-#         return MyRoot()
-
-#     def test___getitem__hit(self):
-#         from macs.models import MyModel
-#         root = self._makeOne()
-#         first = root['1']
-#         self.assertEqual(first.__class__, MyModel)
-#         self.assertEqual(first.__parent__, root)
-#         self.assertEqual(first.__name__, '1')
-
-#     def test___getitem__miss(self):
-#         root = self._makeOne()
-#         self.assertRaises(KeyError, root.__getitem__, '100')
-
-#     def test___getitem__notint(self):
-#         root = self._makeOne()
-#         self.assertRaises(KeyError, root.__getitem__, 'notint')
-
-#     def test_get_hit(self):
-#         from macs.models import MyModel
-#         root = self._makeOne()
-#         first = root.get('1')
-#         self.assertEqual(first.__class__, MyModel)
-#         self.assertEqual(first.__parent__, root)
-#         self.assertEqual(first.__name__, '1')
-
-#     def test_get_miss(self):
-#         root = self._makeOne()
-#         self.assertEqual(root.get('100', 'default'), 'default')
-#         self.assertEqual(root.get('100'), None)
-
-#     def test___iter__(self):
-#         root = self._makeOne()
-#         iterable = iter(root)
-#         result = list(iterable)
-#         self.assertEqual(len(result), 1)
-#         model = result[0]
-#         self.assertEqual(model.id, 1)

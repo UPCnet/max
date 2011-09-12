@@ -7,7 +7,7 @@ import json
 from bson import json_util
 
 from macs.resources import Root
-from macs.views.utils import checkDataFollow, checkRequestConsistency, extractPostData
+from macs.rest.utils import checkDataFollow, checkRequestConsistency, extractPostData
 
 import time
 from rfc3339 import rfc3339

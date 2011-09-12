@@ -2,11 +2,13 @@ from pyramid.view import view_config
 from pyramid.response import Response
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPOk
+
 import json
 from bson import json_util
+from pymongo.objectid import ObjectId
 
 from macs.resources import Root
-from macs.views.utils import checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
+from macs.rest.utils import checkIsValidUser, checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
 
 import time
 from rfc3339 import rfc3339
@@ -24,10 +26,13 @@ def addActivity(context, request):
 
     try:
         checkDataActivity(data)
+        checkIsValidUser(context, data)
     except:
         return HTTPBadRequest()
 
-    # TODO: Do additional check about the content of the data (eg: 'author' is a valid system username)
+    # Once verified the id of the user, convert the userid to an ObjectId
+    data['actor']['_id'] = ObjectId(data['actor']['id'])
+    del data['actor']['id']
 
     # Set published date format
     published = rfc3339(time.time())
