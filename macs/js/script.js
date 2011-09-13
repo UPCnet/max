@@ -13,7 +13,8 @@ $(document).ready(function() {
         // set actor - En un futur ho ha de fer el server comparant tokens
         data['actor'] = {};
         data['actor']['objectType'] = 'person';
-        data['actor']['id'] = 'victor';
+        data['actor']['displayName'] = username;
+        data['actor']['id'] = userid;
         data['verb'] = 'post'
         data['object'] = {}
         data['object']['objectType'] = 'note';
@@ -30,7 +31,7 @@ $(document).ready(function() {
     });
 
     // Fill the last activity in the #activityContainer
-    timeline_query = {"actor.id": username};
+    timeline_query = {"displayName": username};
 
     $.ajax({type:'GET',
             url:'/user_activity',
@@ -46,9 +47,11 @@ $(document).ready(function() {
 });
 
 function reloadActivity () {
+    timeline_query = {"displayName": username};
+
     $.ajax({type:'GET',
             url:'/user_activity',
-            data: JSON.parse('{"actor.id":"victor"}'),
+            data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
                         $('#activityContainer').children().remove();

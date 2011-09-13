@@ -8,7 +8,7 @@ from bson import json_util
 from pymongo.objectid import ObjectId
 
 from macs.resources import Root
-from macs.rest.utils import checkIsValidUser, checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
+from macs.rest.utils import checkQuery, checkIsValidQueryUser, checkIsValidUser, checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
 
 import time
 from rfc3339 import rfc3339
@@ -50,23 +50,36 @@ def getUserActivity(context, request):
     except:
         return HTTPBadRequest()
 
-    if u'actor.id' in request.params:
+    if request.params:
         # The request is issued with query parameters
-        data = {}
-        data['actor.id'] = request.params.get(u'actor.id')
+        data = request.params
     else:
-        # The request is issued by post
+        # The request is issued by POST
         data = extractPostData(request)
 
-    # TODO: Do additional check about the content of the data (eg: 'author' is a valid system username)
+    try:
+        checkQuery(data)
+        checkIsValidQueryUser(context, data)
+    except:
+        return HTTPBadRequest()
 
-    actor = {}
-    actor['actor.id'] = data['actor.id']
+    # Once verified the id of the user, search for the id of the user given its displayName
+    # We suppose that the displayName is unique
+    user = context.db.users.find_one({'displayName': data['displayName']}, {'_id': 1, 'following': 1})
 
-    # Add comments infrastructure from the begginning
-    data['replies'] = {}
-    data['replies']['totalItems'] = 0
-    data['replies']['items'] = []
+    # The query has to have this syntax {'$or': [{'actor.displayName': 'victor'}, {'actor.displayName': 'javier'}] }
+    query = {'$or': []}
+    query['$or'].append({'actor._id': user['_id']})
+
+    # Add the activity of the people that the user follows
+
+    for following in user['following']['items']:
+        query['$or'].append({'actor._id': following['_id']})
+
+    # Add comments infrastructure from the begginning ??
+    # query['replies'] = {}
+    # query['replies']['totalItems'] = 0
+    # query['replies']['items'] = []
 
     # (Change to the user_timeline method):
     # Search the database for the public TL of the user (or activity context) specified in JSON activitystrea.ms standard specs
@@ -74,7 +87,7 @@ def getUserActivity(context, request):
     # Compile the results and forge the resultant collection object
     collection = {}
     activities = []
-    cursor = context.db.activity.find(actor).limit(10)
+    cursor = context.db.activity.find(query).limit(10)
     activities = [activity for activity in cursor]
     collection['totalItems'] = len(activities)
     collection['items'] = activities
@@ -97,11 +110,17 @@ def addComment(context, request):
 
     try:
         checkDataComment(data)
+        checkIsValidUser(context, data)
     except:
         return HTTPBadRequest()
 
-    # TODO: Do additional check about the content of the data (eg: 'author' is a valid system username)
-    # and not comment in data
+    # Once verified the id of the user, convert the userid to an ObjectId
+    data['actor']['_id'] = ObjectId(data['actor']['id'])
+    del data['actor']['id']
+
+    # Once verified the activity is valid, convert the userid to an ObjectId
+    data['object']['inReplyTo'].append({'_id': ObjectId(data['object']['inReplyTo'][0]['id'])})
+    del data['object']['inReplyTo'][0]['id']
 
     # Set published date format
     published = rfc3339(time.time())

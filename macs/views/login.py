@@ -95,7 +95,10 @@ def login(context, request):
             context.db.users.save(user)
         else:
             # No userid found in the database, then create an instance
-            newuser = {'username': userid, 'last_login': datetime.datetime.now()}
+            newuser = {'displayName': userid,
+                       'last_login': datetime.datetime.now(),
+                       'following': {'items': [], }
+                       }
             context.db.users.save(newuser)
 
             # In case it's needed to redirect the new user to his/her profilepage

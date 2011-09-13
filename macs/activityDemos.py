@@ -47,24 +47,53 @@ user_status = {
     "verb": "post",
     "object": {
         "objectType": "note",
-        "content": "<p>Testejant la creació d'un canvi d'estatus</p>"
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
     },
 }
 
 # Un usuari crea un comentari
 user_comment = {
-        "actor": {
-            "objectType": "person",
-            "id": "victor"
-        },
-        "verb": "post",
-        "object": {
-            "objectType": "comment",
-            "content": "<p>This is a comment</p>",
-            "inReplyTo": [
-              {
-                "id": "http://example.org/objects/123",
-              }
-            ]
-        },
-    }
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "displayName": "javier"
+    },
+    "verb": "post",
+    "object": {
+        "objectType": "comment",
+        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+        "inReplyTo": [
+          {
+            "id": "4e6eefc5aceee9210d000004",
+          }
+        ]
+    },
+}
+
+follow = {
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "displayName": "victor"
+    },
+    "verb": "follow",
+    "object": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000001",
+        "displayName": "javier"
+    },
+}
+
+unfollow = {
+    "actor": {
+        "objectType" : "person",
+        "id": "4e6e1243aceee91143000000",
+        "displayName": "victor"
+    },
+    "verb": "unfollow",
+    "object": {
+        "objectType" : "person",
+        "id": "4e6e1243aceee91143000001",
+        "displayName": "javier"
+    },
+}

@@ -23,7 +23,7 @@ def rootView(context, request):
 def js_variables(context, request):
 
     username = authenticated_userid(request)
-    userid = context.db.users.find_one({'username': username}, {'_id': 1})
+    userid = context.db.users.find_one({'displayName': username}, {'_id': 1})
 
     variables = {'username': username,
                  'userid': str(userid['_id']),

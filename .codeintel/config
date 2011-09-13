@@ -1,0 +1,6 @@
+{
+    "Python": {
+    "python": '/var/plone/macsbin/bin/python',
+    "pythonExtraPaths": []
+    },
+}

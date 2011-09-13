@@ -40,6 +40,7 @@ def main(global_config, **settings):
                     renderer='macs:templates/login.pt')
 
     config.add_route('activity', '/activity/{id}')
+    config.add_route('profiles', '/profiles/{displayName}')
 
     config.scan('macs')
 

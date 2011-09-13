@@ -1,5 +1,5 @@
-Serialitzacions i estructures JSON
-==================================
+Serialitzacions i estructures JSON en base de dades
+===================================================
 
 En aquest document s'exposa una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles utilitzades en MACS.
 
@@ -15,7 +15,8 @@ L'activitat generada per l'usuari més simple i comú::
     {
         "actor": {
             "objectType" : "person",
-            "id":"victor"
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
         },
         "verb": "post",
         "object": {
@@ -40,7 +41,8 @@ Aquest és l'esquema de la nova activitat comentari::
     {
         "actor": {
             "objectType" : "person",
-            "id":"victor"
+            "_id": "4e6e1243aceee91143000001",
+            "displayName": "javier"
         },
         "verb": "post",
         "object": {
@@ -48,9 +50,7 @@ Aquest és l'esquema de la nova activitat comentari::
             "content": "<p>This is a comment</p>",
             "inReplyTo": [
               {
-                "objectType": "note",
-                "id": "http://example.org/objects/123",
-                "displayName": "A simple note"
+                "_id": "4e6eefc5aceee9210d000004",
               }
             ]
         },
@@ -62,7 +62,8 @@ Aquest és l'esquema de l'objecte al que fa referència::
     {
         "actor": {
             "objectType" : "person",
-            "id":"victor"
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
         },
         "verb": "post",
         "object": {
@@ -73,21 +74,21 @@ Aquest és l'esquema de l'objecte al que fa referència::
             "totalItems": 2,
             "items": [
                 {
-                    "_id":"4134231423412344",
+                    "_id":"4e6efa0daceee92420000004",
                     "objectType": "comment",
                     "author": {
-                        "objectType" : "person",
-                        "id":"victor"
+                        "id": "4e6e1243aceee91143000001",
+                        "displayName": "javier"
                     },
                     "content": "<p>This is a comment</p>",
                     "published": "2011-08-31T13:45:55Z"
                 },
                 {
-                    "_id":"4134231423412346",
+                    "_id":"4e6efa0daceee92420000005",
                     "objectType": "comment",
                     "author": {
-                        "objectType" : "person",
-                        "id":"victor"
+                        "id": "4e6e1243aceee91143000000",
+                        "displayName": "victor"
                     },
                     "content": "<p>This is another comment</p>",
                     "published": "2011-08-31T13:50:55Z"
@@ -111,12 +112,14 @@ Cada cop que un usuari segueix a un altre, es genera una activitat informant d'a
     {
         "actor": {
             "objectType" : "person",
-            "id":"victor"
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
         },
         "verb": "follow",
         "object": {
             "objectType" : "person",
-            "id":"javier"
+            "_id": "4e6e1243aceee91143000001",
+            "displayName": "javier"
         },
         "published": "2011-08-31T13:45:55Z"
     }

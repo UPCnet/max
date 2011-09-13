@@ -1,0 +1,43 @@
+<!doctype html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
+<body>
+    <metal:main fill-slot="main">
+    
+<!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
+    <div class="row">
+        <div class="cell width-6 position-3">
+            <h1 tal:content="user.displayName">User</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cell width-6 position-3">
+            <section id="user_properties">
+                <ul>
+                    <li>User ID: <span tal:content="user._id"></span></li>
+                    <li>Following: <span tal:content="user.following['items']"></span></li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+<!--     <div class="row">
+        <div class="cell width-6 position-3">
+            <div id="activityBoxContainer">
+                <textarea class="activityBox"></textarea>
+            </div>
+            <div class="button-container">
+                <button class="send">Envia</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cell width-6 position-3">
+            <section id="activityContainer">
+
+            </section>
+        </div>
+    </div> -->
+    </metal:main>
+</body>
+</html>

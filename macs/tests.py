@@ -50,7 +50,7 @@ class TestMacsREST(unittest.TestCase):
         from macs.rest.activity import getUserActivity
         request = DummyRequestREST()
         root = self._makeOne(request)
-        data = {'actor.id': 'victor'}
+        data = {'displayName': 'victor'}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json
@@ -60,7 +60,7 @@ class TestMacsREST(unittest.TestCase):
 
     def test_getUserActivityQuery(self):
         from macs.rest.activity import getUserActivity
-        request = DummyRequestREST(params={'actor.id': 'victor'})
+        request = DummyRequestREST(params={'displayName': 'victor'})
         root = self._makeOne(request)
         request.content_type = 'application/json'
         result = getUserActivity(root, request)
@@ -93,17 +93,60 @@ class TestMacsREST(unittest.TestCase):
 
         data_comment = user_comment
 
-        inreplyto = {'_id': self.activity}
-
         # Put the 'real' id with the user mock object as would be sent
+        data_comment['actor']['id'] = str(self.user2)
+
+        # Put the 'real' id with the activity mock object as would be sent
+        inreplyto = {'id': str(self.activity)}
+
         del data_comment['object']['inReplyTo']
         data_comment['object']['inReplyTo'] = []
         data_comment['object']['inReplyTo'].append(inreplyto)
 
         # Do the request to the WS
-        data_json = json.dumps(data_comment, default=json_util.default)
+        data_json = json.dumps(data_comment)
         request.content_type = 'application/json'
         request.body = data_json
         result = addComment(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
+    def test_Follow(self):
+        from macs.rest.subscriptions import Follow
+        from macs.activityDemos import follow
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+
+        data = follow
+
+        # Put the 'real' id with the user mock object as would be sent
+        data['actor']['id'] = str(self.user1)
+        data['object']['id'] = str(self.user2)
+
+        # Do the request to the WS
+        data_json = json.dumps(data)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = Follow(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
+    def test_unFollow(self):
+        from macs.rest.subscriptions import unFollow
+        from macs.activityDemos import unfollow
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+
+        data = unfollow
+
+        # Put the 'real' id with the user mock object as would be sent
+        data['actor']['id'] = str(self.user1)
+        data['object']['id'] = str(self.user2)
+
+        # Do the request to the WS
+        data_json = json.dumps(data)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = unFollow(root, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
