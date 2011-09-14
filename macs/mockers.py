@@ -174,3 +174,17 @@ like = {
             "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
         },
     }
+
+share = {
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "displayName": "javier"
+    },
+    "verb": "share",
+    "object": {
+        "objectType": "activity",
+        "id": "4e6eefc5aceee9210d000004",
+    },
+    "published": "2011-02-10T15:04:55Z",
+  }

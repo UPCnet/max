@@ -10,13 +10,13 @@ server = 'localhost:6543'
 follow = {
     "actor": {
         "objectType": "person",
-        "id": "4e6f399aaceee9324c000000",
+        "id": "4e70c039aceee95b05000000",
         "displayName": "victor"
     },
     "verb": "follow",
     "object": {
         "objectType": "person",
-        "id": "4e6f4b7faceee9342c000000",
+        "id": "4e70c03eaceee95b05000001",
         "displayName": "javier"
     },
 }

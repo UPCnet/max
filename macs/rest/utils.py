@@ -128,6 +128,19 @@ def checkDataLike(data):
         raise
 
 
+def checkDataShare(data):
+    if not 'actor' in data:
+        raise
+    if not 'verb' in data:
+        raise
+    if not 'object' in data:
+        raise
+    if not data['verb'] == 'share':
+        raise
+    if not 'objectType' in data['object']:
+        raise
+
+
 def checkIsValidUser(context, data):
     """ Do additional check about the content of the data (eg: 'author' is a valid system username) """
 

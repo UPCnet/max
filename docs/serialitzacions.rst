@@ -98,6 +98,37 @@ Aquest és l'esquema de l'objecte al que fa referència::
         "published": "2011-08-31T13:45:55Z"
     }
 
+Compartir (*share*) una activitat
+---------------------------------
+
+L'usuari pot generar una activitat per compartir un altre activitat en cas de que vulgui remarcar o donar rellevància a aquesta activitat concreta. En cas de compartir-la, tots els usuaris que estan subscrits a l'activitat de l'usuari reben reben l'activitat compartida.
+
+Aquest és l'esquema de l'objecte::
+
+  {
+    "actor": {
+        "objectType" : "person",
+        "_id": "4e6e1243aceee91143000000",
+        "displayName": "victor"
+    },
+    "verb": "share",
+    "object" : {
+        "objectType":"activity",
+        "_id": "4e6eefc5aceee9210d000004",
+        "verb": "post",
+        "actor": {
+            "objectType" : "person",
+            "_id": "4e6e1243aceee91143000001",
+            "displayName": "javier"
+        },
+        "object": {
+            "objectType":"note",
+            "content": "Avui sera un gran dia!"
+        }
+    },
+    "published": "2011-02-10T15:04:55Z",
+  }
+
 Seguir (*follow*) a un usuari
 -----------------------------
 

@@ -227,3 +227,23 @@ class TestMacsREST(unittest.TestCase):
         result = Like(root, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
+
+    def test_Share(self):
+        from macs.rest.share import Share
+        from macs.mockers import share
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+
+        data = share
+
+        # Put the 'real' id with the user mock object as would be sent
+        data['actor']['id'] = str(self.user2)
+        data['object']['id'] = str(self.activity)
+
+        # Do the request to the WS
+        data_json = json.dumps(data)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = Share(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))

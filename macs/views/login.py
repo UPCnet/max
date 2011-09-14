@@ -97,7 +97,8 @@ def login(context, request):
             # No userid found in the database, then create an instance
             newuser = {'displayName': userid,
                        'last_login': datetime.datetime.now(),
-                       'following': {'items': [], }
+                       'following': {'items': [], },
+                       'subscribedTo': {'items': [], }
                        }
             context.db.users.save(newuser)
 
