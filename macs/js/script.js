@@ -40,9 +40,9 @@ $(document).ready(function() {
             success: function(data) {
                         // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
                         $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
+                        $(".date").easydate(easydateOptions);
                     }
     });
-
 
 });
 
@@ -57,6 +57,7 @@ function reloadActivity () {
                         $('#activityContainer').children().remove();
                         // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
                         $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
+                        $(".date").easydate(easydateOptions);
                     }
     });    
 }
@@ -75,4 +76,30 @@ function formatActivityStream (activity) {
         var divdata = '<div class="activity" activityid="' + activity['_id']['$oid'] + '" userid="' + activity['actor']['_id']['$oid'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + '</div>';
     }
     return divdata
+}
+
+easydateOptions = {
+    locale: { 
+        "future_format": "%s %t", 
+        "past_format": "%s %t", 
+        "second": "segon", 
+        "seconds": "segons", 
+        "minute": "minut", 
+        "minutes": "minuts", 
+        "hour": "hora", 
+        "hours": "hores", 
+        "day": "dia", 
+        "days": "dies", 
+        "week": "setmana", 
+        "weeks": "setmanes", 
+        "month": "mes", 
+        "months": "mesos", 
+        "year": "any", 
+        "years": "anys", 
+        "yesterday": "ahir", 
+        "tomorrow": "demà", 
+        "just now": "fa un moment", 
+        "ago": "fa",
+        "in": "en" 
+    }
 }
