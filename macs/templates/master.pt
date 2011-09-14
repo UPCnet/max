@@ -46,6 +46,7 @@
           <div class ="cell width-6  position-3">
               <!-- ToolBar Links -->
               <ul id="toolbox" tal:condition="api.authenticatedUser">
+                  <li><a href="/">Inici</a></li>
                   <li><a tal:attributes="href '/profiles/'+api.authenticatedUser" tal:content="api.authenticatedUser"></a></li>
                   <li><a href="http://macs.beta.upcnet.es/docs">Documentació</a></li>
                   <li><a href="/logout">Logout</a></li>

@@ -38,8 +38,8 @@ $(document).ready(function() {
             data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
-                        $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
-                        // alert(JSON.stringify(data));
+                        // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
+                        $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
                     }
     });
 
@@ -55,26 +55,24 @@ function reloadActivity () {
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
                         $('#activityContainer').children().remove();
-                        $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
-                        // alert(JSON.stringify(data));
+                        // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
+                        $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
                     }
     });    
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function formatActivityStream (activity) {
+    if (activity['verb']=='post') {
+        // alert(activity['actor']['displayName']);
+        var user = '<div><span class="user">' + activity['actor']['displayName'] + '</span></div>';
+        if (activity['object']['objectType']=='note') {
+            var body = '<div><span class="body">' + activity['object']['content'] + '</span></div>';
+        } else {
+            var body = '<div><span class="body">' + activity['object'] + '</span></div>';
+        }
+        var date = '<div><span class="date">' + activity['published'] + '</span></div>';
+        var divcontent = '<div class="content">' + user + body + date + '</div>';
+        var divdata = '<div class="activity" activityid="' + activity['_id']['$oid'] + '" userid="' + activity['actor']['_id']['$oid'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + '</div>';
+    }
+    return divdata
+}

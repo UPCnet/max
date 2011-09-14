@@ -108,3 +108,7 @@ textarea:focus {
     text-decoration: none;
     color: #2779AA;
 }
+
+#activityContainer .activity {
+    margin-bottom:  10px;
+}

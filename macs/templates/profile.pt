@@ -16,6 +16,7 @@
                 <ul>
                     <li>User ID: <span tal:content="user._id"></span></li>
                     <li>Following: <span tal:content="user.following['items']"></span></li>
+                    <li>Subscribed to: <span tal:content="user.subscribedTo['items']"></span></li>
                 </ul>
             </section>
         </div>
