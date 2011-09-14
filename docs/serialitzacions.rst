@@ -133,13 +133,13 @@ Cada cop que un usuari es subscriu a un context, es genera una activitat informa
 
     {
         "actor": {
-            "objectType" : "person",
-            "id":"victor"
+            "objectType": "person",
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
         },
         "verb": "follow",
         "object": {
-            "objectType": "service"
-            "id": "ASSIG123456",
+            "objectType": "service",
             "displayName": "Introduccio als computadors",
             "url": "http://atenea.upc.edu/introcomp"
         },
@@ -175,8 +175,7 @@ Aquesta seria la sintaxi d'aquest tipus d'activitat::
             "content": "Avui sera un gran dia!"
         },
         "target": {
-            "objectType": "service"
-            "id": "ASSIG123456",
+            "objectType": "service",
             "displayName": "Introduccio als computadors",
             "url": "http://atenea.upc.edu/introcomp"
         },

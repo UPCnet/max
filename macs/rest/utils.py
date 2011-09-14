@@ -56,7 +56,13 @@ def checkDataFollow(data):
         raise
     if not 'verb' in data:
         raise
+    if not 'object' in data:
+        raise
     if not data['verb'] == 'follow':
+        raise
+    if not 'objectType' in data['object']:
+        raise
+    if not 'person' in data['object']['objectType']:
         raise
 
     # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
@@ -67,10 +73,59 @@ def checkDataunFollow(data):
         raise
     if not 'verb' in data:
         raise
+    if not 'object' in data:
+        raise
     if not data['verb'] == 'unfollow':
+        raise
+    if not 'objectType' in data['object']:
+        raise
+    if not 'person' in data['object']['objectType']:
         raise
 
     # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
+
+
+def checkDataFollowContext(data):
+    if not 'actor' in data:
+        raise
+    if not 'verb' in data:
+        raise
+    if not 'object' in data:
+        raise
+    if not data['verb'] == 'follow':
+        raise
+    if not 'objectType' in data['object']:
+        raise
+    if not 'service' in data['object']['objectType']:
+        raise
+
+
+def checkDataunFollowContext(data):
+    if not 'actor' in data:
+        raise
+    if not 'verb' in data:
+        raise
+    if not 'object' in data:
+        raise
+    if not data['verb'] == 'unfollow':
+        raise
+    if not 'objectType' in data['object']:
+        raise
+    if not 'service' in data['object']['objectType']:
+        raise
+
+
+def checkDataLike(data):
+    if not 'actor' in data:
+        raise
+    if not 'verb' in data:
+        raise
+    if not 'object' in data:
+        raise
+    if not data['verb'] == 'like':
+        raise
+    if not 'objectType' in data['object']:
+        raise
 
 
 def checkIsValidUser(context, data):
@@ -87,6 +142,18 @@ def checkIsValidUser(context, data):
         raise
 
     # Determine if it's necessary do additional checks against the request data
+
+
+def checkIsValidActivity(context, data):
+    """ Do a check to validate that the activity is a registered activity """
+    activityid = ObjectId(data['object']['id'])
+
+    result = context.db.activity.find_one({'_id': activityid})
+
+    if result:
+        return True
+    else:
+        raise
 
 
 def checkIsValidRepliedActivity(context, data):

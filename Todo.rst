@@ -4,19 +4,21 @@ TODO
 OK! Contentitzar cada activitat p.e: http://localhost:6543/activity/$id
 OK! Utilitzar el id de la Mongo com a id?
 OK! Integració amb LDAP users (en produccio) i creació automàtica de mini-perfil
+OK! Likings
+OK! Referencia a les URIs úniques dels diferents objectes (activity, comment, profile...)
+OK! profiles accessibles (objecte d'usuaris)
+OK! Primera integració del motor de subscripcions
 
-Referencia a les URIs úniques dels diferents objectes (activity, comment, profile...)
+UI de l'stream, follows
+
+Templates dels perfils i de les activitats
 
 Millorar els tests, fent comprovacions de integritat
 
-profiles accessibles (objecte d'usuaris)
-
 Extended info person a la coleccio d'usuaris
 
-Primera integració del motor de subscripcions
-
-Likings
+unLikings
 Shares
+delete comments
 fotos de perfil
 ldap oauth
-oauth server python django-oauth-plus http://code.welldev.org/django-oauth-plus/wiki/Home

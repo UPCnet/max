@@ -7,14 +7,30 @@
 demouser1 = {
     'displayName': 'victor',
     'url': 'http://macs.upc.edu/profiles/victor',
-    'objectType': 'person'
+    'objectType': 'person',
+    'following': {
+        'totalItems': 0,
+        'items': []
+    },
+    'subscribedTo': {
+        'totalItems': 0,
+        'items': []
+    }
 }
 
 # Un usuari de demo2
 demouser2 = {
     'displayName': 'javier',
     'url': 'http://macs.upc.edu/profiles/javier',
-    'objectType': 'person'
+    'objectType': 'person',
+    'following': {
+        'totalItems': 0,
+        'items': []
+    },
+    'subscribedTo': {
+        'totalItems': 0,
+        'items': []
+    }
 }
 
 # Una activity de demo
@@ -28,6 +44,25 @@ demostatus = {
     "object": {
         "objectType": "note",
         "content": "Avui sera un gran dia!"
+    },
+    "published": "2011-08-31T13:45:55Z"
+}
+
+demostatus_with_context = {
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "displayName": "victor"
+    },
+    "verb": "post",
+    "object": {
+        "objectType": "note",
+        "content": "[AC] Activitat amb contexte"
+    },
+    "target": {
+        "objectType": "service",
+        "displayName": "Introduccio als computadors",
+        "url": "http://atenea.upc.edu/introcomp"
     },
     "published": "2011-08-31T13:45:55Z"
 }
@@ -86,14 +121,56 @@ follow = {
 
 unfollow = {
     "actor": {
-        "objectType" : "person",
+        "objectType": "person",
         "id": "4e6e1243aceee91143000000",
         "displayName": "victor"
     },
     "verb": "unfollow",
     "object": {
-        "objectType" : "person",
+        "objectType": "person",
         "id": "4e6e1243aceee91143000001",
         "displayName": "javier"
     },
 }
+
+follow_context = {
+        "actor": {
+            "objectType": "person",
+            "id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
+        },
+        "verb": "follow",
+        "object": {
+            "objectType": "service",
+            "displayName": "Introduccio als computadors",
+            "url": "http://atenea.upc.edu/introcomp"
+        },
+    }
+
+unfollow_context = {
+        "actor": {
+            "objectType": "person",
+            "id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
+        },
+        "verb": "unfollow",
+        "object": {
+            "objectType": "service",
+            "displayName": "Introduccio als computadors",
+            "url": "http://atenea.upc.edu/introcomp"
+        },
+    }
+
+like = {
+        "actor": {
+            "objectType": "person",
+            "id": "4e6e1243aceee91143000000",
+            "displayName": "javier"
+        },
+        "verb": "like",
+        "object": {
+            "objectType": "note",
+            "id": "4e707f80aceee94f49000002",
+            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
+        },
+    }
