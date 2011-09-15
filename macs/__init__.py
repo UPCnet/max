@@ -30,6 +30,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'macs:static')
     config.add_static_view('css', 'macs:css')
     config.add_static_view('js', 'macs:js')
+    config.add_static_view('fonts', 'macs:static/fonts')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_view('macs.views.login.login', route_name='login',

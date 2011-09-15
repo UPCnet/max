@@ -30,14 +30,32 @@ def profilesView(context, request):
 
     displayName = request.matchdict['displayName']
 
-    user = context.db.users.find_one({'displayName': displayName})
+    userprofile = context.db.users.find_one({'displayName': displayName})
 
-    if not user:
+    current_username = authenticated_userid(request)
+    if not userprofile:
         return HTTPBadRequest('No such user')
 
-    username = authenticated_userid(request)
-    page_title = "%s's Activity Stream" % username
-    # page_title = "Victor's Activity Stream"
+    # Render follow button?
+    if current_username == displayName:
+        showFollowButton = False
+    else:
+        showFollowButton = True
+
+    # Follow status of the current user on the viewed user profile
+    current_user = context.db.users.find_one({'displayName': current_username}, {'following': 1})
+
+    isFollowing = False
+    for following in current_user['following']['items']:
+        if following['_id'] == userprofile['_id']:
+            isFollowing = True
+            break
+
+    followinfo = {'showFollowButton': showFollowButton, 'isFollowing': isFollowing}
+
+    # import ipdb;ipdb.set_trace()
+
+    page_title = "%s's User Profile" % userprofile
     api = TemplateAPI(context, request, page_title)
     aapi = activityAPI(context, request)
-    return dict(api=api, aapi=aapi, user=user)
+    return dict(api=api, aapi=aapi, userprofile=userprofile, followinfo=followinfo)
