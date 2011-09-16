@@ -6,6 +6,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPOk
 import json
 from bson import json_util
 from pymongo.objectid import ObjectId
+from pymongo import DESCENDING
 
 from macs.resources import Root
 from macs.rest.utils import checkQuery, checkIsValidQueryUser, checkRequestConsistency, extractPostData
@@ -56,7 +57,7 @@ def getUserActivity(context, request):
     # Compile the results and forge the resultant collection object
     collection = {}
     activities = []
-    cursor = context.db.activity.find(query).limit(10)
+    cursor = context.db.activity.find(query).sort("_id", DESCENDING).limit(10)
     activities = [activity for activity in cursor]
     collection['totalItems'] = len(activities)
     collection['items'] = activities

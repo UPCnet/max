@@ -7,21 +7,27 @@
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
     <div class="row">
         <div class="cell width-6 position-3">
-            <h1 tal:content="user.displayName">User</h1>
+            <h1 tal:attributes="userid userprofile._id; displayName userprofile.displayName" tal:content="userprofile.displayName">User</h1>
         </div>
     </div>
     <div class="row">
         <div class="cell width-6 position-3">
             <section id="user_properties">
                 <ul>
-                    <li>User ID: <span tal:content="user._id"></span></li>
-                    <li>Following: <span tal:content="user.following['items']"></span></li>
-                    <li>Subscribed to: <span tal:content="user.subscribedTo['items']"></span></li>
+                    <li>User ID: <span tal:content="userprofile._id"></span></li>
+                    <li>Following: <span tal:content="userprofile.following['items']"></span></li>
+                    <li>Subscribed to: <span tal:content="userprofile.subscribedTo['items']"></span></li>
                 </ul>
             </section>
         </div>
     </div>
-
+    <div class="row">
+        <div class="cell width-6 position-3">
+            <button tal:condition="followinfo.showFollowButton"
+                    tal:content="followinfo.isFollowing and 'Unfollow' or 'Follow'"
+                    class="followButton">Follow</button>
+        </div>
+    </div>
 <!--     <div class="row">
         <div class="cell width-6 position-3">
             <div id="activityBoxContainer">

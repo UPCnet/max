@@ -30,6 +30,27 @@ $(document).ready(function() {
         reloadActivity();
     });
 
+    $("button.followButton").toggle(
+        function() {
+            if ($("button.followButton span").text() == 'Follow') {
+                sendFollow();
+                $("button.followButton span").text('Unfollow');                
+            } else {
+                sendUnfollow();
+                $("button.followButton span").text('Follow');               
+            }
+        },
+        function() {
+            if ($("button.followButton span").text() == 'Unfollow') {
+                sendUnfollow();
+                $("button.followButton span").text('Follow');
+            } else {
+                sendFollow();
+                $("button.followButton span").text('Unfollow'); 
+            }
+        }
+    );
+
     // Fill the last activity in the #activityContainer
     timeline_query = {"displayName": username};
 
@@ -38,12 +59,45 @@ $(document).ready(function() {
             data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
-                        // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
-                        $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
-                    }
+                        $.each(data.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
+                        $(".date").easydate(easydateOptions);
+                        $("button").button();
+                        $(".comment").click( function() {
+                            $(this).closest(".activity").find(".newcommentbox").toggle('fold');
+                        });
+                        $("button.sendcomment").click(function() {
+                            comment = {
+                                "actor": {
+                                    "objectType": "person",
+                                    "id": userid,
+                                    "displayName": username
+                                },
+                                "verb": "post",
+                                "object": {
+                                    "objectType": "comment",
+                                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                                    "inReplyTo": [
+                                      {
+                                        "id": "4e6eefc5aceee9210d000004",
+                                      }
+                                    ]
+                                },
+                            }
+                            comment['object']['content'] = $(this).closest(".activity").find(".commentBox").val();
+                            comment['object']['inReplyTo'][0] = {'id': $(this).closest(".activity").attr('activityid')};
+                            alert(comment.toString());
+                            $.ajax({type:'POST',
+                                     url: '/comment',
+                                     data: JSON.stringify(comment),
+                                     contentType: 'application/json; charset=utf-8'
+                                 });
+
+                            $(".activityBox").val("");
+                            reloadActivity();                            
+                        }
+                    )}
     });
-
-
+    
 });
 
 function reloadActivity () {
@@ -55,24 +109,109 @@ function reloadActivity () {
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
                         $('#activityContainer').children().remove();
-                        // $.each(data.items, function(k,v){ $('#activityContainer').prepend('<p>' + JSON.stringify(v) + '</p>') })
-                        $.each(data.items, function(k,v){ $('#activityContainer').prepend(formatActivityStream(v)) })
+                        $.each(data.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
+                        $(".date").easydate(easydateOptions);
+                        $("button").button();
+                        $(".comment").click( function() {
+                            $(this).closest(".activity").find(".newcommentbox").toggle('fold');
+                        });
                     }
     });    
 }
 
 function formatActivityStream (activity) {
     if (activity['verb']=='post') {
-        // alert(activity['actor']['displayName']);
         var user = '<div><span class="user">' + activity['actor']['displayName'] + '</span></div>';
         if (activity['object']['objectType']=='note') {
             var body = '<div><span class="body">' + activity['object']['content'] + '</span></div>';
+        } else if (activity['object']['objectType']=='comment') {
+            var body = '<div><span class="body">' + 'ha comentat l\'activitat (link): ' + activity['object']['content'] + '</span></div>';
         } else {
             var body = '<div><span class="body">' + activity['object'] + '</span></div>';
         }
+
+        if (activity['object'].hasOwnProperty('replies')) {
+            // fer un each i construir la estructura dels comentaris
+            var divcommentsStructure = activity['object']['replies']
+        }
+
         var date = '<div><span class="date">' + activity['published'] + '</span></div>';
-        var divcontent = '<div class="content">' + user + body + date + '</div>';
-        var divdata = '<div class="activity" activityid="' + activity['_id']['$oid'] + '" userid="' + activity['actor']['_id']['$oid'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + '</div>';
+        var divactions = '<div class="actions"><ul><li><a class="comment" href="#">Comentari</a></li><li><a class="like" href="#">M\'agrada</a></li><ul></div>'
+        var divcontent = '<div class="content">' + user + body + divactions + date +'</div>';
+        var divcomments = '<div class="comments"></div><div class="newcommentbox" style="display: none"><div class="commentBoxContainer"><textarea class="commentBox"></textarea></div><div class="button-container"><button class="sendcomment">Envia comentari</button></div></div>'
+        var divdata = '<div class="activity" activityid="' + activity['_id']['$oid'] + '" userid="' + activity['actor']['_id']['$oid'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + divcomments +'</div>';
     }
     return divdata
+}
+
+
+function sendFollow () {
+    follow = {
+        "actor": {
+            "objectType": "person",
+            "id": userid,
+            "displayName": username
+        },
+        "verb": "follow",
+        "object": {
+            "objectType": "person",
+            "id": $("h1").attr("userid"),
+            "displayName": $("h1").attr("displayname")
+        },
+    }
+
+    $.ajax({type:'POST',
+         url: '/follow',
+         data: JSON.stringify(follow),
+         contentType: 'application/json; charset=utf-8'
+     }); 
+}
+
+function sendUnfollow () {
+    unfollow = {
+        "actor": {
+            "objectType": "person",
+            "id": userid,
+            "displayName": username
+        },
+        "verb": "unfollow",
+        "object": {
+            "objectType": "person",
+            "id": $("h1").attr("userid"),
+            "displayName": $("h1").attr("displayname")
+        },
+    }
+
+    $.ajax({type:'POST',
+         url: '/unfollow',
+         data: JSON.stringify(unfollow),
+         contentType: 'application/json; charset=utf-8'
+     });
+}
+
+easydateOptions = {
+    live: false,
+    locale: { 
+        "future_format": "%s %t", 
+        "past_format": "%s %t", 
+        "second": "segon", 
+        "seconds": "segons", 
+        "minute": "minut", 
+        "minutes": "minuts", 
+        "hour": "hora", 
+        "hours": "hores", 
+        "day": "dia", 
+        "days": "dies", 
+        "week": "setmana", 
+        "weeks": "setmanes", 
+        "month": "mes", 
+        "months": "mesos", 
+        "year": "any", 
+        "years": "anys", 
+        "yesterday": "ahir", 
+        "tomorrow": "demà", 
+        "now": "fa un moment", 
+        "ago": "fa",
+        "in": "en" 
+    }
 }
