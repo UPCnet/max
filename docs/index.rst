@@ -16,3 +16,4 @@ Continguts
 
    introduccio.rst
    serialitzacions.rst
+   apirest.rst

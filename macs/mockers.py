@@ -169,9 +169,8 @@ like = {
         },
         "verb": "like",
         "object": {
-            "objectType": "note",
-            "id": "4e707f80aceee94f49000002",
-            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
+            "objectType": "activity",
+            "id": "4e707f80aceee94f49000002"
         },
     }
 
@@ -186,5 +185,4 @@ share = {
         "objectType": "activity",
         "id": "4e6eefc5aceee9210d000004",
     },
-    "published": "2011-02-10T15:04:55Z",
   }

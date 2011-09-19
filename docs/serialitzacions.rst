@@ -98,37 +98,6 @@ Aquest és l'esquema de l'objecte al que fa referència::
         "published": "2011-08-31T13:45:55Z"
     }
 
-Compartir (*share*) una activitat
----------------------------------
-
-L'usuari pot generar una activitat per compartir un altre activitat en cas de que vulgui remarcar o donar rellevància a aquesta activitat concreta. En cas de compartir-la, tots els usuaris que estan subscrits a l'activitat de l'usuari reben reben l'activitat compartida.
-
-Aquest és l'esquema de l'objecte::
-
-  {
-    "actor": {
-        "objectType" : "person",
-        "_id": "4e6e1243aceee91143000000",
-        "displayName": "victor"
-    },
-    "verb": "share",
-    "object" : {
-        "objectType":"activity",
-        "_id": "4e6eefc5aceee9210d000004",
-        "verb": "post",
-        "actor": {
-            "objectType" : "person",
-            "_id": "4e6e1243aceee91143000001",
-            "displayName": "javier"
-        },
-        "object": {
-            "objectType":"note",
-            "content": "Avui sera un gran dia!"
-        }
-    },
-    "published": "2011-02-10T15:04:55Z",
-  }
-
 Seguir (*follow*) a un usuari
 -----------------------------
 
@@ -181,14 +150,14 @@ Cada cop que un usuari es subscriu a un context, es genera una activitat informa
 
     No s'ha pogut trobar un tipus d'objecte més adient que el de "service" per identificar a un context. En tot cas és susceptible de que es pugui determinar un altre més adient en posteriors revisions.
 
-
 Generació d'activitat sota un context
 -------------------------------------
 
 Un usuari pot generar una activitat sota un determinat context o ubicació. Per exemple, en una assignatura o en una carpeta d'un gestor de continguts.
 
-Aleshores, posteriorment, es poden fer peticions de fil d'activitat per context, amb el web service XXX
+Aleshores, posteriorment, es poden fer peticions de fil d'activitat per context, amb el web service ``user_activity``.
 
+Per ara, el sistema no manté una relació única de contexts seguits al sistema. Han de ser els mateixos contexts que han de mantindre una coherència al generar les seves activitats en els portlets, widgets o activitats autogenerades.
 
 Canvi d'estatus d'usuari sota un context
 ----------------------------------------
@@ -213,3 +182,80 @@ Aquesta seria la sintaxi d'aquest tipus d'activitat::
         "published": "2011-09-06T13:45:55Z"
     }
 
+Compartir (*share*) una activitat
+---------------------------------
+
+L'usuari pot generar una activitat per compartir un altre activitat en cas de que vulgui remarcar o donar rellevància a aquesta activitat concreta. En cas de compartir-la, tots els usuaris que estan subscrits a l'activitat de l'usuari reben reben l'activitat compartida.
+
+Aquest és l'esquema de l'objecte::
+
+  {
+    "actor": {
+        "objectType" : "person",
+        "_id": "4e6e1243aceee91143000000",
+        "displayName": "victor"
+    },
+    "verb": "share",
+    "object" : {
+        "objectType":"activity",
+        "_id": "4e6eefc5aceee9210d000004",
+        "verb": "post",
+        "actor": {
+            "objectType" : "person",
+            "_id": "4e6e1243aceee91143000001",
+            "displayName": "javier"
+        },
+        "object": {
+            "objectType":"note",
+            "content": "Avui sera un gran dia!"
+        }
+    },
+    "published": "2011-02-10T15:04:55Z",
+  }
+
+Marcar l'activitat com *m'agrada* (`likes`)
+-------------------------------------------
+
+L'usuari pot fer públic que li agrada una activitat concreta, i fer-ho palés marcant-la com *m'agrada*. Aquesta acció genera una activitat nova i actualitza l'objecte activitat a la que fa referència.
+
+Aquest és l'esquema de l'objecte::
+
+    {
+        "actor": {
+            "objectType": "person",
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "javier"
+        },
+        "verb": "like",
+        "object": {
+            "objectType": "activity",
+            "_id": "4e707f80aceee94f49000002"
+        },
+        "published": "2011-02-10T15:04:55Z",
+    }
+
+Aquest és l'esquema de l'objecte activitat a la que fa referència::
+
+    {
+        "actor": {
+            "objectType" : "person",
+            "_id": "4e6e1243aceee91143000000",
+            "displayName": "victor"
+        },
+        "verb": "post",
+        "object": {
+            "objectType": "note",
+            "content": "Avui sera un gran dia!"
+        },
+        "likes": {
+            "totalItems": 1,
+            "items": [
+                {
+                    "_id":"4e6e1243aceee91143000000",
+                    "objectType": "person",
+                    "displayName": "javier"
+                },
+            ]
+        },
+        "published": "2011-08-31T13:45:55Z"
+    }
