@@ -3,6 +3,10 @@ Introducció ràpida
 
 El sistema utilitza com enmagatzamatge una base de dades orientada a objectes (MongoDB) i conté una interfície REST per accedir a ella. Aquests són els web services que té:
 
+.. note::
+    
+    En l'apartat API REST es detalla més extensament tots els serveis web que te el sistema. Si us plau adreceu-vos a aquest apartat per més informació.
+
 .. http:post:: /activity
     
     http://macs.beta.upcnet.es/activity (via POST)
@@ -26,17 +30,18 @@ A mode d'exemple, aquí teniu aquest script Python que realitza una prova de cà
     t0 = time.time()
     h = httplib2.Http()
     for i in range(1000):
-        data={
+        data = {
             "actor": {
-                "objectType" : "person",
-                "id":"victor"
+                "objectType": "person",
+                "id": "4e6e1243aceee91143000000",
+                "displayName": "victor"
             },
             "verb": "post",
             "object": {
                 "objectType": "note",
                 "content": "Avui sera un gran dia!"
-            }
-        }       
+            },
+        }
         data_json = json.dumps(data)
         h.request("http://%s/activity" % server,
                   "POST",
@@ -62,7 +67,7 @@ Per ara la query només funciona amb una cerca per autor de l'activitat, aquest 
 
     t0 = time.time()
     req = httplib2.Http()
-    data = {'actor.id': 'victor'}
+    data = {'displayName': 'victor'}
     data_json = json.dumps(data)
     resp = req.request("http://%s/user_activity" % server,
               "GET",
