@@ -240,7 +240,7 @@ Marcar l'activitat com *m'agrada* (`likes`)
 Cerques
 -------
 
-.. http:post:: /user_activity
+.. http:get:: /user_activity
 
     Fa una cerca a la base de dades del sistema i retorna tota l'activitat de l'usuari així com l'activitat a la que està subscrit i l'activitat que generen els usuaris als que segueix.
 
@@ -252,7 +252,7 @@ Cerques
             "displayName": "victor"
         }
 
-.. http:post:: /user_activity_by_scope
+.. http:get:: /user_activity_by_scope
 
     Fa una cerca a la base de dades del sistema i retorna tota l'activitat de l'usuari dins dels contexts especificats. No es retorna ni l'activitat a la que està subscrit ni l'activitat que generen els usuaris als que segueix.
 
