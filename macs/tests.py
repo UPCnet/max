@@ -47,6 +47,18 @@ class TestMacsREST(unittest.TestCase):
         from macs.resources import Root
         return Root(request)
 
+    def test_addUser(self):
+        from macs.rest.admin import addUser
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+        data = {'displayName': 'ferran'}
+        data_json = json.dumps(data)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = addUser(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
     def test_getUserActivity(self):
         from macs.rest.query import getUserActivity
         request = DummyRequestREST()

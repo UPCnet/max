@@ -267,3 +267,16 @@ Cerques
                 'http://atenea.upc.edu/123123', 'http://atenea.upc.edu/456456'
                 ]
         }
+
+Creació d'un usuari del sistema
+-------------------------------
+
+.. http:post:: /add_user
+    
+    Crea un usuari remotament al sistema pel seu posterior us. Retorna l'id únic de l'usuari al sistema en format JSON.
+
+    :query displayName: (Requerit) L'identificador del nou usuari al sistema.
+
+    Retorna un objecte JSON amb l'id de l'usuari::
+
+        {"$oid": "4e7b1d79aceee94bbd000009"}

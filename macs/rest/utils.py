@@ -141,6 +141,11 @@ def checkDataShare(data):
         raise
 
 
+def checkDataAddUser(data):
+    if not 'displayName' in data:
+        raise
+
+
 def checkIsValidUser(context, data):
     """ Do additional check about the content of the data (eg: 'author' is a valid system username) """
 

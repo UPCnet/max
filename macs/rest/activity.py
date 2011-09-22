@@ -1,5 +1,4 @@
 from pyramid.view import view_config
-from pyramid.response import Response
 
 from pyramid.httpexceptions import HTTPBadRequest, HTTPOk
 
@@ -12,7 +11,6 @@ from macs.rest.utils import checkIsValidRepliedActivity, checkIsValidUser, check
 
 import time
 from rfc3339 import rfc3339
-from copy import deepcopy
 
 
 @view_config(context=Root, request_method='POST', name="activity")
