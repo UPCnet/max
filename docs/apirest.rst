@@ -271,9 +271,9 @@ Cerques
 Creació d'un usuari del sistema
 -------------------------------
 
-.. http:post:: /add_user
+.. http:post:: /user
     
-    Crea un usuari remotament al sistema pel seu posterior us. Retorna l'id únic de l'usuari al sistema en format JSON.
+    Si no existeix l'usuari especificats als paràmetres, crea un usuari remotament al sistema pel seu posterior us i retorna l'id únic de l'usuari al sistema en format JSON. Si ja existeix, només retorna l'id de l'usuari especificat.
 
     :query displayName: (Requerit) L'identificador del nou usuari al sistema.
 

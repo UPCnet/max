@@ -26,16 +26,22 @@ def addUser(context, request):
     except:
         return HTTPBadRequest()
 
-    newuser = {'displayName': data['displayName'],
-               'last_login': datetime.datetime.now(),
-               'following': {'items': [], },
-               'subscribedTo': {'items': [], }
-               }
+    result = context.db.users.find_one({'displayName': data['displayName']}, {'_id': 1})
 
-    # Insert user in the database
-    userid = context.db.users.insert(newuser)
+    if not result:
+        # Create the new user
+        newuser = {'displayName': data['displayName'],
+                   'last_login': datetime.datetime.now(),
+                   'following': {'items': [], },
+                   'subscribedTo': {'items': [], }
+                   }
+        # Insert user in the database
+        userid = context.db.users.insert(newuser)
+    else:
+        # Return the id of the already existing user
+        userid = result['_id']
+
     userid = json.dumps(userid, default=json_util.default)
     response = Response(userid)
-    print response
     response.content_type = 'application/json'
     return response
