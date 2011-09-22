@@ -68,7 +68,7 @@ class TestMacsREST(unittest.TestCase):
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
 
-    def test_getUserActivityWithContext(self):
+    def test_getUserActivityWithScope(self):
         from macs.rest.query import getUserActivity
         request = DummyRequestREST()
         root = self._makeOne(request)
@@ -83,6 +83,19 @@ class TestMacsREST(unittest.TestCase):
         request.content_type = 'application/json'
         request.body = data_json
         result = getUserActivity(root, request)
+        self.assertEqual(result.status, '200 OK')
+        self.assertTrue(isinstance(result.body, str))
+
+    def test_getUserActivityByScope(self):
+        from macs.rest.query import getUserActivityByScope
+        request = DummyRequestREST()
+        root = self._makeOne(request)
+
+        data = {'displayName': 'javier', 'scopes': ['http://atenea.upc.edu/123123', 'http://atenea.upc.edu/456456']}
+        data_json = json.dumps(data)
+        request.content_type = 'application/json'
+        request.body = data_json
+        result = getUserActivityByScope(root, request)
         self.assertEqual(result.status, '200 OK')
         self.assertTrue(isinstance(result.body, str))
 

@@ -236,3 +236,34 @@ Marcar l'activitat com *m'agrada* (`likes`)
                 "id": "4e707f80aceee94f49000002"
             },
         }
+
+Cerques
+-------
+
+.. http:post:: /user_activity
+
+    Fa una cerca a la base de dades del sistema i retorna tota l'activitat de l'usuari així com l'activitat a la que està subscrit i l'activitat que generen els usuaris als que segueix.
+
+    :query displayName: (Requerit) L'identificador de l'usuari al sistema.
+
+    Exemple::
+        
+        query = {
+            "displayName": "victor"
+        }
+
+.. http:post:: /user_activity_by_scope
+
+    Fa una cerca a la base de dades del sistema i retorna tota l'activitat de l'usuari dins dels contexts especificats. No es retorna ni l'activitat a la que està subscrit ni l'activitat que generen els usuaris als que segueix.
+
+    :query displayName: (Requerit) L'identificador de l'usuari al sistema.
+    :query scopes: (Requerit) Els identificadors dels contexts sobre els que es vol fer la consulta.
+
+    Exemple::
+        
+        query = {
+            "displayName": "victor",
+            "scopes": [
+                'http://atenea.upc.edu/123123', 'http://atenea.upc.edu/456456'
+                ]
+        }
