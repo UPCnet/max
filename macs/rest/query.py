@@ -95,7 +95,7 @@ def getUserActivityByScope(context, request):
 
     # The query has to have this syntax {'$or': [{'actor.displayName': 'victor'}, {'actor.displayName': 'javier'}] }
     query = {'$or': []}
-    query['$or'].append({'actor._id': user['_id']})
+    query['actor._id'] = user['_id']
 
     # Add the activity of the people that the user follows
     for scope in data['scopes']:

@@ -32,6 +32,10 @@ class TestMacsREST(unittest.TestCase):
         self.user1 = root.db.users.insert(demouser1)
         self.user2 = root.db.users.insert(demouser2)
 
+        # Put the 'real' id with the user mock object as would be sent
+        demostatus['actor']['_id'] = self.user1
+        demostatus_with_context['actor']['_id'] = self.user1
+
         self.activity = root.db.activity.insert(demostatus)
         self.activityContext = root.db.activity.insert(demostatus_with_context)
 
@@ -103,7 +107,7 @@ class TestMacsREST(unittest.TestCase):
         request = DummyRequestREST()
         root = self._makeOne(request)
 
-        data = {'displayName': 'javier', 'scopes': ['http://atenea.upc.edu/123123', 'http://atenea.upc.edu/456456']}
+        data = {'displayName': 'victor', 'scopes': ['http://atenea.upc.edu/introcomp', 'http://atenea.upc.edu/456456']}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json
