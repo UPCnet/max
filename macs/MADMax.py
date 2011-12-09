@@ -9,7 +9,7 @@ class MADMaxCollection(object):
         Wrapper for accessing collections
     """
 
-    def __init__(self,collection,query_key='_id'):
+    def __init__(self,collection,query_key='_id',field_filter=None):
         """
             Wrapper for accessig a collection. Acces to items can be performed dict-like using "_id" as
             key for finding items, or any field specified in "query_key". Anything passed in query_key must have unique values
@@ -17,6 +17,12 @@ class MADMaxCollection(object):
         """
         self.collection = collection
         self.query_key = query_key
+        self.show_fields = field_filter
+
+    def setVisibleResultFields(self, fields):
+        """
+        """
+        self.show_fields = dict([(fieldname,1) for fieldname in fields])
 
     def _getQuery(self,itemID):
         """
@@ -35,7 +41,7 @@ class MADMaxCollection(object):
         """
         query = {}
         query[fieldname]=value
-        cursor = self.collection.find(query)
+        cursor = self.collection.find(query,self.show_fields)
         #unpack the lazy cursor
         return [result for result in cursor]
         
@@ -44,7 +50,7 @@ class MADMaxCollection(object):
             Returns an unique item of the collection
         """
         query = self._getQuery(itemID)
-        return self.collection.find_one(query)
+        return self.collection.find_one(query,self.show_fields)
 
     def __getattr__(self,name):
         """
