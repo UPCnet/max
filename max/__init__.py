@@ -1,5 +1,5 @@
 from pyramid.config import Configurator
-from sqlalchemy import engine_from_config
+# from sqlalchemy import engine_from_config
 
 from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
@@ -7,7 +7,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 
 from max.resources import Root
 
-from max.models import appmaker
+# from max.models import appmaker
 
 
 def main(global_config, **settings):
