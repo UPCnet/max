@@ -13,8 +13,9 @@ Canvi d'estat
     Genera una activitat en el sistema. Els objectes d'aquesta activitat són els especificats en el protocol activitystrea.ms.
 
 
-    :query verb: (Requerit) Per ara només suportat el verb ``post``
     :query actor: (Requerit) Objecte diccionari. Ha de contindre les claus ``id`` i ``displayName``, i com a opcional, determinar el tipus d'objecte (``objectType``) i sent un usuari el valor serpa `person`.
+    :query verb: (Requerit) Per ara només suportat el verb ``post``
+    :query target: (Opcional) Per fer que una activitat estigui associada a un context determinat fa falta que enviem l'objecte target, indicant com a (``objectType``) el tipus 'service', i les dades del context com a l'exemple.
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``) `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot tractar-se d'un camp codificat amb HTML.
 
     Tipus d'activitat suportats:
@@ -37,6 +38,11 @@ Canvi d'estat
                 "displayName": "victor"
             },
             "verb": "post",
+            "target": {
+                "objectType": "service",
+                "displayName": "Introduccio als computadors",
+                "url": "http://atenea.upc.edu/introcomp"
+            },            
             "object": {
                 "objectType": "note",
                 "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
@@ -271,7 +277,7 @@ Cerques
 Creació d'un usuari del sistema
 -------------------------------
 
-.. http:post:: /user
+.. http:post:: /add_user
     
     Si no existeix l'usuari especificats als paràmetres, crea un usuari remotament al sistema pel seu posterior us i retorna l'id únic de l'usuari al sistema en format JSON. Si ja existeix, només retorna l'id de l'usuari especificat.
 
