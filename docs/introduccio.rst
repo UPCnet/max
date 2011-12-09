@@ -9,7 +9,7 @@ El sistema utilitza com enmagatzamatge una base de dades orientada a objectes (M
 
 .. http:post:: /activity
     
-    http://macs.beta.upcnet.es/activity (via POST)
+    http://max.beta.upcnet.es/activity (via POST)
 
     Permet la creació de un objecte nou en la BBDD amb el format activitystrea.ms (http://activitystrea.ms/specs/json/1.0/).
     De fet, a hores d'ara permet la creació de qualsevol objecte JSON (en un futur hauria de permetre només objectes que complissin la especificació activitystrea.ms).
@@ -23,7 +23,7 @@ A mode d'exemple, aquí teniu aquest script Python que realitza una prova de cà
     import time
     import datetime
 
-    server = 'macs.beta.upcnet.es'
+    server = 'max.beta.upcnet.es'
     # server = 'capricornius2.upc.es'
     # server = 'localhost:6543'
 
@@ -51,7 +51,7 @@ A mode d'exemple, aquí teniu aquest script Python que realitza una prova de cà
 
 .. http:get:: /user_activity
 
-    http://macs.beta.upcnet.es/user_activity (via GET)
+    http://max.beta.upcnet.es/user_activity (via GET)
 
     Pren un objecte JSON amb el contingut de la consulta a realitzar i retorna un objecte JSON, amb tots els resultats de la query especificada en el request.
 
@@ -61,7 +61,7 @@ Per ara la query només funciona amb una cerca per autor de l'activitat, aquest 
     import json
     import time
 
-    server = 'macs.beta.upcnet.es'
+    server = 'max.beta.upcnet.es'
     # server = 'capricornius2.upc.es'
     # server = 'localhost:6543'
 

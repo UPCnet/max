@@ -8,8 +8,8 @@ from bson import json_util
 from pymongo.objectid import ObjectId
 from pymongo import DESCENDING
 
-from macs.resources import Root
-from macs.rest.utils import checkQuery, checkIsValidQueryUser, checkRequestConsistency, extractPostData
+from max.resources import Root
+from max.rest.utils import checkQuery, checkIsValidQueryUser, checkRequestConsistency, extractPostData
 
 import time
 from rfc3339 import rfc3339

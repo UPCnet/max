@@ -25,7 +25,7 @@
 
   <!-- CSS: implied media="all" -->
   <link rel="stylesheet" href="css/style.css?v=2">
-  <link rel="stylesheet" href="css/macs.css">
+  <link rel="stylesheet" href="css/max.css">
   <link rel="stylesheet" href="css/cupertino/jquery-ui-1.8.16.custom.css" />
   <link rel="stylesheet" href="css/decogrids-16.css">
     

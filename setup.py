@@ -11,8 +11,6 @@ requires = [
     'pyramid',
     'pyramid_tm',
     'pyramid_debugtoolbar',
-    'sqlalchemy',
-    'zope.sqlalchemy',
     'pyramid_who',
     'pymongo',
     'rfc3339',
@@ -21,9 +19,9 @@ requires = [
 if sys.version_info[:3] < (2,5,0):
     requires.append('pysqlite')
 
-setup(name='macs',
+setup(name='max',
       version='0.0',
-      description='macs',
+      description='Extended Activity Stream and Subscriptions Engine (Motor extes d\'activitat i subscripcions)',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
@@ -40,10 +38,10 @@ setup(name='macs',
       zip_safe=False,
       install_requires = requires,
       tests_require = requires,
-      test_suite="macs",
+      test_suite="max",
       entry_points = """\
       [paste.app_factory]
-      main = macs:main
+      main = max:main
       """,
       paster_plugins=['pyramid'],
       )

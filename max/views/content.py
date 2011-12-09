@@ -4,8 +4,8 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from pyramid.security import authenticated_userid
 
-from macs.resources import Root
-from macs.views.api import TemplateAPI, activityAPI
+from max.resources import Root
+from max.views.api import TemplateAPI, activityAPI
 
 from bson.objectid import ObjectId
 
@@ -25,7 +25,7 @@ def activityView(context, request):
     return Response(str(activity))
 
 
-@view_config(route_name='profiles', renderer='macs:templates/profile.pt', permission='restricted')
+@view_config(route_name='profiles', renderer='max:templates/profile.pt', permission='restricted')
 def profilesView(context, request):
 
     displayName = request.matchdict['displayName']

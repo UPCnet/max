@@ -4,7 +4,7 @@ import time
 import datetime
 
 # server = 'capricornius2.upc.es'
-# server = 'macs.beta.upcnet.es'
+# server = 'max.beta.upcnet.es'
 server = 'localhost:6543'
 
 t0 = time.time()

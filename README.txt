@@ -1,1 +1,1 @@
-macs README
+max README

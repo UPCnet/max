@@ -6,7 +6,7 @@
 # Un usuari de demo1
 demouser1 = {
     'displayName': 'victor',
-    'url': 'http://macs.upc.edu/profiles/victor',
+    'url': 'http://max.upc.edu/profiles/victor',
     'objectType': 'person',
     'following': {
         'totalItems': 0,
@@ -21,7 +21,7 @@ demouser1 = {
 # Un usuari de demo2
 demouser2 = {
     'displayName': 'javier',
-    'url': 'http://macs.upc.edu/profiles/javier',
+    'url': 'http://max.upc.edu/profiles/javier',
     'objectType': 'person',
     'following': {
         'totalItems': 0,

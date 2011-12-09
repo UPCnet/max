@@ -1,7 +1,7 @@
 Serialitzacions i estructures JSON en base de dades
 ===================================================
 
-En aquest document s'exposa una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles utilitzades en MACS.
+En aquest document s'exposa una llista, a mode de manual de referència, de totes les serialitzacions JSON possibles utilitzades en max.
 
 .. note::
 

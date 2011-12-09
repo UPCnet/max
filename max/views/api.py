@@ -10,7 +10,7 @@ class TemplateAPI(object):
 
     @property
     def masterTemplate(self):
-        master = get_renderer('macs:templates/master.pt').implementation()
+        master = get_renderer('max:templates/master.pt').implementation()
         return master
 
     @property
@@ -22,7 +22,7 @@ class TemplateAPI(object):
     @property
     def snippets(self):
         if self._snippets is None:
-            self._snippets = get_renderer('macs:templates/snippets.pt').implementation()
+            self._snippets = get_renderer('max:templates/snippets.pt').implementation()
         return self._snippets
 
     _status_message = None

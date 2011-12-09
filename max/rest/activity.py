@@ -6,8 +6,8 @@ import json
 from bson import json_util
 from pymongo.objectid import ObjectId
 
-from macs.resources import Root
-from macs.rest.utils import checkIsValidRepliedActivity, checkIsValidUser, checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
+from max.resources import Root
+from max.rest.utils import checkIsValidRepliedActivity, checkIsValidUser, checkDataActivity, checkDataComment, checkRequestConsistency, extractPostData
 
 import time
 from rfc3339 import rfc3339

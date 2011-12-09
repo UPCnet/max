@@ -5,9 +5,9 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from macs.resources import Root
+from max.resources import Root
 
-from macs.models import appmaker
+from max.models import appmaker
 
 
 def main(global_config, **settings):
@@ -27,22 +27,22 @@ def main(global_config, **settings):
                           session_factory=my_session_factory,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
-    config.add_static_view('static', 'macs:static')
-    config.add_static_view('css', 'macs:css')
-    config.add_static_view('js', 'macs:js')
-    config.add_static_view('fonts', 'macs:static/fonts')
+    config.add_static_view('static', 'max:static')
+    config.add_static_view('css', 'max:css')
+    config.add_static_view('js', 'max:js')
+    config.add_static_view('fonts', 'max:static/fonts')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
-    config.add_view('macs.views.login.login', route_name='login',
-                     renderer='macs:templates/login.pt')
-    config.add_view('macs.views.login.logout', route_name='logout')
-    config.add_view('macs.views.login.login',
+    config.add_view('max.views.login.login', route_name='login',
+                     renderer='max:templates/login.pt')
+    config.add_view('max.views.login.logout', route_name='logout')
+    config.add_view('max.views.login.login',
                     context='pyramid.httpexceptions.HTTPForbidden',
-                    renderer='macs:templates/login.pt')
+                    renderer='max:templates/login.pt')
 
     config.add_route('activity', '/activity/{id}')
     config.add_route('profiles', '/profiles/{displayName}')
 
-    config.scan('macs')
+    config.scan('max')
 
     return config.make_wsgi_app()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# MACS documentation build configuration file, created by
+# max documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug 30 13:52:33 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'MACS'
+project = u'max'
 copyright = u'2011, UPCnet, SL'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MACSdoc'
+htmlhelp_basename = 'maxdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +178,7 @@ htmlhelp_basename = 'MACSdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'MACS.tex', u'MACS Documentation',
+  ('index', 'max.tex', u'max Documentation',
    u'UPCnet, SL', 'manual'),
 ]
 
@@ -211,6 +211,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'macs', u'MACS Documentation',
+    ('index', 'max', u'max Documentation',
      [u'UPCnet, SL'], 1)
 ]

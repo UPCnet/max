@@ -7,7 +7,7 @@ import pymongo
 import json
 from bson import json_util
 
-from macs.mockers import demostatus_with_context, demostatus, demouser1, demouser2
+from max.mockers import demostatus_with_context, demostatus, demouser1, demouser2
 
 
 class DummyRequestREST(DummyRequest):
@@ -22,7 +22,7 @@ class DummyRequestREST(DummyRequest):
 testSettings = {'mongodb.url': 'mongodb://localhost', 'mongodb.db_name': 'testDB'}
 
 
-class TestMacsREST(unittest.TestCase):
+class TestmaxREST(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(settings=testSettings)
 
@@ -48,11 +48,11 @@ class TestMacsREST(unittest.TestCase):
         testing.tearDown()
 
     def _makeOne(self, request):
-        from macs.resources import Root
+        from max.resources import Root
         return Root(request)
 
     def test_addUser(self):
-        from macs.rest.admin import addUser
+        from max.rest.admin import addUser
         request = DummyRequestREST()
         root = self._makeOne(request)
         data = {'displayName': 'ferran'}
@@ -64,7 +64,7 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_getUserActivity(self):
-        from macs.rest.query import getUserActivity
+        from max.rest.query import getUserActivity
         request = DummyRequestREST()
         root = self._makeOne(request)
         data = {'displayName': 'victor'}
@@ -76,7 +76,7 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_getUserActivityQuery(self):
-        from macs.rest.query import getUserActivity
+        from max.rest.query import getUserActivity
         request = DummyRequestREST(params={'displayName': 'victor'})
         root = self._makeOne(request)
         request.content_type = 'application/json'
@@ -85,7 +85,7 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_getUserActivityWithScope(self):
-        from macs.rest.query import getUserActivity
+        from max.rest.query import getUserActivity
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -103,7 +103,7 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_getUserActivityByScope(self):
-        from macs.rest.query import getUserActivityByScope
+        from max.rest.query import getUserActivityByScope
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -116,8 +116,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_addActivity(self):
-        from macs.rest.activity import addActivity
-        from macs.mockers import user_status
+        from max.rest.activity import addActivity
+        from max.mockers import user_status
         request = DummyRequestREST()
         root = self._makeOne(request)
         data = user_status
@@ -134,8 +134,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_addComment(self):
-        from macs.rest.activity import addComment
-        from macs.mockers import user_comment
+        from max.rest.activity import addComment
+        from max.mockers import user_comment
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -160,8 +160,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_Follow(self):
-        from macs.rest.subscriptions import Follow
-        from macs.mockers import follow
+        from max.rest.subscriptions import Follow
+        from max.mockers import follow
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -180,8 +180,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_unFollow(self):
-        from macs.rest.subscriptions import unFollow
-        from macs.mockers import unfollow
+        from max.rest.subscriptions import unFollow
+        from max.mockers import unfollow
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -200,8 +200,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_followContext(self):
-        from macs.rest.subscriptions import followContext
-        from macs.mockers import follow_context
+        from max.rest.subscriptions import followContext
+        from max.mockers import follow_context
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -219,8 +219,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_unfollowContext(self):
-        from macs.rest.subscriptions import unFollowContext
-        from macs.mockers import unfollow_context
+        from max.rest.subscriptions import unFollowContext
+        from max.mockers import unfollow_context
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -238,8 +238,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_Like(self):
-        from macs.rest.ratings import Like
-        from macs.mockers import like
+        from max.rest.ratings import Like
+        from max.mockers import like
         request = DummyRequestREST()
         root = self._makeOne(request)
 
@@ -258,8 +258,8 @@ class TestMacsREST(unittest.TestCase):
         self.assertTrue(isinstance(result.body, str))
 
     def test_Share(self):
-        from macs.rest.share import Share
-        from macs.mockers import share
+        from max.rest.share import Share
+        from max.mockers import share
         request = DummyRequestREST()
         root = self._makeOne(request)
 

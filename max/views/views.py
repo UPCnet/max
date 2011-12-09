@@ -5,11 +5,11 @@ from pyramid.security import authenticated_userid
 
 import pymongo
 
-from macs.resources import Root
-from macs.views.api import TemplateAPI, activityAPI
+from max.resources import Root
+from max.views.api import TemplateAPI, activityAPI
 
 
-@view_config(context=Root, renderer='macs:templates/activityStream.pt', permission='restricted')
+@view_config(context=Root, renderer='max:templates/activityStream.pt', permission='restricted')
 def rootView(context, request):
 
     username = authenticated_userid(request)
@@ -19,7 +19,7 @@ def rootView(context, request):
     return dict(api=api, aapi=aapi)
 
 
-@view_config(name='js_variables.js', context=Root, renderer='macs:templates/js_variables.js.pt', permission='restricted')
+@view_config(name='js_variables.js', context=Root, renderer='max:templates/js_variables.js.pt', permission='restricted')
 def js_variables(context, request):
 
     username = authenticated_userid(request)
