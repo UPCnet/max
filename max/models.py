@@ -1,20 +1,6 @@
 import time
 from rfc3339 import rfc3339
 
-class Activity(MADBase):
-    
-    collection = 'activity'
-
-    schema = [
-                'actor',
-                'verb',
-                'object'
-            ]
-
-    def __init__(self, *args, **kwargs):
-        self['published'] = rfc3339(time.time())
-        self.update(*args, **kwargs)
-
 class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
     schema = []
@@ -27,7 +13,7 @@ class MADBase(dict):
         return val
 
     def __setitem__(self, key, val):
-        if key in schema:
+        if key in self.schema:
             dict.__setitem__(self, key, val)
         else:
             raise AttributeError
@@ -46,6 +32,21 @@ class MADBase(dict):
     def __getattr__(self, key):
         return self.__getitem__(key)
 
+class Activity(MADBase):
+    
+    collection = 'activity'
+
+    schema = [
+                '_id',
+                'actor',
+                'verb',
+                'object',
+                'published'
+            ]
+
+    def __init__(self, *args, **kwargs):
+        self['published'] = rfc3339(time.time())
+        self.update(*args, **kwargs)
 
 # import transaction
 

@@ -37,7 +37,6 @@ demouser2 = {
 demostatus = {
     "actor": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000000",
         "displayName": "victor"
     },
     "verb": "post",
@@ -51,7 +50,6 @@ demostatus = {
 demostatus_with_context = {
     "actor": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000000",
         "displayName": "victor"
     },
     "verb": "post",

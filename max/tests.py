@@ -32,7 +32,8 @@ class TestmaxREST(unittest.TestCase):
         self.user1 = root.db.users.insert(demouser1)
         self.user2 = root.db.users.insert(demouser2)
 
-        # Put the 'real' id with the user mock object as would be sent
+        # Substitute the test 'real' id of the test user
+        # to fake the request as would be sent
         demostatus['actor']['_id'] = self.user1
         demostatus_with_context['actor']['_id'] = self.user1
 
