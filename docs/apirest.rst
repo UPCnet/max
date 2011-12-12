@@ -34,7 +34,6 @@ Canvi d'estat
         user_status = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "victor"
             },
             "verb": "post",
@@ -65,7 +64,6 @@ Comentaris
         user_comment = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "javier"
             },
             "verb": "post",
@@ -96,13 +94,11 @@ Seguir (*follow*) a un usuari
         follow = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "victor"
             },
             "verb": "follow",
             "object": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000001",
                 "displayName": "javier"
             },
         }
@@ -124,13 +120,11 @@ Deixar de seguir (*unfollow*) a un usuari
         unfollow = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "victor"
             },
             "verb": "unfollow",
             "object": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000001",
                 "displayName": "javier"
             },
         }
@@ -153,13 +147,11 @@ Subscripció a un context
         follow_context = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "victor"
             },
             "verb": "follow",
             "object": {
                 "objectType": "service",
-                "displayName": "Introduccio als computadors",
                 "url": "http://atenea.upc.edu/introcomp"
             },
         }
@@ -180,13 +172,11 @@ Eliminar la subscripció a un context
         unfollow_context = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "victor"
             },
             "verb": "unfollow",
             "object": {
                 "objectType": "service",
-                "displayName": "Introduccio als computadors",
                 "url": "http://atenea.upc.edu/introcomp"
             },
         }
@@ -207,7 +197,6 @@ Compartir (*share*) una activitat
         share = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "javier"
             },
             "verb": "share",
@@ -233,7 +222,6 @@ Marcar l'activitat com *m'agrada* (`likes`)
         like = {
             "actor": {
                 "objectType": "person",
-                "id": "4e6e1243aceee91143000000",
                 "displayName": "javier"
             },
             "verb": "like",
