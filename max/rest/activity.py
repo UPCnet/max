@@ -25,20 +25,11 @@ def addActivity(context, request):
     try:
         checkDataActivity(data)
         checkIsValidUser(context, data)
+
     except:
         return HTTPBadRequest()
 
-    newactivity = Activity({'actor': {
-                                'objectType': 'person',
-                                '_id': ObjectId(data['actor']['id']),
-                                'displayName': data['actor']['displayName']
-                                },
-                            'verb': 'post',
-                            'object': {
-                                'objectType': 'note',
-                                'content': data['object']['content']
-                                }
-                            })
+    newactivity = Activity(request)
 
     # # Once verified the id of the user, convert the userid to an ObjectId
     # data['actor']['_id'] = ObjectId(data['actor']['id'])
@@ -49,7 +40,8 @@ def addActivity(context, request):
     # data['published'] = published
 
     # Insert activity in the database
-    context.db[newactivity.collection].insert(newactivity)
+
+    newactivity.insert()
     return HTTPOk()
 
 
@@ -68,22 +60,22 @@ def addComment(context, request):
     except:
         return HTTPBadRequest()
 
-    newactivity = Activity({'actor': {
-                                'objectType': 'person',
-                                '_id': ObjectId(data['actor']['id']),
-                                'displayName': data['actor']['displayName']
-                                },
-                            'verb': 'post',
-                            'object': {
-                                'objectType': 'comment',
-                                'content': data['object']['content'],
-                                'inReplyTo': [
-                                              {
-                                                "_id": ObjectId(data['object']['inReplyTo'][0]['id']),
-                                              }
-                                            ]
-                                }
-                            })
+  #  newactivity = Activity({'actor': {
+  #                              'objectType': 'person',
+  #                              '_id': ObjectId(data['actor']['id']),
+  #                              'displayName': data['actor']['displayName']
+  #                              },
+  #                          'verb': 'post',
+  #                          'object': {
+  #                              'objectType': 'comment',
+  #                              'content': data['object']['content'],
+  #                              'inReplyTo': [
+  #                                            {
+  #                                              "_id": ObjectId(data['object']['inReplyTo'][0]['id']),
+  #                                            }
+  #                                          ]
+  #                              }
+  #                          })
 
     # Once verified the id of the user, convert the userid to an ObjectId
     # data['actor']['_id'] = ObjectId(data['actor']['id'])
@@ -107,13 +99,12 @@ def addComment(context, request):
         "_id": data['_id'],
         "objectType": "comment",
         "author": {
-            "id": data['actor']['_id'],
+            "id": data['actor']['id'],
             "displayName": data['actor']['displayName']
         },
         "content": data['object']['content'],
     }
 
-    # import ipdb; ipdb.set_trace( )
     context.db.activity.update(data['object']['inReplyTo'][0],
                                 {
                                     '$push': {'object.replies.items': comment},

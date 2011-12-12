@@ -1,9 +1,13 @@
 import time
 from rfc3339 import rfc3339
+from max.rest.utils import extractPostData
+from pymongo.objectid import ObjectId
 
 class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
+
     schema = []
+    attrs = ['collection','mdb_collection']        
 
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
@@ -13,7 +17,7 @@ class MADBase(dict):
         return val
 
     def __setitem__(self, key, val):
-        if key in self.schema:
+        if key in self.schema or key in self.attrs:
             dict.__setitem__(self, key, val)
         else:
             raise AttributeError
@@ -32,10 +36,31 @@ class MADBase(dict):
     def __getattr__(self, key):
         return self.__getitem__(key)
 
+    def keys(self):
+        """
+        Returns the used keys from the dict, filtering out MadBase class attributes
+        defined in __ini
+        """
+        return [key for key in dict.keys(self) if key not in self.attrs]
+
+
+    def cleanDict(self):
+        """
+        Returns a dict cleaning out MADBase class properties, 
+        leaving only filled-in schema keys
+        """
+        return dict([(key,self[key]) for key in self.keys()])        
+
+    def insert(self):
+        """
+        Inserts the item into his collection
+        """
+        self.mdb_collection.insert(self.cleanDict())
+
+
 class Activity(MADBase):
     
     collection = 'activity'
-
     schema = [
                 '_id',
                 'actor',
@@ -44,9 +69,34 @@ class Activity(MADBase):
                 'published'
             ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request, *args, **kwargs):
+        self.mdb_collection = request.context.db[self.collection]
         self['published'] = rfc3339(time.time())
-        self.update(*args, **kwargs)
+        self.buildObject(extractPostData(request))
+
+    def buildObject(self,data):
+        """
+        Updates the dict contentwith the activity structure, 
+        with data from the request
+        """
+        ob =  {'actor': {
+                    'objectType': 'person',
+                    '_id': ObjectId(data['actor']['id']),
+                    'displayName': data['actor']['displayName']
+                    },
+                'verb': 'post',
+                'object': {
+                    'objectType': 'note',
+                    'content': data['object']['content']
+                    }
+                }
+        self.update(ob)
+        
+    def addComment(self,object):
+        """
+        """
+        pass
+
 
 # import transaction
 
