@@ -147,14 +147,15 @@ def checkDataAddUser(data):
 
 
 def checkIsValidUser(context, data):
-    """ Do additional check about the content of the data (eg: 'author' is a valid system username) """
+    """Searches a user by displayName in the db and returns its id if found. 
+       Do additional check about the content of the data (eg: 'author' is a valid system username) """
 
     username = data['actor']['displayName']
-    userid = ObjectId(data['actor']['id'])
+    #userid = ObjectId(data['actor']['id'])
 
-    result = context.db.users.find_one({'_id': userid}, {'displayName': 1})
-
-    if result.get('displayName') == username:
+    result = context.db.users.find_one({'displayName': username}, {'displayName': 1})
+    if result:
+        data['actor']['id'] = result.get('_id')
         return True
     else:
         raise
@@ -189,19 +190,25 @@ def checkIsValidRepliedActivity(context, data):
 def checkAreValidFollowUsers(context, data):
     """ Check if both users follower and following are valid system users """
     follower = data['actor']['displayName']
-    followerid = ObjectId(data['actor']['id'])
+    #followerid = ObjectId(data['actor']['id'])
 
     following = data['object']['displayName']
-    followingid = ObjectId(data['object']['id'])
+    #followingid = ObjectId(data['object']['id'])
 
     # Same user, can't follow yourself, abort
     if follower == following:
         raise
 
-    result_follower = context.db.users.find_one({'_id': followerid}, {'displayName': 1})
-    result_following = context.db.users.find_one({'_id': followingid}, {'displayName': 1})
+    result_follower = context.db.users.find_one({'displayName': follower}, {'displayName': 1})
+    result_following = context.db.users.find_one({'displayName': following}, {'displayName': 1})
 
-    if result_follower.get('displayName') == follower and result_following.get('displayName') == following:
+    if result_follower and result_following:
+        data['actor']['id'] = result_follower.get('_id')
+        data['object']['id'] = result_following.get('_id')
         return True
     else:
         raise
+#    if result_follower.get('displayName') == follower and result_following.get('displayName') == following:
+#        return True
+#    else:
+#        raise
