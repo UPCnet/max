@@ -19,9 +19,9 @@ class MADBase(dict):
 
     def __setitem__(self, key, val):
         """
-        Allow only keys defined in schema to be inserted in the dict
+        Allow only fields defined in schema to be inserted in the dict
         """
-        if key in self.schema:
+        if key in self.schema.keys():
             dict.__setitem__(self, key, val)
         else:
             raise AttributeError
@@ -60,13 +60,14 @@ class MADBase(dict):
 class Activity(MADBase):
     
     collection = 'activity'
-    schema = [
-                '_id',
-                'actor',
-                'verb',
-                'object',
-                'published'
-            ]
+    schema = {
+                '_id':       dict(required=1),
+                'actor':     dict(required=1),
+                'verb':      dict(required=1),
+                'object':    dict(required=1),
+                'published': dict(required=1),
+                'target':    dict(required=0),
+             }
 
     def __init__(self, request, *args, **kwargs):
         self.mdb_collection = request.context.db[self.collection]
@@ -89,6 +90,9 @@ class Activity(MADBase):
                     'content': data['object']['content']
                     }
                 }
+        if 'target' in data:
+            ob['target'] = data['target']
+
         self.update(ob)
         
     def addComment(self,object):
