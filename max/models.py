@@ -7,7 +7,8 @@ class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
 
     schema = []
-    attrs = ['collection','mdb_collection']        
+    collection = ''
+    mdb_collection = None  
 
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
@@ -17,7 +18,10 @@ class MADBase(dict):
         return val
 
     def __setitem__(self, key, val):
-        if key in self.schema or key in self.attrs:
+        """
+        Allow only keys defined in schema to be inserted in the dict
+        """
+        if key in self.schema:
             dict.__setitem__(self, key, val)
         else:
             raise AttributeError
@@ -31,31 +35,26 @@ class MADBase(dict):
             self[k] = v
 
     def __setattr__(self, key, value):
-        self.__setitem__(key, value)
+        """
+        Enables setting values of dict's items trough attribute assignment,
+        while preserving default setting of class attributes
+        """
+        if hasattr(self,key):
+            dict.__setattr__(self,key,value)
+        else:
+            self.__setitem__(key, value)
     
     def __getattr__(self, key):
-        return self.__getitem__(key)
-
-    def keys(self):
         """
-        Returns the used keys from the dict, filtering out MadBase class attributes
-        defined in __ini
+        Maps dict items access to attributes, while preserving access to class attributes
         """
-        return [key for key in dict.keys(self) if key not in self.attrs]
-
-
-    def cleanDict(self):
-        """
-        Returns a dict cleaning out MADBase class properties, 
-        leaving only filled-in schema keys
-        """
-        return dict([(key,self[key]) for key in self.keys()])        
+        return getattr(self,key,self.__getitem__(key))
 
     def insert(self):
         """
-        Inserts the item into his collection
+        Inserts the item into his defined collection
         """
-        self.mdb_collection.insert(self.cleanDict())
+        self.mdb_collection.insert(self)
 
 
 class Activity(MADBase):
