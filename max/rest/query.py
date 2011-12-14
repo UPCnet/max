@@ -15,13 +15,25 @@ import time
 from rfc3339 import rfc3339
 from copy import deepcopy
 
+@view_config(context=Root, request_method='OPTIONS', name="user_activity")
+def preFlightAccept(context,request):
+    response = Response()
+    response.headers['Access-Control-Allow-Origin']='*'
+    response.headers['Access-Control-Allow-Headers']=request.headers.get('Access-Control-Request-Headers')
+    response.headers['Access-Control-Allow-Methods']=request.headers.get('Access-Control-Request-Method')
+    response.headers['Access-Control-Max-Age']=60
+    return response
+
+
+
 
 @view_config(context=Root, request_method='GET', name="user_activity")
 def getUserActivity(context, request):
-    try:
-        checkRequestConsistency(request)
-    except:
-        return HTTPBadRequest()
+    #import pdb;pdb.set_trace()
+    #try:
+    #    checkRequestConsistency(request)
+    #except:
+    #    return HTTPBadRequest()
 
     if request.params:
         # The request is issued with query parameters
@@ -65,6 +77,7 @@ def getUserActivity(context, request):
     collection = json.dumps(collection, default=json_util.default)
     response = Response(collection)
     response.content_type = 'application/json'
+    response.headers['Access-Control-Allow-Origin']='*'    
     return response
 
 
