@@ -43,6 +43,14 @@ def main(global_config, **settings):
     config.add_route('activity', '/activity/{id}')
     config.add_route('profiles', '/profiles/{displayName}')
 
+    # REST Resources
+
+    config.add_route('users', '/users/')
+    config.add_route('user', '/users/{user_displayName}')
+
+    config.add_route('timeline', '/users/{user_displayName}/timeline')
+
     config.scan('max')
+
 
     return config.make_wsgi_app()
