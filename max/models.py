@@ -76,7 +76,7 @@ class Activity(MADBase):
 
     def buildObject(self,data):
         """
-        Updates the dict contentwith the activity structure, 
+        Updates the dict content with the activity structure, 
         with data from the request
         """
         ob =  {'actor': {
