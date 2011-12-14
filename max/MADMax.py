@@ -38,6 +38,8 @@ class MADMaxCollection(object):
     def _getItemsByFieldName(self,fieldname,value):
         """
             Constructs and executes a query on a single fieldname:value pair
+
+            XXX TODO : Check if fieldname exists in the current collection 
         """
         query = {}
         query[fieldname]=value
@@ -63,6 +65,12 @@ class MADMaxCollection(object):
         else:
             getattr(self,name)
 
+    def dump(self):
+        """
+            Returns all records of a collection
+        """
+        cursor = self.collection.find()
+        return [result for result in cursor]
 
 class MADMaxDB(object):
     """
