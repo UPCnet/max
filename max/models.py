@@ -2,6 +2,7 @@ import time
 from rfc3339 import rfc3339
 from max.rest.utils import extractPostData
 from pymongo.objectid import ObjectId
+import datetime
 
 class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
@@ -52,9 +53,9 @@ class MADBase(dict):
 
     def insert(self):
         """
-        Inserts the item into his defined collection
+        Inserts the item into his defined collection and returns its _id
         """
-        self.mdb_collection.insert(self)
+        return self.mdb_collection.insert(self)
 
 
 class Activity(MADBase):
@@ -95,11 +96,37 @@ class Activity(MADBase):
 
         self.update(ob)
         
-    def addComment(self,object):
-        """
-        """
-        pass
 
+
+class User(MADBase):
+    
+    collection = 'users'
+    schema = {
+                '_id':          dict(required=1),
+                'displayName':  dict(required=1),
+                'last_login':   dict(required=1),
+                'following':    dict(required=1),
+                'subscribedTo': dict(required=1),
+             }
+
+    def __init__(self, request, *args, **kwargs):
+        self.mdb_collection = request.context.db[self.collection]
+        self['published'] = rfc3339(time.time())
+        self.buildObject(extractPostData(request))
+
+    def buildObject(self,data):
+        """
+        Updates the dict content with the activity structure, 
+        with data from the request
+        """
+        ob =  {'displayName': data['displayName'],
+                   'last_login': datetime.datetime.now(),
+                   'following': {'items': [], },
+                   'subscribedTo': {'items': [], }
+                   }
+
+
+        self.update(ob)        
 
 # import transaction
 
