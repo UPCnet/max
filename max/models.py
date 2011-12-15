@@ -58,6 +58,7 @@ class MADBase(dict):
         return self.mdb_collection.insert(self)
 
 
+
 class Activity(MADBase):
     
     collection = 'activity'

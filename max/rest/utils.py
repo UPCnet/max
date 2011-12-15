@@ -4,6 +4,27 @@ from bson import json_util
 from pymongo.objectid import ObjectId
 
 
+def flattendict(di):
+    """
+    """
+    for key in di.keys():
+        value = di[key]
+        if key=='_id':
+                di['id']=value['$oid']
+                del di['_id']
+        elif isinstance(value,dict) or isinstance(value,list):
+            flatten(value)
+            
+
+def flatten(data):
+    """
+    """
+    if isinstance(data,list):
+        for item in data:
+            flatten(item)
+    if isinstance(data,dict):
+        flattendict(data)
+
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':
         raise

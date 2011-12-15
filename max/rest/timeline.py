@@ -8,10 +8,10 @@ from bson import json_util
 from pymongo.objectid import ObjectId
 
 from max.resources import Root
-from max.rest.utils import checkDataAddUser, checkRequestConsistency, extractPostData
+from max.rest.utils import checkDataAddUser, checkRequestConsistency, extractPostData, flatten
 
 from max.MADMax import MADMaxDB
-
+from max.rest.ResourceHandlers import JSONResourceRoot
 import datetime
 
 
@@ -31,19 +31,14 @@ def TimelineResourceRoot(context, request):
     query = {'actor._id': actor['_id']}
     activities = [a for a in mmdb.activity.collection.find(query) ]
 
+     
+
     json_data = json.dumps(activities, default=json_util.default)
     json_d = json.loads(json_data)
-    for item in json_d:
-        item['actor']['id'] = item['actor']['_id']['$oid']
-        del item['actor']['_id']
-        item['id'] = item['_id']['$oid']
-        del item['_id']
 
-    json_data = json.dumps(json_d)
-    response = Response(json_data)
-    response.content_type = 'application/json'
-    response.headers['Access-Control-Allow-Origin']='*'   
-    return response 
+    flatten(json_d)
+    handler = JSONResourceRoot(json_d)
+    return handler.buildResponse()
 
 @view_config(route_name='timeline', request_method='POST')
 def TimelineResourceAddActivity(context, request):

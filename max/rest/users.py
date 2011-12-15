@@ -17,40 +17,35 @@ import datetime
        
 
 @view_config(route_name='users', request_method='GET')
-class UsersGetter(JSONResourceRoot):
+def UsersGetter(context, request):
     """
     """
-    def __call__(self):
-        """
-        """
-        mmdb = MADMaxDB(self.context.db)
-        users = mmdb.users.dump()
-        return self.buildResponse(users)
+    mmdb = MADMaxDB(context.db)
+    users = mmdb.users.dump()
+    handler = JSONResourceRoot(users)
+    return handler.buildResponse()
 
 @view_config(route_name='user', request_method='GET')
-class UserGetter(JSONResourceEntity):
+def UserGetter(context, request):
     """
     """
-    def __call__(self):
-        """
-        """
-        displayName = self.request.matchdict['user_displayName']
+    displayName = request.matchdict['user_displayName']
 
-        users = MADMaxCollection(self.context.db.users,query_key='displayName')
-        user = users[displayName]
+    users = MADMaxCollection(context.db.users,query_key='displayName')
+    user = users[displayName]
 
-        return self.buildResponse(user)
+    handler = JSONResourceEntity(user)
+    return handler.buildResponse()
 
 @view_config(route_name='user', request_method='POST')
-class UserAdder(JSONResourceEntity):
+def UserAdder(context, request):
     """
     """
-    def __call__(self):
-        """
-        """
-        displayName = self.request.matchdict['user_displayName']
+    displayName = request.matchdict['user_displayName']
 
-        newuser = User(request)
-        userid = newuser.insert()
+    newuser = User(request)
+    userid = newuser.insert()
 
-        return self.buildResponse(userid)
+    handler = JSONResourceEntity(userid)
+    return handler.buildResponse()
+

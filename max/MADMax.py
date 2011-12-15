@@ -1,6 +1,7 @@
 #MADMax  Mongo Access Delegate for Max
 
 from pymongo.objectid import ObjectId
+from max.models import Activity,User
 
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
 
@@ -51,7 +52,7 @@ class MADMaxCollection(object):
         cursor = self.collection.find(query,self.show_fields)
         #unpack the lazy cursor
         return [result for result in cursor]
-        
+
     def __getitem__(self,itemID):
         """
             Returns an unique item of the collection
