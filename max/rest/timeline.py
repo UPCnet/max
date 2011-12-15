@@ -32,6 +32,15 @@ def TimelineResourceRoot(context, request):
     activities = [a for a in mmdb.activity.collection.find(query) ]
 
     json_data = json.dumps(activities, default=json_util.default)
+    import ipdb;ipdb.set_trace()
+    json_d = json.loads(json_data)
+    for item in json_d:
+        item['actor']['id'] = item['actor']['_id']['$oid']
+        del item['actor']['_id']
+        item['id'] = item['_id']['$oid']
+        del item['_id']
+
+    json_data = json.dumps(json_d)
     response = Response(json_data)
     response.content_type = 'application/json'
     response.headers['Access-Control-Allow-Origin']='*'   
