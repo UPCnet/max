@@ -19,6 +19,11 @@ class MADMaxCollection(object):
         self.query_key = query_key
         self.show_fields = field_filter
 
+    def setQueryKey(self,key):
+        """
+        """
+        self.query_key = key
+
     def setVisibleResultFields(self, fields):
         """
         """
