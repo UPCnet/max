@@ -6,43 +6,43 @@ from rfc3339 import rfc3339
 
 from pymongo.objectid import ObjectId
 
-def decodeBSONEntity(di,key):
+
+def decodeBSONEntity(di, key):
     """
         Inspired by pymongo bson.json_util.default, but specially processing some value types:
 
         ObjectId --> hexvalue
         datetime --> rfc3339
-        
+
         Also, while json_util.default creates a new dict in the form {$name: decodedvalue} we assign
-        the decoded value, 'flattening' the value directly in the field. 
+        the decoded value, 'flattening' the value directly in the field.
 
         Fallback to other values using json_util.default, and flattening only those decoded entities
         that has only one key.
-        
-        
     """
     value = di[key]
-    if isinstance(value,ObjectId):
+    if isinstance(value, ObjectId):
         di[key] = str(value)
         return
-    if isinstance(value,datetime):
+    if isinstance(value, datetime):
         di[key] = rfc3339(value)
         return
     try:
         decoded = json_util.default(di[key])
-        if len(decoded.keys())==1:
+        if len(decoded.keys()) == 1:
             di[key] = decoded[decoded.keys()[0]]
         else:
             di[key] = decoded
     except:
         pass
 
-def deUnderescore(di,key):
+
+def deUnderescore(di, key):
     """
         Renames a dict key, removing underscores from the begginning of the key
     """
     if key.startswith('_'):
-        di[key.lstrip('_')]=di[key]
+        di[key.lstrip('_')] = di[key]
         del di[key]
 
 
@@ -52,21 +52,23 @@ def flattendict(di):
     """
     for key in di.keys():
         value = di[key]
-        if isinstance(value,dict) or isinstance(value,list):
+        if isinstance(value, dict) or isinstance(value, list):
             flatten(value)
-        else:        
-            decodeBSONEntity(di,key)
-            deUnderescore(di,key)
-            
+        else:
+            decodeBSONEntity(di, key)
+            deUnderescore(di, key)
+
+
 def flatten(data):
     """
         Recursively flatten a dict or list
     """
-    if isinstance(data,list):
+    if isinstance(data, list):
         for item in data:
             flatten(item)
-    if isinstance(data,dict):
+    if isinstance(data, dict):
         flattendict(data)
+
 
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':
@@ -79,7 +81,7 @@ def extractPostData(request):
     if request.body:
         return json.loads(request.body, object_hook=json_util.object_hook)
     else:
-       return {}
+        return {}
 
     # TODO: Do more syntax and format checks of sent data
 
@@ -214,7 +216,7 @@ def checkDataAddUser(data):
 
 
 def checkIsValidUser(context, data):
-    """Searches a user by displayName in the db and returns its id if found. 
+    """Searches a user by displayName in the db and returns its id if found.
        Do additional check about the content of the data (eg: 'author' is a valid system username) """
 
     username = data['actor']['displayName']

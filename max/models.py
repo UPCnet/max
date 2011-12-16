@@ -2,10 +2,9 @@ import time
 from rfc3339 import rfc3339
 from max.rest.utils import extractPostData, flatten
 from max.exceptions import MissingField
-from pymongo.objectid import ObjectId
 import datetime
 from pyramid.request import Request
-from copy import deepcopy
+
 
 class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
@@ -14,21 +13,21 @@ class MADBase(dict):
     unique = ''
     params = {}
     collection = ''
-    mdb_collection = None  
+    mdb_collection = None
     data = {}
 
-    def __init__(self,  source, collection = None, rest_params = {}):
+    def __init__(self, source, collection=None, rest_params={}):
         """
         """
-        if isinstance(source,Request):
+        if isinstance(source, Request):
 
             self.mdb_collection = source.context.db[self.collection]
             self.data = extractPostData(source)
             self.data.update(rest_params)
-            self.validate()            
-            existing_object = self.alreadyExists()            
-            if not existing_object:            
-                self['published'] = rfc3339(time.time())             
+            self.validate()
+            existing_object = self.alreadyExists()
+            if not existing_object:
+                self['published'] = rfc3339(time.time())
                 self.buildObject()
             else:
                 self.update(existing_object)
@@ -62,16 +61,16 @@ class MADBase(dict):
         Enables setting values of dict's items trough attribute assignment,
         while preserving default setting of class attributes
         """
-        if hasattr(self,key):
-            dict.__setattr__(self,key,value)
+        if hasattr(self, key):
+            dict.__setattr__(self, key, value)
         else:
             self.__setitem__(key, value)
-    
+
     def __getattr__(self, key):
         """
         Maps dict items access to attributes, while preserving access to class attributes
         """
-        return getattr(self,key,self.__getitem__(key))
+        return getattr(self, key, self.__getitem__(key))
 
     def insert(self):
         """
@@ -85,17 +84,17 @@ class MADBase(dict):
         Checks if there's an object with the value specifiedin the unique field
         """
         unique = self.unique
-        query = {unique : self.data.get(unique)}
+        query = {unique: self.data.get(unique)}
         return self.mdb_collection.find_one(query)
 
     def flatten(self):
         """
         """
-        dd = dict([(key,self[key]) for key in self.keys()])
+        dd = dict([(key, self[key]) for key in self.keys()])
         flatten(dd)
         return dd
 
-    def checkParameterExists(self,fieldname):
+    def checkParameterExists(self, fieldname):
 
         parts = fieldname.split('.')
 
@@ -111,14 +110,15 @@ class MADBase(dict):
         """
         """
         for fieldname in self.params:
-            if self.params.get(fieldname).get('required',0):
+            if self.params.get(fieldname).get('required', 0):
                 if not self.checkParameterExists(fieldname):
                     raise MissingField(fieldname)
         return True
 
 
 class Activity(MADBase):
-    
+    """
+    """
     collection = 'activity'
     unique = '_id'
     schema = {
@@ -137,14 +137,12 @@ class Activity(MADBase):
                 'context':           dict(required=0),
               }
 
-
-
     def buildObject(self):
         """
-        Updates the dict content with the activity structure, 
+        Updates the dict content with the activity structure,
         with data from the request
         """
-        ob =  {'actor': {
+        ob = {'actor': {
                     'objectType': 'person',
                     '_id': self.data['actor']['_id'],
                     'displayName': self.data['actor']['displayName']
@@ -159,11 +157,11 @@ class Activity(MADBase):
             ob['target'] = self.data['target']
 
         self.update(ob)
-        
 
 
 class User(MADBase):
-    
+    """
+    """
     collection = 'users'
     unique = 'displayName'
     schema = {
@@ -179,21 +177,14 @@ class User(MADBase):
                 'displayName':  dict(required=1),
              }
 
-                
-
-        
     def buildObject(self):
         """
-        Updates the dict content with the activity structure, 
+        Updates the dict content with the activity structure,
         with data from the request
         """
-        ob =  {'displayName': self.data['displayName'],
+        ob = {'displayName': self.data['displayName'],
                    'last_login': datetime.datetime.now(),
                    'following': {'items': [], },
                    'subscribedTo': {'items': [], }
                    }
-
-
-        self.update(ob)        
-
-
+        self.update(ob)

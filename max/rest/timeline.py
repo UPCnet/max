@@ -18,7 +18,7 @@ def UserTimeline(context, request):
     actor = mmdb.users.getItemsBydisplayName(displayName)[0]
 
     actor_query = {'actor._id': actor['_id']}
-    
+
     # Add the activity of the people that the user follows
     actors_followings = []
     for following in actor['following']['items']:
@@ -29,11 +29,9 @@ def UserTimeline(context, request):
     for subscribed in actor['subscribedTo']['items']:
         contexts_followings.append({'target.url': subscribed['url']})
 
-    
-    query = {'$or' : [ actor_query ] + actors_followings + contexts_followings}
+    query = {'$or': [actor_query] + actors_followings + contexts_followings}
 
-    activities = mmdb.activity.search(query,sort="_id",limit=10,flatten=1)
+    activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
-

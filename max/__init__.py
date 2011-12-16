@@ -51,9 +51,7 @@ def main(global_config, **settings):
     config.add_route('activity', '/users/{user_displayName}/activities/{activity_oid}')
 
     config.add_route('timeline', '/users/{user_displayName}/timeline')
-    
 
     config.scan('max')
-
 
     return config.make_wsgi_app()

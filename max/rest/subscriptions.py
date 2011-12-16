@@ -14,6 +14,19 @@ from rfc3339 import rfc3339
 from copy import deepcopy
 
 
+
+
+
+###################### Per comprovar els follows/unfollows al afegir, cal comprovar que no el segueixi previament
+
+
+
+
+
+
+
+
+
 @view_config(context=Root, request_method='POST', name="follow")
 def Follow(context, request):
     # import ipdb; ipdb.set_trace()

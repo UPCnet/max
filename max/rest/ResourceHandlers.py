@@ -1,15 +1,15 @@
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPBadRequest, HTTPOk, HTTPNotFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPNotFound, HTTPInternalServerError
 
 import json
-from bson import json_util
+
 
 class ResourceRoot(object):
     """
     """
     response_content_type = 'application/text'
 
-    def __init__(self,data,status_code=200):
+    def __init__(self, data, status_code=200):
         """
         """
         self.data = data
@@ -19,17 +19,16 @@ class ResourceRoot(object):
         """
         """
         wrapper = {"items": self.data,
-                   "totalItems" : len(self.data)}
-        return wrapper     
+                   "totalItems": len(self.data)}
+        return wrapper
 
-
-    def buildResponse(self,payload = None):
+    def buildResponse(self, payload=None):
         """
         """
-        data = payload==None and self.data or payload        
-        response = Response(data,status_int=self.status_code)
+        data = payload == None and self.data or payload
+        response = Response(data, status_int=self.status_code)
         response.content_type = self.response_content_type
-        return response        
+        return response
 
 
 class JSONResourceRoot(ResourceRoot):
@@ -37,22 +36,20 @@ class JSONResourceRoot(ResourceRoot):
     """
     response_content_type = 'application/json'
 
-
-    def buildResponse(self,payload = None):
+    def buildResponse(self, payload=None):
         """
             Translate to JSON object if any data. If data is not a list
             something went wrong
         """
         if self.data:
-            if isinstance(self.data,list):
+            if isinstance(self.data, list):
                 response_payload = json.dumps(self.wrap())
             else:
                 return HTTPInternalServerError('Invalid JSON output')
         else:
             response_payload = self.wrap()
 
-        return super(JSONResourceRoot,self).buildResponse(payload=response_payload)
-
+        return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
 
 
 class ResourceEntity(object):
@@ -61,40 +58,41 @@ class ResourceEntity(object):
 
     response_content_type = 'application/text'
 
-    def __init__(self,data,status_code=200):
+    def __init__(self, data, status_code=200):
         """
         """
         self.data = data
         self.status_code = status_code
 
-    def buildResponse(self,payload = None):
+    def buildResponse(self, payload=None):
         """
         """
-        data = payload==None and self.data or payload
+        data = payload == None and self.data or payload
         if data:
-            response = Response(data,status_int=self.status_code)            
+            response = Response(data, status_int=self.status_code)
             response.content_type = self.response_content_type
         else:
             response = HTTPNotFound()
 
-        return response        
+        return response
+
 
 class JSONResourceEntity(ResourceEntity):
     """
     """
     response_content_type = 'application/json'
 
-    def buildResponse(self,payload = None):
+    def buildResponse(self, payload=None):
         """
             Translate to JSON object if any data. If data is not a dict,
             something went wrong
         """
         if self.data:
-            if isinstance(self.data,dict):
+            if isinstance(self.data, dict):
                 response_payload = json.dumps(self.data)
             else:
                 return HTTPInternalServerError('Invalid JSON output')
         else:
             response_payload = None
 
-        return super(JSONResourceEntity,self).buildResponse(payload=response_payload)
+        return super(JSONResourceEntity, self).buildResponse(payload=response_payload)
