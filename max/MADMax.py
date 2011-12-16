@@ -2,6 +2,7 @@
 
 from pymongo.objectid import ObjectId
 from max.models import Activity,User
+from pymongo import DESCENDING
 
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
 
@@ -30,6 +31,26 @@ class MADMaxCollection(object):
         """
         self.show_fields = dict([(fieldname,1) for fieldname in fields])
 
+    def search(self,query,show_fields=None,flatten=0,sort=None,sort_dir=DESCENDING,limit=None):
+        """
+        """
+        if query:
+            cursor = self.collection.find(query,show_fields)
+        else:
+            cursor = self.collection.find()
+
+
+        # Sort and limit the results if specified
+        if sort:
+            cursor = cursor.sort(sort,sort_dir)
+        if limit:
+            cursor = cursor.limit(limit)
+            
+        # Unpack the lazy cursor, 
+        # Wrap the result in its Mad Class, 
+        # and flattens it if specified
+        return [self.ItemWrapper(result,flatten=flatten) for result in cursor]
+
     def _getQuery(self,itemID):
         """
             Constructs the query based on the field used as key
@@ -41,6 +62,17 @@ class MADMaxCollection(object):
             query[self.query_key]=itemID
         return query
 
+    def ItemWrapper(self,item,flatten=0):
+        """
+        """
+        class_map = dict(activity=Activity,
+                        users=User)
+        wrapped = class_map[self.collection.name](item,collection=self.collection)
+        if flatten:
+            return wrapped.flatten()
+        else:
+            return wrapped
+
     def _getItemsByFieldName(self,fieldname,value):
         """
             Constructs and executes a query on a single fieldname:value pair
@@ -49,16 +81,15 @@ class MADMaxCollection(object):
         """
         query = {}
         query[fieldname]=value
-        cursor = self.collection.find(query,self.show_fields)
-        #unpack the lazy cursor
-        return [result for result in cursor]
+        return self.search(query)
 
     def __getitem__(self,itemID):
         """
             Returns an unique item of the collection
         """
         query = self._getQuery(itemID)
-        return self.collection.find_one(query,self.show_fields)
+        item = self.collection.find_one(query,self.show_fields)
+        return self.ItemWrapper(item)
 
     def __getattr__(self,name):
         """
@@ -71,12 +102,13 @@ class MADMaxCollection(object):
         else:
             getattr(self,name)
 
-    def dump(self):
+    def dump(self, flatten=0):
         """
             Returns all records of a collection
         """
-        cursor = self.collection.find()
-        return [result for result in cursor]
+        
+        return self.search({},flatten=flatten)
+        
 
 class MADMaxDB(object):
     """
