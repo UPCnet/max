@@ -52,6 +52,13 @@ def main(global_config, **settings):
 
     config.add_route('timeline', '/users/{user_displayName}/timeline')
 
+    config.add_route('contexts', '/users/{user_displayName}/timeline/contexts')
+    config.add_route('context', '/users/{user_displayName}/timeline/contexts/{contextid}')
+
+    config.add_route('follows', '/users/{user_displayName}/timeline/follows')
+    config.add_route('follow', '/users/{user_displayName}/timeline/follows/{contextid}')
+
+
     config.scan('max')
 
     return config.make_wsgi_app()
