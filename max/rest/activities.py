@@ -41,11 +41,10 @@ def UserActivity(context, request):
 
     mmdb = MADMaxDB(context.db)
     actor = mmdb.users.getItemsBydisplayName(displayName)[0]
-
     activity_oid = request.matchdict['activity_oid']
     activity = mmdb.activity[activity_oid].flatten()
 
-    handler = JSONResourceRoot(activity)
+    handler = JSONResourceEntity(activity)
     return handler.buildResponse()
 
 
