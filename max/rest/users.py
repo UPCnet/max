@@ -1,27 +1,17 @@
 from pyramid.view import view_config
-from pyramid.response import Response
+from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPOk, HTTPNotFound, HTTPInternalServerError
-
-import json
-from pymongo.objectid import ObjectId
-
-from max.resources import Root
-from max.rest.utils import checkDataAddUser, checkRequestConsistency, extractPostData
-
+from max.exceptions import MissingField
 from max.MADMax import MADMaxDB,MADMaxCollection
 from max.models import User
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-
-import datetime
-       
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity       
 
 @view_config(route_name='users', request_method='GET')
 def UsersGetter(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    users = mmdb.users.dump()
+    users = mmdb.users.dump(flatten=1)
     handler = JSONResourceRoot(users)
     return handler.buildResponse()
 
@@ -30,9 +20,9 @@ def UserGetter(context, request):
     """
     """
     displayName = request.matchdict['user_displayName']
-
+    
     users = MADMaxCollection(context.db.users,query_key='displayName')
-    user = users[displayName]
+    user = users[displayName].flatten()
 
     handler = JSONResourceEntity(user)
     return handler.buildResponse()
@@ -42,10 +32,34 @@ def UserAdder(context, request):
     """
     """
     displayName = request.matchdict['user_displayName']
+    rest_params = dict(displayName=displayName )
 
-    newuser = User(request)
-    userid = newuser.insert()
+    # Try to initialize a User object from the request
+    # And catch the possible exceptions
+    try:
+        newuser = User(request,rest_params = rest_params)
+    except MissingField:
+        return HTTPBadRequest()
+    except ValueError:
+        return HTTPBadRequest()
+    except:
+        return HTTPInternalServerError()
+    
 
-    handler = JSONResourceEntity(userid)
+    # If we have the _id setted, then the object already existed in the DB,
+    # otherwise, proceed to insert it into the DB
+    # In both cases, respond with the JSON of the object and the appropiate
+    # HTTP Status Code
+    
+    if newuser.get('_id'):
+        # Already Exists
+        code = 200
+    else:
+        # New User
+        code = 201        
+        userid = newuser.insert()
+        newuser['_id']=userid
+
+    handler = JSONResourceEntity(newuser.flatten(),status_code=code)
     return handler.buildResponse()
 

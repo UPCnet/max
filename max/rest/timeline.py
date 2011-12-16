@@ -1,22 +1,11 @@
 from pyramid.view import view_config
-from pyramid.response import Response
-
-from pyramid.httpexceptions import HTTPBadRequest, HTTPOk
-
-import json
-from bson import json_util
-from pymongo.objectid import ObjectId
-
-from max.resources import Root
-from max.rest.utils import checkDataAddUser, checkRequestConsistency, extractPostData, flatten
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
-import datetime
 
 
 @view_config(route_name='timeline', request_method='GET')
-def TimelineResourceRoot(context, request):
+def UserTimeline(context, request):
     """
          /users/{displayName}/timeline
 
@@ -28,36 +17,23 @@ def TimelineResourceRoot(context, request):
 
     actor = mmdb.users.getItemsBydisplayName(displayName)[0]
 
-    query = {'actor._id': actor['_id']}
-    activities = [a for a in mmdb.activity.collection.find(query) ]
+    actor_query = {'actor._id': actor['_id']}
+    
+    # Add the activity of the people that the user follows
+    actors_followings = []
+    for following in actor['following']['items']:
+        actors_followings.append({'actor._id': following['_id']})
 
-     
+    # Add the activity of the people that posts to a particular context
+    contexts_followings = []
+    for subscribed in actor['subscribedTo']['items']:
+        contexts_followings.append({'target.url': subscribed['url']})
 
-    json_data = json.dumps(activities, default=json_util.default)
-    json_d = json.loads(json_data)
+    
+    query = {'$or' : [ actor_query ] + actors_followings + contexts_followings}
 
-    flatten(json_d)
-    handler = JSONResourceRoot(json_d)
+    activities = mmdb.activity.search(query,sort="_id",limit=10,flatten=1)
+
+    handler = JSONResourceRoot(activities)
     return handler.buildResponse()
 
-@view_config(route_name='timeline', request_method='POST')
-def TimelineResourceAddActivity(context, request):
-    """
-         /users/{displayName}/timeline
-
-         Afegeix una activitat    
-    """
-    displayName = request.matchdict['user_displayName']
-
-    mmdb = MADMaxDB(context.db)    
-    actor = mmdb.users.getItemsBydisplayName(displayName)[0]
-        
-    newactivity = Activity(request)
-    newactivity.actor = actor
-    newactivity.insert()
-
-    json_data = json.dumps(activities, default=json_util.default)
-    response = Response(json_data)
-    response.content_type = 'application/json'
-    response.headers['Access-Control-Allow-Origin']='*'   
-    return response 

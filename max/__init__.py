@@ -40,15 +40,18 @@ def main(global_config, **settings):
                     context='pyramid.httpexceptions.HTTPForbidden',
                     renderer='max:templates/login.pt')
 
-    config.add_route('activity', '/activity/{id}')
     config.add_route('profiles', '/profiles/{displayName}')
 
     # REST Resources
 
-    config.add_route('users', '/users/')
+    config.add_route('users', '/users')
     config.add_route('user', '/users/{user_displayName}')
 
+    config.add_route('activities', '/users/{user_displayName}/activities')
+    config.add_route('activity', '/users/{user_displayName}/activities/{activity_oid}')
+
     config.add_route('timeline', '/users/{user_displayName}/timeline')
+    
 
     config.scan('max')
 
