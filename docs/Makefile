@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = /var/plone/python2.6/bin/sphinx-build
+SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
 
@@ -36,7 +36,8 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html:
+html: themes
+	mkdir -p _build/html _build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -61,7 +62,8 @@ json:
 	@echo
 	@echo "Build finished; now you can process the JSON files."
 
-htmlhelp:
+htmlhelp: themes
+	mkdir -p _build/htmlhelp _build/doctrees
 	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) $(BUILDDIR)/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
@@ -128,3 +130,6 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+themes:
+	cd .. && git submodule update --init
