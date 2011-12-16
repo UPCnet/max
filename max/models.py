@@ -12,6 +12,7 @@ class MADBase(dict):
 
     schema = {}
     unique = ''
+    params = {}
     collection = ''
     mdb_collection = None  
     data = {}
@@ -94,12 +95,24 @@ class MADBase(dict):
         flatten(dd)
         return dd
 
+    def checkParameterExists(self,fieldname):
+
+        parts = fieldname.split('.')
+
+        base = self.data
+        for part in parts:
+            if part in base.keys():
+                base = base[part]
+            else:
+                return False
+        return True
+
     def validate(self):
         """
         """
-        for fieldname in self.schema:
-            if self.schema.get(fieldname).get('required',0):
-                if fieldname not in self.data.keys():
+        for fieldname in self.params:
+            if self.params.get(fieldname).get('required',0):
+                if not self.checkParameterExists(fieldname):
                     raise MissingField(fieldname)
         return True
 
@@ -109,13 +122,21 @@ class Activity(MADBase):
     collection = 'activity'
     unique = '_id'
     schema = {
-                '_id':       dict(required=0),
-                'actor':     dict(required=1),
-                'verb':      dict(required=1),
-                'object':    dict(required=1),
-                'published': dict(required=1),
-                'target':    dict(required=0),
+                '_id':         dict(required=0),
+                'actor':       dict(required=1),
+                'verb':        dict(required=0),
+                'object':      dict(required=0),
+                'published':   dict(required=0),
+                'target':      dict(required=0),
              }
+
+    params = {
+                'actor':             dict(required=1),
+                'object.content':    dict(required=1),
+                'object.objectType': dict(required=1),
+                'context':           dict(required=0),
+              }
+
 
 
     def buildObject(self):
@@ -125,7 +146,7 @@ class Activity(MADBase):
         """
         ob =  {'actor': {
                     'objectType': 'person',
-                    '_id': ObjectId(self.data['actor']['id']),
+                    '_id': self.data['actor']['_id'],
                     'displayName': self.data['actor']['displayName']
                     },
                 'verb': 'post',
@@ -151,9 +172,14 @@ class User(MADBase):
                 'last_login':   dict(required=0),
                 'following':    dict(required=0),
                 'subscribedTo': dict(required=0),
-                'published': dict(required=0),
+                'published':    dict(required=0),
              }
 
+    params = {
+                'displayName':  dict(required=1),
+             }
+
+                
 
         
     def buildObject(self):
