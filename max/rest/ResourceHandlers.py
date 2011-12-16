@@ -9,10 +9,11 @@ class ResourceRoot(object):
     """
     response_content_type = 'application/text'
 
-    def __init__(self,data):
+    def __init__(self,data,status_code=200):
         """
         """
         self.data = data
+        self.status_code = status_code
 
     def wrap(self):
         """
@@ -26,7 +27,7 @@ class ResourceRoot(object):
         """
         """
         data = payload==None and self.data or payload        
-        response = Response(data)
+        response = Response(data,status_int=self.status_code)
         response.content_type = self.response_content_type
         return response        
 
@@ -44,11 +45,11 @@ class JSONResourceRoot(ResourceRoot):
         """
         if self.data:
             if isinstance(self.data,list):
-                response_payload = json.dumps(self.wrap(), default=json_util.default)
+                response_payload = json.dumps(self.wrap())
             else:
                 return HTTPInternalServerError('Invalid JSON output')
         else:
-            response_payload = None
+            response_payload = self.wrap()
 
         return super(JSONResourceRoot,self).buildResponse(payload=response_payload)
 
@@ -60,17 +61,18 @@ class ResourceEntity(object):
 
     response_content_type = 'application/text'
 
-    def __init__(self,data):
+    def __init__(self,data,status_code=200):
         """
         """
         self.data = data
+        self.status_code = status_code
 
     def buildResponse(self,payload = None):
         """
         """
         data = payload==None and self.data or payload
         if data:
-            response = Response(data)
+            response = Response(data,status_int=self.status_code)            
             response.content_type = self.response_content_type
         else:
             response = HTTPNotFound()
@@ -89,7 +91,7 @@ class JSONResourceEntity(ResourceEntity):
         """
         if self.data:
             if isinstance(self.data,dict):
-                response_payload = json.dumps(self.data, default=json_util.default)
+                response_payload = json.dumps(self.data)
             else:
                 return HTTPInternalServerError('Invalid JSON output')
         else:
