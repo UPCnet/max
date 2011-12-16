@@ -10,7 +10,7 @@ from max.views.api import TemplateAPI, activityAPI
 from bson.objectid import ObjectId
 
 
-@view_config(route_name='activity', permission='restricted')
+#@view_config(route_name='activity', permission='restricted')
 def activityView(context, request):
     activity_id = ObjectId(request.matchdict['id'])
 
