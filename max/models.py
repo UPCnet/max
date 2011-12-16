@@ -1,18 +1,39 @@
 import time
 from rfc3339 import rfc3339
-from max.rest.utils import extractPostData
+from max.rest.utils import extractPostData, flatten
+from max.exceptions import MissingField
 from pymongo.objectid import ObjectId
 import datetime
+from pyramid.request import Request
+from copy import deepcopy
 
 class MADBase(dict):
     """A simple vitaminated dict for holding a MongoBD arbitrary object"""
 
-    schema = []
+    schema = {}
+    unique = ''
     collection = ''
     mdb_collection = None  
+    data = {}
 
-    def __init__(self, *args, **kwargs):
-        self.update(*args, **kwargs)
+    def __init__(self,  source, collection = None, rest_params = {}):
+        """
+        """
+        if isinstance(source,Request):
+
+            self.mdb_collection = source.context.db[self.collection]
+            self.data = extractPostData(source)
+            self.data.update(rest_params)
+            self.validate()            
+            existing_object = self.alreadyExists()            
+            if not existing_object:            
+                self['published'] = rfc3339(time.time())             
+                self.buildObject()
+            else:
+                self.update(existing_object)
+        else:
+            self.mdb_collection = collection
+            self.update(source)
 
     def __getitem__(self, key):
         val = dict.__getitem__(self, key)
@@ -55,15 +76,40 @@ class MADBase(dict):
         """
         Inserts the item into his defined collection and returns its _id
         """
-        return self.mdb_collection.insert(self)
+        oid = self.mdb_collection.insert(self)
+        return str(oid)
 
+    def alreadyExists(self):
+        """
+        Checks if there's an object with the value specifiedin the unique field
+        """
+        unique = self.unique
+        query = {unique : self.data.get(unique)}
+        return self.mdb_collection.find_one(query)
+
+    def flatten(self):
+        """
+        """
+        dd = dict([(key,self[key]) for key in self.keys()])
+        flatten(dd)
+        return dd
+
+    def validate(self):
+        """
+        """
+        for fieldname in self.schema:
+            if self.schema.get(fieldname).get('required',0):
+                if fieldname not in self.data.keys():
+                    raise MissingField(fieldname)
+        return True
 
 
 class Activity(MADBase):
     
     collection = 'activity'
+    unique = '_id'
     schema = {
-                '_id':       dict(required=1),
+                '_id':       dict(required=0),
                 'actor':     dict(required=1),
                 'verb':      dict(required=1),
                 'object':    dict(required=1),
@@ -71,29 +117,25 @@ class Activity(MADBase):
                 'target':    dict(required=0),
              }
 
-    def __init__(self, request, *args, **kwargs):
-        self.mdb_collection = request.context.db[self.collection]
-        self['published'] = rfc3339(time.time())
-        self.buildObject(extractPostData(request))
 
-    def buildObject(self,data):
+    def buildObject(self):
         """
         Updates the dict content with the activity structure, 
         with data from the request
         """
         ob =  {'actor': {
                     'objectType': 'person',
-                    '_id': ObjectId(data['actor']['id']),
-                    'displayName': data['actor']['displayName']
+                    '_id': ObjectId(self.data['actor']['id']),
+                    'displayName': self.data['actor']['displayName']
                     },
                 'verb': 'post',
                 'object': {
                     'objectType': 'note',
-                    'content': data['object']['content']
+                    'content': self.data['object']['content']
                     }
                 }
-        if 'target' in data:
-            ob['target'] = data['target']
+        if 'target' in self.data:
+            ob['target'] = self.data['target']
 
         self.update(ob)
         
@@ -102,25 +144,24 @@ class Activity(MADBase):
 class User(MADBase):
     
     collection = 'users'
+    unique = 'displayName'
     schema = {
-                '_id':          dict(required=1),
+                '_id':          dict(required=0),
                 'displayName':  dict(required=1),
-                'last_login':   dict(required=1),
-                'following':    dict(required=1),
-                'subscribedTo': dict(required=1),
+                'last_login':   dict(required=0),
+                'following':    dict(required=0),
+                'subscribedTo': dict(required=0),
+                'published': dict(required=0),
              }
 
-    def __init__(self, request, *args, **kwargs):
-        self.mdb_collection = request.context.db[self.collection]
-        self['published'] = rfc3339(time.time())
-        self.buildObject(extractPostData(request))
 
-    def buildObject(self,data):
+        
+    def buildObject(self):
         """
         Updates the dict content with the activity structure, 
         with data from the request
         """
-        ob =  {'displayName': data['displayName'],
+        ob =  {'displayName': self.data['displayName'],
                    'last_login': datetime.datetime.now(),
                    'following': {'items': [], },
                    'subscribedTo': {'items': [], }
@@ -129,87 +170,4 @@ class User(MADBase):
 
         self.update(ob)        
 
-# import transaction
 
-# from sqlalchemy.orm import scoped_session
-# from sqlalchemy.orm import sessionmaker
-
-# from sqlalchemy.ext.declarative import declarative_base
-
-# from sqlalchemy.exc import IntegrityError
-
-# from sqlalchemy import Integer
-# from sqlalchemy import Unicode
-# from sqlalchemy import Column
-
-# from zope.sqlalchemy import ZopeTransactionExtension
-
-# DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-# Base = declarative_base()
-
-# class MyModel(Base):
-#     __tablename__ = 'models'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(Unicode(255), unique=True)
-#     value = Column(Integer)
-
-#     def __init__(self, name, value):
-#         self.name = name
-#         self.value = value
-
-# class MyRoot(object):
-#     __name__ = None
-#     __parent__ = None
-
-#     def __getitem__(self, key):
-#         session= DBSession()
-#         try:
-#             id = int(key)
-#         except (ValueError, TypeError):
-#             raise KeyError(key)
-
-#         item = session.query(MyModel).get(id)
-#         if item is None:
-#             raise KeyError(key)
-
-#         item.__parent__ = self
-#         item.__name__ = key
-#         return item
-
-#     def get(self, key, default=None):
-#         try:
-#             item = self.__getitem__(key)
-#         except KeyError:
-#             item = default
-#         return item
-
-#     def __iter__(self):
-#         session= DBSession()
-#         query = session.query(MyModel)
-#         return iter(query)
-
-# root = MyRoot()
-
-# def root_factory(request):
-#     return root
-
-# def populate():
-#     session = DBSession()
-#     model = MyModel(name=u'test name', value=55)
-#     session.add(model)
-#     session.flush()
-#     transaction.commit()
-
-# def initialize_sql(engine):
-#     DBSession.configure(bind=engine)
-#     Base.metadata.bind = engine
-#     Base.metadata.create_all(engine)
-#     try:
-#         populate()
-#     except IntegrityError:
-#         transaction.abort()
-#     return DBSession
-
-# def appmaker(engine):
-#     initialize_sql(engine)
-#     return root_factory
