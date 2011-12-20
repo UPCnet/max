@@ -27,7 +27,7 @@ class MADBase(dict):
             self.validate()
             existing_object = self.alreadyExists()
             if not existing_object:
-                self['published'] = rfc3339(time.time())
+                self['published'] = datetime.datetime.utcnow()
                 self.buildObject()
             else:
                 self.update(existing_object)

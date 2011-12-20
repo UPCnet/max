@@ -25,7 +25,7 @@ def decodeBSONEntity(di, key):
         di[key] = str(value)
         return
     if isinstance(value, datetime):
-        di[key] = rfc3339(value)
+        di[key] = rfc3339(value,utc=True,use_system_timezone=False)
         return
     try:
         decoded = json_util.default(di[key])
