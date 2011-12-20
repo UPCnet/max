@@ -21,9 +21,9 @@ $(document).ready(function() {
         data['object']['content'] = content;
 
         $.ajax({type:'POST',
-                 url: '/activity',
+                 url: '/users/'+username+'/activities',
                  data: JSON.stringify(data),
-                 contentType: 'application/json; charset=utf-8'
+//                 contentType: 'application/json; charset=utf-8'
              });
 
         $(".activityBox").val("");
@@ -55,9 +55,9 @@ $(document).ready(function() {
     timeline_query = {"displayName": username};
 
     $.ajax({type:'GET',
-            url:'/user_activity',
+            url:'/users/'+username+'/timeline',
             data: timeline_query,
-            contentType: 'application/json; charset=utf-8',
+            //contentType: 'application/json; charset=utf-8',
             success: function(data) {
                         $.each(data.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
                         $(".date").easydate(easydateOptions);
@@ -104,7 +104,7 @@ function reloadActivity () {
     timeline_query = {"displayName": username};
 
     $.ajax({type:'GET',
-            url:'/user_activity',
+            url:'/users/'+username+'/timeline',
             data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
@@ -139,7 +139,7 @@ function formatActivityStream (activity) {
         var divactions = '<div class="actions"><ul><li><a class="comment" href="#">Comentari</a></li><li><a class="like" href="#">M\'agrada</a></li><ul></div>'
         var divcontent = '<div class="content">' + user + body + divactions + date +'</div>';
         var divcomments = '<div class="comments"></div><div class="newcommentbox" style="display: none"><div class="commentBoxContainer"><textarea class="commentBox"></textarea></div><div class="button-container"><button class="sendcomment">Envia comentari</button></div></div>'
-        var divdata = '<div class="activity" activityid="' + activity['_id']['$oid'] + '" userid="' + activity['actor']['_id']['$oid'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + divcomments +'</div>';
+        var divdata = '<div class="activity" activityid="' + activity['id'] + '" userid="' + activity['actor']['id'] + '" displayname="' + activity['actor']['displayName'] + '">' + divcontent + divcomments +'</div>';
     }
     return divdata
 }
