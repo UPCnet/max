@@ -1,5 +1,5 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPNotImplemented
 
 from max.exceptions import MissingField
 from max.MADMax import MADMaxDB, MADMaxCollection
@@ -8,7 +8,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='users', request_method='GET')
-def UsersGetter(context, request):
+def getUsers(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
@@ -18,10 +18,10 @@ def UsersGetter(context, request):
 
 
 @view_config(route_name='user', request_method='GET')
-def UserGetter(context, request):
+def getUser(context, request):
     """
     """
-    displayName = request.matchdict['user_displayName']
+    displayName = request.matchdict['displayName']
 
     users = MADMaxCollection(context.db.users, query_key='displayName')
     user = users[displayName].flatten()
@@ -31,11 +31,11 @@ def UserGetter(context, request):
 
 
 @view_config(route_name='user', request_method='POST')
-def UserAdder(context, request):
+def addUser(context, request):
     """
     """
-    displayName = request.matchdict['user_displayName']
-    rest_params = dict(displayName=displayName)
+    displayName = request.matchdict['displayName']
+    rest_params = {'displayName': displayName}
 
     # Try to initialize a User object from the request
     # And catch the possible exceptions
@@ -64,3 +64,17 @@ def UserAdder(context, request):
 
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()
+
+
+@view_config(route_name='user', request_method='PUT')
+def ModifyUser(context, request):
+    """
+    """
+    return HTTPNotImplemented()
+
+
+@view_config(route_name='user', request_method='DELETE')
+def DeleteUser(context, request):
+    """
+    """
+    return HTTPNotImplemented()

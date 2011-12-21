@@ -24,16 +24,21 @@ class MADMaxCollection(object):
 
     def setQueryKey(self, key):
         """
+            Sets the key from where dict-like access will be searched on. Must be
+            a unique field of the object, because in this kind of access only a item is
+            returned
         """
         self.query_key = key
 
     def setVisibleResultFields(self, fields):
         """
+            Sets which fields to be returned in the query
         """
         self.show_fields = dict([(fieldname, 1) for fieldname in fields])
 
     def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, limit=None):
         """
+            Performs a search on the mongoDB
         """
         if query:
             cursor = self.collection.find(query, show_fields)
@@ -64,6 +69,9 @@ class MADMaxCollection(object):
 
     def ItemWrapper(self, item, flatten=0):
         """
+            Transforms a mongoDB item to a wrapped representation of it using
+            the appropiate class, mapped by the origin collection of the item.
+            Flattened or not by demand
         """
         class_map = dict(activity=Activity,
                         users=User)
@@ -139,3 +147,4 @@ class MADMaxDB(object):
                 else:
                     attr = default
             return attr
+

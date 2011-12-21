@@ -6,6 +6,7 @@ from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from max.resources import Root
+from max.rest.services import WADL
 
 # from max.models import appmaker
 
@@ -41,23 +42,32 @@ def main(global_config, **settings):
                     renderer='max:templates/login.pt')
 
     config.add_route('profiles', '/profiles/{displayName}')
+    config.add_route('wadl', '/WADL')
 
     # REST Resources
 
-    config.add_route('users', '/users')
-    config.add_route('user', '/users/{user_displayName}')
+    config.add_route('users', '/people')
+    config.add_route('user', '/people/{displayName}')
 
-    config.add_route('activities', '/users/{user_displayName}/activities')
-    config.add_route('activity', '/users/{user_displayName}/activities/{activity_oid}')
+    config.add_route('user_activities', '/people/{displayName}/activities')
+    config.add_route('timeline', '/people/{displayName}/timeline')
+    config.add_route('user_comments', '/people/{displayName}/comments')
+    config.add_route('user_shares', '/people/{displayName}/shares')
+    config.add_route('user_likes', '/people/{displayName}/likes')
+    config.add_route('follows', '/people/{displayName}/follows')
+    config.add_route('follow', '/people/{displayName}/follows/{followedDN}')
+    config.add_route('subscriptions', '/people/{displayName}/subscriptions')
+    config.add_route('subscription', '/people/{displayName}/subscriptions/{subscrId}}')
 
-    config.add_route('timeline', '/users/{user_displayName}/timeline')
 
-    config.add_route('contexts', '/users/{user_displayName}/timeline/contexts')
-    config.add_route('context', '/users/{user_displayName}/timeline/contexts/{contextid}')
-
-    config.add_route('follows', '/users/{user_displayName}/timeline/follows')
-    config.add_route('follow', '/users/{user_displayName}/timeline/follows/{contextid}')
-
+    config.add_route('activities', '/activities')
+    config.add_route('activity', '/activities/{activity}')
+    config.add_route('comments', '/activities/{activity}/comments')
+    config.add_route('comment', '/activities/{activity}/comments/{commentId}')
+    config.add_route('likes', '/activities/{activity}/likes')
+    config.add_route('like', '/activities/{activity}/likes/{likeId}')
+    config.add_route('shares', '/activities/{activity}/shares')
+    config.add_route('share', '/activities/{activity}/shares/{shareId}')
 
     config.scan('max')
 

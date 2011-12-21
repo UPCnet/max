@@ -3,17 +3,14 @@ from pyramid.view import view_config
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 
-
-@view_config(route_name='contexts', request_method='GET')
-@view_config(route_name='follows', request_method='GET')
 @view_config(route_name='timeline', request_method='GET')
-def UserTimeline(context, request):
+def getUserTimeline(context, request):
     """
          /users/{displayName}/timeline
 
          Retorna totes les activitats d'un usuari
     """
-    displayName = request.matchdict['user_displayName']
+    displayName = request.matchdict['displayName']
     is_context_resource = 'timeline/contexts' in request.path
     is_follows_resource = 'timeline/follows' in request.path
 

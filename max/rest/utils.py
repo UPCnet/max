@@ -7,6 +7,36 @@ from rfc3339 import rfc3339
 from pymongo.objectid import ObjectId
 
 
+
+class RUDict(dict):
+
+    def __init__(self, *args, **kw):
+        super(RUDict,self).__init__(*args, **kw)
+
+    def update(self, E=None, **F):
+        if E is not None:
+            if 'keys' in dir(E) and callable(getattr(E, 'keys')):
+                for k in E:
+                    if k in self:  # existing ...must recurse into both sides
+                        self.r_update(k, E)
+                    else: # doesn't currently exist, just update
+                        self[k] = E[k]
+            else:
+                for (k, v) in E:
+                    self.r_update(k, {k:v})
+
+        for k in F:
+            self.r_update(k, {k:F[k]})
+
+    def r_update(self, key, other_dict):
+        if isinstance(self[key], dict) and isinstance(other_dict[key], dict):
+            od = RUDict(self[key])
+            nd = other_dict[key]
+            od.update(nd)
+            self[key] = od
+        else:
+            self[key] = other_dict[key]
+
 def decodeBSONEntity(di, key):
     """
         Inspired by pymongo bson.json_util.default, but specially processing some value types:
@@ -79,10 +109,11 @@ def checkRequestConsistency(request):
 
 def extractPostData(request):
     if request.body:
-        return json.loads(request.body, object_hook=json_util.object_hook)
+        json_data = json.loads(request.body, object_hook=json_util.object_hook)
     else:
-        return {}
+        json_data = {}
 
+    return json_data
     # TODO: Do more syntax and format checks of sent data
 
 
