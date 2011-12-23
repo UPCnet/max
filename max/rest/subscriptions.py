@@ -1,17 +1,14 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.response import Response
 
-from pyramid.httpexceptions import HTTPBadRequest, HTTPOk, HTTPNotImplemented
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotImplemented, HTTPInternalServerError
 
-import json
-from bson import json_util
-from pymongo.objectid import ObjectId
-from max.resources import Root
-from max.rest.utils import checkDataunFollowContext, checkDataFollowContext, checkIsValidUser, checkAreValidFollowUsers, checkDataFollow, checkDataunFollow, checkRequestConsistency, extractPostData
 
-import time
-from rfc3339 import rfc3339
-from copy import deepcopy
+from max.exceptions import MissingField
+from max.MADMax import MADMaxDB
+
+from max.models import Activity
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='subscriptions', request_method='GET')
@@ -21,19 +18,41 @@ def getUserSubscriptions(context, request):
     return HTTPNotImplemented()
 
 
-@view_config(route_name='subscription', request_method='GET')
-def getUserSubscription(context, request):
-    """
-    """
-    return HTTPNotImplemented()
-
-@view_config(route_name='subscription', request_method='POST')
+@view_config(route_name='subscriptions', request_method='POST')
 def subscribe(context, request):
     """
+        /people/{displayName}/subscriptions
     """
-    return HTTPNotImplemented()
+    #XXX TODO ara només es tracta la primera activitat,
+    # s'ha de iterar si es vol que el comentari sigui de N activitats
+    displayName = request.matchdict['displayName']
 
-@view_config(route_name='subscription', request_method='DELETE')
+    mmdb = MADMaxDB(context.db)
+    actor = mmdb.users.getItemsBydisplayName(displayName)[0]
+    rest_params = {'actor': actor}
+
+    # Try to initialize a Activity object from the request
+    # And catch the possible exceptions
+    try:
+        newactivity = Activity(request, rest_params=rest_params)
+    except MissingField:
+        return HTTPBadRequest()
+    except ValueError:
+        return HTTPBadRequest()
+    except:
+        return HTTPInternalServerError()
+
+    code = 201
+    newactivity_oid = newactivity.insert()
+    newactivity['_id'] = newactivity_oid
+
+    actor.addSubscription(newactivity['object'])
+
+    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    return handler.buildResponse()
+
+
+@view_config(route_name='subscriptions', request_method='DELETE')
 def unsubscribe(context, request):
     """
     """

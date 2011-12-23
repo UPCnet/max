@@ -4,10 +4,13 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTP
 from max.exceptions import MissingField
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import User
+from max.decorators import MaxRequest, MaxResponse
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='users', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getUsers(context, request):
     """
     """
@@ -18,6 +21,8 @@ def getUsers(context, request):
 
 
 @view_config(route_name='user', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getUser(context, request):
     """
     """
@@ -31,22 +36,16 @@ def getUser(context, request):
 
 
 @view_config(route_name='user', request_method='POST')
+@MaxResponse
+@MaxRequest
 def addUser(context, request):
     """
     """
     displayName = request.matchdict['displayName']
     rest_params = {'displayName': displayName}
 
-    # Try to initialize a User object from the request
-    # And catch the possible exceptions
-    try:
-        newuser = User(request, rest_params=rest_params)
-    except MissingField:
-        return HTTPBadRequest()
-    except ValueError:
-        return HTTPBadRequest()
-    except:
-        return HTTPInternalServerError()
+    # Initialize a User object from the request
+    newuser = User(request, rest_params=rest_params)
 
     # If we have the _id setted, then the object already existed in the DB,
     # otherwise, proceed to insert it into the DB

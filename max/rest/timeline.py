@@ -28,7 +28,7 @@ def getUserTimeline(context, request):
     # Add the activity of the people that posts to a particular context
     contexts_followings = []
     for subscribed in actor['subscribedTo']['items']:
-        contexts_followings.append({'target.url': subscribed['url']})
+        contexts_followings.append({'contexts.url': subscribed['url']})
 
     query_items = []
 

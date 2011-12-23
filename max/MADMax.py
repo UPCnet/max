@@ -1,5 +1,6 @@
 #MADMax  Mongo Access Delegate for Max
 
+from max.exceptions import MongoDBObjectNotFound
 from pymongo.objectid import ObjectId
 from max.models import Activity, User
 from pymongo import DESCENDING
@@ -97,7 +98,10 @@ class MADMaxCollection(object):
         """
         query = self._getQuery(itemID)
         item = self.collection.find_one(query, self.show_fields)
-        return self.ItemWrapper(item)
+        if item:
+            return self.ItemWrapper(item)
+        else:
+            raise MongoDBObjectNotFound, "Object with id %s not found inside %s" % (itemID,self.collection.name)
 
     def __getattr__(self, name):
         """

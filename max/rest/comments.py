@@ -5,13 +5,15 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTP
 from max.exceptions import MissingField
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-
+from max.decorators import MaxRequest, MaxResponse
 from max.models import Activity
 
 from pymongo.objectid import ObjectId
 
 
 @view_config(route_name='user_comments', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getUserComments(context, request):
     """
     """
@@ -19,6 +21,8 @@ def getUserComments(context, request):
 
 
 @view_config(route_name='comments', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getActivityComments(context, request):
     """
     """
@@ -26,35 +30,24 @@ def getActivityComments(context, request):
 
 
 @view_config(route_name='comments', request_method='POST')
+@MaxResponse
+@MaxRequest
 def addActivityComment(context, request):
     """
     POST /activities/{activity}/comments
     """
-
     #XXX TODO ara només es tracta la primera activitat,
     # s'ha de iterar si es vol que el comentari sigui de N activitats
     activityid = request.matchdict['activity']
 
-    try:
-        mmdb = MADMaxDB(context.db)
-        refering_activity = mmdb.activity[activityid]
-    except TypeError:
-        # La activitat indicada no existeix
-        return HTTPBadRequest()
+    mmdb = MADMaxDB(context.db)
+    refering_activity = mmdb.activity[activityid]
 
     # Prepare rest parameters to be merged with post data
     rest_params = {'object': {'inReplyTo': [{'_id':ObjectId(activityid)}]}}
 
-    # Try to initialize a Activity object from the request
-    # And catch the possible exceptions
-    try:
-        newactivity = Activity(request, rest_params=rest_params)
-    except MissingField:
-        return HTTPBadRequest()
-    except ValueError:
-        return HTTPBadRequest()
-    except:
-        return HTTPInternalServerError()
+    # Initialize a Activity object from the request
+    newactivity = Activity(request, rest_params=rest_params)
 
     code = 201
     newactivity_oid = newactivity.insert()

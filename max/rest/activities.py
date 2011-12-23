@@ -4,11 +4,14 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError,HTTPN
 from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.exceptions import MissingField
+from max.decorators import MaxRequest, MaxResponse
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='user_activities', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getUserActivities(context, request):
     """
          /people/{displayName}/activities
@@ -30,29 +33,22 @@ def getUserActivities(context, request):
 
 
 @view_config(route_name='user_activities', request_method='POST')
+@MaxResponse
+@MaxRequest
 def addUserActivity(context, request):
     """
          /users/{displayName}/activities
 
          Afegeix una activitat
     """
-
     displayName = request.matchdict['displayName']
 
     mmdb = MADMaxDB(context.db)
     actor = mmdb.users.getItemsBydisplayName(displayName)[0]
     rest_params = {'actor': actor}
 
-    # Try to initialize a Activity object from the request
-    # And catch the possible exceptions
-    try:
-        newactivity = Activity(request, rest_params=rest_params)
-    except MissingField:
-        return HTTPBadRequest()
-    except ValueError:
-        return HTTPBadRequest()
-    except:
-        return HTTPInternalServerError()
+    # Initialize a Activity object from the request
+    newactivity = Activity(request, rest_params=rest_params)
 
     # If we have the _id setted, then the object already existed in the DB,
     # otherwise, proceed to insert it into the DB
@@ -82,6 +78,8 @@ def getActivities(context, request):
     return HTTPNotImplemented()
 
 @view_config(route_name='activity', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getActivity(context, request):
     """
          /activities/{activity}
