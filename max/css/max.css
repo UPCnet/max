@@ -86,7 +86,7 @@ textarea:focus {
     width: 320px;
 }
 #login h1 a {
-    background: url("/static/epilogin.png") no-repeat scroll center top transparent;
+    background: url("/static/logo_MAX_color.png") no-repeat scroll center top transparent;
     display: block;
     height: 67px;
     overflow: hidden;
