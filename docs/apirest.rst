@@ -73,7 +73,7 @@ Representa el conjunt d'activitats creades per un usuari, i permet llistarles i 
 
     :query displayName: (REST) Nom de l'usuari que crea l'activitat
     :query verb: (Requerit) Per ara només suportat el verb ``post``
-    :query target: (Opcional) Per fer que una activitat estigui associada a un context determinat fa falta que enviem l'objecte target, indicant com a (``objectType``) el tipus 'service', i les dades del context com a l'exemple.
+    :query contexts: (Opcional) Per fer que una activitat estigui associada a un context determinat fa falta que enviem l'objecte contexts, indicant com a (``objectType``) el tipus 'context', i les dades del context com a l'exemple.
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``) `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot tractar-se d'un camp codificat amb HTML.
 
     Cos de la petició::
@@ -82,7 +82,6 @@ Representa el conjunt d'activitats creades per un usuari, i permet llistarles i 
             "verb": "post",
             "target": {
                 "objectType": "service",
-                "displayName": "Introduccio als computadors",
                 "url": "http://atenea.upc.edu/introcomp"
             },            
             "object": {
