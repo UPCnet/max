@@ -80,8 +80,8 @@ Representa el conjunt d'activitats creades per un usuari, i permet llistarles i 
         
        {
             "verb": "post",
-            "target": {
-                "objectType": "service",
+            "contexts": {
+                "objectType": "context",
                 "url": "http://atenea.upc.edu/introcomp"
             },            
             "object": {
