@@ -47,7 +47,7 @@ class JSONResourceRoot(ResourceRoot):
             else:
                 return HTTPInternalServerError('Invalid JSON output')
         else:
-            response_payload = self.wrap()
+            response_payload = json.dumps(self.wrap())
 
         return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
 
