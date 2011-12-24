@@ -22,7 +22,7 @@ Codis d'estat
 :201 CREATED: S'ha creat una entitat nova al recurs
 :400 BAD REQUEST: Alguns dels paràmetres requerits manquen o són erronis
 :404 NOT FOUND: El recurs solicitat no existeix, en aquest cas, comprovar la URI
-:500 INTERNAL SERVER ERROR : Només en cas de apareixer algun bug o cas no tractat
+:500 INTERNAL SERVER ERROR: Només en cas de apareixer algun bug o cas no tractat
 :501 NOT IMPLEMENTED: En recursos existents, indica que aquell mètode encara no esta implementat o que no aplica per el tipus de recurs solicitat
 
 Accés a recursos
@@ -87,7 +87,7 @@ Tot i així si el que volem es compartir l'activitat amb algú altre, no te sent
 
     GET /activities/activitat1
 
-que és equivalent a la forma anterior. Això ens dona un punt d'accés simplificat per dur a terme accions com per exemple la de compartir, que seria de la següent forma::
+que és equivalent a la forma anterior. Això ens dona una URI (canònica) simplificada per dur a terme accions com per exemple la de compartir, que seria de la següent forma::
     
     POST /activities/activitat1/shares
 
