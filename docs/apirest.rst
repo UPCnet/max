@@ -109,6 +109,14 @@ Comentaris d'una activitat
 
 Representa el conjunt de comentaris realitzats sobre una activitat concreta
 
+.. http:get:: /activities/{activity}/comments
+
+    Llistat totes els comentaris fets a una activitat concreta
+
+    :query activity: (REST) ha de ser un identificador vàlid d'una activitat existent, per exemple: 4e6eefc5aceee9210d000004
+
+    Retorna una col·lecció d'objecte del tipus ``Activity``
+
 .. http:post:: /activities/{activity}/comments
 
     Afegeix un comentari a una activitat ja existent al sistema. Aquest servei crea el comentari pròpiament dit dins de l'activitat i genera una activitat nova (l'usuari ha comentat l'activitat... )
@@ -128,8 +136,8 @@ Representa el conjunt de comentaris realitzats sobre una activitat concreta
             "verb": "post",
             "object": {
                 "objectType": "comment",
-                "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-            },
+                "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+            }
         }
 
 
