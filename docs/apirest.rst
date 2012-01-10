@@ -128,8 +128,8 @@ Representa el conjunt de comentaris realitzats sobre una activitat concreta
             "verb": "post",
             "object": {
                 "objectType": "comment",
-                "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-            },
+                "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+            }
         }
 
 
