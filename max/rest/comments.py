@@ -30,9 +30,8 @@ def getActivityComments(context, request):
 
     mmdb = MADMaxDB(context.db)
     refering_activity = mmdb.activity[activityid]
-
     cond1 = {'object.objectType' : 'comment'}
-    cond2 = {'object.inReplyTo' : refering_activity['_id']}
+    cond2 = {'object.inReplyTo._id' : refering_activity['_id']}
     query = {'$and' : [ cond1, cond2 ] }
     activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
 
