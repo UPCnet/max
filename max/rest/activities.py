@@ -78,8 +78,8 @@ def getActivities(context, request):
     return HTTPNotImplemented()
 
 @view_config(route_name='activity', request_method='GET')
-@MaxResponse
-@MaxRequest
+#@MaxResponse
+#@MaxRequest
 def getActivity(context, request):
     """
          /activities/{activity}
@@ -87,11 +87,7 @@ def getActivity(context, request):
          Mostra una activitat
     """
 
-    #XXX Aqui potser no cal buscar l'usuari mes que per temes de comprovacions de seguretat
-    displayName = request.matchdict['displayName']
-
     mmdb = MADMaxDB(context.db)
-    actor = mmdb.users.getItemsBydisplayName(displayName)[0]
     activity_oid = request.matchdict['activity']
     activity = mmdb.activity[activity_oid].flatten()
 

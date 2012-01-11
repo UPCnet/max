@@ -21,8 +21,8 @@ def getUserComments(context, request):
 
 
 @view_config(route_name='comments', request_method='GET')
-#@MaxResponse
-#@MaxRequest
+@MaxResponse
+@MaxRequest
 def getActivityComments(context, request):
     """
     """
@@ -30,12 +30,13 @@ def getActivityComments(context, request):
 
     mmdb = MADMaxDB(context.db)
     refering_activity = mmdb.activity[activityid]
-    cond1 = {'object.objectType' : 'comment'}
-    cond2 = {'object.inReplyTo._id' : refering_activity['_id']}
-    query = {'$and' : [ cond1, cond2 ] }
-    activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
+    #cond1 = {'object.objectType' : 'comment'}
+    #cond2 = {'object.inReplyTo._id' : refering_activity['_id']}
+    #query = {'$and' : [ cond1, cond2 ] }
+    #activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
 
-    handler = JSONResourceRoot(activities)
+    #handler = JSONResourceRoot(activities)
+    handler = JSONResourceRoot(refering_activity.replies['items'])
     return handler.buildResponse()
 
 
