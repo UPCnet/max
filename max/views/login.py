@@ -1,8 +1,9 @@
-from pyramid.httpexceptions import HTTPFound, HTTPUnauthorized
+# -*- coding: utf-8 -*-
+from pyramid.httpexceptions import HTTPFound
 
 from pyramid.url import resource_url
+from pyramid.interfaces import IAuthenticationPolicy
 
-from pyramid.security import remember
 from pyramid.security import forget
 
 from urlparse import urljoin
@@ -23,11 +24,6 @@ def _fixup_came_from(request, came_from):
 
 def login(context, request):
 
-#    import ipdb; ipdb.set_trace()
-
-    plugins = request.environ.get('repoze.who.plugins', {})
-    auth_tkt = plugins.get('auth_tkt')
-
     came_from = _fixup_came_from(request, request.POST.get('came_from'))
 
     login_url = resource_url(request.context, request, 'login')
@@ -41,6 +37,9 @@ def login(context, request):
 
     if request.params.get('form.submitted', None) is not None:
 
+        policy = request.registry.queryUtility(IAuthenticationPolicy)
+        authapi = policy._getAPI(request)
+
         challenge_qs = {'came_from': came_from}
         # identify
         login = request.POST.get('login')
@@ -50,20 +49,7 @@ def login(context, request):
                                         % request.application_url)
         credentials = {'login': login, 'password': password}
 
-        # authenticate
-        authenticators = filter(None, [plugins.get(name) for name in ['htpasswd']])
-
-        userid = None
-        # import ipdb; ipdb.set_trace()
-        if authenticators:
-            reason = 'Bad username or password'
-        else:
-            reason = 'No authenticatable users'
-
-        for plugin in authenticators:
-            userid = plugin.authenticate(request.environ, credentials)
-            if userid:
-                break
+        userid, headers = authapi.login(credentials)
 
         # if not successful, try again
         if not userid:
@@ -72,22 +58,15 @@ def login(context, request):
             #                  % (request.application_url,
             #                     urlencode(challenge_qs, doseq=True)))
             return dict(
-                  message=reason,
-                  url=request.application_url + '/login',
-                  came_from=came_from,
-                  login=login,
-                  password=password,
-                  )
-        # else, remember
-        credentials['repoze.who.userid'] = userid
-        if auth_tkt is not None:
-            remember_headers = auth_tkt.remember(request.environ, credentials)
-        else:
-            remember_headers = []
+                    message=reason,
+                    url=request.application_url + '/login',
+                    came_from=came_from,
+                    login=login,
+                    password=password,
+                    )
 
         # If it's the first time the user log in the system, then create the local user structure
-
-        user = context.db.users.find_one({'username': userid})
+        user = context.db.users.find_one({'username': userid['repoze.who.userid']})
 
         if user:
             # User exist in database, update login time and continue
@@ -95,17 +74,14 @@ def login(context, request):
             context.db.users.save(user)
         else:
             # No userid found in the database, then create an instance
-            newuser = {'displayName': userid,
+            newuser = {'displayName': userid['repoze.who.userid'],
                        'last_login': datetime.datetime.now(),
                        'following': {'items': [], },
                        'subscribedTo': {'items': [], }
                        }
             context.db.users.save(newuser)
 
-            # In case it's needed to redirect the new user to his/her profilepage
-            # return HTTPFound(headers=remember_headers, location='%s/editProfile' % request.application_url)
-
-        return HTTPFound(headers=remember_headers, location=came_from)
+        return HTTPFound(headers=headers, location=came_from)
 
     response = dict(
             message=reason,
@@ -118,8 +94,7 @@ def login(context, request):
     return response
 
 
-def logout(request, reason='Logged out'):
-    unauthorized = HTTPUnauthorized()
-    unauthorized.headerlist.append(
-        ('X-Authorization-Failure-Reason', reason))
-    return unauthorized
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(location=request.resource_url(request.context),
+                     headers=headers)
