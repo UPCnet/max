@@ -16,7 +16,7 @@ def main(global_config, **settings):
     """
     # Security
     my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
-    whoconfig_file = 'who.ini'
+    whoconfig_file = settings['whoconfig_file']
     identifier_id = 'auth_tkt'
     authn_policy = WhoV2AuthenticationPolicy(whoconfig_file, identifier_id)
     authz_policy = ACLAuthorizationPolicy()
