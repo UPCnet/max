@@ -56,7 +56,8 @@ def addActivityComment(context, request):
     refering_activity = mmdb.activity[activityid]
 
     # Prepare rest parameters to be merged with post data
-    rest_params = {'object': {'inReplyTo': [{'_id':ObjectId(activityid)}]}}
+    rest_params = {'object': {'inReplyTo': [{'_id':ObjectId(activityid),
+                                              'objectType':refering_activity.object['objectType']}]}}
 
     # Initialize a Activity object from the request
     newactivity = Activity(request, rest_params=rest_params)
