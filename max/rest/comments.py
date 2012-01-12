@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented
 
-from max.exceptions import MissingField
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.decorators import MaxRequest, MaxResponse
@@ -68,7 +67,8 @@ def addActivityComment(context, request):
     newactivity['_id'] = newactivity_oid
 
     comment = dict(newactivity.object)
-    comment['author'] = {'displayName': newactivity.actor['displayName']}
+    comment['author'] = {'displayName': newactivity.actor['displayName'],
+                         'objectType': 'person'}
     comment['id'] = newactivity._id
     del comment['inReplyTo']
 
