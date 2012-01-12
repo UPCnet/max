@@ -36,9 +36,10 @@ def getActivityComments(context, request):
     #activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
 
     #handler = JSONResourceRoot(activities)
-    handler = JSONResourceRoot(refering_activity.replies['items'])
+    replies = refering_activity.get('replies', {})
+    items = replies.get('items', [])
+    handler = JSONResourceRoot(items)
     return handler.buildResponse()
-
 
 
 @view_config(route_name='comments', request_method='POST')
