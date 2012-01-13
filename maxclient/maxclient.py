@@ -9,42 +9,42 @@ Funcionament
 
 Conectar
 
->>> from macsclient import MacsClient
->>> macs = MacsClient('http://max.beta.upcnet.es')
+>>> from maxclient import MaxcLient
+>>> max = MaxcLient('http://max.beta.upcnet.es')
 
 Afegir un usuari
 
->>> macs.addUser('test')
+>>> max.addUser('test')
 {u'displayName': u'test', u'subscribedTo': {u'items': []}, u'last_login': u'2012-01-11T12:14:52Z', u'published': u'2012-01-11T12:14:52Z', u'following': {u'items': []}, u'id': u'4f0d7d3c637e0325bc000000'}
 >>>
 
 Indicar l'usuari que firma les accions
 
->>> macs.setActor('test')
+>>> max.setActor('test')
 
 Afegir una activitat
 
->>> macs.addActivity('Hello world!')
+>>> max.addActivity('Hello world!')
 {u'verb': u'post', u'object': {u'content': u'Hello world!', u'objectType': u'note'}, u'id': u'4f0d7e09637e0325bc000001', u'actor': {u'displayName': u'test', u'id': u'4f0d7d3c637e0325bc000000', u'objectType': u'person'}, u'published': u'2012-01-11T12:18:17Z'}
 
 Obtenir la activitat per id
 
->>> macs.getActivity('4f0d7e09637e0325bc000001')
+>>> max.getActivity('4f0d7e09637e0325bc000001')
 {u'verb': u'post', u'object': {u'content': u'Hello world!', u'objectType': u'note'}, u'id': u'4f0d7e09637e0325bc000001', u'actor': {u'displayName': u'test', u'id': u'4f0d7d3c637e0325bc000000', u'objectType': u'person'}, u'published': u'2012-01-11T12:18:17Z'}
 
 Afegir un comentari a l'activitat
 
->>> macs.addComment('Hello moon!','4f0d7e09637e0325bc000001')
+>>> max.addComment('Hello moon!','4f0d7e09637e0325bc000001')
 {u'verb': u'post', u'object': {u'content': u'Hello moon!', u'inReplyTo': [{u'id': u'4f0d7e09637e0325bc000001'}], u'objectType': u'comment'}, u'id': u'4f0d7fbe637e0325bc000002', u'actor': {u'displayName': u'test', u'id': u'4f0d7d3c637e0325bc000000', u'objectType': u'person'}, u'published': u'2012-01-11T12:25:34Z'}
 
 Afagar el primer comentari de l'activitat
 
->>> macs.getActivity('4f0d7e09637e0325bc000001')['replies']['items'][0]
+>>> max.getActivity('4f0d7e09637e0325bc000001')['replies']['items'][0]
 {u'content': u'Hello moon!', u'author': {u'displayName': u'test'}, u'id': u'4f0d7fbe637e0325bc000002', u'objectType': u'comment'}
 
 Veure el timeline d'un usuari
 
->>> macs.getUserTimeline('test')
+>>> max.getUserTimeline('test')
 {u'totalItems': 2, u'items': [{u'verb': u'post', u'object': {u'content': u'Hello moon!', u'inReplyTo': [{u'id': u'4f0d7e09637e0325bc000001'}], u'objectType': u'comment'}, u'id': u'4f0d7fbe637e0325bc000002', u'actor': {u'displayName': u'test', u'id': u'4f0d7d3c637e0325bc000000', u'objectType': u'person'}, u'published': u'2012-01-11T12:25:34Z'}, {u'replies': {u'totalItems': 1, u'items': [{u'content': u'Hello moon!', u'author': {u'displayName': u'test'}, u'id': u'4f0d7fbe637e0325bc000002', u'objectType': u'comment'}]}, u'object': {u'content': u'Hello world!', u'objectType': u'note'}, u'actor': {u'displayName': u'test', u'id': u'4f0d7d3c637e0325bc000000', u'objectType': u'person'}, u'verb': u'post', u'published': u'2012-01-11T12:18:17Z', u'id': u'4f0d7e09637e0325bc000001'}]}
 >>>
 
@@ -70,7 +70,7 @@ ROUTES = dict(users='/people',
               share='/activities/%(activity)s/shares/%(shareId)s')
 
 
-class MacsClient(object):
+class MaxcLient(object):
 
     def __init__(self, url):
         """
