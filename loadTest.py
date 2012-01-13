@@ -1,19 +1,59 @@
-import httplib2
+from maxclient import MaxClient
+import threading
 import json
 import time
 import datetime
+from random import choice, randint
 
 # server = 'capricornius2.upc.es'
 # server = 'max.beta.upcnet.es'
-server = 'localhost:6543'
+server = 'http://147.83.193.90'
+
+max = MaxClient(server)
+
+# Afegim 30000 usuaris
+numUsuaris = 3000
+numActivitat = 10000
+ALLOWED_CHARACTERS = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789'
+MESSAGE_LENGTH = 140
+
+
+class creaUsuaris(threading.Thread):
+    def __init__(self, numUsuaris):
+        self.numUsuaris = numUsuaris
+        threading.Thread.__init__(self)
+
+    def run(self):
+        for usuari in range(self.numUsuaris):
+            print "Creant usuari %s" % str(usuari)
+            max.addUser('usuari' + str(usuari))
+
+
+class creaActivitat(threading.Thread):
+    def __init__(self, numUsuaris, numActivitat):
+        self.numActivitat = numActivitat
+        self.numUsuaris = numUsuaris
+        self.allowed_chars = ALLOWED_CHARACTERS
+        self.length = MESSAGE_LENGTH
+        threading.Thread.__init__(self)
+
+    def run(self):
+        for i in range(self.numActivitat):
+            usuariName = 'usuari' + str(randint(0, self.numUsuaris))
+            max.setActor(usuariName)
+            max.addActivity(''.join([choice(self.allowed_chars) for i in range(self.length)]))
+            print "Creant activitat %s" % usuariName
 
 t0 = time.time()
-h = httplib2.Http()
-for i in range(10):
-    data={"published": i,"actor": {"url": "http://example.org/martin","objectType" : "person","id": "victor","image": {"url": "http://example.org/martin/image","width": 250,"height": 250}, "displayName": "Victor Fernandez de Alba"},"verb": "post","object" : {"url": "http://example.org/blog/2011/02/entry","id": "tag:example.org,2011:abc123/xyz"},"target" : {"url": "http://example.org/blog/","objectType": "blog","id": "tag:example.org,2011:abc123","displayName": "Martin's Blog"}}
-    data_json = json.dumps(data)
-    h.request("http://%s/activity" % server,
-              "POST",
-              data_json,
-              headers={'Content-Type': 'application/json'})
-print "%.3f segons" % (time.time()-t0)
+thread1 = creaUsuaris(numUsuaris)
+thread1.start()
+while thread1.isAlive():
+    pass
+print "%.3f segons: Fi de creacio usuaris" % (time.time() - t0)
+
+t0 = time.time()
+thread2 = creaActivitat(numUsuaris, numActivitat)
+thread2.start()
+while thread2.isAlive():
+    pass
+print "%.3f segons: Fi de creacio activitat" % (time.time() - t0)

@@ -9,8 +9,8 @@ Funcionament
 
 Conectar
 
->>> from maxclient import MaxcLient
->>> max = MaxcLient('http://max.beta.upcnet.es')
+>>> from maxclient import MaxClient
+>>> max = MaxClient('http://max.beta.upcnet.es')
 
 Afegir un usuari
 
@@ -70,7 +70,7 @@ ROUTES = dict(users='/people',
               share='/activities/%(activity)s/shares/%(shareId)s')
 
 
-class MaxcLient(object):
+class MaxClient(object):
 
     def __init__(self, url):
         """
@@ -110,7 +110,7 @@ class MaxcLient(object):
     def GET(self, route, query=None):
         """
         """
-        resource_uri = '%s/%s' % (self.url, route)
+        resource_uri = '%s%s' % (self.url, route)
         req = requests.get(resource_uri)
 
         isOk = req.status_code == 200
@@ -125,7 +125,7 @@ class MaxcLient(object):
     def POST(self, route, query):
         """
         """
-        resource_uri = '%s/%s' % (self.url, route)
+        resource_uri = '%s%s' % (self.url, route)
         json_query = json.dumps(query)
 
         req = requests.post(resource_uri, data=json_query)
