@@ -74,7 +74,6 @@ demostatus_with_context = {
 user_status = {
     "actor": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000000",
         "displayName": "victor"
     },
     "verb": "post",
@@ -88,7 +87,6 @@ user_status = {
 user_comment = {
     "actor": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000000",
         "displayName": "javier"
     },
     "verb": "post",
@@ -106,13 +104,11 @@ user_comment = {
 follow = {
     "actor": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000000",
         "displayName": "victor"
     },
     "verb": "follow",
     "object": {
         "objectType": "person",
-        "id": "4e6e1243aceee91143000001",
         "displayName": "javier"
     },
 }
