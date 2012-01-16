@@ -55,7 +55,7 @@ $(document).ready(function() {
     timeline_query = {"displayName": username};
 
     max = new MaxClient('http://localhost:6543')
-    max.setActor('sunbit')
+    max.setActor(username)
     timeline = max.getUserTimeline(username)
 
 
