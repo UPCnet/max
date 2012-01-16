@@ -21,7 +21,7 @@ $(document).ready(function() {
         data['object']['content'] = content;
 
         $.ajax({type:'POST',
-                 url: '/users/'+username+'/activities',
+                 url: '/people/'+username+'/activities',
                  data: JSON.stringify(data),
 //                 contentType: 'application/json; charset=utf-8'
              });
@@ -54,49 +54,28 @@ $(document).ready(function() {
     // Fill the last activity in the #activityContainer
     timeline_query = {"displayName": username};
 
-    $.ajax({type:'GET',
-            url:'/users/'+username+'/timeline',
-            data: timeline_query,
-            //contentType: 'application/json; charset=utf-8',
-            success: function(data) {
-                        $.each(data.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
-                        $(".date").easydate(easydateOptions);
-                        $("button").button();
-                        $(".comment").click( function() {
-                            $(this).closest(".activity").find(".newcommentbox").toggle('fold');
-                        });
-                        $("button.sendcomment").click(function() {
-                            comment = {
-                                "actor": {
-                                    "objectType": "person",
-                                    "id": userid,
-                                    "displayName": username
-                                },
-                                "verb": "post",
-                                "object": {
-                                    "objectType": "comment",
-                                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-                                    "inReplyTo": [
-                                      {
-                                        "id": "4e6eefc5aceee9210d000004",
-                                      }
-                                    ]
-                                },
-                            }
-                            comment['object']['content'] = $(this).closest(".activity").find(".commentBox").val();
-                            comment['object']['inReplyTo'][0] = {'id': $(this).closest(".activity").attr('activityid')};
-                            alert(comment.toString());
-                            $.ajax({type:'POST',
-                                     url: '/comment',
-                                     data: JSON.stringify(comment),
-                                     contentType: 'application/json; charset=utf-8'
-                                 });
+    max = new MaxClient('http://localhost:6543')
+    max.setActor('sunbit')
+    timeline = max.getUserTimeline(username)
 
-                            $(".activityBox").val("");
-                            reloadActivity();                            
-                        }
-                    )}
+
+    $.each(timeline.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
+    $(".date").easydate(easydateOptions);
+    $("button").button();
+    $(".comment").click( function() {
+        $(this).closest(".activity").find(".newcommentbox").toggle('fold');
     });
+    $("button.sendcomment").click(function() {
+
+        comment_text = $(this).closest(".activity").find(".commentBox").val();
+        activityid = $(this).closest(".activity").attr('activityid');
+        
+        max.addComment(comment_text,activityid)
+
+        $(".activityBox").val("");
+        reloadActivity();                            
+      })
+
     
 });
 
@@ -104,7 +83,7 @@ function reloadActivity () {
     timeline_query = {"displayName": username};
 
     $.ajax({type:'GET',
-            url:'/users/'+username+'/timeline',
+            url:'/people/'+username+'/timeline',
             data: timeline_query,
             contentType: 'application/json; charset=utf-8',
             success: function(data) {
@@ -214,4 +193,4 @@ easydateOptions = {
         "ago": "fa",
         "in": "en" 
     }
-}
+ }
