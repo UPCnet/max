@@ -9,22 +9,11 @@ $(document).ready(function() {
     // Send the activity
     $("button.send").click(function() {
         content = $(".activityBox").val();
-        data = {};
         // set actor - En un futur ho ha de fer el server comparant tokens
-        data['actor'] = {};
-        data['actor']['objectType'] = 'person';
-        data['actor']['displayName'] = username;
-        data['actor']['id'] = userid;
-        data['verb'] = 'post'
-        data['object'] = {}
-        data['object']['objectType'] = 'note';
-        data['object']['content'] = content;
+        max = new MaxClient('http://localhost:6543')
+        max.setActor(username)
+        max.addActivity(content)
 
-        $.ajax({type:'POST',
-                 url: '/people/'+username+'/activities',
-                 data: JSON.stringify(data),
-//                 contentType: 'application/json; charset=utf-8'
-             });
 
         $(".activityBox").val("");
         reloadActivity();
@@ -82,20 +71,22 @@ $(document).ready(function() {
 function reloadActivity () {
     timeline_query = {"displayName": username};
 
-    $.ajax({type:'GET',
-            url:'/people/'+username+'/timeline',
-            data: timeline_query,
-            contentType: 'application/json; charset=utf-8',
-            success: function(data) {
-                        $('#activityContainer').children().remove();
-                        $.each(data.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
-                        $(".date").easydate(easydateOptions);
-                        $("button").button();
-                        $(".comment").click( function() {
-                            $(this).closest(".activity").find(".newcommentbox").toggle('fold');
-                        });
-                    }
-    });    
+    max = new MaxClient('http://localhost:6543')
+    max.setActor(username)
+    timeline = max.getUserTimeline(username)
+    $('#activityContainer').html('')
+    $.each(timeline.items, function(k,v)
+             { 
+                $('#activityContainer').append(formatActivityStream(v)) 
+             })
+
+    $(".date").easydate(easydateOptions);
+    $("button").button();
+    $(".comment").click( function() {
+             $(this).closest(".activity").find(".newcommentbox").toggle('fold');
+             });
+
+    
 }
 
 function formatActivityStream (activity) {

@@ -83,7 +83,6 @@ MaxClient.prototype.getUserTimeline = function() {
 MaxClient.prototype.addComment = function() {
 	comment = arguments[0]
 	activity = arguments[1]
-	console.log(activity)
 
     query = {
         "actor": {},
@@ -98,6 +97,26 @@ MaxClient.prototype.addComment = function() {
     query.object.content = comment
 
 	route = this.ROUTES['comments'].format(activity);
+    resp = this.POST(route,query)
+    
+    return resp['json']
+};
+
+
+MaxClient.prototype.addActivity = function() {
+	text = arguments[0]
+
+    query = {
+        "verb": "post",
+        "object": {
+            "objectType": "note",
+            "content": ""
+            }
+        }
+
+    query.object.content = text
+
+	route = this.ROUTES['user_activities'].format(this.actor.displayName);
     resp = this.POST(route,query)
     
     return resp['json']
