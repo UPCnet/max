@@ -44,7 +44,7 @@ class Activity(MADBase):
         """
             Adds a comment to an existing activity
         """
-        self.updateList('replies', comment)
+        self.addToList('replies', comment, allow_duplicates=True)
 
 
 class User(MADBase):
@@ -78,4 +78,12 @@ class User(MADBase):
         """
             Adds a comment to an existing activity
         """
-        self.updateList('subscribedTo', url)
+        self.addToList('subscribedTo', url, safe=False)
+
+    def removeSubscription(self, url):
+        """
+            Adds a comment to an existing activity
+        """
+        self.deleteFromList('subscribedTo', url)
+
+    
