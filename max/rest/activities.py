@@ -1,9 +1,8 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError,HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.models import Activity
-from max.exceptions import MissingField
 from max.decorators import MaxRequest, MaxResponse
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
@@ -29,7 +28,6 @@ def getUserActivities(context, request):
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
-
 
 
 @view_config(route_name='user_activities', request_method='POST')
@@ -73,9 +71,10 @@ def getActivities(context, request):
     """
          /activities
 
-         Retorna all activities 
+         Retorna all activities
     """
     return HTTPNotImplemented()
+
 
 @view_config(route_name='activity', request_method='GET')
 #@MaxResponse
@@ -100,6 +99,7 @@ def deleteActivity(context, request):
     """
     """
     return HTTPNotImplemented()
+
 
 @view_config(route_name='activity', request_method='PUT')
 def modifyActivity(context, request):
