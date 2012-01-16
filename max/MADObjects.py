@@ -1,5 +1,5 @@
 from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField, ObjectNotSupported
+from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError
 import datetime
 from pyramid.request import Request
 import sys
@@ -145,7 +145,10 @@ class MADBase(MADDict):
             if '_id' not in self.data['actor'].keys():
                 user_displayName = self.data['actor']['displayName']
                 user = self.mdb_collection.database.users.find_one({'displayName': user_displayName})
-                self.data['actor'] = user
+                if user != None:
+                    self.data['actor'] = user
+                else:
+                    raise UnknownUserError, 'Unknown user "%s"' % user_displayName
 
     def insert(self):
         """
@@ -154,18 +157,41 @@ class MADBase(MADDict):
         oid = self.mdb_collection.insert(self)
         return str(oid)
 
-    def updateList(self, field, obj):
+    def addToList(self, field, obj, allow_duplicates=False, safe=True):
         """
-            Updates an array field of a existing DB object appending the new obj
-            and incrementing the totalItems counter
+            Updates an array field of a existing DB object appending the new object
+            and incrementing the totalItems counter.
+
+            if allow_duplicates = True, allows to add items even if its already on the list. If not
+            , looks for `safe` value to either raise an exception if safe==False or pass gracefully if its True
+
+            XXX TODO allow object to be either a single object or a list of objects
         """
+
+        replies = self.get('replies', {'items': [], 'totalItems': 0})
+
         items = '%s.items' % field
         count = '%s.totalItems' % field
-        self.mdb_collection.update({'_id': self['_id']},
-                                 {
-                                    '$push': {items: obj},
-                                    '$inc': {count: 1}
-                                })
+
+        duplicated = obj in replies['items']
+
+        if allow_duplicates or not duplicated:
+            self.mdb_collection.update({'_id': self['_id']},
+                                      {'$push': {items: obj},
+                                       '$inc': {count: 1}
+                                      }
+                                     )
+        else:
+            if not safe:
+                raise DuplicatedItemError, 'Item already on list "%s"' % (field)
+
+    def deleteFromList(self, field, obj, safe=True):
+        """
+            Updates an array field of a existing DB object removing the object
+
+            If safe == False, don't perform any deletion, otherwise remove the found objects.
+        """
+        pass
 
     def alreadyExists(self):
         """
