@@ -5,7 +5,8 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPNotImplemented, HTTPInter
 
 
 from max.exceptions import MissingField
-from max.MADMax import MADMaxDB
+from max.MADMax import MADMaxCollection
+from max.decorators import MaxRequest, MaxResponse
 
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
@@ -19,6 +20,8 @@ def getUserSubscriptions(context, request):
 
 
 @view_config(route_name='subscriptions', request_method='POST')
+@MaxResponse
+@MaxRequest
 def subscribe(context, request):
     """
         /people/{displayName}/subscriptions
@@ -27,20 +30,12 @@ def subscribe(context, request):
     # s'ha de iterar si es vol que el comentari sigui de N activitats
     displayName = request.matchdict['displayName']
 
-    mmdb = MADMaxDB(context.db)
-    actor = mmdb.users.getItemsBydisplayName(displayName)[0]
+    mmdbusers = MADMaxCollection(context.db.users, query_key='displayName')
+    actor = mmdbusers[displayName]
     rest_params = {'actor': actor}
 
-    # Try to initialize a Activity object from the request
-    # And catch the possible exceptions
-    try:
-        newactivity = Activity(request, rest_params=rest_params)
-    except MissingField:
-        return HTTPBadRequest()
-    except ValueError:
-        return HTTPBadRequest()
-    except:
-        return HTTPInternalServerError()
+    # Initialize a Activity object from the request
+    newactivity = Activity(request, rest_params=rest_params)
 
     code = 201
     newactivity_oid = newactivity.insert()
