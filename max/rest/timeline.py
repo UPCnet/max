@@ -23,7 +23,9 @@ def getUserTimeline(context, request):
     # Add the activity of the people that the user follows
     actors_followings = []
     for following in actor['following']['items']:
-        actors_followings.append({'actor._id': following['_id']})
+        followed_person = mmdb.users.getItemsBydisplayName(following['displayName'])[0]
+        if followed_person:
+            actors_followings.append({'actor._id': followed_person['_id']})
 
     # Add the activity of the people that posts to a particular context
     contexts_followings = []
@@ -34,12 +36,14 @@ def getUserTimeline(context, request):
 
     if not is_follows_resource and not is_context_resource:
         query_items.append(actor_query)
+        query_items += actors_followings
+        query_items += contexts_followings
 
     if is_context_resource:
         query_items += contexts_followings
 
     if is_follows_resource:
-        query_items += actors_followings
+        query_items += contexts_followings
 
     if query_items:
         query = {'$or': query_items}
