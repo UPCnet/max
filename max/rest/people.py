@@ -1,7 +1,7 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.response import Response
 
-from max.exceptions import MissingField
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import User
 from max.decorators import MaxRequest, MaxResponse
@@ -63,6 +63,18 @@ def addUser(context, request):
 
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()
+
+
+@view_config(route_name='avatar', request_method='GET')
+def getUserAvatar(context, request):
+    """
+    """
+    AVATAR_FOLDER = '/var/pyramid/max/avatars/'
+    displayName = request.matchdict['displayName']
+    data = open('%s/%s.jpg' % (AVATAR_FOLDER, displayName)).read()
+    image = Response(data, status_int=200)
+    image.content_type = 'image/jpeg'
+    return image
 
 
 @view_config(route_name='user', request_method='PUT')

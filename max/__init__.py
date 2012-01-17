@@ -10,7 +10,6 @@ from max.rest.services import WADL
 
 # from max.models import appmaker
 
-
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
@@ -48,6 +47,7 @@ def main(global_config, **settings):
 
     config.add_route('users', '/people')
     config.add_route('user', '/people/{displayName}')
+    config.add_route('avatar', '/people/{displayName}/avatar')
 
     config.add_route('user_activities', '/people/{displayName}/activities')
     config.add_route('timeline', '/people/{displayName}/timeline')
