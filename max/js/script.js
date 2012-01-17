@@ -12,11 +12,12 @@ $(document).ready(function() {
         // set actor - En un futur ho ha de fer el server comparant tokens
         max = new MaxClient('http://localhost:6543')
         max.setActor(username)
-        max.addActivity(content)
+        max.addActivity(content,function() {
+            $(".activityBox").val("");
+            reloadActivity();
+        })
 
 
-        $(".activityBox").val("");
-        reloadActivity();
     });
 
     $("button.followButton").toggle(
@@ -45,26 +46,27 @@ $(document).ready(function() {
 
     max = new MaxClient('http://localhost:6543')
     max.setActor(username)
-    timeline = max.getUserTimeline(username)
+    max.getUserTimeline(username, function() {
+        $.each(this.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
+        $(".date").easydate(easydateOptions);
+        $("button").button();
+        $(".comment").click( function() {
+            $(this).closest(".activity").find(".newcommentbox").toggle('fold');
+        });
+        $("button.sendcomment").click(function() {
 
+            comment_text = $(this).closest(".activity").find(".commentBox").val();
+            activityid = $(this).closest(".activity").attr('activityid');
 
-    $.each(timeline.items, function(k,v){ $('#activityContainer').append(formatActivityStream(v)) })
-    $(".date").easydate(easydateOptions);
-    $("button").button();
-    $(".comment").click( function() {
-        $(this).closest(".activity").find(".newcommentbox").toggle('fold');
-    });
-    $("button.sendcomment").click(function() {
+            max.addComment(comment_text,activityid,function() {
 
-        comment_text = $(this).closest(".activity").find(".commentBox").val();
-        activityid = $(this).closest(".activity").attr('activityid');
+                $(".commentBox").val("");
+                reloadActivity();
 
-        max.addComment(comment_text,activityid)
+            })
 
-        $(".activityBox").val("");
-        reloadActivity();
-      })
-
+          })
+     })
 
 });
 
@@ -73,19 +75,19 @@ function reloadActivity () {
 
     max = new MaxClient('http://localhost:6543')
     max.setActor(username)
-    timeline = max.getUserTimeline(username)
+    max.getUserTimeline(username, function() {
     $('#activityContainer').html('')
-    $.each(timeline.items, function(k,v)
-             {
-                $('#activityContainer').append(formatActivityStream(v))
-             })
+        $.each(this.items, function(k,v)
+                 {
+                    $('#activityContainer').append(formatActivityStream(v))
+                 })
 
-    $(".date").easydate(easydateOptions);
-    $("button").button();
-    $(".comment").click( function() {
-             $(this).closest(".activity").find(".newcommentbox").toggle('fold');
-             });
-
+        $(".date").easydate(easydateOptions);
+        $("button").button();
+        $(".comment").click( function() {
+                 $(this).closest(".activity").find(".newcommentbox").toggle('fold');
+                 });
+    })
 
 }
 
@@ -120,7 +122,10 @@ function sendFollow () {
     max = new MaxClient('http://localhost:6543')
     max.setActor(username)
     person_to_follow = $("h1").attr("displayname")
-    max.follow(person_to_follow)
+    max.follow(person_to_follow, function(){
+            alert('Ara segueixes a '+username)
+
+    })
 
     follow = {
         "actor": {

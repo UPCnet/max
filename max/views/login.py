@@ -66,7 +66,7 @@ def login(context, request):
                     )
 
         # If it's the first time the user log in the system, then create the local user structure
-        user = context.db.users.find_one({'username': userid['repoze.who.userid']})
+        user = context.db.users.find_one({'displayName': userid['repoze.who.userid']})
 
         if user:
             # User exist in database, update login time and continue

@@ -6,9 +6,11 @@ String.prototype.format = function(){
 
 function MaxClient (url) {
 	this.url = url;
+	this.mode = 'jquery'
 
     this.ROUTES = {   users : '/people',
 		              user : '/people/{0}',
+		              avatar : '/people/{0}/avatar',
 		              user_activities : '/people/{0}/activities',
 		              timeline : '/people/{0}/timeline',
 		              user_comments : '/people/{0}/comments',
@@ -29,60 +31,95 @@ function MaxClient (url) {
 };
 
 
-MaxClient.prototype.setActor = function() {
+MaxClient.prototype.setMode = function(mode) {
+	this.mode = mode
+
+};
+
+MaxClient.prototype.setActor = function(displayName) {
 	this.actor = {
             "objectType": "person",
-            "displayName": arguments[0],
+            "displayName": displayName,
         }
 
 };
 
-MaxClient.prototype.POST = function() {
-	route = arguments[0]
-	query = arguments[1]
+MaxClient.prototype.POST = function(route, query, callback) {
     resource_uri = '{0}{1}'.format(this.url, route)
-    var ajax_result = '';
-    xhr = $.ajax( {url: route,
-	         success: function(data) {
-	         	ajax_result = data
-		         },
-		     type: 'POST',
-		     data: JSON.stringify(query),
-		     async: false,
-		     dataType: 'json'
-		    }
-		   );
-    return {json:ajax_result,statuscode:xhr['statusText']}
+    if (this.mode=='jquery')
+    {
+	    $.ajax( {url: route,
+		         success: function(result) { callback.call(result.data) },
+			     type: 'POST',
+			     data: JSON.stringify(query),
+			     async: true,
+			     dataType: 'json'
+			    }
+			   );
+    }
+    else
+    {
+	    var params = {}
+	    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON
+	    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST
+	    params[gadgets.io.RequestParameters.REFRESH_INTERVAL] = 1
+	    params[gadgets.io.RequestParameters.POST_DATA] = JSON.stringify(query)
+
+	    gadgets.io.makeRequest(
+	                   resource_uri,
+	                   function(result) { callback.call(result.data) },
+	                   params
+	                    )
+
+
+    }
+    return true
 };
 
-MaxClient.prototype.GET = function() {
-	route = arguments[0]
+MaxClient.prototype.GET = function(route, callback) {
     resource_uri = '{0}{1}'.format(this.url, route)
-    var ajax_result = '';
-    xhr = $.ajax( {url: route,
-	         success: function(data) {
-	         	ajax_result = data
-		         },
-		     type: 'GET',
-		     async: false,
-		     dataType: 'json'
-		    }
-		   );
-    return {json:ajax_result,statuscode:xhr['statusText']}
-}
 
+    if (this.mode=='jquery')
+    {
+	    $.ajax( {url: route,
+		         success: function(result) { callback.call(result) },
+			     type: 'GET',
+			     async: true,
+			     dataType: 'json'
+			    }
+			   );
+	}
+	else
+	{
+	    var params = {}
+	    params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON
+	    params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET
+	    params[gadgets.io.RequestParameters.REFRESH_INTERVAL] = 1
 
-MaxClient.prototype.getUserTimeline = function() {
-    displayName = arguments[0]
+	    gadgets.io.makeRequest(
+	                   resource_uri,
+	                   function(result) { callback.call(result.data) },
+	                   params
+	                    )
+
+     }
+   //return {json:ajax_result,statuscode:xhr['statusText']}
+   return true
+	}
+
+MaxClient.prototype.getUserAvatarURL = function(displayName) {
+	route = this.ROUTES['avatar'].format(displayName);
+	imageurl = '{0}{1}'.format(this.url, route )
+	return imageurl
+
+};
+
+MaxClient.prototype.getUserTimeline = function(displayName, callback) {
 	route = this.ROUTES['timeline'].format(displayName);
-    resp = this.GET(route)
-
-    return resp['json']
+    this.GET(route,callback)
 };
 
-MaxClient.prototype.addComment = function() {
-	comment = arguments[0]
-	activity = arguments[1]
+MaxClient.prototype.addComment = function(comment, activity, callback) {
 
     query = {
         "actor": {},
@@ -97,15 +134,12 @@ MaxClient.prototype.addComment = function() {
     query.object.content = comment
 
 	route = this.ROUTES['comments'].format(activity);
-    resp = this.POST(route,query)
+    this.POST(route,query)
 
-    return resp['json']
 };
 
 
-MaxClient.prototype.addActivity = function() {
-	text = arguments[0]
-
+MaxClient.prototype.addActivity = function(text,callback) {
     query = {
         "verb": "post",
         "object": {
@@ -117,14 +151,10 @@ MaxClient.prototype.addActivity = function() {
     query.object.content = text
 
 	route = this.ROUTES['user_activities'].format(this.actor.displayName);
-    resp = this.POST(route,query)
-
-    return resp['json']
+    this.POST(route,query,callback)
 };
 
-MaxClient.prototype.follow = function() {
-	displayName = arguments[0]
-
+MaxClient.prototype.follow = function(displayName, callback ) {
     query = {
         "verb": "follow",
         "object": {
@@ -137,6 +167,4 @@ MaxClient.prototype.follow = function() {
 
 	route = this.ROUTES['follow'].format(this.actor.displayName,displayName);
     resp = this.POST(route,query)
-
-    return resp['json']
 };
