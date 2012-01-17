@@ -168,12 +168,12 @@ class MADBase(MADDict):
             XXX TODO allow object to be either a single object or a list of objects
         """
 
-        replies = self.get('replies', {'items': [], 'totalItems': 0})
+        obj_list = self.get(field, {'items': [], 'totalItems': 0})
 
         items = '%s.items' % field
         count = '%s.totalItems' % field
 
-        duplicated = obj in replies['items']
+        duplicated = obj in obj_list['items']
 
         if allow_duplicates or not duplicated:
             self.mdb_collection.update({'_id': self['_id']},

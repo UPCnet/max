@@ -74,6 +74,12 @@ class User(MADBase):
                    }
         self.update(ob)
 
+    def addFollower(self, person):
+        """
+            Adds a follower to the list
+        """
+        self.addToList('following', person)
+
     def addSubscription(self, url):
         """
             Adds a comment to an existing activity
@@ -85,5 +91,3 @@ class User(MADBase):
             Adds a comment to an existing activity
         """
         self.deleteFromList('subscribedTo', url)
-
-    

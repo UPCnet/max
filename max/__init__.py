@@ -6,9 +6,9 @@ from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from max.resources import Root
-from max.rest.services import WADL
 
 # from max.models import appmaker
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -58,7 +58,6 @@ def main(global_config, **settings):
     config.add_route('follow', '/people/{displayName}/follows/{followedDN}')
     config.add_route('subscriptions', '/people/{displayName}/subscriptions')
     config.add_route('subscription', '/people/{displayName}/subscriptions/{subscrId}}')
-
 
     config.add_route('activities', '/activities')
     config.add_route('activity', '/activities/{activity}')

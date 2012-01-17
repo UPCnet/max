@@ -6,6 +6,7 @@ String.prototype.format = function(){
 
 function MaxClient (url) {
 	this.url = url;
+
     this.ROUTES = {   users : '/people',
 		              user : '/people/{0}',
 		              user_activities : '/people/{0}/activities',
@@ -33,14 +34,13 @@ MaxClient.prototype.setActor = function() {
             "objectType": "person",
             "displayName": arguments[0],
         }
-	
-};
 
+};
 
 MaxClient.prototype.POST = function() {
 	route = arguments[0]
 	query = arguments[1]
-    resource_uri = '{0}{1}'.format(this.url, route) 
+    resource_uri = '{0}{1}'.format(this.url, route)
     var ajax_result = '';
     xhr = $.ajax( {url: route,
 	         success: function(data) {
@@ -52,12 +52,12 @@ MaxClient.prototype.POST = function() {
 		     dataType: 'json'
 		    }
 		   );
-    return {json:ajax_result,statuscode:xhr['statusText']}	
+    return {json:ajax_result,statuscode:xhr['statusText']}
 };
 
 MaxClient.prototype.GET = function() {
 	route = arguments[0]
-    resource_uri = '{0}{1}'.format(this.url, route) 
+    resource_uri = '{0}{1}'.format(this.url, route)
     var ajax_result = '';
     xhr = $.ajax( {url: route,
 	         success: function(data) {
@@ -76,7 +76,7 @@ MaxClient.prototype.getUserTimeline = function() {
     displayName = arguments[0]
 	route = this.ROUTES['timeline'].format(displayName);
     resp = this.GET(route)
-    
+
     return resp['json']
 };
 
@@ -98,7 +98,7 @@ MaxClient.prototype.addComment = function() {
 
 	route = this.ROUTES['comments'].format(activity);
     resp = this.POST(route,query)
-    
+
     return resp['json']
 };
 
@@ -118,6 +118,25 @@ MaxClient.prototype.addActivity = function() {
 
 	route = this.ROUTES['user_activities'].format(this.actor.displayName);
     resp = this.POST(route,query)
-    
+
+    return resp['json']
+};
+
+MaxClient.prototype.follow = function() {
+	displayName = arguments[0]
+
+    query = {
+        "verb": "follow",
+        "object": {
+            "objectType": "person",
+            "displayName": ""
+            }
+        }
+
+    query.object.displayName = displayName
+
+	route = this.ROUTES['follow'].format(this.actor.displayName,displayName);
+    resp = this.POST(route,query)
+
     return resp['json']
 };

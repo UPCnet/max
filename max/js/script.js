@@ -1,4 +1,4 @@
-/* Author: 
+/* Author:
 
 */
 
@@ -23,10 +23,10 @@ $(document).ready(function() {
         function() {
             if ($("button.followButton span").text() == 'Follow') {
                 sendFollow();
-                $("button.followButton span").text('Unfollow');                
+                $("button.followButton span").text('Unfollow');
             } else {
                 sendUnfollow();
-                $("button.followButton span").text('Follow');               
+                $("button.followButton span").text('Follow');
             }
         },
         function() {
@@ -35,7 +35,7 @@ $(document).ready(function() {
                 $("button.followButton span").text('Follow');
             } else {
                 sendFollow();
-                $("button.followButton span").text('Unfollow'); 
+                $("button.followButton span").text('Unfollow');
             }
         }
     );
@@ -58,14 +58,14 @@ $(document).ready(function() {
 
         comment_text = $(this).closest(".activity").find(".commentBox").val();
         activityid = $(this).closest(".activity").attr('activityid');
-        
+
         max.addComment(comment_text,activityid)
 
         $(".activityBox").val("");
-        reloadActivity();                            
+        reloadActivity();
       })
 
-    
+
 });
 
 function reloadActivity () {
@@ -76,8 +76,8 @@ function reloadActivity () {
     timeline = max.getUserTimeline(username)
     $('#activityContainer').html('')
     $.each(timeline.items, function(k,v)
-             { 
-                $('#activityContainer').append(formatActivityStream(v)) 
+             {
+                $('#activityContainer').append(formatActivityStream(v))
              })
 
     $(".date").easydate(easydateOptions);
@@ -86,7 +86,7 @@ function reloadActivity () {
              $(this).closest(".activity").find(".newcommentbox").toggle('fold');
              });
 
-    
+
 }
 
 function formatActivityStream (activity) {
@@ -116,6 +116,12 @@ function formatActivityStream (activity) {
 
 
 function sendFollow () {
+
+    max = new MaxClient('http://localhost:6543')
+    max.setActor(username)
+    person_to_follow = $("h1").attr("displayname")
+    max.follow(person_to_follow)
+
     follow = {
         "actor": {
             "objectType": "person",
@@ -134,7 +140,7 @@ function sendFollow () {
          url: '/follow',
          data: JSON.stringify(follow),
          contentType: 'application/json; charset=utf-8'
-     }); 
+     });
 }
 
 function sendUnfollow () {
@@ -161,27 +167,27 @@ function sendUnfollow () {
 
 easydateOptions = {
     live: false,
-    locale: { 
-        "future_format": "%s %t", 
-        "past_format": "%s %t", 
-        "second": "segon", 
-        "seconds": "segons", 
-        "minute": "minut", 
-        "minutes": "minuts", 
-        "hour": "hora", 
-        "hours": "hores", 
-        "day": "dia", 
-        "days": "dies", 
-        "week": "setmana", 
-        "weeks": "setmanes", 
-        "month": "mes", 
-        "months": "mesos", 
-        "year": "any", 
-        "years": "anys", 
-        "yesterday": "ahir", 
-        "tomorrow": "demà", 
-        "now": "fa un moment", 
+    locale: {
+        "future_format": "%s %t",
+        "past_format": "%s %t",
+        "second": "segon",
+        "seconds": "segons",
+        "minute": "minut",
+        "minutes": "minuts",
+        "hour": "hora",
+        "hours": "hores",
+        "day": "dia",
+        "days": "dies",
+        "week": "setmana",
+        "weeks": "setmanes",
+        "month": "mes",
+        "months": "mesos",
+        "year": "any",
+        "years": "anys",
+        "yesterday": "ahir",
+        "tomorrow": "demà",
+        "now": "fa un moment",
         "ago": "fa",
-        "in": "en" 
+        "in": "en"
     }
  }

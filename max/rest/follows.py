@@ -1,18 +1,11 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPNotImplemented
-from max.exceptions import MissingField
-from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import User
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from pyramid.httpexceptions import HTTPNotImplemented
+from max.MADMax import MADMaxCollection
+from max.decorators import MaxResponse, MaxRequest
 
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError
-
-from max.MADMax import MADMaxDB
 from max.models import Activity
-from max.exceptions import MissingField
 
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceEntity
 
 
 @view_config(route_name='follows', request_method='GET')
@@ -21,17 +14,41 @@ def getFollowedUsers(context, request):
     """
     return HTTPNotImplemented()
 
+
 @view_config(route_name='follow', request_method='GET')
 def getFollowedUser(context, request):
     """
     """
     return HTTPNotImplemented()
 
+
 @view_config(route_name='follow', request_method='POST')
+@MaxResponse
+@MaxRequest
 def follow(context, request):
     """
+        /people/{displayName}/follows/{followedDN}'
     """
-    return HTTPNotImplemented()
+    #XXX TODO ara nomes es tracta un sol follow
+    # s'ha de iterar si es vol que el comentari sigui de N follows
+    displayName = request.matchdict['displayName']
+
+    mmdbusers = MADMaxCollection(context.db.users, query_key='displayName')
+    actor = mmdbusers[displayName]
+    rest_params = {'actor': actor}
+
+    # Initialize a Activity object from the request
+    newactivity = Activity(request, rest_params=rest_params)
+
+    code = 201
+    newactivity_oid = newactivity.insert()
+    newactivity['_id'] = newactivity_oid
+
+    actor.addFollower(newactivity['object'])
+
+    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    return handler.buildResponse()
+
 
 @view_config(route_name='follow', request_method='DELETE')
 def unfollow(context, request):

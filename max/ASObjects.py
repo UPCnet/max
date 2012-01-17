@@ -1,14 +1,5 @@
 
-import time
-from rfc3339 import rfc3339
-from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField
-import datetime
-from pyramid.request import Request
-from pymongo.objectid import ObjectId
 from max.MADObjects import MADDict
-
-
 
 
 class ASObject(MADDict):
@@ -75,7 +66,26 @@ class Context(ASObject):
     schema = {
                 '_id':         dict(required=0),
                 'url':         dict(required=0,request=1),
-                'objectType':  dict(required=0,request=1),                
+                'objectType':  dict(required=0,request=1),
+             }
+
+    def __init__(self,data):
+        """
+        """
+        self.data = data
+        self.validate()
+        self.update(data)
+
+
+class Person(ASObject):
+    """
+        An Max Context Object
+    """
+    data = {}
+    schema = {
+                '_id':         dict(required=0),
+                'displayName': dict(required=0,request=1),
+                'objectType':  dict(required=0,request=1),
              }
 
     def __init__(self,data):

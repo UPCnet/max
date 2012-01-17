@@ -4,7 +4,6 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from pyramid.security import authenticated_userid
 
-from max.resources import Root
 from max.views.api import TemplateAPI, activityAPI
 
 from bson.objectid import ObjectId
@@ -47,7 +46,7 @@ def profilesView(context, request):
 
     isFollowing = False
     for following in current_user['following']['items']:
-        if following['_id'] == userprofile['_id']:
+        if following['displayName'] == userprofile['displayName']:
             isFollowing = True
             break
 
