@@ -6,6 +6,7 @@ from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import User
 from max.decorators import MaxRequest, MaxResponse
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+import os
 
 
 @view_config(route_name='users', request_method='GET')
@@ -69,9 +70,10 @@ def addUser(context, request):
 def getUserAvatar(context, request):
     """
     """
-    AVATAR_FOLDER = '/var/pyramid/max/avatars/'
+    AVATAR_FOLDER = '/var/pyramid/max/avatars'
     displayName = request.matchdict['displayName']
-    data = open('%s/%s.jpg' % (AVATAR_FOLDER, displayName)).read()
+    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, displayName)) and displayName or 'missing'
+    data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/jpeg'
     return image
