@@ -14,6 +14,7 @@ requires = [
     'pyramid_who',
     'pymongo',
     'rfc3339',
+    'requests'
     ]
 
 if sys.version_info[:3] < (2,5,0):
