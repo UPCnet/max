@@ -51,12 +51,3 @@ class TemplateAPI(object):
 
     def getAppURL(self):
         return self.request.application_url
-
-class activityAPI(object):
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def getLastActivityForUser(self):
-        return ''

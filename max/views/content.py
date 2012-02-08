@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPBadRequest
 
 from pyramid.security import authenticated_userid
 
-from max.views.api import TemplateAPI, activityAPI
+from max.views.api import TemplateAPI
 
 from bson.objectid import ObjectId
 
@@ -15,12 +15,6 @@ def activityView(context, request):
 
     activity = context.db.activity.find_one(activity_id)
 
-    username = authenticated_userid(request)
-    page_title = "%s's Activity Stream" % username
-    # page_title = "Victor's Activity Stream"
-    api = TemplateAPI(context, request, page_title)
-    aapi = activityAPI(context, request)
-    # return dict(api=api, aapi=aapi)
     return Response(str(activity))
 
 
@@ -56,5 +50,4 @@ def profilesView(context, request):
 
     page_title = "%s's User Profile" % userprofile
     api = TemplateAPI(context, request, page_title)
-    aapi = activityAPI(context, request)
-    return dict(api=api, aapi=aapi, userprofile=userprofile, followinfo=followinfo)
+    return dict(api=api, userprofile=userprofile, followinfo=followinfo)

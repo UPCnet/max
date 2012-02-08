@@ -29,6 +29,7 @@ def main(global_config, **settings):
                           authorization_policy=authz_policy)
     config.add_static_view('static', 'max:static')
     config.add_static_view('css', 'max:css')
+    config.add_static_view('less', 'max:less')
     config.add_static_view('js', 'max:js')
     config.add_static_view('fonts', 'max:static/fonts')
     config.add_route('login', '/login')

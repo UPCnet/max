@@ -10,6 +10,8 @@ from urlparse import urljoin
 
 import datetime
 
+from max.views.api import TemplateAPI
+
 
 def _fixup_came_from(request, came_from):
     if came_from is None:
@@ -23,6 +25,9 @@ def _fixup_came_from(request, came_from):
 
 
 def login(context, request):
+
+    page_title = "MAX Login"
+    api = TemplateAPI(context, request, page_title)
 
     came_from = _fixup_came_from(request, request.POST.get('came_from'))
 
@@ -63,6 +68,7 @@ def login(context, request):
                     came_from=came_from,
                     login=login,
                     password=password,
+                    api=api
                     )
 
         # If it's the first time the user log in the system, then create the local user structure
@@ -89,6 +95,7 @@ def login(context, request):
             came_from=came_from,
             login=login,
             password=password,
+            api=api
             )
 
     return response
