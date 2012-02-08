@@ -2,8 +2,12 @@ from pyramid.view import view_config
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
+from max.decorators import MaxRequest, MaxResponse
+
 
 @view_config(route_name='timeline', request_method='GET')
+@MaxResponse
+@MaxRequest
 def getUserTimeline(context, request):
     """
          /users/{displayName}/timeline
