@@ -26,7 +26,7 @@ def _fixup_came_from(request, came_from):
 
 def login(context, request):
 
-    page_title = "MAX Login"
+    page_title = "MAX Server Login"
     api = TemplateAPI(context, request, page_title)
 
     came_from = _fixup_came_from(request, request.POST.get('came_from'))

@@ -1,0 +1,38 @@
+<!doctype html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
+<body>
+  <metal:main fill-slot="main">
+    
+    <div class="row">
+        <div class="span6 offset4">
+          <div id="login">
+            <form class="form-horizontal" action="${url}" method="post">
+              <fieldset>
+                <legend>MAX Server Config</legend>
+                <div class="control-group">
+                  <label class="control-label" for="oauth_check_endpoint">OAuth token verifier endpoint</label>
+                  <div class="controls">
+                    <input class="input-xlarge" id="oauth_check_endpoint" type="text" name="oauth_check_endpoint" value="${oauth_check_endpoint}">
+                    <p class="help-block">Please, specify the URI for the oAuth token verifier endpoint.</p>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="oauth_grant_type">OAuth grant type</label>
+                  <div class="controls">
+                    <input class="input-xlarge" id="oauth_grant_type" type="text" name="oauth_grant_type" value="${oauth_grant_type}">
+                    <p class="help-block">Please, specify the oAuth grant type.</p>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Save</button>
+                  <button type="reset" class="btn btn-large">Cancel</button>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+    </div>
+  </metal:main>
+</body>
+</html>
