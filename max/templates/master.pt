@@ -81,6 +81,7 @@
 <script src="js/libs/bootstrap/collapse.js"></script>
 <script src="js/libs/bootstrap/dropdown.js"></script>
 <script src="js/libs/bootstrap/modal.js"></script>
+<script src="js/libs/bootstrap/alert.js"></script>
 
 <script src="js/plugins.js"></script>
 <script src="js/script.js"></script>

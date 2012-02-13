@@ -11,6 +11,7 @@ DEFAULT_OAUTH_GRANT_TYPE = 'password'
 def configView(context, request):
     page_title = "MAX Server Config"
     api = TemplateAPI(context, request, page_title)
+    success = False
 
     config = context.db.config.find_one()
     if not config:
@@ -23,8 +24,10 @@ def configView(context, request):
 
         # Save config data
         context.db.config.save(config)
+        success = True
 
     return dict(api=api, url=request.path_url,
                 oauth_check_endpoint=config.get('oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),
-                oauth_grant_type=config.get('oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE)
+                oauth_grant_type=config.get('oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE),
+                success=success
                 )

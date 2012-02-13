@@ -3,13 +3,16 @@
 <head></head>
 <body>
   <metal:main fill-slot="main">
-    
     <div class="row">
         <div class="span6 offset4">
           <div id="login">
             <form class="form-horizontal" action="${url}" method="post">
               <fieldset>
                 <legend>MAX Server Config</legend>
+                <div tal:condition="success" class="alert alert-success">
+                  <a class="close" data-dismiss="alert">×</a>
+                  <h4 class="alert-heading">Changes saved!</h4>
+                </div>
                 <div class="control-group">
                   <label class="control-label" for="oauth_check_endpoint">OAuth token verifier endpoint</label>
                   <div class="controls">
