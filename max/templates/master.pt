@@ -36,7 +36,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </a>
-        <a class="brand" href="/"><img class="icon-max" src="/static/simbol_max.png"/>MAX Server</a>
+        <a class="brand" href="/"><img class="maxlogo" src="/static/simbol_MAX_24.png"/>MAX Server</a>
         <div class="nav-collapse">
           <ul class="nav">
             <li class="active"><a href="/">Home</a></li>
