@@ -1,5 +1,5 @@
 from pyramid.view import view_config
-from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 
 from max.views.api import TemplateAPI
 
@@ -25,6 +25,9 @@ def configView(context, request):
         # Save config data
         context.db.config.save(config)
         success = True
+
+    if request.params.get('form.cancelled', None) is not None:
+        return HTTPFound(request.application_url)
 
     return dict(api=api, url=request.path_url,
                 oauth_check_endpoint=config.get('oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),

@@ -1,5 +1,5 @@
-from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError
+from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized
+from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
 from bson.errors import InvalidId
 
 
@@ -29,6 +29,8 @@ def MaxResponse(func):
             return HTTPBadRequest(detail=message)
         except UnknownUserError, message:
             return HTTPBadRequest(detail=message)
+        except Unauthorized, message:
+            return HTTPUnauthorized(detail=message)
         # JSON decode error????
         except ValueError:
             return HTTPBadRequest()

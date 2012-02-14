@@ -29,7 +29,7 @@
                 </div>
                 <div class="form-actions">
                   <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Save</button>
-                  <button type="reset" class="btn btn-large">Cancel</button>
+                  <button type="submit" name="form.cancelled" class="btn btn-large">Cancel</button>
                 </div>
               </fieldset>
             </form>

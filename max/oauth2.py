@@ -1,4 +1,7 @@
 from max.exceptions import Unauthorized
+from max.resources import getMAXSettings
+from max.resources import Root
+
 import requests
 
 
@@ -6,11 +9,14 @@ def oauth2(allowed_scopes=[]):
     def wrap(view_function):
 
         def new_function(*args, **kw):
-            request = args[0]
+            nkargs = [a for a in args]
+            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
 
             # Extract the username and token from request headers
             # It will be like:
             # headers = {"X-Oauth-Token":"jfa1sDF2SDF234", "X-Oauth-Username":"victor.fernandez", "X-Oauth-Scope"="widgetcli"}
+
+            settings = getMAXSettings(context)
 
             oauth_token = request.headers.get('X-Oauth-Token', '')
             username = request.headers.get('X-Oauth-Username', '')
@@ -30,7 +36,7 @@ def oauth2(allowed_scopes=[]):
             if scope:
                 payload['scope'] = scope
 
-            r = requests.post('https://oauth.upc.edu/checktoken', data=payload, verify=False)
+            r = requests.post(settings.oauth_check_endpoint, data=payload, verify=False)
 
             if r.status_code == 200:
                 # Valid token, proceed.
