@@ -14,7 +14,6 @@ from max.oauth2 import oauth2
 @view_config(route_name='users', request_method='GET')
 @MaxResponse
 @MaxRequest
-@oauth2(['max', ])
 def getUsers(context, request):
     """
     """
