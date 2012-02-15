@@ -27,6 +27,27 @@
                     <p class="help-block">Please, specify the oAuth grant type.</p>
                   </div>
                 </div>
+                <div class="control-group">
+                  <label class="control-label" for="max_server">MAX Server URL</label>
+                  <div class="controls">
+                    <input class="input-xlarge" id="max_server" type="text" name="max_server" value="${max_server}">
+                    <p class="help-block">Please, specify the MAX server URL.</p>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="max_ops_username">MAX operations username</label>
+                  <div class="controls">
+                    <input class="input-xlarge" id="max_ops_username" type="text" name="max_ops_username" value="${max_ops_username}">
+                    <p class="help-block">Please, specify the MAX operations username.</p>
+                  </div>
+                </div>
+                <div class="control-group">
+                  <label class="control-label" for="max_ops_password">MAX operations password</label>
+                  <div class="controls">
+                    <input class="input-xlarge" id="max_ops_password" type="text" name="max_ops_password" value="${max_ops_password}">
+                    <p class="help-block">Please, specify the MAX operations password.</p>
+                  </div>
+                </div>
                 <div class="form-actions">
                   <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Save</button>
                   <button type="submit" name="form.cancelled" class="btn btn-large">Cancel</button>
