@@ -30,13 +30,12 @@ def oauth2(allowed_scopes=[]):
 
             # Validate access token
             payload = {"oauth_token": oauth_token,
-                       "username": username,
+                       "user_id": username,
                        }
             if scope:
                 payload['scope'] = scope
 
-            r = requests.post(settings.oauth_check_endpoint, data=payload, verify=False)
-
+            r = requests.post(settings['oauth_check_endpoint'], data=payload, verify=False)
             if r.status_code == 200:
                 # Valid token, proceed.
                 return view_function(*args, **kw)

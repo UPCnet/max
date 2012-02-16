@@ -4,11 +4,12 @@ from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
+from max.exceptions import UnknownUserError
 
 @view_config(route_name='timeline', request_method='GET')
 @MaxResponse
 @MaxRequest
-#@oauth2
+@oauth2(['widgetcli'])
 def getUserTimeline(context, request):
     """
          /users/{displayName}/timeline
@@ -21,7 +22,10 @@ def getUserTimeline(context, request):
 
     mmdb = MADMaxDB(context.db)
 
-    actor = mmdb.users.getItemsBydisplayName(displayName)[0]
+    try:
+        actor = mmdb.users.getItemsBydisplayName(displayName)[0]
+    except:
+        raise UnknownUserError, 'Unknown user "%s"' % displayName
 
     actor_query = {'actor._id': actor['_id']}
 
