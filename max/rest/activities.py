@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxRequest, MaxResponse
+from max.oauth2 import oauth2
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
@@ -11,6 +12,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 @view_config(route_name='user_activities', request_method='GET')
 @MaxResponse
 @MaxRequest
+#@oauth2
 def getUserActivities(context, request):
     """
          /people/{displayName}/activities

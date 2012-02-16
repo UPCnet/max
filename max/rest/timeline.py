@@ -3,11 +3,12 @@ from pyramid.view import view_config
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.decorators import MaxRequest, MaxResponse
-
+from max.oauth2 import oauth2
 
 @view_config(route_name='timeline', request_method='GET')
 @MaxResponse
 @MaxRequest
+#@oauth2
 def getUserTimeline(context, request):
     """
          /users/{displayName}/timeline

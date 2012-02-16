@@ -7,7 +7,6 @@ import requests
 
 def oauth2(allowed_scopes=[]):
     def wrap(view_function):
-
         def new_function(*args, **kw):
             nkargs = [a for a in args]
             context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
@@ -46,4 +45,7 @@ def oauth2(allowed_scopes=[]):
 
         new_function.__doc__ = view_function.__doc__
         return new_function
+    if type(allowed_scopes) == type(wrap):
+        return wrap(allowed_scopes)
     return wrap
+
