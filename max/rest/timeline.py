@@ -6,6 +6,7 @@ from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
 from max.exceptions import UnknownUserError
 
+
 @view_config(route_name='timeline', request_method='GET')
 @MaxResponse
 @MaxRequest

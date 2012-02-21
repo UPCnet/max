@@ -1,4 +1,26 @@
-0.1
----
+1.0 (2011-12-1)
+---------------
 
-- Initial version
+Initial version, featuring:
+
+ * Compatibility with activitystrea.ms standard
+ * RESTful API
+ * Add activity (post)
+ * Add coment to any activity
+ * Follow users
+ * Subscribe to URL based contexts
+ * Display user timeline
+ * No support for oAUTH
+ * No support for user profiles
+ * User photos resources hardcoded and stored in fs
+
+ 2.0 (2012-03-01)
+ ----------------
+
+ Added this new features:
+
+ * oAuth based user authentication against a oAuth 2.0 server compliant using *Resource owner password credentials* flow
+ * oAuth user - activity actor validation
+ * App hooks dirven apps
+ * Restricted-API access for app driven hooks
+ * Support for restricted-API users and its management UI
