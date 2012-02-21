@@ -3,15 +3,13 @@ from bson import json_util
 from datetime import datetime
 from rfc3339 import rfc3339
 
-
 from pymongo.objectid import ObjectId
-
 
 
 class RUDict(dict):
 
     def __init__(self, *args, **kw):
-        super(RUDict,self).__init__(*args, **kw)
+        super(RUDict, self).__init__(*args, **kw)
 
     def update(self, E=None, **F):
         if E is not None:
@@ -19,14 +17,14 @@ class RUDict(dict):
                 for k in E:
                     if k in self:  # existing ...must recurse into both sides
                         self.r_update(k, E)
-                    else: # doesn't currently exist, just update
+                    else:  # doesn't currently exist, just update
                         self[k] = E[k]
             else:
                 for (k, v) in E:
-                    self.r_update(k, {k:v})
+                    self.r_update(k, {k: v})
 
         for k in F:
-            self.r_update(k, {k:F[k]})
+            self.r_update(k, {k: F[k]})
 
     def r_update(self, key, other_dict):
         if isinstance(self[key], dict) and isinstance(other_dict[key], dict):
@@ -36,6 +34,7 @@ class RUDict(dict):
             self[key] = od
         else:
             self[key] = other_dict[key]
+
 
 def decodeBSONEntity(di, key):
     """
@@ -55,7 +54,7 @@ def decodeBSONEntity(di, key):
         di[key] = str(value)
         return
     if isinstance(value, datetime):
-        di[key] = rfc3339(value,utc=True,use_system_timezone=False)
+        di[key] = rfc3339(value, utc=True, use_system_timezone=False)
         return
     try:
         decoded = json_util.default(di[key])
