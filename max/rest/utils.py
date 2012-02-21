@@ -5,6 +5,10 @@ from rfc3339 import rfc3339
 
 from pymongo.objectid import ObjectId
 
+import requests
+import json
+import urllib2
+import re
 
 class RUDict(dict):
 
@@ -98,6 +102,54 @@ def flatten(data):
     if isinstance(data, dict):
         flattendict(data)
 
+
+def formatMessageEntities(text):
+    """
+        function that shearches for elements in the text that have to be formatted.
+        Currently shortens urls.
+        XXX TODO find @usernames to acces profiles
+    """
+    def shorten(matchobj):
+        return shortenURL(matchobj.group(0))
+
+    find_url_regex = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+    shortened = re.sub(find_url_regex,shorten,text)
+
+    return shortened
+
+def shortenURL(url):
+    """
+        Shortens a url using bitly API. Keeps the original url in case
+        something goes wrong with the api call
+    """
+    # FOR DEBUGGING !! if localhost present in the domain part of the url,
+    # substitute with a fake domain
+    # to allow bitly shortening in development environments
+    # (localhost/ port not allowed in URI by bitly api)
+    url = re.sub(r'(.*://)(localhost:[0-9]{4,5})(.*)', r'\1foo.bar\3', url)
+
+    bitly_username = 'maxclient'
+    bitly_api_key = 'R_33a0cbaa2d41c3957dc5a40a0b2c2760'
+
+    params = {'api_url': 'http://api.bitly.com',
+              'login': 'apiKey=%s&login=%s' % (bitly_api_key, bitly_username),
+              'version': 'v3',
+              'endpoint': 'shorten',
+              'endpoint_params': 'longUrl=%s' % (urllib2.quote(url))
+             }
+
+    queryurl = '%(api_url)s/%(version)s/%(endpoint)s?%(login)s&%(endpoint_params)s' % params
+
+    req = requests.get(queryurl)
+
+    try:
+        response = json.loads(req.content)
+        if response.get('status_code', None) == 200:
+            if 'data' in response.keys():
+                return response['data']['url']
+    except:
+        return url
+    return url
 
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':
