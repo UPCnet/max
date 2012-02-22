@@ -1,5 +1,6 @@
 from max.MADObjects import MADBase
 import datetime
+from max.rest.utils import formatMessageEntities
 
 
 class Activity(MADBase):
@@ -33,6 +34,7 @@ class Activity(MADBase):
                 }
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
         subobject = wrapper(self.data['object'])
+        subobject['content'] = formatMessageEntities(subobject['content'])
         ob['object'] = subobject
 
         if 'contexts' in self.data:
