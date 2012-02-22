@@ -1,4 +1,4 @@
-
+from max.rest.utils import formatMessageEntities
 from max.MADObjects import MADDict
 
 
@@ -30,12 +30,13 @@ class Note(ASObject):
                 'objectType':  dict(required=1),
              }
 
-    def __init__(self,data):
+    def __init__(self, data):
         """
         """
         self.data = data
         self.validate()
         self.update(data)
+        self.data['content'] = formatMessageEntities(self.data['content'])
 
 
 class Comment(ASObject):
@@ -50,7 +51,7 @@ class Comment(ASObject):
                 'inReplyTo':   dict(required=1),
              }
 
-    def __init__(self,data):
+    def __init__(self, data):
         """
         """
         self.data = data
@@ -69,7 +70,7 @@ class Context(ASObject):
                 'objectType':  dict(required=1),
              }
 
-    def __init__(self,data):
+    def __init__(self, data):
         """
         """
         self.data = data
@@ -89,7 +90,7 @@ class Person(ASObject):
                 'objectType':  dict(required=1),
              }
 
-    def __init__(self,data):
+    def __init__(self, data):
         """
         """
         self.data = data

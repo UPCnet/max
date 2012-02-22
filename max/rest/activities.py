@@ -44,9 +44,8 @@ def addUserActivity(context, request):
     """
     username = request.matchdict['username']
 
-    #mmdb = MADMaxDB(context.db)
-    #actor = mmdb.users.getItemsByusername(username)[0]
-    rest_params = {'actor': {'username':username}}
+    rest_params = {'actor': {'username':username},
+                   'verb': 'post'}
 
     # Initialize a Activity object from the request
     newactivity = Activity(request, rest_params=rest_params)

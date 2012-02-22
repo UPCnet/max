@@ -57,6 +57,7 @@ def getUserTimeline(context, request):
 
     if query_items:
         query = {'$or': query_items}
+        query['verb'] = 'post'
         activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
     else:
         activities = []
