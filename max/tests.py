@@ -56,7 +56,7 @@ class TestmaxREST(unittest.TestCase):
         from max.rest.admin import addUser
         request = DummyRequestREST()
         root = self._makeOne(request)
-        data = {'displayName': 'ferran'}
+        data = {'username': 'ferran'}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json
@@ -68,7 +68,7 @@ class TestmaxREST(unittest.TestCase):
         from max.rest.query import getUserActivity
         request = DummyRequestREST()
         root = self._makeOne(request)
-        data = {'displayName': 'victor'}
+        data = {'username': 'victor'}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json
@@ -78,7 +78,7 @@ class TestmaxREST(unittest.TestCase):
 
     def test_getUserActivityQuery(self):
         from max.rest.query import getUserActivity
-        request = DummyRequestREST(params={'displayName': 'victor'})
+        request = DummyRequestREST(params={'username': 'victor'})
         root = self._makeOne(request)
         request.content_type = 'application/json'
         result = getUserActivity(root, request)
@@ -95,7 +95,7 @@ class TestmaxREST(unittest.TestCase):
                             {'$push': {'subscribedTo.items': {'url': 'http://atenea.upc.edu/introcomp'}},
                             '$inc': {'subscribedTo.totalItems': 1}})
 
-        data = {'displayName': 'javier'}
+        data = {'username': 'javier'}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json
@@ -108,7 +108,7 @@ class TestmaxREST(unittest.TestCase):
         request = DummyRequestREST()
         root = self._makeOne(request)
 
-        data = {'displayName': 'victor', 'scopes': ['http://atenea.upc.edu/introcomp', 'http://atenea.upc.edu/456456']}
+        data = {'username': 'victor', 'scopes': ['http://atenea.upc.edu/introcomp', 'http://atenea.upc.edu/456456']}
         data_json = json.dumps(data)
         request.content_type = 'application/json'
         request.body = data_json

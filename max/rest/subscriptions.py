@@ -24,14 +24,14 @@ def getUserSubscriptions(context, request):
 @MaxRequest
 def subscribe(context, request):
     """
-        /people/{displayName}/subscriptions
+        /people/{username}/subscriptions
     """
     #XXX TODO ara només es tracta la primera activitat,
     # s'ha de iterar si es vol que el comentari sigui de N activitats
-    displayName = request.matchdict['displayName']
+    username = request.matchdict['username']
 
-    mmdbusers = MADMaxCollection(context.db.users, query_key='displayName')
-    actor = mmdbusers[displayName]
+    mmdbusers = MADMaxCollection(context.db.users, query_key='username')
+    actor = mmdbusers[username]
     rest_params = {'actor': actor}
 
     # Initialize a Activity object from the request

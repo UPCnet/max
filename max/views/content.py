@@ -21,26 +21,26 @@ def activityView(context, request):
 @view_config(route_name='profiles', renderer='max:templates/profile.pt', permission='restricted')
 def profilesView(context, request):
 
-    displayName = request.matchdict['displayName']
+    username = request.matchdict['username']
 
-    userprofile = context.db.users.find_one({'displayName': displayName})
+    userprofile = context.db.users.find_one({'username': username})
 
     current_username = authenticated_userid(request)
     if not userprofile:
         return HTTPBadRequest('No such user')
 
     # Render follow button?
-    if current_username == displayName:
+    if current_username == username:
         showFollowButton = False
     else:
         showFollowButton = True
 
     # Follow status of the current user on the viewed user profile
-    current_user = context.db.users.find_one({'displayName': current_username}, {'following': 1})
+    current_user = context.db.users.find_one({'username': current_username}, {'following': 1})
 
     isFollowing = False
     for following in current_user['following']['items']:
-        if following['displayName'] == userprofile['displayName']:
+        if following['username'] == userprofile['username']:
             isFollowing = True
             break
 

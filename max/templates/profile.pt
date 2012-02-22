@@ -3,11 +3,11 @@
 <head></head>
 <body>
     <metal:main fill-slot="main">
-    
+
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
     <div class="row">
         <div class="cell width-6 position-3">
-            <h1 tal:attributes="userid userprofile._id; displayName userprofile.displayName" tal:content="userprofile.displayName">User</h1>
+            <h1 tal:attributes="userid userprofile._id; username userprofile.username" tal:content="userprofile.username">User</h1>
         </div>
     </div>
     <div class="row">

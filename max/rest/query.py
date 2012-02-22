@@ -48,11 +48,11 @@ def getUserActivity(context, request):
     except:
         return HTTPBadRequest()
 
-    # Once verified the id of the user, search for the id of the user given its displayName
-    # We suppose that the displayName is unique
-    user = context.db.users.find_one({'displayName': data['displayName']}, {'_id': 1, 'following': 1, 'subscribedTo': 1})
+    # Once verified the id of the user, search for the id of the user given its username
+    # We suppose that the username is unique
+    user = context.db.users.find_one({'username': data['username']}, {'_id': 1, 'following': 1, 'subscribedTo': 1})
 
-    # The query has to have this syntax {'$or': [{'actor.displayName': 'victor'}, {'actor.displayName': 'javier'}] }
+    # The query has to have this syntax {'$or': [{'actor.username': 'victor'}, {'actor.username': 'javier'}] }
     query = {'$or': []}
     query['$or'].append({'actor._id': user['_id']})
 
@@ -77,7 +77,7 @@ def getUserActivity(context, request):
     collection = json.dumps(collection, default=json_util.default)
     response = Response(collection)
     response.content_type = 'application/json'
-    response.headers['Access-Control-Allow-Origin']='*'    
+    response.headers['Access-Control-Allow-Origin']='*'
     return response
 
 
@@ -102,11 +102,11 @@ def getUserActivityByScope(context, request):
     except:
         return HTTPBadRequest()
 
-    # Once verified the id of the user, search for the id of the user given its displayName
-    # We suppose that the displayName is unique
-    user = context.db.users.find_one({'displayName': data['displayName']}, {'_id': 1})
+    # Once verified the id of the user, search for the id of the user given its username
+    # We suppose that the username is unique
+    user = context.db.users.find_one({'username': data['username']}, {'_id': 1})
 
-    # The query has to have this syntax {'$or': [{'actor.displayName': 'victor'}, {'actor.displayName': 'javier'}] }
+    # The query has to have this syntax {'$or': [{'actor.username': 'victor'}, {'actor.username': 'javier'}] }
     query = {'$or': []}
     query['actor._id'] = user['_id']
 

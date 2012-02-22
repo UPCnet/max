@@ -13,27 +13,27 @@ from max.exceptions import UnknownUserError
 @oauth2(['widgetcli'])
 def getUserTimeline(context, request):
     """
-         /users/{displayName}/timeline
+         /users/{username}/timeline
 
          Retorna totes les activitats d'un usuari
     """
-    displayName = request.matchdict['displayName']
+    username = request.matchdict['username']
     is_context_resource = 'timeline/contexts' in request.path
     is_follows_resource = 'timeline/follows' in request.path
 
     mmdb = MADMaxDB(context.db)
 
     try:
-        actor = mmdb.users.getItemsBydisplayName(displayName)[0]
+        actor = mmdb.users.getItemsByusername(username)[0]
     except:
-        raise UnknownUserError, 'Unknown user "%s"' % displayName
+        raise UnknownUserError, 'Unknown user "%s"' % username
 
     actor_query = {'actor._id': actor['_id']}
 
     # Add the activity of the people that the user follows
     actors_followings = []
     for following in actor['following']['items']:
-        followed_person = mmdb.users.getItemsBydisplayName(following['displayName'])[0]
+        followed_person = mmdb.users.getItemsByusername(following['username'])[0]
         if followed_person:
             actors_followings.append({'actor._id': followed_person['_id']})
 

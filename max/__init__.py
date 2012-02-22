@@ -41,24 +41,24 @@ def main(global_config, **settings):
                     context='pyramid.httpexceptions.HTTPForbidden',
                     renderer='max:templates/login.pt')
 
-    config.add_route('profiles', '/profiles/{displayName}')
+    config.add_route('profiles', '/profiles/{username}')
     config.add_route('wadl', '/WADL')
 
     # REST Resources
 
     config.add_route('users', '/people')
-    config.add_route('user', '/people/{displayName}')
-    config.add_route('avatar', '/people/{displayName}/avatar')
+    config.add_route('user', '/people/{username}')
+    config.add_route('avatar', '/people/{username}/avatar')
 
-    config.add_route('user_activities', '/people/{displayName}/activities')
-    config.add_route('timeline', '/people/{displayName}/timeline')
-    config.add_route('user_comments', '/people/{displayName}/comments')
-    config.add_route('user_shares', '/people/{displayName}/shares')
-    config.add_route('user_likes', '/people/{displayName}/likes')
-    config.add_route('follows', '/people/{displayName}/follows')
-    config.add_route('follow', '/people/{displayName}/follows/{followedDN}')
-    config.add_route('subscriptions', '/people/{displayName}/subscriptions')
-    config.add_route('subscription', '/people/{displayName}/subscriptions/{subscrId}}')
+    config.add_route('user_activities', '/people/{username}/activities')
+    config.add_route('timeline', '/people/{username}/timeline')
+    config.add_route('user_comments', '/people/{username}/comments')
+    config.add_route('user_shares', '/people/{username}/shares')
+    config.add_route('user_likes', '/people/{username}/likes')
+    config.add_route('follows', '/people/{username}/follows')
+    config.add_route('follow', '/people/{username}/follows/{followedDN}')
+    config.add_route('subscriptions', '/people/{username}/subscriptions')
+    config.add_route('subscription', '/people/{username}/subscriptions/{subscrId}}')
 
     config.add_route('activities', '/activities')
     config.add_route('activity', '/activities/{activity}')

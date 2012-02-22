@@ -169,14 +169,14 @@ def extractPostData(request):
 
 
 def checkQuery(data):
-    if not 'displayName' in data and not 'context' in data:
+    if not 'username' in data and not 'context' in data:
         raise
 
 
 def checkIsValidQueryUser(context, data):
-    username = data['displayName']
+    username = data['username']
 
-    result = context.db.users.find_one({'displayName': username})
+    result = context.db.users.find_one({'username': username})
 
     if result:
         return True
@@ -293,18 +293,18 @@ def checkDataShare(data):
 
 
 def checkDataAddUser(data):
-    if not 'displayName' in data:
+    if not 'username' in data:
         raise
 
 
 def checkIsValidUser(context, data):
-    """Searches a user by displayName in the db and returns its id if found.
+    """Searches a user by username in the db and returns its id if found.
        Do additional check about the content of the data (eg: 'author' is a valid system username) """
 
-    username = data['actor']['displayName']
+    username = data['actor']['username']
     #userid = ObjectId(data['actor']['id'])
 
-    result = context.db.users.find_one({'displayName': username}, {'displayName': 1})
+    result = context.db.users.find_one({'username': username}, {'username': 1})
     if result:
         data['actor']['id'] = result.get('_id')
         return True
@@ -340,18 +340,18 @@ def checkIsValidRepliedActivity(context, data):
 
 def checkAreValidFollowUsers(context, data):
     """ Check if both users follower and following are valid system users """
-    follower = data['actor']['displayName']
+    follower = data['actor']['username']
     #followerid = ObjectId(data['actor']['id'])
 
-    following = data['object']['displayName']
+    following = data['object']['username']
     #followingid = ObjectId(data['object']['id'])
 
     # Same user, can't follow yourself, abort
     if follower == following:
         raise
 
-    result_follower = context.db.users.find_one({'displayName': follower}, {'displayName': 1})
-    result_following = context.db.users.find_one({'displayName': following}, {'displayName': 1})
+    result_follower = context.db.users.find_one({'username': follower}, {'username': 1})
+    result_following = context.db.users.find_one({'username': following}, {'username': 1})
 
     if result_follower and result_following:
         data['actor']['id'] = result_follower.get('_id')
@@ -359,7 +359,7 @@ def checkAreValidFollowUsers(context, data):
         return True
     else:
         raise
-#    if result_follower.get('displayName') == follower and result_following.get('displayName') == following:
+#    if result_follower.get('username') == follower and result_following.get('username') == following:
 #        return True
 #    else:
 #        raise

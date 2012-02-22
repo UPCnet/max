@@ -46,7 +46,7 @@ def Like(context, request):
     context.db.activity.insert(data)
 
     # Search for the referenced activity by id and update his likes.items field
-    person = {'_id': data['actor']['_id'], 'objectType': 'person', 'displayName': data['actor']['displayName']}
+    person = {'_id': data['actor']['_id'], 'objectType': 'person', 'username': data['actor']['username']}
 
     context.db.activity.update({'_id': data['object']['_id']},
                                {

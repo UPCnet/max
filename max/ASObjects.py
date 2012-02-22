@@ -25,9 +25,9 @@ class Note(ASObject):
     """
     data = {}
     schema = {
-                '_id':         dict(required=0),
-                'content':     dict(required=0,request=1),
-                'objectType':  dict(required=0,request=1),
+                '_id':         dict(),
+                'content':     dict(required=1),
+                'objectType':  dict(required=1),
              }
 
     def __init__(self,data):
@@ -44,10 +44,10 @@ class Comment(ASObject):
     """
     data = {}
     schema = {
-                '_id':         dict(required=0),
-                'content':     dict(required=0,request=1),
-                'objectType':  dict(required=0,request=1),
-                'inReplyTo':   dict(required=0,request=1),
+                '_id':         dict(),
+                'content':     dict(required=1),
+                'objectType':  dict(required=1),
+                'inReplyTo':   dict(required=1),
              }
 
     def __init__(self,data):
@@ -64,9 +64,9 @@ class Context(ASObject):
     """
     data = {}
     schema = {
-                '_id':         dict(required=0),
-                'url':         dict(required=0,request=1),
-                'objectType':  dict(required=0,request=1),
+                '_id':         dict(),
+                'url':         dict(required=1),
+                'objectType':  dict(required=1),
              }
 
     def __init__(self,data):
@@ -83,9 +83,10 @@ class Person(ASObject):
     """
     data = {}
     schema = {
-                '_id':         dict(required=0),
-                'displayName': dict(required=0,request=1),
-                'objectType':  dict(required=0,request=1),
+                '_id':         dict(),
+                'username':    dict(required=1),
+                'displayName': dict(required=0),
+                'objectType':  dict(required=1),
              }
 
     def __init__(self,data):

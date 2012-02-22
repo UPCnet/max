@@ -5,7 +5,7 @@
 
 # Un usuari de demo1
 demouser1 = {
-    'displayName': 'victor',
+    'username': 'victor',
     'url': 'http://max.upc.edu/profiles/victor',
     'objectType': 'person',
     'following': {
@@ -20,7 +20,7 @@ demouser1 = {
 
 # Un usuari de demo2
 demouser2 = {
-    'displayName': 'javier',
+    'username': 'javier',
     'url': 'http://max.upc.edu/profiles/javier',
     'objectType': 'person',
     'following': {
@@ -37,7 +37,7 @@ demouser2 = {
 demostatus = {
     "actor": {
         "objectType": "person",
-        "displayName": "victor"
+        "username": "victor"
     },
     "verb": "post",
     "object": {
@@ -50,7 +50,7 @@ demostatus = {
 demostatus_with_context = {
     "actor": {
         "objectType": "person",
-        "displayName": "victor"
+        "username": "victor"
     },
     "verb": "post",
     "object": {
@@ -59,7 +59,7 @@ demostatus_with_context = {
     },
     "target": {
         "objectType": "service",
-        "displayName": "Introduccio als computadors",
+        "username": "Introduccio als computadors",
         "url": "http://atenea.upc.edu/introcomp"
     },
     "published": "2011-08-31T13:45:55Z"
@@ -74,7 +74,7 @@ demostatus_with_context = {
 user_status = {
     "actor": {
         "objectType": "person",
-        "displayName": "victor"
+        "username": "victor"
     },
     "verb": "post",
     "object": {
@@ -87,7 +87,7 @@ user_status = {
 user_comment = {
     "actor": {
         "objectType": "person",
-        "displayName": "javier"
+        "username": "javier"
     },
     "verb": "post",
     "object": {
@@ -104,12 +104,12 @@ user_comment = {
 follow = {
     "actor": {
         "objectType": "person",
-        "displayName": "victor"
+        "username": "victor"
     },
     "verb": "follow",
     "object": {
         "objectType": "person",
-        "displayName": "javier"
+        "username": "javier"
     },
 }
 
@@ -117,13 +117,13 @@ unfollow = {
     "actor": {
         "objectType": "person",
         "id": "4e6e1243aceee91143000000",
-        "displayName": "victor"
+        "username": "victor"
     },
     "verb": "unfollow",
     "object": {
         "objectType": "person",
         "id": "4e6e1243aceee91143000001",
-        "displayName": "javier"
+        "username": "javier"
     },
 }
 
@@ -131,12 +131,12 @@ follow_context = {
         "actor": {
             "objectType": "person",
             "id": "4e6e1243aceee91143000000",
-            "displayName": "victor"
+            "username": "victor"
         },
         "verb": "follow",
         "object": {
             "objectType": "service",
-            "displayName": "Introduccio als computadors",
+            "username": "Introduccio als computadors",
             "url": "http://atenea.upc.edu/introcomp"
         },
     }
@@ -145,12 +145,12 @@ unfollow_context = {
         "actor": {
             "objectType": "person",
             "id": "4e6e1243aceee91143000000",
-            "displayName": "victor"
+            "username": "victor"
         },
         "verb": "unfollow",
         "object": {
             "objectType": "service",
-            "displayName": "Introduccio als computadors",
+            "username": "Introduccio als computadors",
             "url": "http://atenea.upc.edu/introcomp"
         },
     }
@@ -159,7 +159,7 @@ like = {
         "actor": {
             "objectType": "person",
             "id": "4e6e1243aceee91143000000",
-            "displayName": "javier"
+            "username": "javier"
         },
         "verb": "like",
         "object": {
@@ -172,7 +172,7 @@ share = {
     "actor": {
         "objectType": "person",
         "id": "4e6e1243aceee91143000000",
-        "displayName": "javier"
+        "username": "javier"
     },
     "verb": "share",
     "object": {

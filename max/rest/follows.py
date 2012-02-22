@@ -27,14 +27,14 @@ def getFollowedUser(context, request):
 @MaxRequest
 def follow(context, request):
     """
-        /people/{displayName}/follows/{followedDN}'
+        /people/{username}/follows/{followedDN}'
     """
     #XXX TODO ara nomes es tracta un sol follow
     # s'ha de iterar si es vol que el comentari sigui de N follows
-    displayName = request.matchdict['displayName']
+    username = request.matchdict['username']
 
-    mmdbusers = MADMaxCollection(context.db.users, query_key='displayName')
-    actor = mmdbusers[displayName]
+    mmdbusers = MADMaxCollection(context.db.users, query_key='username')
+    actor = mmdbusers[username]
     rest_params = {'actor': actor}
 
     # Initialize a Activity object from the request

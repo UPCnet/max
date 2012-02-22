@@ -12,13 +12,13 @@ activity = {
         'objectType':'note',
         'content':'texthere'
     }
-} 
+}
 
 import json
 WADL = [
   {'base' : 'http://max.beta.upcnet.es',
    'docs' : 'http://max.beta.upcnet.es/docs',
-   'resources' : [ 
+   'resources' : [
 
                 { 'route' : 'users',
                   'format' : '/people',
@@ -33,7 +33,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'user',
-                  'format' : '/people/{displayName}',
+                  'format' : '/people/{username}',
                   'methods' : [
                                 { 'id' : 'getUser',
                                   'name' : 'GET',
@@ -47,13 +47,13 @@ WADL = [
                                   'desc' : 'Afegir un usuari',
                                   'tags' : ['People'],
                                   'auth' : False,
-                                  'doc' : 'Afegeix un usuari amb nom segons {displayName}',
+                                  'doc' : 'Afegeix un usuari amb nom segons {username}',
                                 },
-                                
+
                                ]
                   },
                 { 'route' : 'user_activities',
-                  'format' : '/people/{displayName}/activities',
+                  'format' : '/people/{username}/activities',
                   'methods' : [
                                 { 'id' : 'getUserActivities',
                                   'name' : 'GET',
@@ -71,11 +71,11 @@ WADL = [
                                   'request' : {'payload': CDATA(activity),
                                                 'contenttype':'application/json'}
                                 },
-                                
+
                                ]
                   },
                 { 'route' : 'timeline',
-                  'format' : '/people/{displayName}/timeline',
+                  'format' : '/people/{username}/timeline',
                   'methods' : [
                                 { 'id' : 'getUserTimeline',
                                   'name' : 'GET',
@@ -87,7 +87,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'user_comments',
-                  'format' : '/people/{displayName}/comments',
+                  'format' : '/people/{username}/comments',
                   'methods' : [
                                 { 'id' : 'getUserComments',
                                   'name' : 'GET',
@@ -99,7 +99,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'user_shares',
-                  'format' : '/people/{displayName}/shares',
+                  'format' : '/people/{username}/shares',
                   'methods' : [
                                 { 'id' : 'getUserSharedActivities',
                                   'name' : 'GET',
@@ -111,7 +111,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'user_likes',
-                  'format' : '/people/{displayName}/likes',
+                  'format' : '/people/{username}/likes',
                   'methods' : [
                                 { 'id' : 'getUserLikedActivities',
                                   'name' : 'GET',
@@ -123,7 +123,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'follows',
-                  'format' : '/people/{displayName}/follows',
+                  'format' : '/people/{username}/follows',
                   'methods' : [
                                 { 'id' : 'getFollowedUsers',
                                   'name' : 'GET',
@@ -135,7 +135,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'follow',
-                  'format' : '/people/{displayName}/follows/{followedDN}',
+                  'format' : '/people/{username}/follows/{followedDN}',
                   'methods' : [
                                 { 'id' : 'getFollowedUser',
                                   'name' : 'GET',
@@ -147,7 +147,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'subscriptions',
-                  'format' : '/people/{displayName}/subscriptions',
+                  'format' : '/people/{username}/subscriptions',
                   'methods' : [
                                 { 'id' : 'getUserSubscriptions',
                                   'name' : 'GET',
@@ -159,7 +159,7 @@ WADL = [
                                ]
                   },
                 { 'route' : 'subscription',
-                  'format' : '/people/{displayName}/subscription/{subscrId}}',
+                  'format' : '/people/{username}/subscription/{subscrId}}',
                   'methods' : [
                                 { 'id' : 'getUserSubscription',
                                   'name' : 'GET',
@@ -266,7 +266,7 @@ WADL = [
                                 },
                                ]
                   },
-                                    
+
                ]
   }
 ]

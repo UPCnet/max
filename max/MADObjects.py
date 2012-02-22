@@ -70,13 +70,13 @@ class MADDict(dict):
 
     def validate(self):
         """
-            Checks if all the required schema fields (request=1) are present in
+            Checks if all the required schema fields (required=1) are present in
             the collected data
         """
         for fieldname in self.schema:
-            if self.schema.get(fieldname).get('request', 0):
+            if self.schema.get(fieldname).get('required', 0):
                 if not self.checkParameterExists(fieldname):
-                    raise MissingField, 'Required paramer "%s" not found in the request' % fieldname
+                    raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
         return True
 
 
@@ -85,7 +85,7 @@ class MADBase(MADDict):
         Base Class for Objects in the MongoDB, It can be instantiated with a MongoDB Object
         or a request object in the source param.
 
-        If instantiated with a MongoDB Object collection must be passed
+        If instantiated with a MongoDB Object the collection where the object must be passed
         If instantiated with a request, rest_params may be passed to extend request params
 
         Provides the methods to validate and construct an object according to activitystrea.ms
@@ -139,16 +139,18 @@ class MADBase(MADDict):
     def getActorFromDB(self):
         """
             If a 'actor' object is present in the received params, search for the user
-            record on the DB and set it as actor
+            record on the DB and set it as actor. Also provides the user object with default
+            displayName if not set.
         """
         if 'actor' in self.data:
             if '_id' not in self.data['actor'].keys():
-                user_displayName = self.data['actor']['displayName']
-                user = self.mdb_collection.database.users.find_one({'displayName': user_displayName})
+                user_username = self.data['actor']['username']
+                user = self.mdb_collection.database.users.find_one({'username': user_username})
                 if user != None:
+                    user.setdefault('displayName', user['username'])
                     self.data['actor'] = user
                 else:
-                    raise UnknownUserError, 'Unknown user "%s"' % user_displayName
+                    raise UnknownUserError, 'Unknown user "%s"' % user_username
 
     def insert(self):
         """

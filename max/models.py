@@ -10,13 +10,13 @@ class Activity(MADBase):
     collection = 'activity'
     unique = '_id'
     schema = {
-                '_id':         dict(required=0, request=0),
-                'actor':       dict(required=0, request=1),
-                'verb':        dict(required=0, request=1),
-                'object':      dict(required=0, request=1),
-                'published':   dict(required=0, request=0),
-                'contexts':    dict(required=0, request=0),
-                'replies':    dict(required=0, request=0),
+                '_id':         dict(required=0),
+                'actor':       dict(required=1),
+                'verb':        dict(required=1),
+                'object':      dict(required=1),
+                'published':   dict(required=0),
+                'contexts':    dict(required=0),
+                'replies':    dict(required=0),
              }
 
     def buildObject(self):
@@ -27,7 +27,8 @@ class Activity(MADBase):
         ob = {'actor': {
                     'objectType': 'person',
                     '_id': self.data['actor']['_id'],
-                    'displayName': self.data['actor']['displayName']
+                    'username': self.data['actor']['username'],
+                    'displayName': self.data['actor']['displayName'],
                     },
                 'verb': self.data['verb'],
                 'object': None,
@@ -54,14 +55,15 @@ class User(MADBase):
         An activitystrea.ms User object representation
     """
     collection = 'users'
-    unique = 'displayName'
+    unique = 'username'
     schema = {
-                '_id':          dict(required=0),
-                'displayName':  dict(required=1, request=1),
-                'last_login':   dict(required=0),
-                'following':    dict(required=0),
-                'subscribedTo': dict(required=0),
-                'published':    dict(required=0),
+                '_id':          dict(),
+                'username':     dict(required=1),
+                'displayName':  dict(),
+                'last_login':   dict(),
+                'following':    dict(),
+                'subscribedTo': dict(),
+                'published':    dict(),
              }
 
     def buildObject(self):
@@ -69,7 +71,7 @@ class User(MADBase):
             Updates the dict content with the user structure,
             with data from the request
         """
-        ob = {'displayName': self.data['displayName'],
+        ob = {'username': self.data['username'],
                    'last_login': datetime.datetime.utcnow(),
                    'following': {'items': [], },
                    'subscribedTo': {'items': [], }

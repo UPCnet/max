@@ -29,23 +29,23 @@ def getUsers(context, request):
 def getUser(context, request):
     """
     """
-    displayName = request.matchdict['displayName']
+    username = request.matchdict['username']
 
-    users = MADMaxCollection(context.db.users, query_key='displayName')
-    user = users[displayName].flatten()
+    users = MADMaxCollection(context.db.users, query_key='username')
+    user = users[username].flatten()
 
     handler = JSONResourceEntity(user)
     return handler.buildResponse()
 
 
-@view_config(route_name='user', request_method='POST')
+@view_config(route_name='user', request_method='POST', permission='manage')
 @MaxResponse
 @MaxRequest
 def addUser(context, request):
     """
     """
-    displayName = request.matchdict['displayName']
-    rest_params = {'displayName': displayName}
+    username = request.matchdict['username']
+    rest_params = {'username': username}
 
     # Initialize a User object from the request
     newuser = User(request, rest_params=rest_params)
@@ -73,8 +73,8 @@ def getUserAvatar(context, request):
     """
     """
     AVATAR_FOLDER = '/var/pyramid/max/avatars'
-    displayName = request.matchdict['displayName']
-    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, displayName)) and displayName or 'missing'
+    username = request.matchdict['username']
+    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, username)) and username or 'missing'
     data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/jpeg'
