@@ -37,7 +37,7 @@ class Activity(MADBase):
         ob['object'] = subobject
 
         if 'contexts' in self.data:
-            ob['contexts'] = self.data['contexts']
+            ob['contexts'] = [dict(url=url, objectType='context') for url in self.data['contexts']]
 
         self.update(ob)
 

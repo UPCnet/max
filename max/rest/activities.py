@@ -44,7 +44,7 @@ def addUserActivity(context, request):
     """
     username = request.matchdict['username']
 
-    rest_params = {'actor': {'username':username},
+    rest_params = {'actor': {'username': username},
                    'verb': 'post'}
 
     # Initialize a Activity object from the request
@@ -69,13 +69,30 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
+#@MaxResponse
+@MaxRequest
+@oauth2(['widgetcli'])
 def getActivities(context, request):
     """
          /activities
 
-         Retorna all activities
+         Retorna all activities, optionaly filtered by context
     """
-    return HTTPNotImplemented()
+    mmdb = MADMaxDB(context.db)
+    # Add all the activities posted on particular contexts
+    contexts_followings = []
+
+    urls = request.params.getall('contexts')
+    #urls = isinstance(contexts, list) and contexts or [contexts, ]
+    for url in urls:
+        contexts_followings.append({'contexts.url': url})
+
+    query = {'verb': 'post'}
+    if contexts_followings:
+        query = {'$or': contexts_followings}
+    activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
+    handler = JSONResourceRoot(activities)
+    return handler.buildResponse()
 
 
 @view_config(route_name='activity', request_method='GET')
