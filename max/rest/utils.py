@@ -2,13 +2,29 @@ import json
 from bson import json_util
 from datetime import datetime
 from rfc3339 import rfc3339
+from max.exceptions import InvalidSearchParams
 
 from pymongo.objectid import ObjectId
 
 import requests
-import json
 import urllib2
 import re
+
+
+def searchParams(request):
+    """
+        Extracts search params from the request, or sets default values if not found
+        Returns a dict with all the results
+    """
+    params = {}
+    limit = request.params.get('limit', 10)
+    try:
+        params['limit'] = int(limit)
+    except:
+        raise InvalidSearchParams, 'limit must be a positive integer'
+
+    return params
+
 
 class RUDict(dict):
 
@@ -113,9 +129,10 @@ def formatMessageEntities(text):
         return shortenURL(matchobj.group(0))
 
     find_url_regex = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
-    shortened = re.sub(find_url_regex,shorten,text)
+    shortened = re.sub(find_url_regex, shorten, text)
 
     return shortened
+
 
 def shortenURL(url):
     """

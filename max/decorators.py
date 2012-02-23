@@ -1,11 +1,13 @@
-from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized
+from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams
 from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
 from bson.errors import InvalidId
-
+from max.resources import Root
 
 def MaxRequest(func):
     def replacement(*args, **kwargs):
-        # handle request checks
+        nkargs = [a for a in args]
+        context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
+        #import ipdb;ipdb.set_trace()
         response = func(*args, **kwargs)
         return response
     return replacement
@@ -31,6 +33,9 @@ def MaxResponse(func):
             return HTTPBadRequest(detail=message)
         except Unauthorized, message:
             return HTTPUnauthorized(detail=message)
+        except InvalidSearchParams, message:
+            return HTTPBadRequest(detail=message)
+
         # JSON decode error????
         except ValueError:
             return HTTPBadRequest()

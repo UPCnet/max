@@ -8,6 +8,7 @@ from max.oauth2 import oauth2
 from max.exceptions import MissingField, Unauthorized, UnknownUserError
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.utils import searchParams
 
 
 @view_config(route_name='user_activities', request_method='GET')
@@ -110,7 +111,7 @@ def getActivities(context, request):
     query = {'verb': 'post'}
     if contexts_followings_query:
         query = {'$or': contexts_followings_query}
-    activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
+    activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
 

@@ -2,7 +2,7 @@
 
 from max.exceptions import MongoDBObjectNotFound
 from pymongo.objectid import ObjectId
-from max.models import Activity, User
+import sys
 from pymongo import DESCENDING
 
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
@@ -37,10 +37,16 @@ class MADMaxCollection(object):
         """
         self.show_fields = dict([(fieldname, 1) for fieldname in fields])
 
-    def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, limit=None):
+    def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
         """
             Performs a search on the mongoDB
+            Kwarts may contain:
+                limit: Count of objects to be returned from search
         """
+
+        #Extract known params from kwargs
+        limit = kwargs.get('limit', None)
+
         if query:
             cursor = self.collection.find(query, show_fields)
         else:
@@ -74,9 +80,11 @@ class MADMaxCollection(object):
             the appropiate class, mapped by the origin collection of the item.
             Flattened or not by demand
         """
-        class_map = dict(activity=Activity,
-                        users=User)
-        wrapped = class_map[self.collection.name](item, collection=self.collection)
+        class_map = dict(activity='Activity',
+                        users='User')
+
+        module = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
+        wrapped = module(item, collection=self.collection)
         if flatten:
             return wrapped.flatten()
         else:
@@ -151,4 +159,3 @@ class MADMaxDB(object):
                 else:
                     attr = default
             return attr
-
