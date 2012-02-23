@@ -5,7 +5,7 @@ from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
-from max.exceptions import MissingField, Unauthorized
+from max.exceptions import MissingField, Unauthorized, UnknownUserError
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
@@ -24,7 +24,10 @@ def getUserActivities(context, request):
 
     mmdb = MADMaxDB(context.db)
 
-    actor = mmdb.users.getItemsByusername(username)[0]
+    try:
+        actor = mmdb.users.getItemsByusername(username)[0]
+    except:
+        raise UnknownUserError, 'Unknown user "%s"' % username
 
     query = {'actor._id': actor['_id']}
     activities = mmdb.activity.search(query, sort="_id", flatten=1)
@@ -86,7 +89,10 @@ def getActivities(context, request):
 
     mmdb = MADMaxDB(context.db)
     username = request.headers.get('X-Oauth-Username')
-    actor = mmdb.users.getItemsByusername(username)[0]
+    try:
+        actor = mmdb.users.getItemsByusername(username)[0]
+    except:
+        raise UnknownUserError, 'Unknown user "%s"' % username
 
     subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
     forbidden_contexts = [url for url in urls if url not in subscribed_contexts_urls]
