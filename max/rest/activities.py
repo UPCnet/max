@@ -5,6 +5,7 @@ from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
+from max.exceptions import MissingField, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
@@ -69,7 +70,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -78,18 +79,31 @@ def getActivities(context, request):
 
          Retorna all activities, optionaly filtered by context
     """
-    mmdb = MADMaxDB(context.db)
-    # Add all the activities posted on particular contexts
-    contexts_followings = []
 
     urls = request.params.getall('contexts')
-    #urls = isinstance(contexts, list) and contexts or [contexts, ]
+    if urls == []:
+        raise MissingField, 'You have to specify at least one context'
+
+    mmdb = MADMaxDB(context.db)
+    username = request.headers.get('X-Oauth-Username')
+    actor = mmdb.users.getItemsByusername(username)[0]
+
+    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
+    forbidden_contexts = [url for url in urls if url not in subscribed_contexts_urls]
+
+    if forbidden_contexts:
+        raise Unauthorized, "You don't have permission to get activities from this contexts: %s" % ', '.join(forbidden_contexts)
+
+    # If we reached here, we have permission to search for all urls in urls
+
+    # Add all the activities posted on particular contexts
+    contexts_followings_query = []
     for url in urls:
-        contexts_followings.append({'contexts.url': url})
+        contexts_followings_query.append({'contexts.url': url})
 
     query = {'verb': 'post'}
-    if contexts_followings:
-        query = {'$or': contexts_followings}
+    if contexts_followings_query:
+        query = {'$or': contexts_followings_query}
     activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
