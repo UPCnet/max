@@ -16,16 +16,13 @@ def getUserSubscriptions(context, request):
     return HTTPNotImplemented()
 
 
-@view_config(route_name='subscriptions', request_method='POST')
-@MaxResponse
-@MaxRequest
-@oauth2(['widgetcli'])
+@view_config(route_name='subscriptions', request_method='POST', permission='manage')
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
     """
-    #XXX TODO ara només es tracta la primera activitat,
-    # s'ha de iterar si es vol que el comentari sigui de N activitats
+    # XXX For now only one context can be subscribed at a time
+
     username = request.matchdict['username']
 
     rest_params = {'actor': {'username': username},
