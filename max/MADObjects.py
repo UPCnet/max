@@ -226,5 +226,8 @@ class MADBase(MADDict):
             raise ObjectNotSupported, 'Activitystrea.ms object type %s unknown or unsupported' % objType
 
     def updateFields(self, fields):
+        """
+            Update fields on objects
+        """
         return self.mdb_collection.update({'_id': self['_id']},
                                           {'$set': fields, },)
