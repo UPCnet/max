@@ -59,8 +59,8 @@ class User(MADBase):
                 'username':     dict(required=1),
                 'displayName':  dict(),
                 'last_login':   dict(),
-                'following':    dict(default=[]),
-                'subscribedTo': dict(default=[]),
+                'following':    dict(default={'items':[]}),
+                'subscribedTo': dict(default={'items':[]}),
                 'published':    dict(),
              }
 
