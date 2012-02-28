@@ -59,8 +59,8 @@ class User(MADBase):
                 'username':     dict(required=1),
                 'displayName':  dict(),
                 'last_login':   dict(),
-                'following':    dict(),
-                'subscribedTo': dict(),
+                'following':    dict(default=[]),
+                'subscribedTo': dict(default=[]),
                 'published':    dict(),
              }
 
@@ -69,11 +69,19 @@ class User(MADBase):
             Updates the dict content with the user structure,
             with data from the request
         """
-        ob = {'username': self.data['username'],
-                   'last_login': datetime.datetime.utcnow(),
-                   'following': {'items': [], },
-                   'subscribedTo': {'items': [], }
-                   }
+        ob = {'last_login': datetime.datetime.utcnow()}
+
+        # Update properties from request data if defined in schema
+        # Also create properties with a default value defined
+        properties = {}
+        for key, value in self.schema.items():
+            default = value.get('default', None)
+            if key in self.data:
+                properties[key] = self.data[key]
+            elif default:
+                properties[key] = default
+
+        ob.update(properties)
         self.update(ob)
 
     def addFollower(self, person):
