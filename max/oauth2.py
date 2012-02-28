@@ -47,4 +47,3 @@ def oauth2(allowed_scopes=[]):
     if type(allowed_scopes) == type(wrap):
         return wrap(allowed_scopes)
     return wrap
-

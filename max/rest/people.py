@@ -81,11 +81,22 @@ def getUserAvatar(context, request):
     return image
 
 
-@view_config(route_name='user', request_method='PUT')
+@view_config(route_name='user', request_method='PUT', permission='manage')
+#@MaxResponse
+@MaxRequest
 def ModifyUser(context, request):
     """
     """
-    return HTTPNotImplemented()
+    username = request.matchdict['username']
+
+    users = MADMaxCollection(context.db.users, query_key='username')
+    user = users[username]
+    displayName = request.params.get('displayName')
+    properties = dict(displayName=displayName)
+    user.modifyUser(properties)
+
+    handler = JSONResourceEntity(users[username].flatten())
+    return handler.buildResponse()
 
 
 @view_config(route_name='user', request_method='DELETE')

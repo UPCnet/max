@@ -93,3 +93,10 @@ class User(MADBase):
             Adds a comment to an existing activity
         """
         self.deleteFromList('subscribedTo', url)
+
+    def modifyUser(self, properties):
+        """Update the user object with the given properties"""
+        valid_user_fields_for_update = ['displayName']
+        # Comprehension dict (Muahaha)
+        fields = {i: properties[i] for i in valid_user_fields_for_update}
+        self.updateFields(fields)
