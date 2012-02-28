@@ -82,7 +82,7 @@ def getUserAvatar(context, request):
 
 
 @view_config(route_name='user', request_method='PUT', permission='manage')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 def ModifyUser(context, request):
     """
