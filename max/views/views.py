@@ -1,10 +1,13 @@
 from pyramid.view import view_config
 from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
+from pyramid.response import Response
+import requests
 
 from max.resources import Root
 from max.views.api import TemplateAPI
 from max.rest.services import WADL
+from urllib2 import urlparse
 
 
 @view_config(context=Root, renderer='max:templates/activityStream.pt', permission='restricted')
@@ -37,3 +40,21 @@ def js_variables(context, request):
                  'userid': str(userid['_id']),
     }
     return dict(variables=variables)
+
+
+@view_config(name='makeRequest', context=Root)
+def makeRequest(context, request):
+    method = request.params.get('httpMethod')
+    url = request.params.get('url')
+    headers_qs = request.params.get('headers', '')
+    headers = dict(urlparse.parse_qsl(headers_qs))
+    data = request.params.get('postData')
+
+    requester = getattr(requests, method.lower())
+    resp = requester(url, headers=headers, data=data)
+
+    response = Response(resp.text)
+    response.status_int = resp.status_code
+    response.headers.update(resp.headers)
+    print 'finished'
+    return response
