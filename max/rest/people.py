@@ -9,6 +9,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
 
 from max.oauth2 import oauth2
+from max.rest.utils import extractPostData
 
 
 @view_config(route_name='users', request_method='GET')
@@ -91,7 +92,8 @@ def ModifyUser(context, request):
 
     users = MADMaxCollection(context.db.users, query_key='username')
     user = users[username]
-    displayName = request.params.get('displayName')
+    params = extractPostData(request)
+    displayName = params.get('displayName')
     properties = dict(displayName=displayName)
     user.modifyUser(properties)
 
