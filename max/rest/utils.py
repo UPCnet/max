@@ -13,8 +13,9 @@ import re
 
 def searchParams(request):
     """
-        Extracts search params from the request, or sets default values if not found
+        Extracts valid search params from the request, or sets default values if not found
         Returns a dict with all the results
+        Raises InvalidSearchParams on bad param values
     """
     params = {}
     limit = request.params.get('limit', 10)
@@ -22,6 +23,14 @@ def searchParams(request):
         params['limit'] = int(limit)
     except:
         raise InvalidSearchParams, 'limit must be a positive integer'
+
+    since = request.params.get('since')
+    if since:
+        try:
+            params['since'] = ObjectId(since)
+        except:
+            raise InvalidSearchParams, 'since must be a valid ObjectId BSON identifier'
+
 
     return params
 

@@ -46,8 +46,13 @@ class MADMaxCollection(object):
 
         #Extract known params from kwargs
         limit = kwargs.get('limit', None)
+        since = kwargs.get('since', None)
 
         if query:
+            if since:
+                # Filter the query to return objects created later than the one
+                # represented by since (since not included)
+                query.update({'_id': {'$gt': since}})
             cursor = self.collection.find(query, show_fields)
         else:
             cursor = self.collection.find()
