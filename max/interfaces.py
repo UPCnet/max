@@ -16,8 +16,8 @@ class IMADObjects(Interface):
 
     unique = Attribute("""Ensure Unique""")
     collection = Attribute("""Name of the collection""")
-    mdb_collection = Attribute()
-    data = Attribute()
+    mdb_collection = Attribute("")
+    data = Attribute("")
 
     def __init__(source, collection=None, rest_params={}):
         """Constructor"""
