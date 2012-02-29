@@ -6,6 +6,7 @@ from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
 from max.resources import Root
+from max.rest.resources import RESOURCES
 
 # from max.models import appmaker
 
@@ -45,29 +46,10 @@ def main(global_config, **settings):
     config.add_route('wadl', '/WADL')
 
     # REST Resources
+    # Configure routes based on resources defined in RESOURCES
 
-    config.add_route('users', '/people')
-    config.add_route('user', '/people/{username}')
-    config.add_route('avatar', '/people/{username}/avatar')
-
-    config.add_route('user_activities', '/people/{username}/activities')
-    config.add_route('timeline', '/people/{username}/timeline')
-    config.add_route('user_comments', '/people/{username}/comments')
-    config.add_route('user_shares', '/people/{username}/shares')
-    config.add_route('user_likes', '/people/{username}/likes')
-    config.add_route('follows', '/people/{username}/follows')
-    config.add_route('follow', '/people/{username}/follows/{followedDN}')
-    config.add_route('subscriptions', '/people/{username}/subscriptions')
-    config.add_route('subscription', '/people/{username}/subscriptions/{subscrId}}')
-
-    config.add_route('activities', '/activities')
-    config.add_route('activity', '/activities/{activity}')
-    config.add_route('comments', '/activities/{activity}/comments')
-    config.add_route('comment', '/activities/{activity}/comments/{commentId}')
-    config.add_route('likes', '/activities/{activity}/likes')
-    config.add_route('like', '/activities/{activity}/likes/{likeId}')
-    config.add_route('shares', '/activities/{activity}/shares')
-    config.add_route('share', '/activities/{activity}/shares/{shareId}')
+    for name, properties in RESOURCES.items():
+        config.add_route(name, properties.get('route'))
 
     config.scan('max')
 

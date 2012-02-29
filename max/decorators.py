@@ -2,6 +2,8 @@ from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFou
 from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
 from bson.errors import InvalidId
 from max.resources import Root
+from max.rest.resources import RESOURCES
+
 
 def MaxRequest(func):
     def replacement(*args, **kwargs):
@@ -13,12 +15,14 @@ def MaxRequest(func):
     return replacement
 
 
-def MaxResponse(func):
+def MaxResponse(fun):
     def replacement(*args, **kwargs):
         # Handle exceptions throwed in the process of executing the REST method and
         # issue proper status code with message
+        nkargs = [a for a in args]
+        context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
         try:
-            response = func(*args, **kwargs)
+            response = fun(*args, **kwargs)
         except InvalidId, message:
             return HTTPBadRequest(detail=message)
         except ObjectNotSupported, message:
@@ -42,5 +46,11 @@ def MaxResponse(func):
         except:
             return HTTPInternalServerError()
         else:
+            try:
+                # Don't cache by default, get configuration from resource if any
+                route_cache_settings = RESOURCES.get(request.matched_route.name).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
+                response.headers.update({'Cache-Control': route_cache_settings})
+            except:
+                pass
             return response
     return replacement
