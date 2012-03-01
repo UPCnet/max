@@ -24,13 +24,22 @@ def searchParams(request):
     except:
         raise InvalidSearchParams, 'limit must be a positive integer'
 
-    since = request.params.get('since')
-    if since:
+    after = request.params.get('after')
+    if after:
         try:
-            params['since'] = ObjectId(since)
+            params['after'] = ObjectId(after)
         except:
-            raise InvalidSearchParams, 'since must be a valid ObjectId BSON identifier'
+            raise InvalidSearchParams, 'after must be a valid ObjectId BSON identifier'
 
+    before = request.params.get('before')
+    if before:
+        try:
+            params['before'] = ObjectId(before)
+        except:
+            raise InvalidSearchParams, 'before must be a valid ObjectId BSON identifier'
+
+    if 'before' in params and 'after' in params:
+        raise InvalidSearchParams, 'only one offset filter is allowe, after or before'
 
     return params
 

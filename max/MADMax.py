@@ -40,19 +40,28 @@ class MADMaxCollection(object):
     def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
         """
             Performs a search on the mongoDB
-            Kwarts may contain:
+            Kwargs may contain:
                 limit: Count of objects to be returned from search
+                before: An id pointing to an activity, whose older fellows will be fetched
+                after: An id pointing to an activity, whose newer fellows will be fetched
         """
 
         #Extract known params from kwargs
         limit = kwargs.get('limit', None)
-        since = kwargs.get('since', None)
+        after = kwargs.get('after', None)
+        before = kwargs.get('before', None)
+
+        if after or before:
+            condition = after and '$gt' or '$lt'
+            offset = after and after or before
+        else:
+            offset = None
 
         if query:
-            if since:
-                # Filter the query to return objects created later than the one
-                # represented by since (since not included)
-                query.update({'_id': {'$gt': since}})
+            if offset:
+                # Filter the query to return objects created later or earlier than the one
+                # represented by offset (offset not included)
+                query.update({'_id': {condition: offset}})
             cursor = self.collection.find(query, show_fields)
         else:
             cursor = self.collection.find()
