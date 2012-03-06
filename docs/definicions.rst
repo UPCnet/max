@@ -1,5 +1,5 @@
-Introducció a conceptes
-========================
+Introducció a conceptes i convencions
+=====================================
 
 En aquest document introduïem alguns conceptes relacionats amb l'arquitectura REST, orientats a entendre la implementació dels serveis al MAX. Aquí s'expliquen conceptes que o bé son comuns a tots els serveis, o ajuden a entendre la filosofia i la estructura darrera d'aquests.
 
@@ -18,12 +18,17 @@ Els recursos poden imlemenetar un o diversos dels mètodes de la UI, segons apli
 Codis d'estat
 ---------------
 
+Tots els serveis indiquen el resultat de l'operació amb un codi d'estat de la resposta HTTP que pot ser un dels següents.
+
 :200 OK: El servidor ha pogut processar el servei i donar una resposta correctament. Si estem fent un POST, i l'element que voliem crear ja existeix, aquest és el codi que rebrem.
 :201 CREATED: S'ha creat una entitat nova al recurs
 :400 BAD REQUEST: Alguns dels paràmetres requerits manquen o són erronis
+:401 UNAUTHORIZED: Manca alguna paràmetre d'autenticació o aquesta no és vàlida
 :404 NOT FOUND: El recurs solicitat no existeix, en aquest cas, comprovar la URI
 :500 INTERNAL SERVER ERROR: Només en cas de apareixer algun bug o cas no tractat
 :501 NOT IMPLEMENTED: En recursos existents, indica que aquell mètode encara no esta implementat o que no aplica per el tipus de recurs solicitat
+
+Exceptuant els codis 200 i 201, que en el cos de la resposta es retorna l'object sobre el qual s'està actuant, en la resta de casos s'inclou un text descriptiu de l'error, que ens pot indicar la causa exacte del mateix.
 
 Accés a recursos
 ------------------
@@ -43,7 +48,7 @@ Ens llista totes les dades de l'entitat mindundi. En aquest cas a la URI podem l
     GET /people/mindundi/activities
 
 Les URI's dels serveis REST les podem interpretar quasibé sempre llegint de dreta a esquerra, agrupant els diferents identificadors d'entitats concretes amb el seu recurs. D'aquesta manera, l'ultim exemple el podem interpretar com a::
-    
+
     "Activitats de la persona amb nom mindundi"
 
 Creació d'elements nous
@@ -70,6 +75,22 @@ D'aquesta manera fent::
 
 Obtenim  l'usuari mindundi que en la secció anterior haviem creat. La URI és la mateixa, els paràmetres els mateixos (en aquest cas no n'hi han), només canvia el mètode HTTP usat.
 
+Format dels paràmetres
+----------------------
+
+Els serveis accepten paràmetres en format JSON quan s'envien a través del cos de la resposta, cas en el qual s'ha de incloure la capçalera 'content-type' indicant el valor 'aplication/json'.
+
+Els serveis també accepten pas de paràmentres en el format 'application/form-url-encoded', per exemple les peticions GET que no tenen cos, obligatòriament han de utilitzar aquest format.
+
+Per estructures complexes amb més d'un nivell utilitzarem sempre JSON, mentre que per llistes de paràmetres clau=valor, podem utilitzar el tradicional 'application/form-url-encoded'
+
+Per paràmetres que representen llistes de valors i que s'han de passar via GET, hem d'assegurar que el format en que es genera la llista de paràmentres compleixi el bàsic de HTTP, ja que hi han multiples convencions de com fer-ho. Per exemple:
+
+    Si tenim el camp 'context' que té 2 valors 'A' i 'B', els paràmetres de la petició
+    han repetir la clau 'context' tantes vegades com valors hi hagi::
+
+    ?context=A&context=B
+
 Adreces canòniques per recursos amb múltiples URI's
 ------------------------------------------------------
 
@@ -88,7 +109,7 @@ Tot i així si el que volem es compartir l'activitat amb algú altre, no te sent
     GET /activities/activitat1
 
 que és equivalent a la forma anterior. Això ens dona una URI (canònica) simplificada per dur a terme accions com per exemple la de compartir, que seria de la següent forma::
-    
+
     POST /activities/activitat1/shares
 
 on shares representa el conjunt de vegades que s'ha compartit la activitat

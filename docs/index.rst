@@ -17,4 +17,5 @@ Continguts
    introduccio.rst
    serialitzacions.rst
    definicions.rst
+   oauth2.rst
    apirest.rst
