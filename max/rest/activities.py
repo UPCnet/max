@@ -38,7 +38,7 @@ def getUserActivities(context, request):
 
 
 @view_config(route_name='user_activities', request_method='POST')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def addUserActivity(context, request):

@@ -6,6 +6,8 @@ from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.decorators import MaxRequest, MaxResponse
 from max.models import Activity
+from max.oauth2 import oauth2
+from max.rest.utils import flatten
 
 from pymongo.objectid import ObjectId
 
@@ -22,6 +24,7 @@ def getUserComments(context, request):
 @view_config(route_name='comments', request_method='GET')
 @MaxResponse
 @MaxRequest
+@oauth2(['widgetcli'])
 def getActivityComments(context, request):
     """
     """
@@ -37,6 +40,7 @@ def getActivityComments(context, request):
     #handler = JSONResourceRoot(activities)
     replies = refering_activity.get('replies', {})
     items = replies.get('items', [])
+    flatten(items)
     handler = JSONResourceRoot(items)
     return handler.buildResponse()
 
@@ -44,6 +48,7 @@ def getActivityComments(context, request):
 @view_config(route_name='comments', request_method='POST')
 @MaxResponse
 @MaxRequest
+@oauth2(['widgetcli'])
 def addActivityComment(context, request):
     """
     POST /activities/{activity}/comments
@@ -68,6 +73,7 @@ def addActivityComment(context, request):
     newactivity['_id'] = newactivity_oid
 
     comment = dict(newactivity.object)
+    comment['published'] = newactivity.published
     comment['author'] = {'username': newactivity.actor['username'],
                          'objectType': 'person'}
     comment['id'] = newactivity._id
