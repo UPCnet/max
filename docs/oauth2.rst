@@ -29,35 +29,29 @@ Crides al sistema oauth
 
     Demana un token per un usuari i un scope concrets segons els següents paràmetres passats en format 'application/form-url-encoded'
 
-    :grant_type : La cadena de text 'password', que indica que utilitzara un usuari LDAP per validar
-    :client_id : en el nostre cas, l'id és 'MAX'
-    :scope: Cadena de text que indica desde on es genera l'activitat, de moment l'única permesa pel max és 'widgetcli', per tant hem d'usar aquesta
-    :username: nom d'usuari pel que volem obtenir el token
-    :password: contrasenya de l'usuari
+    :``grant_type`` : La cadena de text 'password', que indica que utilitzara un usuari LDAP per validar
+    :``client_id`` : en el nostre cas, l'id és 'MAX'
+    :``scope``: Cadena de text que indica desde on es genera l'activitat, de moment l'única permesa pel max és 'widgetcli', per tant hem d'usar aquesta
+    :``username``: nom d'usuari pel que volem obtenir el token
+    :``password``: contrasenya de l'usuari
 
 
     Retorna un codi de resposta HTTP 200 i una estructura JSON de la forma::
 
-    {
-    "oauth_token": "4d53575d0d9582839c510b3302ac1f2c",
-    "scope": "widgetcli",
-    "fresh": false
-    }
+    {  "oauth_token": "4d53575d0d9582839c510b3302ac1f2c", "scope": "widgetcli", "fresh": false  }
 
 
     on 'fresh' ens indica si el token s'acava de generar o ja n'existia un de vàlid per aquest usuari i scope concrets. Davant d'un error, el servei retorna un codi d'error HTTP 400, i una estructura JSON indicant l'error, per exemple::
 
-    {
-    "error": "invalid_grant"
-    }
+    {  "error": "invalid_grant"   }
 
 .. http:post:: /checktoken
 
     Comprova la validesa d'un token per un usuari i un scope concrets segons els següents paràmetres passats en format 'application/form-url-encoded'
 
-    :oauth_token : El token que volem validar
-    :user_id : Nom d'usuari al que pertany el token
-    :scope: Cadena de text que indica desde on es genera l'activitat, de moment l'única permesa pel max és 'widgetcli', per tant hem d'usar aquesta. Ha de ser la mateixa que es va especificar al moment de demanar el token.
+    :``oauth_token`` : El token que volem validar
+    :``user_id`` : Nom d'usuari al que pertany el token
+    :``scope``: Cadena de text que indica desde on es genera l'activitat, de moment l'única permesa pel max és 'widgetcli', per tant hem d'usar aquesta. Ha de ser la mateixa que es va especificar al moment de demanar el token.
 
 
     Retorna un codi de resposta HTTP 200 si el token és valid i un HTTP 401 si no ho és.
@@ -68,6 +62,6 @@ Us de OAuth amb MAX
 
 Per poder indicar al max que ens volem autenticar utilizant OAuth, ho farem a través de 3 capçaleres HTTP pròpies, amb les que proporcionarem les dades al MAX perquè pugui fer la validació del token. Tota petició a un servei del max que requereix de autenticació OAuth ha de contenir:
 
-* 'X-Oauth-Token': amb el valor del token que volem validar
-* 'X-Oauth-Username': amb el nom de l'usuari al qual pertany el token
-* 'X-Oauth-Scope': scope amb el que es va generar el token
+* ``X-Oauth-Token``: amb el valor del token que volem validar
+* ``X-Oauth-Username``: amb el nom de l'usuari al qual pertany el token
+* ``X-Oauth-Scope``: scope amb el que es va generar el token
