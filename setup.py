@@ -17,7 +17,7 @@ requires = [
     'requests'
     ]
 
-test_requires = ['WebTest', 'wgsi_intercept']
+test_requires = ['WebTest', 'mock_http', 'CherryPy==3.1.1']
 
 setup(name='max',
       version='2.0',
@@ -38,7 +38,7 @@ setup(name='max',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires + test_requires,
-      test_suite="max",
+      test_suite="max.tests",
       entry_points="""\
       [paste.app_factory]
       main = max:main

@@ -1,14 +1,11 @@
 from pyramid.config import Configurator
-# from sqlalchemy import engine_from_config
 
 from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from max.resources import Root
+from max.resources import Root, setMAXSettings
 from max.rest.resources import RESOURCES
-
-# from max.models import appmaker
 
 
 def main(global_config, **settings):
@@ -21,8 +18,7 @@ def main(global_config, **settings):
     authn_policy = WhoV2AuthenticationPolicy(whoconfig_file, identifier_id)
     authz_policy = ACLAuthorizationPolicy()
 
-    # engine = engine_from_config(settings, 'sqlalchemy.')
-    # get_root = appmaker(engine)
+    # App config
     config = Configurator(settings=settings,
                           root_factory=Root,
                           session_factory=my_session_factory,
@@ -45,12 +41,23 @@ def main(global_config, **settings):
     config.add_route('profiles', '/profiles/{username}')
     config.add_route('wadl', '/WADL')
 
+    # Store in registry
+    db_uri = settings['mongodb.url']
+    import pymongo
+    conn = pymongo.Connection(db_uri)
+    db = conn[settings['mongodb.db_name']]
+    config.registry.max_store = db
+
+    # Set MAX settings
+    setMAXSettings(config)
+
     # REST Resources
     # Configure routes based on resources defined in RESOURCES
 
     for name, properties in RESOURCES.items():
         config.add_route(name, properties.get('route'))
 
-    config.scan('max')
+    config.scan('max.views')
+    config.scan('max.rest')
 
     return config.make_wsgi_app()

@@ -14,11 +14,21 @@ class Root(object):
         self.request = request
         # MongoDB:
         settings = self.request.registry.settings
-        db_uri = settings['mongodb.url']
-        conn = pymongo.Connection(db_uri)
-        self.db = conn[settings['mongodb.db_name']]
+        self.db = settings.max_store
 
 
 def getMAXSettings(context):
     config = context.db.config.find_one()
     return config
+
+
+def setMAXSettings(config):
+    import ipdb; ipdb.set_trace( )
+    db = config.registry.max_store
+    config_doc = db.config.find_one()
+    if not config_doc:
+        config_doc = {}
+        config_doc['oauth_checkpoint'] = config.registry.settings.get('max.oauth_check_endpoint')
+        db.config.save(config_doc)
+    else:
+        config.registry.settings['max.oauth_check_endpoint'] = config_doc.get('max.oauth_check_endpoint')
