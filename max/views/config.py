@@ -25,11 +25,11 @@ def configView(context, request):
                       max_ops_password=DEFAULT_MAX_PASSWORD,)
 
     if request.params.get('form.submitted', None) is not None:
-        config['oauth_check_endpoint'] = request.POST.get('oauth_check_endpoint')
-        config['oauth_grant_type'] = request.POST.get('oauth_grant_type')
-        config['max_server'] = request.POST.get('max_server')
-        config['max_ops_username'] = request.POST.get('max_ops_username')
-        config['max_ops_password'] = request.POST.get('max_ops_password')
+        config['max.oauth_check_endpoint'] = request.POST.get('oauth_check_endpoint')
+        config['max.oauth_grant_type'] = request.POST.get('oauth_grant_type')
+        config['max.max_server'] = request.POST.get('max_server')
+        config['max.max_ops_username'] = request.POST.get('max_ops_username')
+        config['max.max_ops_password'] = request.POST.get('max_ops_password')
 
         # Save config data
         context.db.config.save(config)
@@ -39,10 +39,10 @@ def configView(context, request):
         return HTTPFound(request.application_url)
 
     return dict(api=api, url=request.path_url,
-                oauth_check_endpoint=config.get('oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),
-                oauth_grant_type=config.get('oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE),
-                max_server=config.get('max_server', DEFAULT_MAX_SERVER),
-                max_ops_username=config.get('max_ops_username', DEFAULT_MAX_USERNAME),
-                max_ops_password=config.get('max_ops_password', DEFAULT_MAX_PASSWORD),
+                oauth_check_endpoint=config.get('max.oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),
+                oauth_grant_type=config.get('max.oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE),
+                max_server=config.get('max.max_server', DEFAULT_MAX_SERVER),
+                max_ops_username=config.get('max.max_ops_username', DEFAULT_MAX_USERNAME),
+                max_ops_password=config.get('max.max_ops_password', DEFAULT_MAX_PASSWORD),
                 success=success
                 )

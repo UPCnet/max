@@ -4,7 +4,7 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from max.resources import Root, setMAXSettings
+from max.resources import Root, loadMAXSettings
 from max.rest.resources import RESOURCES
 
 
@@ -49,7 +49,7 @@ def main(global_config, **settings):
     config.registry.max_store = db
 
     # Set MAX settings
-    setMAXSettings(config)
+    config.registry.max_settings = loadMAXSettings(settings, config)
 
     # REST Resources
     # Configure routes based on resources defined in RESOURCES
@@ -57,7 +57,6 @@ def main(global_config, **settings):
     for name, properties in RESOURCES.items():
         config.add_route(name, properties.get('route'))
 
-    config.scan('max.views')
-    config.scan('max.rest')
+    config.scan('max', ignore='max.tests')
 
     return config.make_wsgi_app()

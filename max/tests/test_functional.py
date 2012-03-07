@@ -2,6 +2,7 @@ import unittest
 import os
 from paste.deploy import loadapp
 from mock_http import MockHTTP, GET
+import base64
 
 
 class FunctionalTests(unittest.TestCase):
@@ -11,9 +12,11 @@ class FunctionalTests(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
-    # def test_root(self):
-    #     res = self.testapp.get('/', status=200)
-    #     self.failUnless('Pyramid' in res.body)
+    def test_add_user(self):
+        username = 'messi'
+        res = self.testapp.post('/people/%s' % username, {}, basicAuthHeader('operations', 'operations'), status=201)
+        # TODO: comprovar que es semblant a:
+        # u'{"username": "messi", "subscribedTo": {"items": []}, "last_login": "2012-03-07T22:32:19Z", "published": "2012-03-07T22:32:19Z", "following": {"items": []}, "id": "4f57e1f3530a693147000000"}'
 
 
 class MockOAuthServerTest(unittest.TestCase):
@@ -26,3 +29,8 @@ class MockOAuthServerTest(unittest.TestCase):
         import requests
         result = requests.get('http://localhost:8080/checktoken')
         self.assertEqual(result.text, '')
+
+
+def basicAuthHeader(username, password):
+    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
+    return dict(Authorization="Basic %s" % base64string)

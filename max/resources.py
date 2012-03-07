@@ -1,5 +1,6 @@
 import pymongo
 from pyramid.security import Everyone, Allow, Authenticated
+from pyramid.settings import asbool
 
 
 class Root(object):
@@ -13,22 +14,27 @@ class Root(object):
     def __init__(self, request):
         self.request = request
         # MongoDB:
-        settings = self.request.registry.settings
-        self.db = settings.max_store
+        registry = self.request.registry
+        self.db = registry.max_store
 
 
-def getMAXSettings(context):
-    config = context.db.config.find_one()
-    return config
+def getMAXSettings(request):
+    return request.registry.max_settings
 
 
-def setMAXSettings(config):
-    import ipdb; ipdb.set_trace( )
+def loadMAXSettings(settings, config):
     db = config.registry.max_store
-    config_doc = db.config.find_one()
-    if not config_doc:
-        config_doc = {}
-        config_doc['oauth_checkpoint'] = config.registry.settings.get('max.oauth_check_endpoint')
-        db.config.save(config_doc)
+    max_ini_settings = {key: settings[key] for key in settings.keys() if 'max' in key}
+
+    if asbool(max_ini_settings.get('max.enforce_settings')) == True:
+        # Enforce ini settings
+        return max_ini_settings
     else:
-        config.registry.settings['max.oauth_check_endpoint'] = config_doc.get('max.oauth_check_endpoint')
+        # Try to find config in store
+        config_doc = db.config.find_one()
+        if not config_doc:
+            # No settings in store, return the ini settings
+            return max_ini_settings
+        else:
+            max_db_settings = {key: config_doc[key] for key in config_doc.keys() if 'max' in key}
+            return max_db_settings
