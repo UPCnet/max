@@ -17,6 +17,8 @@ requires = [
     'requests'
     ]
 
+test_requires = ['WebTest', 'wgsi_intercept']
+
 setup(name='max',
       version='2.0',
       description='Extended Activity Stream and Subscriptions Engine (Motor extes d\'activitat i subscripcions)',
@@ -35,7 +37,7 @@ setup(name='max',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires.append('WebTest', 'wgsi_intercept'),
+      tests_require=requires + test_requires,
       test_suite="max",
       entry_points="""\
       [paste.app_factory]
