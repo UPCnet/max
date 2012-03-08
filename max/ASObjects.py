@@ -35,8 +35,8 @@ class Note(ASObject):
         """
         self.data = data
         self.validate()
-        self.update(data)
         self.data['content'] = formatMessageEntities(self.data['content'])
+        self.update(data)
 
 
 class Comment(ASObject):
