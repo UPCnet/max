@@ -4,7 +4,6 @@ from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
-from max.exceptions import UnknownUserError
 
 
 @view_config(route_name='timeline', request_method='GET')
@@ -17,16 +16,11 @@ def getUserTimeline(context, request):
 
          Retorna totes les activitats d'un usuari
     """
-    username = request.matchdict['username']
+    actor = request.actor
     is_context_resource = 'timeline/contexts' in request.path
     is_follows_resource = 'timeline/follows' in request.path
 
     mmdb = MADMaxDB(context.db)
-
-    try:
-        actor = mmdb.users.getItemsByusername(username)[0]
-    except:
-        raise UnknownUserError, 'Unknown user "%s"' % username
 
     actor_query = {'actor._id': actor['_id']}
 

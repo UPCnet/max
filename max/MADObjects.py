@@ -118,7 +118,9 @@ class MADBase(MADDict):
             self.data.update(extractPostData(source))
             self.data.update(rest_params)
 
-            self.getActorFromDB()
+            # Since we are building from a request,
+            # overwrite actor with the validated one from the request in source
+            self.data['actor'] = source.actor
             self.validate()
 
             #check if the object we pretend to create already exists

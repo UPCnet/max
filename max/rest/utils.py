@@ -11,6 +11,40 @@ import urllib2
 import re
 
 
+def getUsernameFromXOAuth(request):
+    """
+    """
+    return request.headers.get('X-Oauth-Username')
+
+
+def getUsernameFromURI(request):
+    """
+    """
+    return request.matchdict.get('username', None)
+
+
+def getUsernameFromPOSTBody(request):
+    """
+    """
+    return extractPostData(request).get('actor', {}).get('username', None)
+
+
+def isOauth(request):
+    """
+    """
+    keys = request.headers.keys()
+    return 'X-Oauth-Username' in keys and 'X-Oauth-Token' in keys and 'X-Oauth-Scope' in keys
+
+
+def isBasic(request):
+    """
+    """
+    if request.authorization:
+        return request.authorization[0] == 'Basic'
+    else:
+        return False
+
+
 def searchParams(request):
     """
         Extracts valid search params from the request, or sets default values if not found
@@ -185,6 +219,7 @@ def shortenURL(url):
     except:
         return url
     return url
+
 
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':

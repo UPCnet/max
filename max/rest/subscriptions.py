@@ -17,15 +17,16 @@ def getUserSubscriptions(context, request):
 
 
 @view_config(route_name='subscriptions', request_method='POST', permission='manage')
+@MaxResponse
+@MaxRequest
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
     """
     # XXX For now only one context can be subscribed at a time
 
-    username = request.matchdict['username']
-
-    rest_params = {'actor': {'username': username},
+    actor = request.actor
+    rest_params = {'actor': actor,
                    'verb': 'subscribe'}
 
     # Initialize a Activity object from the request
@@ -35,8 +36,6 @@ def subscribe(context, request):
     newactivity_oid = newactivity.insert()
     newactivity['_id'] = newactivity_oid
 
-    mmdb = MADMaxDB(context.db)
-    actor = mmdb.users.getItemsByusername(username)[0]
     actor.addSubscription(newactivity['object'])
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)

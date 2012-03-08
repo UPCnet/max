@@ -1,6 +1,5 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
-from max.MADMax import MADMaxCollection
 from max.decorators import MaxResponse, MaxRequest
 
 from max.models import Activity
@@ -31,11 +30,8 @@ def follow(context, request):
     """
     #XXX TODO ara nomes es tracta un sol follow
     # s'ha de iterar si es vol que el comentari sigui de N follows
-    username = request.matchdict['username']
-
-    mmdbusers = MADMaxCollection(context.db.users, query_key='username')
-    actor = mmdbusers[username]
-    rest_params = {'actor': actor}
+    actor = request.actor
+    rest_params = {'actor': request.actor}
 
     # Initialize a Activity object from the request
     newactivity = Activity(request, rest_params=rest_params)

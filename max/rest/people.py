@@ -15,6 +15,7 @@ from max.rest.utils import extractPostData
 @view_config(route_name='users', request_method='GET')
 @MaxResponse
 @MaxRequest
+@oauth2(['widgetcli'])
 def getUsers(context, request):
     """
     """
@@ -27,15 +28,11 @@ def getUsers(context, request):
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
 @MaxRequest
+@oauth2(['widgetcli'])
 def getUser(context, request):
     """
     """
-    username = request.matchdict['username']
-
-    users = MADMaxCollection(context.db.users, query_key='username')
-    user = users[username].flatten()
-
-    handler = JSONResourceEntity(user)
+    handler = JSONResourceEntity(request.actor)
     return handler.buildResponse()
 
 
@@ -85,18 +82,18 @@ def getUserAvatar(context, request):
 @view_config(route_name='user', request_method='PUT', permission='manage')
 @MaxResponse
 @MaxRequest
+@oauth2(['widgetcli'])
 def ModifyUser(context, request):
     """
     """
-    username = request.matchdict['username']
-
-    users = MADMaxCollection(context.db.users, query_key='username')
-    user = users[username]
+    actor = request.actor
     params = extractPostData(request)
     displayName = params.get('displayName')
     properties = dict(displayName=displayName)
-    user.modifyUser(properties)
+    actor.modifyUser(properties)
 
+    users = MADMaxCollection(context.db.users, query_key='username')
+    user = users[username]
     handler = JSONResourceEntity(users[username].flatten())
     return handler.buildResponse()
 
