@@ -1,6 +1,33 @@
 {
     "Python": {
-    "python": '/var/plone/maxbin/bin/python',
-    "pythonExtraPaths": []
-    },
+        "python": "/var/pyramid/python2.7/bin/python -S",
+        "pythonExtraPaths": [
+            '/var/plone/eggs/pyramid-1.3b1-py2.7.egg',
+            '/var/plone/eggs/gunicorn-0.13.4-py2.7.egg',
+            '/var/pyramid/maxserver/src/max',
+            '/var/pyramid/python2.7/lib/python2.7/site-packages/distribute-0.6.24-py2.7.egg',
+            '/var/pyramid/python2.7/lib/python2.7/site-packages',
+            '/var/plone/eggs/rfc3339-5-py2.7.egg',
+            '/var/plone/eggs/pymongo-2.1.1-py2.7-linux-i686.egg',
+            '/var/plone/eggs/pyramid_who-0.3-py2.7.egg',
+            '/var/plone/eggs/pyramid_debugtoolbar-0.9.9.1-py2.7.egg',
+            '/var/plone/eggs/pyramid_tm-0.3-py2.7.egg',
+            '/var/plone/eggs/PasteDeploy-1.5.0-py2.7.egg',
+            '/var/plone/eggs/translationstring-1.1-py2.7.egg',
+            '/var/plone/eggs/venusian-1.0a3-py2.7.egg',
+            '/var/plone/eggs/zope.deprecation-3.5.0-py2.7.egg',
+            '/var/plone/eggs/zope.interface-3.8.0-py2.7-linux-i686.egg',
+            '/var/plone/eggs/repoze.lru-0.4-py2.7.egg',
+            '/var/plone/eggs/WebOb-1.2b3-py2.7.egg',
+            '/var/plone/eggs/Mako-0.6.2-py2.7.egg',
+            '/var/plone/eggs/Chameleon-2.7.4-py2.7.egg',
+            '/var/plone/eggs/chardet-1.0.1-py2.7.egg',
+            '/var/plone/eggs/certifi-0.0.8-py2.7.egg',
+            '/var/plone/eggs/repoze.who-2.0-py2.7.egg',
+            '/var/plone/eggs/Pygments-1.4-py2.7.egg',
+            '/var/plone/eggs/transaction-1.2.0-py2.7.egg',
+            '/var/plone/eggs/MarkupSafe-0.15-py2.7-linux-i686.egg',
+            '/var/plone/eggs/Paste-1.7.5.1-py2.7.egg',
+        ]
+    }
 }

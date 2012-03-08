@@ -55,7 +55,7 @@ def MaxRequest(func):
             except:
                 # Raise only if we are NOT adding a user. This is the only case
                 # Were the user will not be in the DB, as we are just about to do it ...
-                if not (request.matched_route == 'user' and request.method == 'POST'):
+                if not (request.matched_route.name == 'user' and request.method == 'POST'):
                     raise UnknownUserError, 'Unknown user "%s"' % username
 
         # Raise an error if no authentication present
@@ -66,7 +66,8 @@ def MaxRequest(func):
         # (Except in the case of a new users explained 10 lines up)
         # Define a callable to prepare the actor in order to inject it in the request
         def getActor(request):
-            actor.setdefault('displayName', actor['username'])
+            if actor:
+                actor.setdefault('displayName', actor['username'])
             return actor
 
         request.set_property(getActor, name='actor', reify=True)

@@ -32,7 +32,7 @@ def getUsers(context, request):
 def getUser(context, request):
     """
     """
-    handler = JSONResourceEntity(request.actor)
+    handler = JSONResourceEntity(request.actor.flatten())
     return handler.buildResponse()
 
 

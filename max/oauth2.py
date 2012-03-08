@@ -13,7 +13,7 @@ def oauth2(allowed_scopes=[]):
 
             # Extract the username and token from request headers
             # It will be like:
-            # headers = {"X-Oauth-Token":"jfa1sDF2SDF234", "X-Oauth-Username":"victor.fernandez", "X-Oauth-Scope"="widgetcli"}
+            # headers = {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": "messi", "X-Oauth-Scope": "widgetcli"}
 
             settings = getMAXSettings(request)
 
