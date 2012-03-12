@@ -3,21 +3,15 @@
 <head></head>
 <body>
     <metal:main fill-slot="main">
-    
+
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
     <div class="row">
         <div class="cell width-6 position-3">
-            <h1>max - Prova de concepte</h1>          
+            <h1>max - Prova de concepte</h1>
         </div>
     </div>
     <div class="row">
-        <div class="cell width-6 position-3">
-            <div id="activityBoxContainer">
-                <textarea class="activityBox"></textarea>
-            </div>
-            <div class="button-container">
-                <button class="send">Envia</button>
-            </div>
+        <div class="cell width-6 position-3" id="activityStream">
         </div>
     </div>
     <div class="row">

@@ -11,6 +11,8 @@ from urlparse import urljoin
 import datetime
 
 from max.views.api import TemplateAPI
+import requests
+import json
 
 
 def _fixup_came_from(request, came_from):
@@ -74,6 +76,7 @@ def login(context, request):
         # If it's the first time the user log in the system, then create the local user structure
         user = context.db.users.find_one({'username': userid['repoze.who.userid']})
 
+        import ipdb;ipdb.set_trace()
         if user:
             # User exist in database, update login time and continue
             user['last_login'] = datetime.datetime.now()
@@ -87,6 +90,27 @@ def login(context, request):
                        }
             context.db.users.save(newuser)
 
+        OAUTH_SERVER = 'https://oauth.upc.edu'
+        GRANT_TYPE = 'password'
+        CLIENT_ID = 'MAX'
+        SCOPE = 'widgetcli'
+
+        username = login
+
+        REQUEST_TOKEN_ENDPOINT = '%s/token' % (OAUTH_SERVER)
+
+        payload = {"grant_type": GRANT_TYPE,
+                   "client_id": CLIENT_ID,
+                   "scope": SCOPE,
+                   "username": username,
+                   "password": password
+                   }
+
+        req = requests.post(REQUEST_TOKEN_ENDPOINT, data=payload, verify=False)
+        response = json.loads(req.text)
+        oauth_token = response.get("oauth_token")
+
+        request.session['oauth_token'] = oauth_token
         return HTTPFound(headers=headers, location=came_from)
 
     response = dict(

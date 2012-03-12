@@ -30,14 +30,18 @@ def WADLView(context, request):
     return response
 
 
-@view_config(name='js_variables.js', context=Root, renderer='max:templates/js_variables.js.pt', permission='restricted')
+@view_config(name='variables.js', context=Root, renderer='max:templates/js_variables.js.pt', permission='restricted')
 def js_variables(context, request):
 
     username = authenticated_userid(request)
-    userid = context.db.users.find_one({'username': username}, {'_id': 1})
+    config = context.db.config.find_one()
+
 
     variables = {'username': username,
-                 'userid': str(userid['_id']),
+                'token': request.session.get('oauth_token'),
+                'server': config.get('max_max_server'),
+                'grant': config.get('oauth_grant_type'),
+
     }
     return dict(variables=variables)
 
