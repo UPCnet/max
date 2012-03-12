@@ -50,6 +50,7 @@ class MADMaxCollection(object):
         limit = kwargs.get('limit', None)
         after = kwargs.get('after', None)
         before = kwargs.get('before', None)
+        hashtag = kwargs.get('hashtag', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -63,6 +64,12 @@ class MADMaxCollection(object):
                 # represented by offset (offset not included)
                 query.update({'_id': {condition: offset}})
             cursor = self.collection.find(query, show_fields)
+
+            if hashtag:
+                hashtag_query = {'$and': []}
+                for hasht in hashtag:
+                    hashtag_query['$and'].append({'object._hashtags': hasht})
+                query.update(hashtag_query)
         else:
             cursor = self.collection.find()
 

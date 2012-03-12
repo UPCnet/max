@@ -28,6 +28,7 @@ class Note(ASObject):
                 '_id':         dict(),
                 'content':     dict(required=1),
                 'objectType':  dict(required=1),
+                'hashTags':     dict(),
              }
 
     def __init__(self, data):
@@ -38,8 +39,8 @@ class Note(ASObject):
         self.data['content'] = formatMessageEntities(self.data['content'])
         hashtags = findHashtags(self.data['content'])
         if hashtags:
-            self.data['hashTags'] = hashtags
-        self.update(data)
+            self.data['_hashtags'] = hashtags
+        self.update(self.data)
 
 
 class Comment(ASObject):

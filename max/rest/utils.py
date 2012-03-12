@@ -75,6 +75,12 @@ def searchParams(request):
     if 'before' in params and 'after' in params:
         raise InvalidSearchParams, 'only one offset filter is allowe, after or before'
 
+
+    hashtags = request.params.getall('hashtag')
+    if hashtags:
+        params['hashtag'] = hashtags
+
+
     return params
 
 
