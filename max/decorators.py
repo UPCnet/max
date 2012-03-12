@@ -1,4 +1,5 @@
 from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams
+from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotImplemented
 from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
@@ -56,7 +57,7 @@ def MaxRequest(func):
                 # Raise only if we are NOT adding a user. This is the only case
                 # Were the user will not be in the DB, as we are just about to do it ...
                 if not (request.matched_route.name == 'user' and request.method == 'POST'):
-                    raise UnknownUserError, 'Unknown user "%s"' % username
+                    raise UnknownUserError, 'Unknown user: %s' % username
 
         # Raise an error if no authentication present
         else:
@@ -96,7 +97,7 @@ def MaxResponse(fun):
         except DuplicatedItemError, message:
             return HTTPBadRequest(detail=message)
         except UnknownUserError, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=message.value))
         except Unauthorized, message:
             return HTTPUnauthorized(detail=message)
         except InvalidSearchParams, message:

@@ -79,7 +79,7 @@ def getUserAvatar(context, request):
     return image
 
 
-@view_config(route_name='user', request_method='PUT', permission='manage')
+@view_config(route_name='user', request_method='PUT')
 @MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
@@ -93,8 +93,7 @@ def ModifyUser(context, request):
     actor.modifyUser(properties)
 
     users = MADMaxCollection(context.db.users, query_key='username')
-    user = users[username]
-    handler = JSONResourceEntity(users[username].flatten())
+    handler = JSONResourceEntity(users[actor['username']].flatten())
     return handler.buildResponse()
 
 
