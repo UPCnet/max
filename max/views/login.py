@@ -76,7 +76,6 @@ def login(context, request):
         # If it's the first time the user log in the system, then create the local user structure
         user = context.db.users.find_one({'username': userid['repoze.who.userid']})
 
-        import ipdb;ipdb.set_trace()
         if user:
             # User exist in database, update login time and continue
             user['last_login'] = datetime.datetime.now()
