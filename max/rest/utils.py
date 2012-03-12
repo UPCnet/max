@@ -175,7 +175,6 @@ def formatMessageEntities(text):
     """
         function that shearches for elements in the text that have to be formatted.
         Currently shortens urls.
-        XXX TODO find @usernames to acces profiles
     """
     def shorten(matchobj):
         return shortenURL(matchobj.group(0))
@@ -184,6 +183,21 @@ def formatMessageEntities(text):
     shortened = re.sub(find_url_regex, shorten, text)
 
     return shortened
+
+
+def findHashtags(text):
+    """
+        Returns a list of valid #hastans in text
+        Narrative description of the search pattern will be something like:
+        "Any group of alphanumeric characters preceded by one (and only one) hash (#)
+         At the begginning of a string or before a whitespace"
+
+        teststring = "#first # Hello i'm a #text with #hashtags but#some are not valid#  # ##double #last"
+        should return ['first', 'text', 'hashtags', 'last']
+    """
+    find_hastags_regex = r'(\s|^)#{1}(\w+)'
+    hashtags = [a.groups()[1] for a in re.finditer(find_hastags_regex, text)]
+    return hashtags
 
 
 def shortenURL(url):

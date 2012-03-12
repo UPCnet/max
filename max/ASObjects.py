@@ -1,4 +1,4 @@
-from max.rest.utils import formatMessageEntities
+from max.rest.utils import formatMessageEntities, findHashtags
 from max.MADObjects import MADDict
 
 
@@ -36,6 +36,9 @@ class Note(ASObject):
         self.data = data
         self.validate()
         self.data['content'] = formatMessageEntities(self.data['content'])
+        hashtags = findHashtags(self.data['content'])
+        if hashtags:
+            self.data['hashTags'] = hashtags
         self.update(data)
 
 
