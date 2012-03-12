@@ -16,7 +16,6 @@ window._MAXUI.onReady = function() {
                    'load_more': "Carrega'n més"
                  }
 
-
     var settings = {
            'literals': literals_ca,
            'username' : window._MAXUI.username,

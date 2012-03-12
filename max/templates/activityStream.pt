@@ -6,16 +6,16 @@
 
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
     <div class="row">
-        <div class="cell width-6 position-3">
-            <h1>max - Prova de concepte</h1>
+        <div class="span6 offset3">
+            <h1>Activity Stream</h1>
         </div>
     </div>
     <div class="row">
-        <div class="cell width-6 position-3" id="activityStream">
+        <div class="span6 offset3" id="activityStream">
         </div>
     </div>
     <div class="row">
-        <div class="cell width-4 position-3">
+        <div class="span6 offset3">
             <section id="activityContainer">
 
             </section>
