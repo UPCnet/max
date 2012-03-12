@@ -36,5 +36,5 @@ def loadMAXSettings(settings, config):
             # No settings in store, return the ini settings
             return max_ini_settings
         else:
-            max_db_settings = {key: config_doc[key] for key in config_doc.keys() if 'max' in key}
+            max_db_settings = {key.replace('max.', 'max_'): config_doc[key] for key in config_doc.keys() if 'max' in key}
             return max_db_settings
