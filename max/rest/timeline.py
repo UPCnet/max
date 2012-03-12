@@ -4,10 +4,11 @@ from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
+from max.rest.utils import searchParams
 
 
 @view_config(route_name='timeline', request_method='GET')
-@MaxResponse
+#@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getUserTimeline(context, request):
@@ -52,7 +53,7 @@ def getUserTimeline(context, request):
     if query_items:
         query = {'$or': query_items}
         query['verb'] = 'post'
-        activities = mmdb.activity.search(query, sort="_id", limit=10, flatten=1)
+        activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
     else:
         activities = []
 
