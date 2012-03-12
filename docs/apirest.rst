@@ -23,7 +23,7 @@ Les respostes que retorna el sistema, en cas que siguin 1 o múltiples resultats
 Usuaris
 --------
 
-Representa el conjunt d'usuaris del sistema
+Representa el conjunt d'usuaris del sistema.
 
 .. http:post:: /people/{username}
 
@@ -32,7 +32,8 @@ Representa el conjunt d'usuaris del sistema
     :query username: (REST) L'identificador del nou usuari al sistema.
     :query displayName: (Opcional) El nom real de l'usuari al sistema
 
-    Retorna un objecte ``Person``
+    Success
+        Retorna un objecte ``Person``
 
 .. http:put:: /people/{username}
 
@@ -41,8 +42,23 @@ Representa el conjunt d'usuaris del sistema
     :query username: (REST) L'identificador de l'usuari
     :query displayName: (Opcional) El nom real de l'usuari al sistema
 
-    Retorna un objecte ``Person`` amb els paràmetres indicats modificats
+    Success
+        Retorna un objecte ``Person`` amb els paràmetres indicats modificats
 
+    Error
+        {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+.. http:get:: /people/{username}
+
+    Retorna la informació d'un usuari del sistema. En cas de que l'usuari no existis, retorna l'error especificat.
+
+    :query username: (REST) L'identificador de l'usuari
+
+    Success
+        Retorna un objecte ``Person``
+
+    Error
+        {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 Subscripcions
 --------------

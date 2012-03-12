@@ -24,8 +24,7 @@ class FunctionalTests(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
-    def create_user(self):
-        username = 'messi'
+    def create_user(self, username):
         self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
 
     def test_add_user(self):
@@ -36,18 +35,52 @@ class FunctionalTests(unittest.TestCase):
         # u'{"username": "messi", "subscribedTo": {"items": []}, "last_login": "2012-03-07T22:32:19Z", "published": "2012-03-07T22:32:19Z", "following": {"items": []}, "id": "4f57e1f3530a693147000000"}'
 
     def test_user_exist(self):
-        self.create_user()
         username = 'messi'
+        self.create_user(username)
         res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
 
     def test_get_user(self):
-        self.create_user()
         username = 'messi'
+        self.create_user(username)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
+
+    def test_get_user_not_me(self):
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.testapp.get('/people/%s' % username_not_me, "", oauth2Header(username), status=401)
+
+    def test_get_non_existent_user(self):
+        username = 'messi'
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username), status=400)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'UnknownUserError')
+
+    def test_modify_user(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.put('/people/%s' % username, json.dumps({"displayName": "Lionel Messi"}), oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('displayName', None), 'Lionel Messi')
+
+    def test_modify_non_existent_user(self):
+        username = 'messi'
+        res = self.testapp.put('/people/%s' % username, json.dumps({"displayName": "Lionel Messi"}), oauth2Header(username), status=400)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'UnknownUserError')
+
+    def test_get_all_users(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/people', "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('username'), 'messi')
 
 
 def basicAuthHeader(username, password):
