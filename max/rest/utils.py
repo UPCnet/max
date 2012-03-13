@@ -81,11 +81,14 @@ def searchParams(request):
     if 'before' in params and 'after' in params:
         raise InvalidSearchParams, 'only one offset filter is allowe, after or before'
 
-
     hashtags = request.params.getall('hashtag')
     if hashtags:
-        params['hashtag'] = hashtags
+        params['hashtag'] = [hasht.lower() for hasht in hashtags]
 
+    keywords = request.params.get('text')
+    if keywords:
+        ### XXX Split or regex?
+        params['keywords'] = [keyw.lower() for keyw in keywords.split()]
 
     return params
 
@@ -207,17 +210,19 @@ def findHashtags(text):
         should return ['first', 'text', 'hashtags', 'last']
     """
     hashtags = [a.groups()[1] for a in re.finditer(FIND_HASHTAGS_REGEX, text)]
-    return hashtags
+    lowercase = [hasht.lower() for hasht in hashtags]
+    return lowercase
 
 
 def findKeywords(text):
     """
         Returns a list of valid keywords, including hashtags (without the hash),
-        excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH
+        excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH.
+        Keywords are stored in lowercase.
     """
     stripped_urls = re.sub(FIND_URL_REGEX, '', text)
     keywords = [a.groups()[1] for a in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
-    limited = [kw for kw in keywords if len(kw) >= KEYWORD_MIN_LENGTH]
+    limited = [kw.lower() for kw in keywords if len(kw) >= KEYWORD_MIN_LENGTH]
     return limited
 
 
