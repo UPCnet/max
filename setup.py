@@ -17,7 +17,7 @@ requires = [
     'requests'
     ]
 
-test_requires = ['WebTest', 'mock_http', 'CherryPy==3.1.1']
+test_requires = ['WebTest', 'mock', ]
 
 setup(name='max',
       version='2.0',
