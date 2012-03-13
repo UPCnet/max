@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 from bson import json_util
 from datetime import datetime
@@ -9,6 +10,11 @@ from pymongo.objectid import ObjectId
 import requests
 import urllib2
 import re
+
+FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\wñçáéíóúàèìòùïü]+)'
+FIND_KEYWORDS_REGEX = r'(\s|^)#?([\wñçáéíóúàèìòùïü]+)'
+KEYWORD_MIN_LENGTH = 3
 
 
 def getUsernameFromXOAuth(request):
@@ -185,15 +191,14 @@ def formatMessageEntities(text):
     def shorten(matchobj):
         return shortenURL(matchobj.group(0))
 
-    find_url_regex = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
-    shortened = re.sub(find_url_regex, shorten, text)
+    shortened = re.sub(FIND_URL_REGEX, shorten, text)
 
     return shortened
 
 
 def findHashtags(text):
     """
-        Returns a list of valid #hastans in text
+        Returns a list of valid #hastags in text
         Narrative description of the search pattern will be something like:
         "Any group of alphanumeric characters preceded by one (and only one) hash (#)
          At the begginning of a string or before a whitespace"
@@ -201,9 +206,19 @@ def findHashtags(text):
         teststring = "#first # Hello i'm a #text with #hashtags but#some are not valid#  # ##double #last"
         should return ['first', 'text', 'hashtags', 'last']
     """
-    find_hastags_regex = r'(\s|^)#{1}(\w+)'
-    hashtags = [a.groups()[1] for a in re.finditer(find_hastags_regex, text)]
+    hashtags = [a.groups()[1] for a in re.finditer(FIND_HASHTAGS_REGEX, text)]
     return hashtags
+
+
+def findKeywords(text):
+    """
+        Returns a list of valid keywords, including hashtags (without the hash),
+        excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH
+    """
+    stripped_urls = re.sub(FIND_URL_REGEX, '', text)
+    keywords = [a.groups()[1] for a in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
+    limited = [kw for kw in keywords if len(kw) >= KEYWORD_MIN_LENGTH]
+    return limited
 
 
 def shortenURL(url):

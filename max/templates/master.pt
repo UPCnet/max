@@ -53,6 +53,7 @@
               <ul class="dropdown-menu">
                 <li><a tal:attributes="href '/profiles/'+api.authenticatedUser">Profile</a></li>
                 <li><a href="/control_panel">Setup Server</a></li>
+                <li><a href="/maintenance">Maintenance</a></li>
                 <li class="divider"></li>
                 <li><a href="/logout">Logout</a></li>
               </ul>

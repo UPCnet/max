@@ -8,7 +8,7 @@ from max.rest.utils import searchParams
 
 
 @view_config(route_name='timeline', request_method='GET')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getUserTimeline(context, request):
