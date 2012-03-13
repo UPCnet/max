@@ -1,4 +1,4 @@
-from max.rest.utils import formatMessageEntities, findHashtags
+from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
 
 
@@ -25,10 +25,11 @@ class Note(ASObject):
     """
     data = {}
     schema = {
-                '_id':         dict(),
-                'content':     dict(required=1),
-                'objectType':  dict(required=1),
-                'hashTags':     dict(),
+                '_id':           dict(),
+                'content':       dict(required=1),
+                'objectType':    dict(required=1),
+                '_hashtags':     dict(),
+                '_keywords':     dict(),
              }
 
     def __init__(self, data):
@@ -40,6 +41,7 @@ class Note(ASObject):
         hashtags = findHashtags(self.data['content'])
         if hashtags:
             self.data['_hashtags'] = hashtags
+        self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
 
 
@@ -60,7 +62,12 @@ class Comment(ASObject):
         """
         self.data = data
         self.validate()
-        self.update(data)
+        self.data['content'] = formatMessageEntities(self.data['content'])
+        hashtags = findHashtags(self.data['content'])
+        if hashtags:
+            self.data['_hashtags'] = hashtags
+        self.data['_keywords'] = findKeywords(self.data['content'])
+        self.update(self.data)
 
 
 class Context(ASObject):

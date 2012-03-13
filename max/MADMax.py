@@ -51,6 +51,7 @@ class MADMaxCollection(object):
         after = kwargs.get('after', None)
         before = kwargs.get('before', None)
         hashtag = kwargs.get('hashtag', None)
+        keywords = kwargs.get('keywords', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -66,10 +67,19 @@ class MADMaxCollection(object):
             cursor = self.collection.find(query, show_fields)
 
             if hashtag:
+                # Filter the query to only objects containing certain hashtags
                 hashtag_query = {'$and': []}
                 for hasht in hashtag:
                     hashtag_query['$and'].append({'object._hashtags': hasht})
                 query.update(hashtag_query)
+
+            if keywords:
+                # Filter the query to only objects containing certain keywords
+                keywords_query = {'$and': []}
+                for keyw in keywords:
+                    keywords_query['$and'].append({'object._keywords': keyw})
+                query.update(keywords_query)
+
         else:
             cursor = self.collection.find()
 
