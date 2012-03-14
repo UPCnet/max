@@ -9,6 +9,8 @@ Els paràmetres indicats a les seccions Query parameters, poden ser de 3 tipus:
 :Requerits: Són obligatoris, però formen part de l'estructura JSON que s'envia amb el cos de la petició
 :Opcionals: Com el nom indica, no son obligatoris, indiquen alguna funcionalitat extra
 
+Tots els serveis requereixen autenticació oAuth en cas de que no s'especifiqui el contrari.
+
 Les respostes que retorna el sistema, en cas que siguin 1 o múltiples resultats (Associats a col.leccions o entitats) seràn, o bé un sol objecte JSON en cas de l'accés a una entitat concreta, o una estructura que englobi un conjunt de resultats, indicant el total d'elements retornats::
 
     {
@@ -129,10 +131,9 @@ Representa el conjunt d'activitats creades per un usuari i permet tant llistarle
 
 
 Activitats globals
---------------------
+------------------
 
 Representa el conjunt d'activitats generades pels usuaris del sistema. L'accés a algunes de les activitats vindrà limitada per les subscripcions a contexts de l'usuari que fa la petició.
-
 
 .. http:get:: /activities
 
@@ -140,7 +141,8 @@ Representa el conjunt d'activitats generades pels usuaris del sistema. L'accés 
 
     :query contexts: (Requerit) una llista de urls representant cadascuna un context
 
-    Retorna una col·lecció d'objectes del tipus ``Activity``
+    Success
+        Retorna una col·lecció d'objectes del tipus ``Activity``.
 
 
 Timeline
@@ -196,18 +198,29 @@ Representa el conjunt de comentaris fets a una activitat
 Subscripcions
 --------------
 
-Representa el conjunt de contextes als quals esta subscrit un usuari
+Representa el conjunt de contextes als quals esta subscrit un usuari.
 
 .. http:post:: /people/{username}/subscriptions
 
-    Subscriu l'usuari a un context
+    Subscriu l'usuari a un context determinat.
+
+    ..note::
+        Aquest servei requereix autenticació basicAuth amb l'usuari d'operacions del MAX.
 
     :query username: (REST) L'identificador de l'usuari al sistema.
-    :query contexts: (Requerit) Tipus d'object al qual ens volem subscriure. De moment només està suportat el tipus `context`. Hem de proporcionar un objecte amb les claus ``objectType`` i el valor 'context', i les dades del context com a l'exemple.
+    :query contexts: (Requerit) Tipus d'object al qual ens volem subscriure. De moment només està suportat el tipus `context`. Hem de proporcionar un objecte amb les claus ``objectType`` i el valor 'context', i les dades del context com a l'exemple::
 
-       {
+        {
             "object": {
                 "objectType": "context",
-                "url": "http://atenea.upc.edu/introcomp"
-                }
-       }
+                "url": "http://atenea.upc.edu/4127368123"
+            }
+        }
+
+    Success
+        Retorna un objecte del tipus ``Activity``.
+
+    Error
+        En cas que l'usuari no existeixi::
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}

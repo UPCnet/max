@@ -13,7 +13,7 @@ from max.rest.utils import searchParams
 @oauth2(['widgetcli'])
 def getUserTimeline(context, request):
     """
-         /users/{username}/timeline
+         /people/{username}/timeline
 
          Retorna totes les activitats d'un usuari
     """

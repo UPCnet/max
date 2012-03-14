@@ -39,6 +39,9 @@ setup(name='max',
       install_requires=requires,
       tests_require=requires + test_requires,
       test_suite="max.tests",
+      extras_require={
+        'test': ['WebTest', 'mock', ]
+      },
       entry_points="""\
       [paste.app_factory]
       main = max:main
