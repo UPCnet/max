@@ -8,7 +8,7 @@ from max.oauth2 import oauth2
 from max.exceptions import MissingField, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import searchParams
+from max.rest.utils import searchParams, isActorAllowedInContexts
 
 
 @view_config(route_name='user_activities', request_method='GET')
@@ -77,14 +77,7 @@ def getActivities(context, request):
     if urls == []:
         raise MissingField, 'You have to specify at least one context'
 
-    actor = request.actor
-
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
-    forbidden_contexts = [url for url in urls if url not in subscribed_contexts_urls]
-
-    if forbidden_contexts:
-        raise Unauthorized, "You don't have permission to get activities from this contexts: %s" % ', '.join(forbidden_contexts)
-
+    isActorAllowedInContexts(request.actor, urls)
     # If we reached here, we have permission to search for all urls in urls
 
     # Add all the activities posted on particular contexts

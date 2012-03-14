@@ -1,4 +1,5 @@
 from max.MADObjects import MADBase
+from max.rest.utils import isActorAllowedInContexts
 import datetime
 
 
@@ -46,6 +47,13 @@ class Activity(MADBase):
             Adds a comment to an existing activity
         """
         self.addToList('replies', comment, allow_duplicates=True)
+
+    def _validate(self):
+        """
+            Perform custom validations on the Activity Object
+        """
+        result = isActorAllowedInContexts(self.data['actor'], self.data.get('contexts', []))
+        return result
 
 
 class User(MADBase):

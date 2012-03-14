@@ -3,7 +3,7 @@ import json
 from bson import json_util
 from datetime import datetime
 from rfc3339 import rfc3339
-from max.exceptions import InvalidSearchParams
+from max.exceptions import InvalidSearchParams, Unauthorized
 
 from pymongo.objectid import ObjectId
 
@@ -261,13 +261,6 @@ def shortenURL(url):
     return url
 
 
-def checkRequestConsistency(request):
-    if request.content_type != 'application/json':
-        raise
-
-    # TODO: Do more consistency checks
-
-
 def extractPostData(request):
     if request.body:
         json_data = json.loads(request.body, object_hook=json_util.object_hook)
@@ -276,6 +269,28 @@ def extractPostData(request):
 
     return json_data
     # TODO: Do more syntax and format checks of sent data
+
+
+def isActorAllowedInContexts(actor, urls):
+    """
+    """
+    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
+    forbidden_contexts = [url for url in urls if url not in subscribed_contexts_urls]
+
+    if forbidden_contexts:
+        raise Unauthorized, "You don't have permission to get activities from this contexts: %s" % ', '.join(forbidden_contexts)
+    return True
+
+
+# Old methods
+
+def checkRequestConsistency(request):
+    if request.content_type != 'application/json':
+        raise
+
+    # TODO: Do more consistency checks
+
+
 
 
 def checkQuery(data):

@@ -52,6 +52,9 @@ class MADDict(dict):
         except AttributeError:
             return self.__getitem__(key)
 
+    def _validate(self):
+        return True
+
     def checkParameterExists(self, fieldname):
         """
             Checks if a parameter 'fieldname' exists in the data dict, accepts fieldnames
@@ -72,11 +75,13 @@ class MADDict(dict):
         """
             Checks if all the required schema fields (required=1) are present in
             the collected data
+            Executes custom validations if present
         """
         for fieldname in self.schema:
             if self.schema.get(fieldname).get('required', 0):
                 if not self.checkParameterExists(fieldname):
                     raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+        self._validate()
         return True
 
 
