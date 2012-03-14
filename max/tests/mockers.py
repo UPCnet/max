@@ -70,11 +70,44 @@ demostatus_with_context = {
 # web service com a arguments
 # =============================================================================
 
+
+
+# Revisat i actualitzat
+subscribe_context = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/"
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextA = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/A"
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextB = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/B"
+    }
+}
+
 # Un usuari crea una activitat de canvi d'estat
 # Revisat i actualitzat
 user_status = {
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+}
+
+user_status_context = {
     "contexts": [
-        "http://atenea.upc.edu/4127368123"
+        subscribe_context['object']['url']
     ],
     "object": {
         "objectType": "note",
@@ -84,7 +117,7 @@ user_status = {
 
 user_status_contextA = {
     "contexts": [
-        "http://atenea.upc.edu/A"
+        subscribe_contextA['object']['url']
     ],
     "object": {
         "objectType": "note",
@@ -94,7 +127,7 @@ user_status_contextA = {
 
 user_status_contextB = {
     "contexts": [
-        "http://atenea.upc.edu/B"
+        subscribe_contextB['object']['url']
     ],
     "object": {
         "objectType": "note",
@@ -104,8 +137,8 @@ user_status_contextB = {
 
 user_status_contextAB = {
     "contexts": [
-        "http://atenea.upc.edu/B",
-        "http://atenea.upc.edu/A"
+        subscribe_contextA['object']['url'],
+        subscribe_contextB['object']['url'],
     ],
     "object": {
         "objectType": "note",
@@ -115,9 +148,16 @@ user_status_contextAB = {
 
 context_query = {
     "contexts": [
-        "http://atenea.upc.edu/4127368123"
+        subscribe_context['object']['url']
     ]
 }
+
+context_queryA = {
+    "contexts": [
+        subscribe_contextA['object']['url']
+    ]
+}
+
 
 # Un usuari crea un comentari
 user_comment = {
@@ -163,29 +203,7 @@ unfollow = {
     },
 }
 
-# Revisat i actualitzat
-subscribe_context = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/4127368123"
-    }
-}
 
-# Revisat i actualitzat
-subscribe_contextA = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/A"
-    }
-}
-
-# Revisat i actualitzat
-subscribe_contextB = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/B"
-    }
-}
 
 unfollow_context = {
         "actor": {
