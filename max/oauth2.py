@@ -35,7 +35,7 @@ def oauth2(allowed_scopes=[]):
             if scope:
                 payload['scope'] = scope
 
-            r = requests.post(settings['max.oauth_check_endpoint'], data=payload, verify=False)
+            r = requests.post(settings['max_oauth_check_endpoint'], data=payload, verify=False)
 
             if r.status_code == 200:
                 # Valid token, proceed.
