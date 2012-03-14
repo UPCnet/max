@@ -30,13 +30,11 @@ class FunctionalTests(unittest.TestCase):
     def create_user(self, username):
         self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
 
-    def create_activity(self, username):
-        from .mockers import user_status
-        self.testapp.post('/people/%s/activities' % username, json.dumps(user_status), oauth2Header(username), status=201)
+    def create_activity(self, username, activity):
+        self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
 
-    def subscribe_user_to_context(self, username, context=None):
-        from .mockers import subscribe_context
-        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), basicAuthHeader('operations', 'operations'), status=201)
+    def subscribe_user_to_context(self, username, context):
+        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=201)
 
     def test_add_user(self):
         username = 'messi'
@@ -131,9 +129,10 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_activity(self):
+        from .mockers import user_status
         username = 'messi'
         self.create_user(username)
-        self.create_activity(username)
+        self.create_activity(username, user_status)
         res = self.testapp.get('/people/%s/activities' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
@@ -142,24 +141,28 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0].get('url', None), 'http://atenea.upc.edu/4127368123')
 
     def test_get_activity_not_me(self):
+        from .mockers import user_status
         username = 'messi'
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
-        self.create_activity(username_not_me)
+        self.create_activity(username_not_me, user_status)
         res = self.testapp.get('/people/%s/activities' % username_not_me, "", oauth2Header(username), status=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_activities(self):
         from .mockers import context_query
+        from .mockers import user_status
+        from .mockers import subscribe_context
         username = 'messi'
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
-        self.create_activity(username)
-        self.create_activity(username_not_me)
-        self.subscribe_user_to_context(username)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username_not_me, subscribe_context)
+        self.create_activity(username, user_status)
+        self.create_activity(username_not_me, user_status)
         res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 2)
@@ -170,17 +173,36 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0].get('url', None), 'http://atenea.upc.edu/4127368123')
 
-
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
+        from .mockers import user_status
         username = 'messi'
         self.create_user(username)
-        self.create_activity(username)
+        self.create_activity(username, user_status)
         res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'context')
         self.assertEqual(result.get('object', None).get('url', None), 'http://atenea.upc.edu/4127368123')
+
+    def test_get_timeline(self):
+        from .mockers import user_status, user_status_contextA
+        from .mockers import subscribe_context, subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.create_activity(username, user_status)
+        self.create_activity(username, user_status_contextA)
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 2)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0].get('url', None), 'http://atenea.upc.edu/A')
+        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0].get('url', None), 'http://atenea.upc.edu/4127368123')
 
 
 def basicAuthHeader(username, password):

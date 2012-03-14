@@ -82,6 +82,37 @@ user_status = {
     },
 }
 
+user_status_contextA = {
+    "contexts": [
+        "http://atenea.upc.edu/A"
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+}
+
+user_status_contextB = {
+    "contexts": [
+        "http://atenea.upc.edu/B"
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+}
+
+user_status_contextAB = {
+    "contexts": [
+        "http://atenea.upc.edu/B",
+        "http://atenea.upc.edu/A"
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+}
+
 context_query = {
     "contexts": [
         "http://atenea.upc.edu/4127368123"
@@ -137,6 +168,22 @@ subscribe_context = {
     "object": {
         "objectType": "context",
         "url": "http://atenea.upc.edu/4127368123"
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextA = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/A"
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextB = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/B"
     }
 }
 
