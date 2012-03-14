@@ -99,7 +99,7 @@ def MaxResponse(fun):
         except UnknownUserError, message:
             return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=message.value))
         except Unauthorized, message:
-            return HTTPUnauthorized(detail=message)
+            return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=message.value))
         except InvalidSearchParams, message:
             return HTTPBadRequest(detail=message)
 

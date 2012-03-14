@@ -71,16 +71,21 @@ demostatus_with_context = {
 # =============================================================================
 
 # Un usuari crea una activitat de canvi d'estat
+# Revisat i actualitzat
 user_status = {
-    "actor": {
-        "objectType": "person",
-        "username": "victor"
-    },
-    "verb": "post",
+    "contexts": [
+        "http://atenea.upc.edu/4127368123"
+    ],
     "object": {
         "objectType": "note",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
     },
+}
+
+context_query = {
+    "contexts": [
+        "http://atenea.upc.edu/4127368123"
+    ]
 }
 
 # Un usuari crea un comentari
@@ -127,19 +132,13 @@ unfollow = {
     },
 }
 
-follow_context = {
-        "actor": {
-            "objectType": "person",
-            "id": "4e6e1243aceee91143000000",
-            "username": "victor"
-        },
-        "verb": "follow",
-        "object": {
-            "objectType": "service",
-            "username": "Introduccio als computadors",
-            "url": "http://atenea.upc.edu/introcomp"
-        },
+# Revisat i actualitzat
+subscribe_context = {
+    "object": {
+        "objectType": "context",
+        "url": "http://atenea.upc.edu/4127368123"
     }
+}
 
 unfollow_context = {
         "actor": {

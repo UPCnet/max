@@ -33,7 +33,7 @@ Representa el conjunt d'usuaris del sistema.
     :query displayName: (Opcional) El nom real de l'usuari al sistema
 
     Success
-        Retorna un objecte ``Person``
+        Retorna un objecte ``Person``.
 
 .. http:put:: /people/{username}
 
@@ -43,7 +43,7 @@ Representa el conjunt d'usuaris del sistema.
     :query displayName: (Opcional) El nom real de l'usuari al sistema
 
     Success
-        Retorna un objecte ``Person`` amb els paràmetres indicats modificats
+        Retorna un objecte ``Person`` amb els paràmetres indicats modificats.
 
     Error
         {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
@@ -55,59 +55,34 @@ Representa el conjunt d'usuaris del sistema.
     :query username: (REST) L'identificador de l'usuari
 
     Success
-        Retorna un objecte ``Person``
+        Retorna un objecte ``Person``.
 
     Error
         {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
-Subscripcions
---------------
-
-Representa el conjunt de contextes als quals esta subscrit un usuari
-
-.. http:post:: /people/{username}/subscriptions
-
-    Subscriu l'usuari a un context
-
-    :query username: (REST) L'identificador de l'usuari al sistema.
-    :query contexts: (Requerit) Tipus d'object al qual ens volem subscriure. De moment només està suportat el tipus `context`. Hem de proporcionar un objecte amb les claus ``objectType`` i el valor 'context', i les dades del context com a l'exemple.
-
-
-       {
-            "object": {
-                "objectType": "context",
-                "url": "http://atenea.upc.edu/introcomp"
-                }
-       }
-
-
-Timeline
-----------
-
-Representa el flux d'activitat global de l'usuari, que comprèn les activitats que ha creat, les activitats de les persones a qui segueix, i les activitats generades sota un context concret al qual esta subscrit.
-
-
-.. http:get:: /people/{username}/timeline
-
-    Llistat totes les activitats del timeline de l'usuari
-
-    :query username: (REST) Nom de l'usuari que del qual volem el llistat
-
-    Retorna una col·lecció d'objectes del tipus ``Activity``
 
 Activitats de l'usuari
-------------------------
+----------------------
 
-Representa el conjunt d'activitats creades per un usuari, i permet llistarles i crear-ne de noves
-
+Representa el conjunt d'activitats creades per un usuari i permet tant llistarles com crear-ne de noves.
 
 .. http:get:: /people/{username}/activities
 
-    Llistat totes les activitats generades al sistema d'un usuari concret
+    Llistat totes les activitats generades al sistema d'un usuari concret.
 
     :query username: (REST) Nom de l'usuari que crea l'activitat
 
-    Retorna una col·lecció d'objecte del tipus ``Activity``
+    Success
+        Retorna una col·lecció d'objecte del tipus ``Activity``.
+
+    Error
+        En cas de que l'usuari actor no sigui el mateix usuari que s'autentica via oAuth::
+
+            {u'error_description': u"You don't have permission to access xavi resources", u'error': u'Unauthorized'}
+
+        En cas que l'usuari no existeixi::
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 .. http:post:: /people/{username}/activities
 
@@ -119,20 +94,27 @@ Representa el conjunt d'activitats creades per un usuari, i permet llistarles i 
 
     Cos de la petició::
 
-       {
+        {
             "contexts": [
-                {
-                "objectType": "context",
-                "url": "http://atenea.upc.edu/introcomp"
-                }
-              ]
-            },
+                "http://atenea.upc.edu/4127368123"
+            ],
             "object": {
+                "objectType": "note",
                 "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
             },
         }
 
-    Retorna un objecte del tipus ``Activity``
+    Success
+        Retorna un objecte del tipus ``Activity``.
+
+    Error
+        En cas de que l'usuari actor no sigui el mateix usuari que s'autentica via oAuth::
+
+            {u'error_description': u"You don't have permission to access xavi resources", u'error': u'Unauthorized'}
+
+        En cas que l'usuari no existeixi::
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
     Tipus d'activitat suportats:
      * `note` (estatus d'usuari)
@@ -161,6 +143,21 @@ Representa el conjunt d'activitats generades pels usuaris del sistema. L'accés 
     Retorna una col·lecció d'objectes del tipus ``Activity``
 
 
+Timeline
+----------
+
+Representa el flux d'activitat global de l'usuari, que comprèn les activitats que ha creat, les activitats de les persones a qui segueix i les activitats generades sota un context concret al qual esta subscrit.
+
+.. http:get:: /people/{username}/timeline
+
+    Llistat totes les activitats del timeline de l'usuari.
+
+    :query username: (REST) Nom de l'usuari que del qual volem el llistat
+
+    Success
+        Retorna una col·lecció d'objectes del tipus ``Activity``.
+
+
 Comentaris d'una activitat
 ----------------------------
 
@@ -187,7 +184,6 @@ Representa el conjunt de comentaris fets a una activitat
             }
         }
 
-
 .. http:get:: /activities/{activity}/comments
 
     Llistat de tots els comentaris d'una activitat
@@ -195,3 +191,23 @@ Representa el conjunt de comentaris fets a una activitat
     :query activity: (REST) ha de ser un identificador vàlid d'una activitat existent, per
 
     Retorna una col·lecció d'objectes del tipus ``Comment``
+
+
+Subscripcions
+--------------
+
+Representa el conjunt de contextes als quals esta subscrit un usuari
+
+.. http:post:: /people/{username}/subscriptions
+
+    Subscriu l'usuari a un context
+
+    :query username: (REST) L'identificador de l'usuari al sistema.
+    :query contexts: (Requerit) Tipus d'object al qual ens volem subscriure. De moment només està suportat el tipus `context`. Hem de proporcionar un objecte amb les claus ``objectType`` i el valor 'context', i les dades del context com a l'exemple.
+
+       {
+            "object": {
+                "objectType": "context",
+                "url": "http://atenea.upc.edu/introcomp"
+                }
+       }
