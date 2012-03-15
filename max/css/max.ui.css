@@ -1,170 +1,144 @@
+body {background:#f2f2f2;}
 
+#maxui-container a {text-decoration: none;font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;color:#007bc0; }
+#maxui-container a:hover {text-decoration:underline; color:#005ea0;}
 
-#maxui-container a {
-text-decoration: none;
-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+#maxui-container {text-shadow: 0 1px #fff; font:13px/18px Arial, "HelveticaNeue","Helvetica Neue",Helvetica,sans-serif;color:#333;}
 
-#maxui-container {
-font:13px/20px "HelveticaNeue","Helvetica Neue",Helvetica,Arial,sans-serif;
-color:#222;
-}
+#maxui-activities .maxui-activity {border-top: 1px #fff solid;border-bottom: 1px #ccc solid;width:100%;float:left;padding:8px 0;padding-left:0; min-height:51px;}
 
-#maxui-activities .maxui-activity {
-border-bottom: 1px #ddd solid;
-width:100%;
-float:left;
-padding:5px;
-padding-left:50px;
-}
+#maxui-timeline  .wrapper {height:100%;}
 
-#maxui-timeline  .wrapper{
-    height:100%;
-
-}
-
-
-#maxui-newactivity {
-    padding:5px;
-}
-
-#maxui-newactivity:after {
-content: "";
-display: block;
-height: 0;
-clear: both;
-}
+#maxui-newactivity {padding:0 0 10px; position:relative;}
+#maxui-newactivity:after {content: "";display: block;height: 0;clear: both;}
 
 #maxui-newactivity textarea, .maxui-comments textarea {
 width:100%;
-height:50px;
-border: 1px #ccc solid;
-border-radius: 4px;
-font:inherit;
--webkit-box-shadow:inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 #fff;
-box-shadow:inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 #fff;
-font-size: 13px;
-line-height: 18px;
+color:#666;
+height:48px; min-height:48px;
+border: 1px #b2b2b2 solid;
+position:relative;
+padding:0 3px;
+-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+font-family: Arial, Helvetica, sans-serif;
+-webkit-box-shadow:inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 #fff;box-shadow:inset 0 1px 3px rgba(0,0,0,.1),0 1px 0 #fff;
+font-size: 13px;line-height: 18px;
+overflow: auto;resize: vertical ;
+}
+#maxui-newactivity textarea:focus, .maxui-comments textarea:focus {color:#333;}
 
+.maxui-newcommentBoxContainer {padding-right:0 5px;padding-top:5px;}
+
+.maxui-comment {padding:1px 0 0;}
+	.maxui-comments textarea {width:100%;}
+.maxui-commentsbox {min-height:32px;}
+.maxui-newcommentbutton {text-align:right;}
+
+#maxui-newactivity textarea, .maxui-comments textarea {
+width:97.75% \0/;
+*width:97.75%;
+height:45px \0/;
+min-height:45px \0/;
+*height:45px;
+*min-height:45px;
 }
 
-.maxui-comments textarea {
-width:60%;
-}
+input.load {width:100% !important; margin:10px 0 !important;}
+input.send, input.load {
+border:1px solid #b2b2b2;
+border-radius:3px;
 
-#maxui-newactivity input.send {
-float:right;
-margin:5px 0;
+margin: 5px 0 0 0;
+font-family: Arial, "HelveticaNeue", "Helvetica Neue", Helvetica, sans-serif;
+font-size:13px;
+padding:3px 6px;
+color:#007bc0;
+background: #f2f2f2;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f2f2f2'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#f2f2f2)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #ffffff,  #f2f2f2); /* for firefox 3.6+ */ 
 }
+input.send:hover, input.load:hover, input.send:focus, input.load:focus {border:1px solid #999; background: #f2f2f2; cursor:pointer; color:#005ea0; box-shadow:0 1px 5px rgba(0,0,0,.1);}
+input.send:active, input.load:active {background: #e5e5e5;filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e5e5e5', endColorstr='#f2f2f2'); /* for IE */background: -webkit-gradient(linear, left top, left bottom, from(#e5e5e5), to(#f2f2f2)); /* for webkit browsers */background: -moz-linear-gradient(top,  #e5e5e5,  #f2f2f2); /* for firefox 3.6+ */ color:#666;}
 
-#maxui-timeline {
-clear:both;
-margin:10px 0;
-border-top: 1px #ddd solid;
-overflow: hidden;
-}
+#maxui-timeline {clear:both;margin:0;border-top: 1px #ccc solid;overflow: hidden;}
 
 #maxui-activities .maxui-avatar {
     float:left;
-    margin-left:-50px;
-    padding-left:5px;
+    margin-left:0;
+    padding:0;
 }
+	#maxui-activities .maxui-avatar img {float:left;}
+	.maxui-avatar img {width:48px;
+		-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;
+		-moz-box-shadow:0 1px #fff;-webkit-box-shadow:0 1px #fff;box-shadow:0 1px #fff;
+	}
 
-#maxui-activities .maxui-avatar img{
-float:left;
-}
+#maxui-activities .maxui-activity-content {margin:-5px 0 0 55px;}
+	#maxui-activities .maxui-comments .maxui-activity-content {
+		margin-left:41px;
+		margin-right:0;
+		margin-top:0;
+		margin-bottom:18px;
+		position:relative;
+	} 
+.maxui-activity-content a {position:relative;}
+#maxui-activities .maxui-footer {}
+#maxui-newactivity div {}
 
-.maxui-avatar img {
-width:48px;
--moz-border-radius: 5px;
--webkit-border-radius:5px;
-border-radius:5px;
-}
+#maxui-newactivity .textbox {margin-left:56px;width:auto; text-align:right;}
 
-#maxui-activities .maxui-activity-content {
-margin-left:10px;
-margin-right:50px;
-}
+.maxui-clear {clear:both;float:none;}
 
-#maxui-activities .maxui-footer {
-float:right;
-text-align: right;
-margin-right:50px;
-}
+.maxui-displayname {font-weight: bold;}
 
+.maxui-username {color: #767676;font-size:93%;}
 
-#maxui-newactivity div {
-float:left;
-}
-
-#maxui-newactivity .textbox {
-margin-left:5px;
-width:86%; /* FIX THIS !!!*/
-}
-
-.maxui-clear {
-clear:both;
-float:none;
-}
-
-.maxui-displayname {
-font-weight: bold;
-color: #333;
-}
-
-.maxui-username {
-color: #aaa;
-}
-
-p.maxui-body {
-margin:0;
-font-size:14px;
-}
-
+p.maxui-body {margin:0;font-size:13px;}
+	.maxui-comment .maxui-activity-content p.maxui-body {font-size:12px !important;}
 
 .maxui-publisheddate{
-font-style: italic;
 font-size:11px;
-color:  #999;
+color:  #767676;
+float:right;
+padding-top:1px;
 }
 
-
-.maxui-actions ul {
-margin:0;
-}
-
-.maxui-actions ul li{
+.maxui-actions a{
 display:inline;
-}
-
-.maxui-actions ul li {
+margin-left: 56px;
 padding-right:10px;
 }
-.maxui-actions ul li span.maxui-commentaction{
-font-size:12px;
-background: url('http://beta.upcnet.es/igas/comments.png') no-repeat 0 3px;
-color:#444;
+.maxui-actions span.maxui-commentaction {
+font-size:11px;
+background: url('../static/maxcomm.png') no-repeat 0 2px;
+color:#007bc0;
 text-decoration:none;
-padding-left:15px;
+padding-left:18px;
 cursor:pointer;
 }
-
+.maxui-actions span.maxui-commentaction:hover {
+color:#005ea0;
+background-position: 0 -18px;
+text-decoration:underline;
+}
 .maxui-comments {
-margin-left:70px;
-width:100%;
-margin-top:10px;
+margin-left:56px;
+width:auto;
+margin-top:0;
 
 }
+.maxui-comments .maxui-activity-content, .maxui-comments .maxui-activity-content .maxui-body {font-size:93% !important; line-height: 15px;}
 
 .maxui-comments .maxui-avatar {
-margin-left:-30px!important;
+margin-left:0!important;
 padding-top:5px;
 
 }
 
 .maxui-comments .maxui-avatar img {
-width:30px!important;
-
+width:36px!important; 
+height:36px!important;
 }
 
 
@@ -178,7 +152,7 @@ padding:2px 2px 2px 10px;
 -moz-border-radius: 3px;
 -webkit-border-radius: 3px;
 border-radius: 3px;
-font-size:12px;
+font-size:13px;
 
 background-color:#2D6987;
 color:white;
@@ -191,3 +165,27 @@ color : #ddd;
 font-weight:bold;
 padding: 0 5px;
 }
+
+
+
+
+#maxui-newactivity .maxui-avatar {left:0; top:0; position:absolute;}
+#maxui-container a img {border:0;}
+
+.maxui-avatar {position: relative;	max-width: 100%;float: left; position: absolute;left: -55px; top: 5px;} 
+	.maxui-avatar:before, .maxui-avatar::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		-moz-border-radius:3px; -webkit-border-radius:3px; border-radius:3px;
+		-moz-box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+		-webkit-box-shadow: inset 0 0 8px rgba(0,0,0,.5);
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.5), inset 0 0 4px rgba(0,0,0,.25);
+	} 
+	.maxui-avatar a {display:block; height:48px; } 
+	.maxui-comments .maxui-avatar a { height:36px;}
+	.maxui-avatar img {float: left;	}
+	.maxui-comments .maxui-avatar {margin-top:5px; position: absolute;left: -41px; top:0;}
