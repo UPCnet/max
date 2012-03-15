@@ -229,6 +229,20 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_context['object'])
 
+    def test_post_comment(self):
+        from .mockers import user_status, user_comment
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.subscribe_user_to_context(username, subscribe_context)
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+        result = res.json
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
+        self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
+
 
 def basicAuthHeader(username, password):
     base64string = base64.encodestring('%s:%s' % (username, password))[:-1]

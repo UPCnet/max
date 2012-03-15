@@ -161,20 +161,10 @@ context_queryA = {
 
 # Un usuari crea un comentari
 user_comment = {
-    "actor": {
-        "objectType": "person",
-        "username": "javier"
-    },
-    "verb": "post",
     "object": {
         "objectType": "comment",
-        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-        "inReplyTo": [
-          {
-            "id": "4e6eefc5aceee9210d000004",
-          }
-        ]
-    },
+        "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+    }
 }
 
 follow = {
