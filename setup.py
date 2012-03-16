@@ -49,3 +49,4 @@ setup(name='max',
       paster_plugins=['pyramid'],
       )
 
+
