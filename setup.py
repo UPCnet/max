@@ -14,7 +14,8 @@ requires = [
     'pyramid_who',
     'pymongo',
     'rfc3339',
-    'requests'
+    'requests',
+    'tweepy'
     ]
 
 test_requires = ['WebTest', 'mock', ]
@@ -45,8 +46,7 @@ setup(name='max',
       entry_points="""\
       [paste.app_factory]
       main = max:main
+      [console_scripts]
+      maxrules.twitter = maxrules.twitter:main
       """,
-      paster_plugins=['pyramid'],
       )
-
-
