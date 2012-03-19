@@ -63,11 +63,6 @@ input.send:active, input.load:active {background: #e5e5e5;filter: progid:DXImage
 
 #maxui-timeline {clear:both;margin:0;border-top: 1px #ccc solid;overflow: hidden;}
 
-#maxui-activities .maxui-avatar {
-    float:left;
-    margin-left:0;
-    padding:0;
-}
 	#maxui-activities .maxui-avatar img {float:left;}
 	.maxui-avatar img {width:48px;
 		-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;
@@ -109,15 +104,15 @@ display:inline;
 margin-left: 56px;
 padding-right:10px;
 }
-.maxui-actions span.maxui-commentaction {
+.maxui-actions a.maxui-commentaction {
 font-size:11px;
-background: url('../static/maxcomm.png') no-repeat 0 2px;
+background: url('../img/maxcomm.png') no-repeat 0 2px;
 color:#007bc0;
 text-decoration:none;
 padding-left:18px;
 cursor:pointer;
 }
-.maxui-actions span.maxui-commentaction:hover {
+.maxui-actions a.maxui-commentaction:hover {
 color:#005ea0;
 background-position: 0 -18px;
 text-decoration:underline;
@@ -132,7 +127,6 @@ margin-top:0;
 
 .maxui-comments .maxui-avatar {
 margin-left:0!important;
-padding-top:5px;
 
 }
 
