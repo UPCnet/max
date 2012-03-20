@@ -102,6 +102,27 @@ create_context = {
     'displayName': 'Atenea'
 }
 
+create_context_private_rw = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea',
+    'permissions': {'read':'subscribed',
+                    'write':'subscribed',
+                    'join':'restricted',
+                    'invite':'restricted'}
+}
+
+create_context_private_r = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea',
+    'permissions': {'read':'subscribed',
+                    'write':'restricted',
+                    'join':'restricted',
+                    'invite':'restricted'}
+
+}
+
 create_contextA = {
 
     'url': subscribe_contextA['object']['url'],

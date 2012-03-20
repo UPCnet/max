@@ -39,10 +39,12 @@ class FunctionalTests(unittest.TestCase):
 
     def create_context(self, context, permissions=None, expect=201):
         default_permissions = dict(read='public', write='public', join='public', invite='public')
+        new_context = dict(context)
+        if 'permissions' not in new_context:
+            new_context['permissions'] = default_permissions
         if permissions:
-            default_permissions.update(permissions)
-        context['permissions'] = default_permissions
-        res = self.testapp.post('/contexts', json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
+            new_context['permissions'].update(permissions)
+        res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=expect)
         return res
 
     def subscribe_user_to_context(self, username, context, expect=201):
@@ -219,7 +221,9 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
-    def test_post_activity_with_authorized_context(self):
+    def test_post_activity_with_public_context(self):
+        """ Post an activity to a context which allows everyone to read and write
+        """
         from .mockers import subscribe_context, create_context
         from .mockers import user_status_context
         username = 'messi'
@@ -232,6 +236,40 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
+    def test_post_activity_with_private_read_write_context(self):
+        """ Post an activity to a context which needs the user to be subscribed to read and write
+            and we have previously subscribed the user.
+        """
+        from .mockers import subscribe_context, create_context
+        from .mockers import user_status_context
+        username = 'messi'
+        self.create_user(username)
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_context, permissions=context_permissions)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
+    def test_post_activity_with_private_read_context(self):
+        """ Try to post an activity to a context which needs the user to be subscribed to read
+            but needs to explicitly give write permission on the user to post and we have previously
+            subscribed the user but not given write permission.
+        """
+        from .mockers import subscribe_context, create_context
+        from .mockers import user_status_context
+        username = 'messi'
+        self.create_user(username)
+        context_permissions = dict(read='subscribed', write='restricted', join='restricted', invite='restricted')
+        self.create_context(create_context, permissions=context_permissions)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context, expect=401)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_timeline(self):
         from .mockers import user_status, user_status_context, user_status_contextA
@@ -280,6 +318,50 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
+
+    def test_add_private_rw_context(self):
+        from hashlib import sha1
+        from .mockers import create_context_private_rw
+        res = self.testapp.post('/contexts', json.dumps(create_context_private_rw), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        url_hash = sha1(create_context_private_rw['url']).hexdigest()
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('permissions', None), create_context_private_rw['permissions'])
+
+    def test_add_private_r_context(self):
+        from hashlib import sha1
+        from .mockers import create_context_private_r
+        res = self.testapp.post('/contexts', json.dumps(create_context_private_r), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        url_hash = sha1(create_context_private_r['url']).hexdigest()
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('permissions', None), create_context_private_r['permissions'])
+
+    def test_check_permissions_on_subscribed_rw_context(self):
+        from .mockers import create_context_private_rw, subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_rw)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
+        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+        self.assertEqual('write' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+
+    def test_check_permissions_on_subscribed_r_context(self):
+        from .mockers import create_context_private_r, subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
+        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+        self.assertEqual('write' not in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
 
 
 def basicAuthHeader(username, password):

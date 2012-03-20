@@ -291,7 +291,7 @@ def hasPermissionInContexts(actor, permission, urls):
     context_map = {context['url']: context for context in actor.subscribedTo['items']}
     unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
 
-    if unsubscribed_contexts:
+    if unauthorized_contexts:
         raise Unauthorized, "You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts)
 
     # If we reached here, we have permission to post on all contexts
