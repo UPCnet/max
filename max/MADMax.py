@@ -1,6 +1,6 @@
 #MADMax  Mongo Access Delegate for Max
 
-from max.exceptions import MongoDBObjectNotFound
+from max.exceptions import ObjectNotFound
 from pymongo.objectid import ObjectId
 import sys
 from pymongo import DESCENDING
@@ -112,7 +112,8 @@ class MADMaxCollection(object):
             Flattened or not by demand
         """
         class_map = dict(activity='Activity',
-                        users='User')
+                        users='User',
+                        contexts='Context')
 
         module = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
         wrapped = module(item, collection=self.collection)
@@ -140,7 +141,7 @@ class MADMaxCollection(object):
         if item:
             return self.ItemWrapper(item)
         else:
-            raise MongoDBObjectNotFound, "Object with id %s not found inside %s" % (itemID,self.collection.name)
+            raise ObjectNotFound, "Object with id %s not found inside %s" % (itemID,self.collection.name)
 
     def __getattr__(self, name):
         """

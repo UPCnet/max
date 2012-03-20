@@ -1,6 +1,8 @@
 from max.MADObjects import MADBase
-from max.rest.utils import isActorAllowedInContexts
+from max.rest.utils import hasPermissionInContexts
 import datetime
+from hashlib import sha1
+from MADMax import MADMaxDB
 
 
 class Activity(MADBase):
@@ -52,7 +54,7 @@ class Activity(MADBase):
         """
             Perform custom validations on the Activity Object
         """
-        result = isActorAllowedInContexts(self.data['actor'], self.data.get('contexts', []))
+        result = hasPermissionInContexts(self.data['actor'], 'write', self.data.get('contexts', []))
         return result
 
 
@@ -98,11 +100,27 @@ class User(MADBase):
         """
         self.addToList('following', person)
 
-    def addSubscription(self, url):
+    def addSubscription(self, context):
         """
             Adds a comment to an existing activity
         """
-        self.addToList('subscribedTo', url, safe=False)
+        #XXX TODO Check authentication method, and if is oauth, check if user can auto join the context.
+        subscription = context.flatten()
+        permissions = subscription['permissions']
+
+        #If we are subscribing the user, read permission is granted
+        user_permissions = ['read']
+
+        #Set other permissions based on context defaults
+        if permissions['write'] in ['subscribed', 'public']:
+            user_permissions.append('write')
+        if permissions['invite'] in ['subscribed']:
+            user_permissions.append('invite')
+
+        #Assign permissions to the subscription object before adding it
+        subscription['permissions'] = user_permissions
+
+        self.addToList('subscribedTo', subscription, safe=False)
 
     def removeSubscription(self, url):
         """
@@ -116,3 +134,41 @@ class User(MADBase):
         # Comprehension dict (Muahaha)
         fields = {i: properties[i] for i in valid_user_fields_for_update}
         self.updateFields(fields)
+
+
+class Context(MADBase):
+    """
+        A max Context object representation
+    """
+    collection = 'contexts'
+    unique = 'url'
+    schema = {
+                '_id':          dict(),
+                'url':          dict(required=1),
+                'urlHash':      dict(),
+                'displayName':  dict(),
+                'published':    dict(),
+                'permissions':  dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
+             }
+
+    def buildObject(self):
+        """
+            Updates the dict content with the context structure,
+            with data from the request
+        """
+
+        # Update properties from request data if defined in schema
+        # Also create properties with a default value defined
+        ob = {}
+        properties = {}
+        for key, value in self.schema.items():
+            default = value.get('default', None)
+            if key in self.data:
+                properties[key] = self.data[key]
+            elif default:
+                properties[key] = default
+
+        ob['urlHash'] = sha1(self.data['url']).hexdigest()
+
+        ob.update(properties)
+        self.update(ob)

@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.decorators import MaxRequest, MaxResponse
-from max.MADMax import MADMaxDB
+from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.oauth2 import oauth2
@@ -36,7 +36,9 @@ def subscribe(context, request):
     newactivity_oid = newactivity.insert()
     newactivity['_id'] = newactivity_oid
 
-    actor.addSubscription(newactivity['object'])
+    contexts = MADMaxCollection(context.db.contexts, query_key='url')
+    scontext = contexts[newactivity['object']['url']]
+    actor.addSubscription(scontext)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()

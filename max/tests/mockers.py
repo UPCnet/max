@@ -71,7 +71,6 @@ demostatus_with_context = {
 # =============================================================================
 
 
-
 # Revisat i actualitzat
 subscribe_context = {
     "object": {
@@ -95,6 +94,20 @@ subscribe_contextB = {
         "url": "http://atenea.upc.edu/B"
     }
 }
+
+
+create_context = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea'
+}
+
+create_contextA = {
+
+    'url': subscribe_contextA['object']['url'],
+    'displayName': 'Atenea A'
+}
+
 
 # Un usuari crea una activitat de canvi d'estat
 # Revisat i actualitzat

@@ -41,7 +41,7 @@ class ObjectNotSupported(Exception):
         return repr(self.value)
 
 
-class MongoDBObjectNotFound(Exception):
+class ObjectNotFound(Exception):
     def __init__(self, value):
         self.value = value
 

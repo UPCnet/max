@@ -10,7 +10,8 @@ RESOURCES = {
 'follows': {'route': '/people/{username}/follows'},
 'follow': {'route': '/people/{username}/follows/{followedDN}'},
 'subscriptions': {'route': '/people/{username}/subscriptions'},
-'subscription': {'route': '/people/{username}/subscriptions/{subscrId}'},
+'subscription': {'route': '/people/{username}/subscriptions/{urlHash}'},
+
 'activities': {'route': '/activities'},
 'activity': {'route': '/activities/{activity}'},
 'comments': {'route': '/activities/{activity}/comments'},
@@ -19,4 +20,10 @@ RESOURCES = {
 'like': {'route': '/activities/{activity}/likes/{likeId}'},
 'shares': {'route': '/activities/{activity}/shares'},
 'share': {'route': '/activities/{activity}/shares/{shareId}'},
+
+'contexts': {'route': '/contexts'},
+'context': {'route': '/context/{urlHash}'},
+'context_permissions': {'route': '/context/{urlHash}/permissions'},
+'context_user_permissions': {'route': '/context/{urlHash}/permissions/{username}'},
+'context_user_permission': {'route': '/context/{urlHash}/permissions/{username}/{permission}'},
 }

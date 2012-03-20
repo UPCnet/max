@@ -1,4 +1,4 @@
-from max.exceptions import MissingField, ObjectNotSupported, MongoDBObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams
 from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotImplemented
 from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
 from bson.errors import InvalidId
@@ -47,16 +47,21 @@ def MaxRequest(func):
             #Try to get the username from the POST body
             if not username and request.method == 'POST':
                 username = getUsernameFromPOSTBody(request)
+
             # If no actor specified anywhere, raise an error
+            # except when adding a context
             if not username:
-                raise UnknownUserError, 'No user specified as actor'
+                if not ((request.matched_route.name, request.method) in [('contexts', 'POST')]):
+                    raise UnknownUserError, 'No user specified as actor'
             #try to load the oauth User from DB
             try:
                 actor = mmdb.users.getItemsByusername(username)[0]
             except:
-                # Raise only if we are NOT adding a user. This is the only case
-                # Were the user will not be in the DB, as we are just about to do it ...
-                if not (request.matched_route.name == 'user' and request.method == 'POST'):
+                # Raise only if we are NOT adding a user or a context. These are the only cases
+                # Were we permit not specifing an ator:
+                #   - Creating a user, beacause the user doesn't exists
+                #   - Creating a context, because context is actor-agnostic
+                if not ((request.matched_route.name, request.method) in [('user', 'POST'), ('contexts', 'POST')]):
                     raise UnknownUserError, 'Unknown user: %s' % username
 
         # Raise an error if no authentication present
@@ -87,25 +92,25 @@ def MaxResponse(fun):
         try:
             response = fun(*args, **kwargs)
         except InvalidId, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=InvalidId.__name__, error_description=message.value))
         except ObjectNotSupported, message:
-            return HTTPBadRequest(detail=message)
-        except MongoDBObjectNotFound, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=ObjectNotSupported.__name__, error_description=message.value))
+        except ObjectNotFound, message:
+            return JSONHTTPBadRequest(error=dict(error=ObjectNotFound.__name__, error_description=message.value))
         except MissingField, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=MissingField.__name__, error_description=message.value))
         except DuplicatedItemError, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=DuplicatedItemError.__name__, error_description=message.value))
         except UnknownUserError, message:
             return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=message.value))
         except Unauthorized, message:
             return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=message.value))
         except InvalidSearchParams, message:
-            return HTTPBadRequest(detail=message)
+            return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=message.value))
 
         # JSON decode error????
         except ValueError:
-            return HTTPBadRequest()
+            return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
         except:
             return HTTPInternalServerError()
         else:

@@ -24,6 +24,7 @@ class FunctionalTests(unittest.TestCase):
         self.app = loadapp('config:tests.ini', relative_to=conf_dir)
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
+        self.app.registry.max_store.drop_collection('contexts')
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
@@ -36,8 +37,19 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
-    def subscribe_user_to_context(self, username, context,):
-        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=201)
+    def create_context(self, context, permissions=None, expect=201):
+        default_permissions = dict(read='public', write='public', join='public', invite='public')
+        if permissions:
+            default_permissions.update(permissions)
+        context['permissions'] = default_permissions
+        res = self.testapp.post('/contexts', json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
+        return res
+
+    def subscribe_user_to_context(self, username, context, expect=201):
+        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
+        return res
+
+    # BEGIN TESTS
 
     def test_add_user(self):
         username = 'messi'
@@ -164,11 +176,12 @@ class FunctionalTests(unittest.TestCase):
     def test_get_activities(self):
         from .mockers import context_query
         from .mockers import user_status_context
-        from .mockers import subscribe_context
+        from .mockers import subscribe_context, create_context
         username = 'messi'
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
+        self.create_context(create_context)
         self.subscribe_user_to_context(username, subscribe_context)
         self.subscribe_user_to_context(username_not_me, subscribe_context)
         self.create_activity(username, user_status_context)
@@ -186,8 +199,10 @@ class FunctionalTests(unittest.TestCase):
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
         from .mockers import user_status_context
+        from .mockers import create_context
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_context)
         self.subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
 
@@ -196,11 +211,20 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
 
-    def test_post_activity_with_authorized_context(self):
+    def test_subscribe_to_inexistent_context(self):
         from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        res = self.subscribe_user_to_context(username, subscribe_context, expect=400)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'ObjectNotFound')
+
+    def test_post_activity_with_authorized_context(self):
+        from .mockers import subscribe_context, create_context
         from .mockers import user_status_context
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_context)
         self.subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
 
@@ -212,8 +236,11 @@ class FunctionalTests(unittest.TestCase):
     def test_get_timeline(self):
         from .mockers import user_status, user_status_context, user_status_contextA
         from .mockers import subscribe_context, subscribe_contextA
+        from .mockers import create_context, create_contextA
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_context)
+        self.create_context(create_contextA)
         self.subscribe_user_to_context(username, subscribe_context)
         self.subscribe_user_to_context(username, subscribe_contextA)
         self.create_activity(username, user_status)
@@ -231,9 +258,10 @@ class FunctionalTests(unittest.TestCase):
 
     def test_post_comment(self):
         from .mockers import user_status, user_comment
-        from .mockers import subscribe_context
+        from .mockers import subscribe_context, create_context
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_context)
         self.subscribe_user_to_context(username, subscribe_context)
         activity = self.create_activity(username, user_status)
         activity = activity.json
@@ -242,6 +270,16 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
         self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
+
+    # CONTEXTS
+
+    def test_add_public_context(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.assertEqual(result.get('urlHash', None), url_hash)
 
 
 def basicAuthHeader(username, password):
