@@ -8,7 +8,8 @@ class Root(object):
     __acl__ = [
         (Allow, Everyone, 'anonymous'),
         (Allow, Authenticated, 'restricted'),
-        (Allow, 'operations', 'manage')
+        (Allow, 'operations', 'operations'),
+        (Allow, 'admin', 'admin')
         ]
 
     def __init__(self, request):

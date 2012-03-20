@@ -16,7 +16,7 @@ def getUserSubscriptions(context, request):
     return HTTPNotImplemented()
 
 
-@view_config(route_name='subscriptions', request_method='POST', permission='manage')
+@view_config(route_name='subscriptions', request_method='POST', permission='operations')
 @MaxResponse
 @MaxRequest
 def subscribe(context, request):
