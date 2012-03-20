@@ -102,12 +102,38 @@ create_context = {
     'displayName': 'Atenea'
 }
 
+create_context_private_rw = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea',
+    'permissions': {'read':'subscribed',
+                    'write':'subscribed',
+                    'join':'restricted',
+                    'invite':'restricted'}
+}
+
+create_context_private_r = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea',
+    'permissions': {'read':'subscribed',
+                    'write':'restricted',
+                    'join':'restricted',
+                    'invite':'restricted'}
+
+}
+
 create_contextA = {
 
     'url': subscribe_contextA['object']['url'],
     'displayName': 'Atenea A'
 }
 
+create_contextB = {
+
+    'url': subscribe_contextB['object']['url'],
+    'displayName': 'Atenea B'
+}
 
 # Un usuari crea una activitat de canvi d'estat
 # Revisat i actualitzat
@@ -160,15 +186,11 @@ user_status_contextAB = {
 }
 
 context_query = {
-    "contexts": [
-        subscribe_context['object']['url']
-    ]
+    "context": subscribe_context['object']['url']
 }
 
 context_queryA = {
-    "contexts": [
-        subscribe_contextA['object']['url']
-    ]
+    "contexts": subscribe_contextA['object']['url']
 }
 
 

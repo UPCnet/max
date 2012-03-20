@@ -272,7 +272,7 @@ def extractPostData(request):
     # TODO: Do more syntax and format checks of sent data
 
 
-def hasPermissionInContexts(actor, permission, urls):
+def canWriteInContexts(actor, urls):
     """
     """
     # If no context filter defined, write/read is always allowed
@@ -291,14 +291,35 @@ def hasPermissionInContexts(actor, permission, urls):
     context_map = {context['url']: context for context in actor.subscribedTo['items']}
     unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
 
-    if unsubscribed_contexts:
+    if unauthorized_contexts:
         raise Unauthorized, "You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts)
 
     # If we reached here, we have permission to post on all contexts
     return True
 
 
+def canReadContext(actor, url):
+    """
+    """
+    # If no context filter defined, write/read is always allowed
+    if url == []:
+        return True
+
+    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
+
+    if url not in subscribed_contexts_urls:
+
+        # Check recursive read: User is allowed to read recursively on an
+        # unsubscribed context if is subscribed to at least one child context
+        containments = [usc.startswith(url) for usc in subscribed_contexts_urls]
+        if True not in containments:
+            raise Unauthorized, "You are not subscribed to this context: %s" % url
+
+    #If we reached here, we have permission to read on all contexts
+    return True
+
 # Old methods
+
 
 def checkRequestConsistency(request):
     if request.content_type != 'application/json':
