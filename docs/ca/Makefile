@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = _build
+BUILDDIR      = ../_build
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -38,9 +38,9 @@ clean:
 
 html: themes
 	mkdir -p _build/html _build/doctrees
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html/$(LANG)
 	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html/$(LANG)."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
@@ -132,4 +132,4 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 themes:
-	cd .. && git submodule update --init
+	cd .. && cd .. && git submodule update --init
