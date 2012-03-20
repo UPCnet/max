@@ -198,6 +198,32 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_context['object'])
 
+    def test_get_activities_from_recursive_contexts(self):
+        from .mockers import context_query
+        from .mockers import create_context
+        from .mockers import subscribe_contextA, create_contextA, user_status_contextA
+        from .mockers import subscribe_contextB, create_contextB, user_status_contextB
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
+        self.create_context(create_contextA)
+        self.create_context(create_contextB)
+        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.subscribe_user_to_context(username_not_me, subscribe_contextB)
+        self.create_activity(username, user_status_contextA)
+        self.create_activity(username_not_me, user_status_contextB)
+        res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 2)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
+
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
         from .mockers import user_status_context
@@ -315,6 +341,15 @@ class FunctionalTests(unittest.TestCase):
         from hashlib import sha1
         from .mockers import create_context
         res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.assertEqual(result.get('urlHash', None), url_hash)
+
+    def test_context_exists(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)

@@ -8,7 +8,7 @@ from max.oauth2 import oauth2
 from max.exceptions import MissingField, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import searchParams, hasPermissionInContexts
+from max.rest.utils import searchParams, canReadContext
 
 
 @view_config(route_name='user_activities', request_method='GET')
@@ -65,7 +65,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-@MaxResponse
+#@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -74,21 +74,16 @@ def getActivities(context, request):
 
          Retorna all activities, optionaly filtered by context
     """
-    urls = request.params.getall('contexts')
-    if urls == []:
-        raise MissingField, 'You have to specify at least one context'
+    url = request.params.get('context', None)
+    if not url:
+        raise MissingField, 'You have to specify one context'
 
-    hasPermissionInContexts(request.actor, 'read', urls)
+    canReadContext(request.actor, url)
     # If we reached here, we have permission to search for all urls in urls
 
-    # Add all the activities posted on particular contexts
-    contexts_followings_query = []
-    for url in urls:
-        contexts_followings_query.append({'contexts.url': url})
-
-    query = {'verb': 'post'}
-    if contexts_followings_query:
-        query = {'$or': contexts_followings_query}
+    query = {}
+    query.update({'contexts.url': {'$regex': '^%s' % url}})
+    query.update({'verb': 'post'})
 
     mmdb = MADMaxDB(context.db)
     activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))

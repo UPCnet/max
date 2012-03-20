@@ -129,6 +129,11 @@ create_contextA = {
     'displayName': 'Atenea A'
 }
 
+create_contextB = {
+
+    'url': subscribe_contextB['object']['url'],
+    'displayName': 'Atenea B'
+}
 
 # Un usuari crea una activitat de canvi d'estat
 # Revisat i actualitzat
@@ -181,15 +186,11 @@ user_status_contextAB = {
 }
 
 context_query = {
-    "contexts": [
-        subscribe_context['object']['url']
-    ]
+    "context": subscribe_context['object']['url']
 }
 
 context_queryA = {
-    "contexts": [
-        subscribe_contextA['object']['url']
-    ]
+    "contexts": subscribe_contextA['object']['url']
 }
 
 

@@ -1,5 +1,5 @@
 from max.MADObjects import MADBase
-from max.rest.utils import hasPermissionInContexts
+from max.rest.utils import canWriteInContexts
 import datetime
 from hashlib import sha1
 from MADMax import MADMaxDB
@@ -54,7 +54,7 @@ class Activity(MADBase):
         """
             Perform custom validations on the Activity Object
         """
-        result = hasPermissionInContexts(self.data['actor'], 'write', self.data.get('contexts', []))
+        result = canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
         return result
 
 
