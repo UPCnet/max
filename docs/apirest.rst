@@ -163,7 +163,7 @@ Representa el flux d'activitat global de l'usuari, que comprèn les activitats q
 Comentaris d'una activitat
 ----------------------------
 
-Representa el conjunt de comentaris fets a una activitat
+Representa el conjunt de comentaris fets a una activitat.
 
 .. http:post:: /activities/{activity}/comments
 

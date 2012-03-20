@@ -15,7 +15,8 @@ requires = [
     'pymongo',
     'rfc3339',
     'requests',
-    'tweepy'
+    'tweepy',
+    'celery'
     ]
 
 test_requires = ['WebTest', 'mock', ]
@@ -34,7 +35,7 @@ setup(name='max',
       author_email='victor.fernandez@upcnet.es',
       url='http://github.com/upcnet/max',
       keywords='web pylons pyramid',
-      packages=find_packages(),
+      packages=['max', 'maxclient', 'maxrules'],
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
