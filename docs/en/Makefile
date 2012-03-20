@@ -132,4 +132,4 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 themes:
-	cd .. && git submodule update --init
+	cd .. && cd .. && git submodule update --init
