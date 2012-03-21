@@ -62,21 +62,28 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT')
-@MaxResponse
+@view_config(route_name='context', request_method='PUT', permission='operations')
+#@MaxResponse
 @MaxRequest
-@oauth2(['widgetcli'])
 def ModifyContext(context, request):
     """
     """
-    actor = request.actor
-    params = extractPostData(request)
-    displayName = params.get('displayName')
-    properties = dict(displayName=displayName)
-    actor.modifyUser(properties)
+    urlHash = request.matchdict['urlHash']
+    contexts = MADMaxCollection(context.db.contexts)
+    maxcontext = contexts.getItemsByurlHash(urlHash)
+    if maxcontext:
+        maxcontext = maxcontext[0]
+    else:
+        raise ObjectNotFound, 'Unknown context: %s' % urlHash
 
-    contexts = MADMaxCollection(context.db.contexts, query_key='username')
-    handler = JSONResourceEntity(contexts[actor['username']].flatten())
+    params = extractPostData(request)
+    allowed_fields = [fieldName for fieldName in maxcontext.schema if maxcontext.schema[fieldName].get('operations_mutable', 0)]
+    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None)}
+
+    maxcontext.modifyContext(properties)
+
+    maxcontext = contexts.getItemsByurlHash(urlHash)[0]
+    handler = JSONResourceEntity(maxcontext.flatten())
     return handler.buildResponse()
 
 

@@ -49,9 +49,9 @@ def MaxRequest(func):
                 username = getUsernameFromPOSTBody(request)
 
             # If no actor specified anywhere, raise an error
-            # except when adding a context
+            # except when adding or modifying a context
             if not username:
-                if not ((request.matched_route.name, request.method) in [('contexts', 'POST')]):
+                if not ((request.matched_route.name, request.method) in [('contexts', 'POST'), ('context', 'PUT')]):
                     raise UnknownUserError, 'No user specified as actor'
             #try to load the oauth User from DB
             try:
@@ -61,7 +61,7 @@ def MaxRequest(func):
                 # Were we permit not specifing an ator:
                 #   - Creating a user, beacause the user doesn't exists
                 #   - Creating a context, because context is actor-agnostic
-                if not ((request.matched_route.name, request.method) in [('user', 'POST'), ('contexts', 'POST')]):
+                if not ((request.matched_route.name, request.method) in [('user', 'POST'), ('contexts', 'POST'), ('context', 'PUT')]):
                     raise UnknownUserError, 'Unknown user: %s' % username
 
         # Raise an error if no authentication present

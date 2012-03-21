@@ -19,6 +19,7 @@ class Activity(MADBase):
                 'published':   dict(required=0),
                 'contexts':    dict(required=0),
                 'replies':    dict(required=0),
+                'generator':    dict(required=0),
              }
 
     def buildObject(self):
@@ -67,11 +68,12 @@ class User(MADBase):
     schema = {
                 '_id':          dict(),
                 'username':     dict(required=1),
-                'displayName':  dict(),
+                'displayName':  dict(user_mutable=1),
                 'last_login':   dict(),
                 'following':    dict(default={'items':[]}),
                 'subscribedTo': dict(default={'items':[]}),
                 'published':    dict(),
+                'twitterUsername':    dict(user_mutable=1),
              }
 
     def buildObject(self):
@@ -130,10 +132,8 @@ class User(MADBase):
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
-        valid_user_fields_for_update = ['displayName']
         # Comprehension dict (Muahaha)
-        fields = {i: properties[i] for i in valid_user_fields_for_update}
-        self.updateFields(fields)
+        self.updateFields(properties)
 
 
 class Context(MADBase):
@@ -146,9 +146,10 @@ class Context(MADBase):
                 '_id':          dict(),
                 'url':          dict(required=1),
                 'urlHash':      dict(),
-                'displayName':  dict(),
+                'displayName':  dict(operations_mutable=1),
                 'published':    dict(),
-                'twitterHashtag':    dict(),
+                'twitterHashtag':    dict(operations_mutable=1),
+                'twitterUsername':    dict(operations_mutable=1),
                 'permissions':  dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
              }
 
@@ -173,3 +174,8 @@ class Context(MADBase):
 
         ob.update(properties)
         self.update(ob)
+
+    def modifyContext(self, properties):
+        """Update the user object with the given properties"""
+        # Comprehension dict (Muahaha)
+        self.updateFields(properties)

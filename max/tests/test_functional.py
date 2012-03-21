@@ -32,6 +32,10 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
         return res
 
+    def modify_user(self, username, properties):
+        res = self.testapp.put('/people/%s' % username, json.dumps(properties), oauth2Header(username))
+        return res
+
     def create_activity(self, username, activity, oauth_username=None, expect=201):
         oauth_username = oauth_username != None and oauth_username or username
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
@@ -89,12 +93,29 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'UnknownUserError')
 
-    def test_modify_user(self):
+    def test_modify_user_one_parameter(self):
         username = 'messi'
         self.create_user(username)
         res = self.testapp.put('/people/%s' % username, json.dumps({"displayName": "Lionel Messi"}), oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('displayName', None), 'Lionel Messi')
+
+    def test_modify_user_several_parameters(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.put('/people/%s' % username, json.dumps({"displayName": "Lionel Messi", "twitterUsername": "leomessi"}), oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('displayName', None), 'Lionel Messi')
+        self.assertEqual(result.get('twitterUsername', None), 'leomessi')
+
+    def test_modify_user_several_parameters_twice(self):
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi"})
+        res = self.testapp.put('/people/%s' % username, json.dumps({"twitterUsername": "leomessi"}), oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('displayName', None), 'Lionel Messi')
+        self.assertEqual(result.get('twitterUsername', None), 'leomessi')
 
     def test_modify_non_existent_user(self):
         username = 'messi'
@@ -367,6 +388,16 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
+
+    def test_modify_context(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/context/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
 
     # ADMIN
 

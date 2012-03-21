@@ -6,3 +6,7 @@ BROKER_VHOST = "sneridagh"
 
 CELERY_RESULT_BACKEND = "amqp"
 CELERY_IMPORTS = ("maxrules.tasks",)
+
+# MongoDB config
+mongodb_url = "mongodb://localhost"
+mongodb_db_name = "max"

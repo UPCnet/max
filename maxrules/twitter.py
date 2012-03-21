@@ -7,6 +7,9 @@ from textwrap import TextWrapper
 
 import tweepy
 
+# CONFIG
+twitter_generator_name = 'Twitter'
+
 
 def main(argv=sys.argv, quiet=False):
     command = MaxTwitterRulesRunner(argv, quiet)

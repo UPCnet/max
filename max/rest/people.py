@@ -88,8 +88,8 @@ def ModifyUser(context, request):
     """
     actor = request.actor
     params = extractPostData(request)
-    displayName = params.get('displayName')
-    properties = dict(displayName=displayName)
+    allowed_fields = [fieldName for fieldName in actor.schema if actor.schema[fieldName].get('user_mutable', 0)]
+    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None)}
     actor.modifyUser(properties)
 
     users = MADMaxCollection(context.db.users, query_key='username')
