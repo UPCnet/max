@@ -65,7 +65,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -78,14 +78,33 @@ def getActivities(context, request):
     if not url:
         raise MissingField, 'You have to specify one context'
 
-    canReadContext(request.actor, url)
-    # If we reached here, we have permission to search for all urls in urls
-
-    query = {}
-    query.update({'contexts.url': {'$regex': '^%s' % url}})
-    query.update({'verb': 'post'})
-
     mmdb = MADMaxDB(context.db)
+
+    # subscribed contexts with read permission
+    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions')]
+
+    # regex query to find all contexts within url
+    url_regex = {'$regex': '^%s' % url}
+
+    # search all contexts with public read permissions within url
+    query = {'permissions.read': 'public', 'url': url_regex}
+    public = [result.url for result in mmdb.contexts.search(query, show_fields=['url'])]
+
+    query = {}                                                     # Search
+    query.update({'verb': 'post'})                                 # 'post' activities
+    query.update({'contexts.url': url_regex})                      # equal or child of url
+
+    contexts_query = []
+    if subscribed:
+        subscribed_query = {'contexts.url': {'$in': subscribed}}  # that are subscribed contexts
+        contexts_query.append(subscribed_query)                    # with read permission
+
+    if public:                                                     # OR
+        public_query = {'contexts.url': {'$in': public}}
+        contexts_query.append(public_query)                        # pubic contexts
+
+    query.update({'$or': contexts_query})
+
     activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()

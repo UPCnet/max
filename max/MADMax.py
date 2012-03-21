@@ -35,7 +35,10 @@ class MADMaxCollection(object):
         """
             Sets which fields to be returned in the query
         """
-        self.show_fields = dict([(fieldname, 1) for fieldname in fields])
+        if fields:
+            self.show_fields = dict([(fieldname, 1) for fieldname in fields])
+        else:
+            self.show_fields = None
 
     def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
         """
@@ -64,7 +67,8 @@ class MADMaxCollection(object):
                 # Filter the query to return objects created later or earlier than the one
                 # represented by offset (offset not included)
                 query.update({'_id': {condition: offset}})
-            cursor = self.collection.find(query, show_fields)
+            self.setVisibleResultFields(show_fields)
+            cursor = self.collection.find(query, self.show_fields)
 
             if hashtag:
                 # Filter the query to only objects containing certain hashtags

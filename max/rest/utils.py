@@ -305,7 +305,7 @@ def canReadContext(actor, url):
     if url == []:
         return True
 
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
+    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
 
     if url not in subscribed_contexts_urls:
 

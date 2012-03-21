@@ -38,7 +38,7 @@ class FunctionalTests(unittest.TestCase):
         return res
 
     def create_context(self, context, permissions=None, expect=201):
-        default_permissions = dict(read='public', write='public', join='public', invite='public')
+        default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
         new_context = dict(context)
         if 'permissions' not in new_context:
             new_context['permissions'] = default_permissions
@@ -199,6 +199,13 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_context['object'])
 
     def test_get_activities_from_recursive_contexts(self):
+        """
+            Create 3 contexts, one parent and two childs
+            The parent context is public-readable, the two childs require subscription
+            Create 2 users, messi subscribed to contextA and xavi to both A and B
+            Messi querying all activities from parent context, should only get the activity created in contextA
+            Xavi querying all activities from parent context, should get the activities from both contexts
+        """
         from .mockers import context_query
         from .mockers import create_context
         from .mockers import subscribe_contextA, create_contextA, user_status_contextA
@@ -208,21 +215,37 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         self.create_user(username_not_me)
         self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
-        self.create_context(create_contextA)
-        self.create_context(create_contextB)
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
         self.subscribe_user_to_context(username, subscribe_contextA)
+        self.subscribe_user_to_context(username_not_me, subscribe_contextA)
         self.subscribe_user_to_context(username_not_me, subscribe_contextB)
         self.create_activity(username, user_status_contextA)
+        self.create_activity(username_not_me, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextB)
+
         res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
+
+        res = self.testapp.get('/activities', context_query, oauth2Header(username_not_me), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 3)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[2].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0], subscribe_contextA['object'])
 
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
