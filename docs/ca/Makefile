@@ -5,7 +5,7 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = _build
+BUILDDIR      = ../_build
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -13,9 +13,6 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest
-
-SPHINX_DEPENDENCIES = \
-    ca/Makefile
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -39,10 +36,11 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html: $(SPHINX_DEPENDENCIES)
+html: themes
 	mkdir -p _build/html _build/doctrees
- 	cd en && make html LANG=en
-    cd ca && make html LANG=ca
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html/$(LANG)
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html/$(LANG)."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
@@ -134,4 +132,4 @@ doctest:
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
 themes:
-	cd .. && git submodule update --init
+	cd .. && cd .. && git submodule update --init

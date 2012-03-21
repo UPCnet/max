@@ -36,7 +36,7 @@ def getUser(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user', request_method='POST', permission='manage')
+@view_config(route_name='user', request_method='POST', permission='operations')
 @MaxResponse
 @MaxRequest
 def addUser(context, request):

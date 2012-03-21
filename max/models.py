@@ -148,6 +148,7 @@ class Context(MADBase):
                 'urlHash':      dict(),
                 'displayName':  dict(),
                 'published':    dict(),
+                'twitterHashtag':    dict(),
                 'permissions':  dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
              }
 

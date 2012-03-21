@@ -35,7 +35,7 @@ def getContext(context, request):
     return HTTPNotImplemented()
 
 
-@view_config(route_name='contexts', request_method='POST', permission='manage')
+@view_config(route_name='contexts', request_method='POST', permission='operations')
 @MaxResponse
 @MaxRequest
 def addContext(context, request):

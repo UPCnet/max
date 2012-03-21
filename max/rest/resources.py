@@ -1,4 +1,4 @@
-RESOURCES = {
+OAUTH_RESOURCES = {
 'users': {'route': '/people'},
 'user': {'route': '/people/{username}'},
 'avatar': {'route': '/people/{username}/avatar'},
@@ -27,3 +27,11 @@ RESOURCES = {
 'context_user_permissions': {'route': '/context/{urlHash}/permissions/{username}'},
 'context_user_permission': {'route': '/context/{urlHash}/permissions/{username}/{permission}'},
 }
+
+ADMIN_RESOURCES = {
+'admin_user_activities': {'route': '/admin/people/{username}/activities'},
+}
+
+RESOURCES = {}
+RESOURCES.update(OAUTH_RESOURCES)
+RESOURCES.update(ADMIN_RESOURCES)

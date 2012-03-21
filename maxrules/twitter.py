@@ -9,7 +9,7 @@ import tweepy
 
 
 def main(argv=sys.argv, quiet=False):
-    command = MaxRulesRunner(argv, quiet)
+    command = MaxTwitterRulesRunner(argv, quiet)
     return command.run()
 
 
@@ -36,7 +36,7 @@ class StreamWatcherListener(tweepy.StreamListener):
         print 'Snoozing Zzzzzz'
 
 
-class MaxRulesRunner(object):
+class MaxTwitterRulesRunner(object):
     verbosity = 1  # required
     description = "Max rules runner."
     usage = "usage: %prog [options]"

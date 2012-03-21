@@ -368,6 +368,18 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
 
+    # ADMIN
+
+    def test_admin_post_activity_without_context(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/admin/people/%s/activities' % username, json.dumps(user_status), basicAuthHeader('admin', 'admin'))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None), None)
+
     def test_context_exists(self):
         from hashlib import sha1
         from .mockers import create_context

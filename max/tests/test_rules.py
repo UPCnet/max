@@ -10,6 +10,6 @@ class RulesTests(unittest.TestCase):
     def tearDown(self):
         testing.tearDown()
 
-    # def test_process_new_tweet(self):
-    #     from maxrules.tasks import processTweet
-    #     processTweet.delay('sneridagh', '#Atenea')
+    def test_process_new_tweet(self):
+        from maxrules.tasks import processTweet
+        processTweet.delay('sneridagh', '#Atenea')
