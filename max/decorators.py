@@ -1,6 +1,6 @@
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams
-from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotImplemented
-from pyramid.httpexceptions import HTTPBadRequest, HTTPInternalServerError, HTTPUnauthorized
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission
+from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest
+from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
 from max.resources import Root
@@ -15,6 +15,9 @@ def MaxRequest(func):
 
         actor = None
         mmdb = MADMaxDB(context.db)
+
+        allowed_ws_without_username = [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
+        allowed_ws_without_actor = [('user', 'POST')] + allowed_ws_without_username
 
         # If Oauth authorization is used, The actor that will perform the actions will be
         # the one specified in oauth headers, so for routes that match username
@@ -51,7 +54,7 @@ def MaxRequest(func):
             # If no actor specified anywhere, raise an error
             # except when adding or modifying a context
             if not username:
-                if not ((request.matched_route.name, request.method) in [('contexts', 'POST'), ('context', 'PUT')]):
+                if not ((request.matched_route.name, request.method) in allowed_ws_without_username):
                     raise UnknownUserError, 'No user specified as actor'
             #try to load the oauth User from DB
             try:
@@ -61,7 +64,9 @@ def MaxRequest(func):
                 # Were we permit not specifing an ator:
                 #   - Creating a user, beacause the user doesn't exists
                 #   - Creating a context, because context is actor-agnostic
-                if not ((request.matched_route.name, request.method) in [('user', 'POST'), ('contexts', 'POST'), ('context', 'PUT')]):
+                #   - Getting a context, because context is actor-agnostic
+
+                if not ((request.matched_route.name, request.method) in allowed_ws_without_actor):
                     raise UnknownUserError, 'Unknown user: %s' % username
 
         # Raise an error if no authentication present
@@ -107,6 +112,9 @@ def MaxResponse(fun):
             return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=message.value))
         except InvalidSearchParams, message:
             return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=message.value))
+        except InvalidPermission, message:
+            return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=message.value))
+
 
         # JSON decode error????
         except ValueError:

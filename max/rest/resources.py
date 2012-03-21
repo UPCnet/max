@@ -22,10 +22,10 @@ OAUTH_RESOURCES = {
 'share': {'route': '/activities/{activity}/shares/{shareId}'},
 
 'contexts': {'route': '/contexts'},
-'context': {'route': '/context/{urlHash}'},
-'context_permissions': {'route': '/context/{urlHash}/permissions'},
-'context_user_permissions': {'route': '/context/{urlHash}/permissions/{username}'},
-'context_user_permission': {'route': '/context/{urlHash}/permissions/{username}/{permission}'},
+'context': {'route': '/contexts/{urlHash}'},
+'context_permissions': {'route': '/contexts/{urlHash}/permissions'},
+'context_user_permissions': {'route': '/contexts/{urlHash}/permissions/{username}'},
+'context_user_permission': {'route': '/contexts/{urlHash}/permissions/{username}/{permission}'},
 }
 
 ADMIN_RESOURCES = {

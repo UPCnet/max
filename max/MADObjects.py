@@ -166,6 +166,12 @@ class MADBase(MADDict):
         oid = self.mdb_collection.insert(self)
         return str(oid)
 
+    def delete(self):
+        """
+            Removes the object from the DB
+        """
+        self.mdb_collection.remove({'_id': self._id})
+
     def addToList(self, field, obj, allow_duplicates=False, safe=True):
         """
             Updates an array field of a existing DB object appending the new object
