@@ -57,6 +57,6 @@ def processTweet(twitter_username, hashtag, content):
     # Use the restricted REST endpoint for create a new activity in the specified
     # MAX context in name of the specified MAX username
 
-    re = requests.post('/admin/people/%s/activities' % maxuser.username, newactivity, auth=('admin', 'admin'))
+    re = requests.post('https://localhost/admin/people/%s/activities' % maxuser.username, newactivity, auth=('admin', 'admin'), verify=False)
 
     return "Successful tweet insertion from user %s in context %s" % (maxuser, maxcontext)

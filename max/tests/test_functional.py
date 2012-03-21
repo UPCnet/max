@@ -415,7 +415,7 @@ class FunctionalTests(unittest.TestCase):
         from .mockers import create_context
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
-        res = self.testapp.put('/context/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('urlHash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
