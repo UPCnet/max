@@ -71,7 +71,7 @@ def addContext(context, request):
 
 
 @view_config(route_name='context', request_method='PUT', permission='operations')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 def ModifyContext(context, request):
     """
