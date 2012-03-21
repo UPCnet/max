@@ -135,6 +135,30 @@ class User(MADBase):
         fields = {i: properties[i] for i in valid_user_fields_for_update}
         self.updateFields(fields)
 
+    def grantPermission(self, subscription, permission):
+        """
+        """
+        criteria = {}
+        criteria.update({'subscribedTo.items.urlHash':subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'_id':self._id})                 # of collection entry with _id
+
+         # Add permission to permissions array, of matched object of "items"
+        what = {'$addToSet': {'subscribedTo.items.$.permissions':permission}}
+
+        self.mdb_collection.update(criteria, what)
+
+    def revokePermission(self, subscription, permission):
+        """
+        """
+        criteria = {}
+        criteria.update({'subscribedTo.items.urlHash':subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'_id':self._id})                 # of collection entry with _id
+
+         # deletes permission from permissions array, of matched object of "items"
+        what = {'$pull': {'subscribedTo.items.$.permissions':permission}}
+
+        self.mdb_collection.update(criteria, what)
+
 
 class Context(MADBase):
     """
@@ -173,3 +197,14 @@ class Context(MADBase):
 
         ob.update(properties)
         self.update(ob)
+
+    def removeUserSubscriptions(self):
+        """
+        """
+        # update object from "items" that matches urlHash
+        criteria = {'subscribedTo.items.urlHash':self.urlHash}
+
+         # deletes context from subcription list
+        what = {'$pull': {'subscribedTo.items':{'urlHash':self.urlHash}}}
+
+        self.mdb_collection.database.users.update(criteria, what)

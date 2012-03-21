@@ -358,16 +358,6 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
         self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
 
-    # CONTEXTS
-
-    def test_add_public_context(self):
-        from hashlib import sha1
-        from .mockers import create_context
-        res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=201)
-        result = json.loads(res.text)
-        url_hash = sha1(create_context['url']).hexdigest()
-        self.assertEqual(result.get('urlHash', None), url_hash)
-
     # ADMIN
 
     def test_admin_post_activity_without_context(self):
@@ -380,14 +370,75 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None), None)
 
-    def test_context_exists(self):
+    # CONTEXTS
+
+    def test_add_public_context(self):
         from hashlib import sha1
         from .mockers import create_context
-        self.create_context(create_context)
-        res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
+
+    def test_context_exists(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.create_context(create_context)
+        res = self.testapp.get('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('urlHash', None), url_hash)
+
+    def test_delete_context(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.create_context(create_context)
+        self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
+
+    def test_deleted_context_is_really_deleted(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.create_context(create_context)
+        self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
+        res = self.testapp.get('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=400)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'ObjectNotFound')
+
+    def test_delete_only_deleted_specified_context(self):
+        from hashlib import sha1
+        from .mockers import create_context, create_contextA
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        url_hashA = sha1(create_contextA['url']).hexdigest()
+        self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
+        res = self.testapp.get('/contexts/%s' % url_hashA, "", basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('urlHash', None), url_hashA)
+
+    # def test_delete_context_removes_subscription_from_user(self):
+    #     """
+    #     """
+    #     from hashlib import sha1
+    #     from .mockers import subscribe_context, create_context
+    #     from .mockers import user_status_context
+    #     username = 'messi'
+    #     self.create_user(username)
+    #     self.create_context(create_context)
+    #     self.subscribe_user_to_context(username, subscribe_context)
+    #     self.create_activity(username, user_status_context)
+
+    #     url_hash = sha1(create_context['url']).hexdigest()
+    #     self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
+
+    #     res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+    #     result = json.loads(res.text)
+
+    #     self.assertEqual(result.get('username', None), 'messi')
+    #     self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 0)
 
     def test_add_private_rw_context(self):
         from hashlib import sha1
@@ -420,7 +471,7 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
         self.assertEqual('write' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
 
-    def test_check_permissions_on_subscribed_r_context(self):
+    def test_check_permissions_on_subscribed_write_restricted_context(self):
         from .mockers import create_context_private_r, subscribe_context
         username = 'messi'
         self.create_user(username)
@@ -432,6 +483,78 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
         self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
         self.assertEqual('write' not in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+
+    def test_post_on_subscribed_write_restricted_context_without_write_permission(self):
+        from .mockers import create_context_private_r, subscribe_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context, expect=401)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'Unauthorized')
+
+    def test_post_on_subscribed_rw_context(self):
+        from .mockers import create_context_private_rw, subscribe_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_rw)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0]['url'], user_status_context['contexts'][0])
+
+    def test_grant_write_permission_on_write_restricted_context(self):
+        from .mockers import create_context_private_r, subscribe_context
+        from hashlib import sha1
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        self.subscribe_user_to_context(username, subscribe_context)
+        urlhash = sha1(create_context_private_r['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        self.assertEqual('read' in result['permissions'], True)
+        self.assertEqual('write' in result['permissions'], True)
+
+    def test_revoke_write_permission_on_write_restricted_context(self):
+        from .mockers import create_context_private_r, subscribe_context
+        from hashlib import sha1
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        self.subscribe_user_to_context(username, subscribe_context)
+        urlhash = sha1(create_context_private_r['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=201)
+        res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual('read' in result['permissions'], True)
+        self.assertEqual('write' not in result['permissions'], True)
+
+    def test_grant_write_permission_on_non_subscribed_context(self):
+        from .mockers import create_context_private_r
+        from hashlib import sha1
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        urlhash = sha1(create_context_private_r['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=401)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'Unauthorized')
+
+    def test_grant_invalid_permission_on_subscribed_context(self):
+        from .mockers import create_context_private_r, subscribe_context
+        from hashlib import sha1
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_private_r)
+        self.subscribe_user_to_context(username, subscribe_context)
+        urlhash = sha1(create_context_private_r['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=400)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'InvalidPermission')
 
 
 def basicAuthHeader(username, password):

@@ -1,10 +1,11 @@
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
 from pyramid.response import Response
 
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
 from max.decorators import MaxRequest, MaxResponse
+from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
 
@@ -25,14 +26,21 @@ def getContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='GET')
+@view_config(route_name='context', request_method='GET', permission='operations')
 @MaxResponse
 @MaxRequest
-@oauth2(['widgetcli'])
 def getContext(context, request):
     """
     """
-    return HTTPNotImplemented()
+    mmdb = MADMaxDB(context.db)
+    urlhash = request.matchdict.get('urlHash', None)
+    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+
+    if not found_context:
+        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
+
+    handler = JSONResourceEntity(found_context[0].flatten())
+    return handler.buildResponse()
 
 
 @view_config(route_name='contexts', request_method='POST', permission='operations')
@@ -80,8 +88,91 @@ def ModifyContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='DELETE')
+@view_config(route_name='context', request_method='DELETE', permission='operations')
+@MaxResponse
+@MaxRequest
 def DeleteContext(context, request):
     """
     """
-    return HTTPNotImplemented()
+    mmdb = MADMaxDB(context.db)
+    urlhash = request.matchdict.get('urlHash', None)
+    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+
+    if not found_context:
+        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
+
+    found_context[0].delete()
+    found_context[0].removeUserSubscriptions()
+    return HTTPNoContent()
+
+
+@view_config(route_name='context_user_permission', request_method='PUT', permission='operations')
+@MaxResponse
+@MaxRequest
+def grantPermissionOnContext(context, request):
+    """
+    """
+    permission = request.matchdict.get('permission', None)
+    if permission not in ['read', 'write', 'join', 'invite']:
+        raise InvalidPermission, "There's not any permission named '%s'" % permission
+
+    urlhash = request.matchdict.get('urlHash', None)
+    subscription = None
+    pointer = 0
+    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
+        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
+            subscription = request.actor.subscribedTo['items'][pointer]
+        pointer += 1
+
+    if not subscription:
+        raise Unauthorized, "You can't set permissions on a context where you are not subscribed"
+
+    #If we reach here, we are subscribed to a context and ready to set the permission
+
+    permissions = subscription['permissions']
+    if permission in permissions:
+        #Already have the permission
+        code = 200
+    else:
+        #Assign the permission
+        code = 201
+        request.actor.grantPermission(subscription, permission)
+        permissions.append(permission)
+
+    handler = JSONResourceEntity(subscription, status_code=code)
+    return handler.buildResponse()
+
+
+@view_config(route_name='context_user_permission', request_method='DELETE', permission='operations')
+@MaxResponse
+@MaxRequest
+def revokePermissionOnContext(context, request):
+    """
+    """
+    permission = request.matchdict.get('permission', None)
+    if permission not in ['read', 'write', 'join', 'invite']:
+        raise InvalidPermission, "There's not any permission named '%s'" % permission
+
+    urlhash = request.matchdict.get('urlHash', None)
+    subscription = None
+    pointer = 0
+    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
+        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
+            subscription = request.actor.subscribedTo['items'][pointer]
+        pointer += 1
+
+    if not subscription:
+        raise Unauthorized, "You can't rempve permissions on a context where you are not subscribed"
+
+    #If we reach here, we are subscribed to a context and ready to remove the permission
+
+    code = 200
+    permissions = subscription['permissions']
+    if permission in permissions:
+        #We have the permission, let's delete it
+        request.actor.revokePermission(subscription, permission)
+        subscription['permissions'] = [a for a in permissions if permission != a]
+
+    handler = JSONResourceEntity(subscription, status_code=code)
+    return handler.buildResponse()
+
