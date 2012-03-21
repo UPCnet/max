@@ -11,18 +11,13 @@ from maxrules import config
 config.mongodb_db_name = 'tests'
 
 
-class mock_post(object):
+class mock_post_obj(object):
 
     def __init__(self, *args, **kwargs):
-        pass
-        # if '/admin/people/messi/activities' in args[1]:
-        #     self.text = args[2]
-
-    text = ""
-    status_code = 200
+        self.text = kwargs['text']
+        self.status_code = kwargs['status_code']
 
 
-@patch('requests.post', new=mock_post)
 class RulesTests(unittest.TestCase):
 
     def setUp(self):
@@ -33,6 +28,16 @@ class RulesTests(unittest.TestCase):
         self.app.registry.max_store.drop_collection('contexts')
         from webtest import TestApp
         self.testapp = TestApp(self.app)
+        self.patched = patch('requests.post', new=self.mock_post)
+        self.patched.start()
+
+    def mock_post(self, *args, **kwargs):
+        if '/admin/people/messi/activities' in args[0]:
+            # Fake the requests.post thorough the self.testapp instance, and test result later in test
+            res = self.testapp.post('/admin/people/%s/activities' % 'messi', json.dumps(args[1]), basicAuthHeader('admin', 'admin'), status=201)
+            return mock_post_obj(text=res.text, status_code=201)
+
+        return mock_post_obj(text='', status_code=200)
 
     def create_user(self, username):
         res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
@@ -60,7 +65,7 @@ class RulesTests(unittest.TestCase):
     def modify_context(self, context, properties):
         from hashlib import sha1
         url_hash = sha1(context).hexdigest()
-        res = self.testapp.put('/context/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
         return res
 
     def subscribe_user_to_context(self, username, context, expect=201):
@@ -82,12 +87,12 @@ class RulesTests(unittest.TestCase):
 
         processTweet('leomessi', 'assignatura1', 'Ehteee, acabo de batir el récor de goles en el Barça #atenea #assignatura1')
 
-        # res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
-        # result = json.loads(res.text)
-        # self.assertEqual(result.get('totalItems', None), 1)
-        # self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        # self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        # self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
 
 def basicAuthHeader(username, password):

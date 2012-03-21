@@ -9,7 +9,7 @@ from mock import patch
 
 class mock_post(object):
 
-    def __init__(*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         pass
 
     text = ""
