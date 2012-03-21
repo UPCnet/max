@@ -24,8 +24,12 @@ class StreamWatcherListener(tweepy.StreamListener):
         try:
             print self.status_wrapper.fill(status.text)
             print '\n %s  %s  via %s\n' % (status.author.screen_name, status.created_at, status.source)
-            # Filter by valid twitter usernames found in MAX users
+            # Parse text and determine the second hashtag
+            # TODO: Some reggex awesomeness here, please
+
             # Insert the new data in MAX
+            from maxrules.tasks import processTweet
+            processTweet(status.author.user_id, 'assignatura1', status.text)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
