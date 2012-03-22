@@ -54,6 +54,7 @@
                 <li><a tal:attributes="href '/profiles/'+api.authenticatedUser">Profile</a></li>
                 <li><a href="/control_panel">Setup Server</a></li>
                 <li><a href="/maintenance">Maintenance</a></li>
+                <li><a href="/explorer">DB Explorer</a></li>
                 <li class="divider"></li>
                 <li><a href="/logout">Logout</a></li>
               </ul>
@@ -85,6 +86,8 @@
 <script src="/js/libs/bootstrap/dropdown.js"></script>
 <script src="/js/libs/bootstrap/modal.js"></script>
 <script src="/js/libs/bootstrap/alert.js"></script>
+<script src="/js/libs/bootstrap/tab.js"></script>
+<script src="/js/explorer.js"></script>
 <script src="/variables.js"></script>
 <script src="/js/maxui.loader.js"></script>
 <!-- <script>
