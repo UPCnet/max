@@ -85,7 +85,7 @@ class RulesTests(unittest.TestCase):
         self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
         self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('leomessi', 'assignatura1', 'Ehteee, acabo de batir el récor de goles en el Barça #atenea #assignatura1')
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #atenea #assignatura1')
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
