@@ -65,7 +65,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -81,7 +81,7 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed contexts with read permission
-    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions',[])]
+    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
 
     # regex query to find all contexts within url
     url_regex = {'$regex': '^%s' % url}
