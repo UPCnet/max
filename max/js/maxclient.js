@@ -119,6 +119,12 @@ MaxClient.prototype.getUserTimeline = function(displayName, callback) {
     this.GET(route,callback)
 };
 
+MaxClient.prototype.getUserData = function(username, callback) {
+    route = this.ROUTES['user'].format(username);
+    this.GET(route,callback)
+};
+
+
 MaxClient.prototype.addComment = function(comment, activity, callback) {
 
     query = {

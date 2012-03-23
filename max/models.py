@@ -42,7 +42,15 @@ class Activity(MADBase):
         ob['object'] = subobject
 
         if 'contexts' in self.data:
-            ob['contexts'] = [dict(url=url, objectType='context') for url in self.data['contexts']]
+            ob['contexts'] = []
+
+            for url in self.data['contexts']:
+                subscription = self.data['actor'].getSubscriptionByURL(url)
+                context = dict(url=url,
+                               objectType='context',
+                               displayName=subscription.get('displayName', 'url')
+                               )
+                ob['contexts'].append(context)
 
         self.update(ob)
 
@@ -159,6 +167,12 @@ class User(MADBase):
         what = {'$pull': {'subscribedTo.items.$.permissions': permission}}
 
         self.mdb_collection.update(criteria, what)
+
+    def getSubscriptionByURL(self,url):
+        """
+        """
+        context_map = {context['url']: context for context in self.subscribedTo['items']}
+        return context_map.get(url)
 
 
 class Context(MADBase):

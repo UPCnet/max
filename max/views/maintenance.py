@@ -39,6 +39,10 @@ def configView(context, request):
                         for field in ['displayName']:
                             if context.get(field, None):
                                 item[field] = context[field]
+
+                #Purge subscriptions without context
+                items = [item for item in items if item.get('permissions', None)]
+
                 db.users.update({'_id': user['_id']}, {'$set': {'subscribedTo.items': items}})
 
         success = True
