@@ -65,7 +65,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-@MaxResponse
+#@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -81,7 +81,7 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed contexts with read permission
-    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions')]
+    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions',[])]
 
     # regex query to find all contexts within url
     url_regex = {'$regex': '^%s' % url}
@@ -103,9 +103,14 @@ def getActivities(context, request):
         public_query = {'contexts.url': {'$in': public}}
         contexts_query.append(public_query)                        # pubic contexts
 
-    query.update({'$or': contexts_query})
+    if contexts_query:
+        query.update({'$or': contexts_query})
+        activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
+    else:
+        # we have no public contexts and we are not subscribed to any context, so we
+        # won't get anything
+        activities = []
 
-    activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
 

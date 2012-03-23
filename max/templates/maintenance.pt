@@ -19,6 +19,14 @@
                   <button type="submit" name="form.rebuildKeywords" class="btn btn-large btn-primary">Rebuild Keywords</button>
                   </div>
                 </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="max_ops_password">Reset subscription user permissions to contexts defaults</label>
+                  <div class="controls">
+                  <button type="submit" name="form.resetPermissions" class="btn btn-large btn-primary">Reset Permissions</button>
+                  </div>
+                </div>
+
                 <div class="form-actions">
                   <button type="submit" name="form.cancelled" class="btn btn-large">Cancel</button>
                 </div>
