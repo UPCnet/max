@@ -44,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr tal:repeat="row collection.data">
+        <tr tal:repeat="row collection.data" tal:attributes="object-type collection.objectType">
           <td tal:repeat="col row" tal:content="col.value"></td>
           <td>
                <i class="icon-remove deleteItem" title="Esborrar"></i>
@@ -65,13 +65,33 @@
     <h3>Afegir Usuari</h3>
   </div>
   <div class="modal-body">
-    <p>One fine body…</p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn btn-close">Cancelar</a>
-    <a class="btn btn-primary save">Guardar</a>
-  </div>
+    <form class="form-horizontal">
+      <fieldset>
+        <div class="control-group">
+          <label class="control-label" for="username">Nom d'usuari</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" required="required" id="username">
+            <p class="help-block">Nom d'usuari per accedir al sistema</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="displayName">Nom complet</label>
+          <div class="controls">
+            <input type="text" class="input-xlarge" id="displayName">
+            <p class="help-block">Nom complet per les vistes</p>
+          </div>
+        </div>
+
+      </fieldset>
+      </form>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-close">Cancelar</a>
+        <a id="saveUser" name="saveUser" class="btn btn-primary save">Guardar</a>
+      </div>
 </div>
+
 
 <div class="modal fade addnew" id="addNewactivity">
   <div class="modal-header">
@@ -94,7 +114,6 @@
     <h3>Afegir Context</h3>
   </div>
   <div class="modal-body">
-
     <form class="form-horizontal">
       <fieldset>
         <div class="control-group">
@@ -140,30 +159,26 @@
           <div class="controls">
               Lectura
               <select class="input-medium" id="read" style="margin-right:15px;">
-                <option>Públic</option>
-                <option selected="selected">Subscripció</option>
+                <option value="public">Públic</option>
+                <option value="subscribed" selected="selected">Subscripció</option>
               </select>
               Escriptura
               <select class="input-small" id="write">
-                <option>Públic</option>
-                <option>Subscripció</option>
-                <option selected="selected">Restringit</option>
+                <option value="public">Públic</option>
+                <option value="subscribed">Subscripció</option>
+                <option value="restricted" selected="selected">Restringit</option>
               </select>
 
             <p class="help-block">Permisos d'accés i escriptura per defecte al context. Públic - tothom te el sense subscripció; Subscripció - L'usuari subscrit té el permís; Restringit  - Un administrador ha de otorgar permís a l'usuari previament subscrit.</p>
           </div>
         </div>
-
-
       </fieldset>
-    </form>
-
-
-  </div>
-  <div class="modal-footer">
-    <a class="btn btn-close">Cancelar</a>
-    <a class="btn btn-primary save">Guardar</a>
-  </div>
+      </form>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-close">Cancelar</a>
+        <a id="saveContext" name="saveContext" class="btn btn-primary save">Guardar</a>
+      </div>
 </div>
 
 

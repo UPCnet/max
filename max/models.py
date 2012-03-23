@@ -167,14 +167,14 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'url'
     schema = {
-                '_id':          dict(),
-                'url':          dict(required=1),
-                'urlHash':      dict(),
-                'displayName':  dict(operations_mutable=1),
-                'published':    dict(),
-                'twitterHashtag':    dict(operations_mutable=1),
-                'twitterUsername':    dict(operations_mutable=1),
-                'permissions':  dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
+                '_id':              dict(),
+                'url':              dict(required=1),
+                'urlHash':          dict(),
+                'displayName':      dict(operations_mutable=1),
+                'published':        dict(),
+                'twitterHashtag':   dict(operations_mutable=1),
+                'twitterUsername':  dict(operations_mutable=1),
+                'permissions':      dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
              }
 
     def buildObject(self):

@@ -102,6 +102,14 @@ create_context = {
     'displayName': 'Atenea'
 }
 
+create_context_full = {
+
+    'url': subscribe_context['object']['url'],
+    'displayName': 'Atenea',
+    'twitterHashtag': 'atenea',
+    'twitterUsername': 'atenaupc',
+}
+
 create_context_private_rw = {
 
     'url': subscribe_context['object']['url'],

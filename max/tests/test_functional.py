@@ -401,6 +401,17 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
 
+    def test_add_public_context_with_all_params(self):
+        from hashlib import sha1
+        from .mockers import create_context_full
+        res = self.testapp.post('/contexts', json.dumps(create_context_full), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        url_hash = sha1(create_context_full['url']).hexdigest()
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('displayName', None), create_context_full['displayName'])
+        self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
+        self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
+
     def test_context_exists(self):
         from hashlib import sha1
         from .mockers import create_context
