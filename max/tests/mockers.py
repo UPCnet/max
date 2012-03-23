@@ -71,40 +71,17 @@ demostatus_with_context = {
 # =============================================================================
 
 
-# Revisat i actualitzat
-subscribe_context = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/"
-    }
-}
-
-# Revisat i actualitzat
-subscribe_contextA = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/A"
-    }
-}
-
-# Revisat i actualitzat
-subscribe_contextB = {
-    "object": {
-        "objectType": "context",
-        "url": "http://atenea.upc.edu/B"
-    }
-}
-
 
 create_context = {
 
-    'url': subscribe_context['object']['url'],
-    'displayName': 'Atenea'
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
 }
+
 
 create_context_full = {
 
-    'url': subscribe_context['object']['url'],
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'twitterHashtag': 'atenea',
     'twitterUsername': 'atenaupc',
@@ -112,7 +89,7 @@ create_context_full = {
 
 create_context_private_rw = {
 
-    'url': subscribe_context['object']['url'],
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'permissions': {'read':'subscribed',
                     'write':'subscribed',
@@ -122,7 +99,7 @@ create_context_private_rw = {
 
 create_context_private_r = {
 
-    'url': subscribe_context['object']['url'],
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'permissions': {'read':'subscribed',
                     'write':'restricted',
@@ -133,14 +110,42 @@ create_context_private_r = {
 
 create_contextA = {
 
-    'url': subscribe_contextA['object']['url'],
-    'displayName': 'Atenea A'
+    'url': 'http://atenea.upc.edu/A',
+    'displayName': 'Atenea A',
 }
 
 create_contextB = {
 
-    'url': subscribe_contextB['object']['url'],
-    'displayName': 'Atenea B'
+    'url': 'http://atenea.upc.edu/B',
+    'displayName': 'Atenea B',
+}
+
+
+# Revisat i actualitzat
+subscribe_context = {
+    "object": {
+        "objectType": "context",
+        "url": create_context['url'],
+        'displayName': create_context['displayName']       #displayName not needed, only for assertEquals comparison purposes
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextA = {
+    "object": {
+        "objectType": "context",
+        "url": create_contextA['url'],
+        'displayName': create_contextA['displayName']       #displayName not needed, only for assertEquals comparison purposes
+    }
+}
+
+# Revisat i actualitzat
+subscribe_contextB = {
+    "object": {
+        "objectType": "context",
+        "url": create_contextB['url'],
+        'displayName': create_contextB['displayName']       #displayName not needed, only for assertEquals comparison purposes
+    }
 }
 
 # Un usuari crea una activitat de canvi d'estat
