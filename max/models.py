@@ -3,6 +3,7 @@ from max.rest.utils import canWriteInContexts
 import datetime
 from hashlib import sha1
 from MADMax import MADMaxDB
+from max.rest.utils import getUserIdFromTwitter
 
 
 class Activity(MADBase):
@@ -70,8 +71,8 @@ class User(MADBase):
                 'username':     dict(required=1),
                 'displayName':  dict(user_mutable=1),
                 'last_login':   dict(),
-                'following':    dict(default={'items':[]}),
-                'subscribedTo': dict(default={'items':[]}),
+                'following':    dict(default={'items': []}),
+                'subscribedTo': dict(default={'items': []}),
                 'published':    dict(),
                 'twitterUsername':    dict(user_mutable=1),
              }
@@ -139,11 +140,11 @@ class User(MADBase):
         """
         """
         criteria = {}
-        criteria.update({'subscribedTo.items.urlHash':subscription['urlHash']})   # update object from "items" that matches urlHash
-        criteria.update({'_id':self._id})                 # of collection entry with _id
+        criteria.update({'subscribedTo.items.urlHash': subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # Add permission to permissions array, of matched object of "items"
-        what = {'$addToSet': {'subscribedTo.items.$.permissions':permission}}
+        what = {'$addToSet': {'subscribedTo.items.$.permissions': permission}}
 
         self.mdb_collection.update(criteria, what)
 
@@ -151,11 +152,11 @@ class User(MADBase):
         """
         """
         criteria = {}
-        criteria.update({'subscribedTo.items.urlHash':subscription['urlHash']})   # update object from "items" that matches urlHash
-        criteria.update({'_id':self._id})                 # of collection entry with _id
+        criteria.update({'subscribedTo.items.urlHash': subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # deletes permission from permissions array, of matched object of "items"
-        what = {'$pull': {'subscribedTo.items.$.permissions':permission}}
+        what = {'$pull': {'subscribedTo.items.$.permissions': permission}}
 
         self.mdb_collection.update(criteria, what)
 
@@ -174,7 +175,8 @@ class Context(MADBase):
                 'published':        dict(),
                 'twitterHashtag':   dict(operations_mutable=1),
                 'twitterUsername':  dict(operations_mutable=1),
-                'permissions':      dict(default={'read':'public', 'write':'public', 'join':'public', 'invite':'public'}),
+                'twitterUsernameId':  dict(operations_mutable=1),
+                'permissions':      dict(default={'read': 'public', 'write': 'public', 'join': 'public', 'invite': 'public'}),
              }
 
     def buildObject(self):
@@ -196,21 +198,28 @@ class Context(MADBase):
 
         ob['urlHash'] = sha1(self.data['url']).hexdigest()
 
+        # If creating with the twitterUsername, get its Twitter ID
+        if self.data.get('twitterUsername', None):
+            ob['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
+
         ob.update(properties)
         self.update(ob)
 
     def modifyContext(self, properties):
         """Update the user object with the given properties"""
-        # Comprehension dict (Muahaha)
+        # If updating the twitterUsername, get its Twitter ID
+        if properties.get('twitterUsername', None):
+            properties['twitterUsernameId'] = getUserIdFromTwitter(properties['twitterUsername'])
+
         self.updateFields(properties)
 
     def removeUserSubscriptions(self):
         """
         """
         # update object from "items" that matches urlHash
-        criteria = {'subscribedTo.items.urlHash':self.urlHash}
+        criteria = {'subscribedTo.items.urlHash': self.urlHash}
 
          # deletes context from subcription list
-        what = {'$pull': {'subscribedTo.items':{'urlHash':self.urlHash}}}
+        what = {'$pull': {'subscribedTo.items': {'urlHash': self.urlHash}}}
 
         self.mdb_collection.database.users.update(criteria, what)

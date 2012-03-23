@@ -18,6 +18,16 @@ FIND_KEYWORDS_REGEX = r'(\s|^)#?([\wñçáéíóúàèìòùïü]+)'
 KEYWORD_MIN_LENGTH = 3
 
 
+def getUserIdFromTwitter(twitterUsername):
+
+    res = requests.get('http://api.twitter.com/users/show/%s.json' % twitterUsername)
+
+    if res.status_code == 404:
+        return None
+
+    return json.loads(res.text).get('id_str', None)
+
+
 def getUsernameFromXOAuth(request):
     """
     """

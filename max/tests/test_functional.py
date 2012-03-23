@@ -431,6 +431,18 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('urlHash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
 
+    def test_modify_context_with_twitter_username(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"}), basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
+        self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
+        self.assertEqual(result.get('twitterUsernameId', None), '526326641')
+
     def test_delete_context(self):
         from hashlib import sha1
         from .mockers import create_context

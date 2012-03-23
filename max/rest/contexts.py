@@ -182,4 +182,3 @@ def revokePermissionOnContext(context, request):
 
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
-

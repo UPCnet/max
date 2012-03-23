@@ -1,6 +1,18 @@
 Configuració
 ============
 
+Python
+------
+
+Cal definir la codificació del Python que estem utilitzant per defecte::
+
+    $ vi /var/pyramid/python2.7/lib/python2.7/sitecustomize.py
+
+Afegir a aquest arxiu::
+
+    import sys
+    sys.setdefaultencoding('utf-8')
+
 RabbitMQ
 --------
 

@@ -56,11 +56,11 @@ Creació d'elements nous
 
 Per afegir una entitat a un recurs concret, ens podem trobar dos casos, depenent del recurs. Ens podem trobar que necessitem indicar el paràmetre que es convertira en l'identificador únic de l'entitat, o que el sistema ja el generi automàticament i per tant no ens calgui proporcionar-lo. En ambdos casos, per afegir entitats a un recurs, sempre utilitzarem el mètode POST, per exemple::
 
-    POST /users/mindundi
+    POST /people/mindundi
 
 Ens afegirà l'usuari mindundi al recurs. Per altra banda::
 
-    POST /users/mindundi/activities
+    POST /people/mindundi/activities
 
 Ens afegirà una activitat, generant l'identificador automàticament. En la documentació detallada de cada recurs, especifica quin cas aplica per cada un, i quins paràmetres i/o estructures de dades se li han de proporcionar.
 
@@ -71,7 +71,7 @@ Les URI's per accedir a un element concret d'un recurs, coincidiran amb la sinta
 
 D'aquesta manera fent::
 
-    GET /users/mindundi
+    GET /people/mindundi
 
 Obtenim  l'usuari mindundi que en la secció anterior haviem creat. La URI és la mateixa, els paràmetres els mateixos (en aquest cas no n'hi han), només canvia el mètode HTTP usat.
 
@@ -84,10 +84,9 @@ Els serveis també accepten pas de paràmentres en el format 'application/form-u
 
 Per estructures complexes amb més d'un nivell utilitzarem sempre JSON, mentre que per llistes de paràmetres clau=valor, podem utilitzar el tradicional 'application/form-url-encoded'
 
-Per paràmetres que representen llistes de valors i que s'han de passar via GET, hem d'assegurar que el format en que es genera la llista de paràmentres compleixi el bàsic de HTTP, ja que hi han multiples convencions de com fer-ho. Per exemple:
+Per paràmetres que representen llistes de valors i que s'han de passar via GET, hem d'assegurar que el format en que es genera la llista de paràmentres compleixi el bàsic de HTTP, ja que hi han multiples convencions de com fer-ho.
 
-    Si tenim el camp 'context' que té 2 valors 'A' i 'B', els paràmetres de la petició
-    han repetir la clau 'context' tantes vegades com valors hi hagi::
+Per exemple, si tenim el camp 'context' que té 2 valors 'A' i 'B', els paràmetres de la petició han repetir la clau 'context' tantes vegades com valors hi hagi::
 
     ?context=A&context=B
 
@@ -98,11 +97,11 @@ Hi a alguns casos en que un recurs te més d'una possible URI, majoritàriament 
 
 Per Afegir una activitat::
 
-    POST /users/mindundi/activities
+    POST /people/mindundi/activities
 
 Pasant el contingut de l'activitat amb una estructura JSON. Aquesta activitat, tot i haver-la creat nosaltres, es pot donar el cas que algú que ens estigui seguint vulgui compartir aquesta activitat. Supsant que la activitat creada tingues un nom "activitat1", seguint la sintaxis del rest, podem accedir a la activitat a través de ::
 
-    GET /users/mindundi/activities/activitat1
+    GET /people/mindundi/activities/activitat1
 
 Tot i així si el que volem es compartir l'activitat amb algú altre, no te sentit indicar qui és el creador de l'activitat, ja que totes les activitats estan a la mateixa "saca". Podem accedir a la activitat de la següent manera::
 

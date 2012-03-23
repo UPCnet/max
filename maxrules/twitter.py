@@ -4,7 +4,8 @@ import sys
 import optparse
 #from getpass import getpass
 from textwrap import TextWrapper
-
+import pymongo
+from max.MADMax import MADMaxCollection
 import tweepy
 
 # CONFIG
@@ -26,7 +27,7 @@ class StreamWatcherListener(tweepy.StreamListener):
             print '\n %s  %s  via %s\n' % (status.author.screen_name, status.created_at, status.source)
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
-            processTweet(status.author.user_id, status.text)
+            processTweet.delay(status.author.screen_name, status.text)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
@@ -55,6 +56,16 @@ class MaxTwitterRulesRunner(object):
                       type='string',
                       action='append',
                       help=('Twitter password'))
+    parser.add_option('-d', '--mongodb-url',
+                      dest='mongodb_url',
+                      type='string',
+                      action='append',
+                      help=('Twitter password'))
+    parser.add_option('-n', '--mongodb-name',
+                      dest='mongodb_db_name',
+                      type='string',
+                      action='append',
+                      help=('Twitter password'))
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -70,19 +81,22 @@ class MaxTwitterRulesRunner(object):
         auth = tweepy.auth.BasicAuthHandler(self.options.username[0], self.options.password[0])
         stream = tweepy.Stream(auth, StreamWatcherListener(), timeout=None)
 
-        follow_list = ""
-        track_list = "#ateneaupc, "
-
         #follow_list = raw_input('Users to follow (comma separated): ').strip()
         #track_list = raw_input('Keywords to track (comma seperated):').strip()
-        if follow_list:
-            follow_list = [u for u in follow_list.split(',')]
-        else:
-            follow_list = None
-        if track_list:
-            track_list = [k for k in track_list.split(',')]
-        else:
-            track_list = None
+
+        # Querying the BBDD for users to follow.
+        conn = pymongo.Connection(self.options.mongodb_url[0])
+        db = conn[self.options.mongodb_db_name[0]]
+        contexts_with_twitter_username = db.contexts.find({"twitterUsernameId": {"$exists": True}})
+        follow_list = [users_to_follow.get('twitterUsernameId') for users_to_follow in contexts_with_twitter_username]
+        contexts_with_twitter_username.rewind()
+        readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
+
+        # Hardcoded global hashtag(s)
+        track_list = ['#upc', ]
+
+        print "Listening to this Twitter hashtags: %s" % str(track_list)
+        print "Listening to this Twitter userIds: %s" % str(readable_follow_list)
 
         stream.filter(follow=follow_list, track=track_list)
 
