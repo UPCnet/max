@@ -291,7 +291,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
-    def test_post_activity_with_public_context(self):
+    def test_post_activity_with_public_context(self):    
         """ Post an activity to a context which allows everyone to read and write
         """
         from .mockers import subscribe_context, create_context
@@ -305,7 +305,24 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])        
+
+    def test_post_activity_with_generator(self):
+        """ Post an activity to a context which allows everyone to read and write
+        """
+        from .mockers import subscribe_context, create_context
+        from .mockers import user_status_context_generator
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context_generator)
+
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('generator', None), user_status_context_generator['generator'])
 
     def test_post_activity_with_private_read_write_context(self):
         """ Post an activity to a context which needs the user to be subscribed to read and write

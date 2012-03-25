@@ -7,6 +7,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from max.resources import Root, loadMAXSettings
 from max.rest.resources import RESOURCES
 
+DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', join='public', invite='public')
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.

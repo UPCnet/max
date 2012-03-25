@@ -167,6 +167,19 @@ user_status_context = {
     },
 }
 
+
+user_status_context_generator = {
+    "contexts": [
+        subscribe_context['object']['url']
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+    "generator": "Twitter"
+}
+
+
 user_status_contextA = {
     "contexts": [
         subscribe_contextA['object']['url']

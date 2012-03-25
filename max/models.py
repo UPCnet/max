@@ -4,7 +4,7 @@ import datetime
 from hashlib import sha1
 from MADMax import MADMaxDB
 from max.rest.utils import getUserIdFromTwitter
-
+from max import DEFAULT_CONTEXT_PERMISSIONS
 
 class Activity(MADBase):
     """
@@ -40,6 +40,11 @@ class Activity(MADBase):
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
+
+        if 'generator' in self.data:
+            ob['generator'] = self.data['generator']
+
+
 
         if 'contexts' in self.data:
             ob['contexts'] = []
@@ -123,9 +128,9 @@ class User(MADBase):
         user_permissions = ['read']
 
         #Set other permissions based on context defaults
-        if permissions['write'] in ['subscribed', 'public']:
+        if permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
             user_permissions.append('write')
-        if permissions['invite'] in ['subscribed']:
+        if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
             user_permissions.append('invite')
 
         #Assign permissions to the subscription object before adding it
@@ -190,7 +195,10 @@ class Context(MADBase):
                 'twitterHashtag':   dict(operations_mutable=1),
                 'twitterUsername':  dict(operations_mutable=1),
                 'twitterUsernameId':  dict(operations_mutable=1),
-                'permissions':      dict(default={'read': 'public', 'write': 'public', 'join': 'public', 'invite': 'public'}),
+                'permissions':      dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'], 
+                                                  'write': DEFAULT_CONTEXT_PERMISSIONS['write'], 
+                                                  'join': DEFAULT_CONTEXT_PERMISSIONS['join'], 
+                                                  'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']}),
              }
 
     def buildObject(self):
