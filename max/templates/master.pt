@@ -74,7 +74,14 @@
 
     <hr>
     <footer>
-      <p>&copy; Powered by: Equip de gestió de continguts - UPCnet 2012</p>
+      <div class="row">
+        <div class="span6 offset3">
+          <img src="/static/PoweredMongoDBbeige50.png" /> &nbsp; <img src="/static/pyramid.png" />
+        </div>
+        <div class="span6 offset3">
+          <p>&copy; 2011-2012 - Powered by: e-knowledge Team - UPCnet, SLU</p>
+        </div>
+      </div>
     </footer>
   </div> <!--! end of #container -->
 

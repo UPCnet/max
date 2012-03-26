@@ -1,7 +1,7 @@
 Instal·lació
 ============
 
-En aquest apartat s’indiquen totes les passes per tal de posar en marxa una instància de tota la pila de software i serveis necessaris per al funcionament d’una instància del projecte Arts Combinatòries.
+En aquest apartat s’indiquen totes les passes per tal de posar en marxa una instància de tota la pila de software i serveis necessaris per al funcionament d’una instància del servei MAX.
 
 Requisits
 ---------
@@ -11,7 +11,7 @@ Cal satisfer una sèrie de requisits previs que es detallen a continuació.
 Sistema operatiu
 ----------------
 
-Actualment, degut a limitacions tecnològiques, el entorn del projecte només pot executar-se sobre màquines \*nix. En aquests documents suposarem una màquina basada en una distribució Ubuntu Linux 11.04 (Natty).
+Actualment, degut a limitacions tecnològiques, el entorn del projecte només pot executar-se sobre màquines \*nix. En aquests documents suposarem una màquina basada en una distribució Ubuntu Linux 11.04 (Natty). Per la instal·lació per altres distribucions cal substituïr els noms dels paquets pels corresponents a la distribució d'instal·lació.
 
 Software base i llibreries:
 

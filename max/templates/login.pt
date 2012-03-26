@@ -3,9 +3,9 @@
 <head></head>
 <body>
   <metal:main fill-slot="main">
-    
+
     <div class="row">
-        <div class="span6 offset4">
+        <div class="span6 offset3">
           <div id="login">
             <form class="form-horizontal" action="${url}" method="post">
               <fieldset>
@@ -27,7 +27,7 @@
                 <div class="form-actions">
                   <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Log In</button>
                 </div>
-                <input type="hidden" name="came_from" value="${came_from}"/>              
+                <input type="hidden" name="came_from" value="${came_from}"/>
                 <div tal:replace="message"/>
               </fieldset>
             </form>
