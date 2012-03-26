@@ -96,10 +96,10 @@ def searchParams(request):
     if hashtags:
         params['hashtag'] = [hasht.lower() for hasht in hashtags]
 
-    keywords = request.params.get('text')
+    keywords = request.params.getall('keyword')
     if keywords:
         ### XXX Split or regex?
-        params['keywords'] = [keyw.lower() for keyw in keywords.split()]
+        params['keywords'] = [keyw.lower() for keyw in keywords]
 
     return params
 
