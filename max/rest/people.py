@@ -70,7 +70,7 @@ def addUser(context, request):
 def getUserAvatar(context, request):
     """
     """
-    AVATAR_FOLDER = '/var/pyramid/max/avatars'
+    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
     filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, username)) and username or 'missing'
     data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()

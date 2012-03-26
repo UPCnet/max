@@ -24,8 +24,8 @@ window._MAXUI.onReady = function() {
            'maxServerURL' : window._MAXUI.server,
            'maxServerURLAlias' : '',
            'avatarURLpattern' : '',
-           'contextFilter': [],
-           'activitySource': 'timeline'
+           'readContext': "http://max.upc.edu",
+           'activitySource': 'activities'
            }
 
     $('#activityStream').maxUI(settings)

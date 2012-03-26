@@ -26,7 +26,7 @@ def getMAXSettings(request):
 def loadMAXSettings(settings, config):
     db = config.registry.max_store
     max_ini_settings = {key.replace('max.', 'max_'): settings[key] for key in settings.keys() if 'max' in key}
-    if asbool(max_ini_settings.get('max.enforce_settings')) == True:
+    if asbool(max_ini_settings.get('max_enforce_settings')) == True:
         # Enforce ini settings
         return max_ini_settings
     else:
