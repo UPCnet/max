@@ -77,9 +77,11 @@ def MaxRequest(func):
         # (Except in the case of a new users explained 10 lines up)
         # Define a callable to prepare the actor in order to inject it in the request
         def getActor(request):
-            if actor:
+            try:
                 actor.setdefault('displayName', actor['username'])
-            return actor
+                return actor
+            except:
+                return None
 
         request.set_property(getActor, name='actor', reify=True)
 
