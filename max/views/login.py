@@ -1,37 +1,34 @@
 # -*- coding: utf-8 -*-
 from pyramid.httpexceptions import HTTPFound
 
+from pyramid.view import view_config
 from pyramid.url import resource_url
+from pyramid.view import forbidden_view_config
 from pyramid.interfaces import IAuthenticationPolicy
 
 from pyramid.security import forget
 
-from urlparse import urljoin
-
 import datetime
 
+from max.rest.resources import RESOURCES
+from max.exceptions import JSONHTTPUnauthorized
 from max.views.api import TemplateAPI
 import requests
 import json
 
 
-def _fixup_came_from(request, came_from):
-    if came_from is None:
-        return request.application_url
-    came_from = urljoin(request.application_url, came_from)
-    if came_from.endswith('login'):
-        came_from = came_from[:-len('login')]
-    elif came_from.endswith('logout'):
-        came_from = came_from[:-len('logout')]
-    return came_from
-
-
+@view_config(name='login', renderer='max:templates/login.pt')
+@forbidden_view_config(renderer='max:templates/login.pt')
 def login(context, request):
+    """ The login view - pyramid_who enabled with the forbidden view logic.
+    """
     page_title = "MAX Server Login"
     api = TemplateAPI(context, request, page_title)
 
-    # came_from on the fridge
-    # came_from = _fixup_came_from(request, request.POST.get('came_from'))
+    # Catch unauthorized requests and answer with an JSON error if it is a REST service.
+    # Otherwise, show the login form.
+    if getattr(request.matched_route, 'name', None) in RESOURCES:
+        return JSONHTTPUnauthorized(error=dict(error='RestrictedService', error_description="You don't have permission to access this service"))
 
     login_url = resource_url(request.context, request, 'login')
     referrer = request.url
@@ -123,6 +120,7 @@ def login(context, request):
     return response
 
 
+@view_config(name='logout')
 def logout(request):
     headers = forget(request)
     return HTTPFound(location=request.resource_url(request.context), headers=headers)
