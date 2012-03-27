@@ -35,7 +35,8 @@ def login(context, request):
     if referrer == login_url:
         referrer = '/'  # never use the login form itself as came_from
 
-    reason = ''
+    came_from = request.params.get('came_from', referrer)
+    message = ''
     login = ''
     password = ''
 
@@ -44,12 +45,19 @@ def login(context, request):
         policy = request.registry.queryUtility(IAuthenticationPolicy)
         authapi = policy._getAPI(request)
 
-        #challenge_qs = {'came_from': came_from}
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
-        if login is None or password is None:
-            return HTTPFound(location='%s/login' % api.application_url)
+
+        if login is u'' or password is u'':
+            return dict(
+                    message='You need to suply an username and a password.',
+                    url=api.application_url + '/login',
+                    came_from=came_from,
+                    login=login,
+                    password=password,
+                    api=api
+                    )
 
         credentials = {'login': login, 'password': password}
 
@@ -57,12 +65,10 @@ def login(context, request):
 
         # if not successful, try again
         if not userid:
-            #challenge_qs['reason'] = reason
-
             return dict(
-                    message=reason,
+                    message='Login failed. Please try again.',
                     url=api.application_url + '/login',
-#                    came_from=came_from,
+                    came_from=came_from,
                     login=login,
                     password=password,
                     api=api
@@ -106,18 +112,17 @@ def login(context, request):
 
         request.session['oauth_token'] = oauth_token
 
-        return HTTPFound(headers=headers, location=api.application_url)
+        # Finally, return the authenticated view
+        return HTTPFound(headers=headers, location=came_from)
 
-    response = dict(
-            message=reason,
+    return dict(
+            message=message,
             url=api.application_url + '/login',
-            # came_from=came_from,
+            came_from=came_from,
             login=login,
             password=password,
             api=api
             )
-
-    return response
 
 
 @view_config(name='logout')

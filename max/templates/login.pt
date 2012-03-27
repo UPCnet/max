@@ -10,6 +10,10 @@
             <form class="form-horizontal" action="${url}" method="post">
               <fieldset>
                 <legend>Login Form</legend>
+                <div tal:condition="message" class="alert alert-error">
+                  <a class="close" data-dismiss="alert">×</a>
+                  <h4 class="alert-heading" tal:content="message">Login error</h4>
+                </div>
                 <div class="control-group">
                   <label class="control-label" for="user_login">Username</label>
                   <div class="controls">
@@ -27,8 +31,7 @@
                 <div class="form-actions">
                   <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Log In</button>
                 </div>
-
-                <div tal:replace="message"/>
+                <input type="hidden" name="came_from" value="${came_from}"/>
               </fieldset>
             </form>
           </div>
