@@ -49,5 +49,14 @@ class TemplateAPI(object):
 
     errorMessage = property(getErrorMessage, setErrorMessage)
 
-    def getAppURL(self):
-        return self.request.application_url
+    @property
+    def application_url(self):
+        app_url = self.request.application_url
+        vh = self.getVirtualHost()
+        if vh:
+            return vh
+        else:
+            return app_url
+
+    def getVirtualHost(self):
+        return self.request.headers.get('X-Virtual-Host-Uri', None)

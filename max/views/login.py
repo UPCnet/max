@@ -27,11 +27,11 @@ def _fixup_came_from(request, came_from):
 
 
 def login(context, request):
-
     page_title = "MAX Server Login"
     api = TemplateAPI(context, request, page_title)
 
-    came_from = _fixup_came_from(request, request.POST.get('came_from'))
+    # came_from on the fridge
+    # came_from = _fixup_came_from(request, request.POST.get('came_from'))
 
     login_url = resource_url(request.context, request, 'login')
     referrer = request.url
@@ -47,27 +47,25 @@ def login(context, request):
         policy = request.registry.queryUtility(IAuthenticationPolicy)
         authapi = policy._getAPI(request)
 
-        challenge_qs = {'came_from': came_from}
+        #challenge_qs = {'came_from': came_from}
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
         if login is None or password is None:
-            return HTTPFound(location='%s/login?'
-                                        % request.application_url)
+            return HTTPFound(location='%s/login' % api.application_url)
+
         credentials = {'login': login, 'password': password}
 
         userid, headers = authapi.login(credentials)
 
         # if not successful, try again
         if not userid:
-            challenge_qs['reason'] = reason
-            # return HTTPFound(location='%s/login?%s'
-            #                  % (request.application_url,
-            #                     urlencode(challenge_qs, doseq=True)))
+            #challenge_qs['reason'] = reason
+
             return dict(
                     message=reason,
-                    url=request.application_url + '/login',
-                    came_from=came_from,
+                    url=api.application_url + '/login',
+#                    came_from=came_from,
                     login=login,
                     password=password,
                     api=api
@@ -110,12 +108,13 @@ def login(context, request):
         oauth_token = response.get("oauth_token")
 
         request.session['oauth_token'] = oauth_token
-        return HTTPFound(headers=headers, location=came_from)
+
+        return HTTPFound(headers=headers, location=api.application_url)
 
     response = dict(
             message=reason,
-            url=request.application_url + '/login',
-            came_from=came_from,
+            url=api.application_url + '/login',
+            # came_from=came_from,
             login=login,
             password=password,
             api=api
@@ -126,5 +125,4 @@ def login(context, request):
 
 def logout(request):
     headers = forget(request)
-    return HTTPFound(location=request.resource_url(request.context),
-                     headers=headers)
+    return HTTPFound(location=request.resource_url(request.context), headers=headers)

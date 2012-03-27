@@ -27,7 +27,7 @@
                 <div class="form-actions">
                   <button type="submit" name="form.submitted" class="btn btn-large btn-primary">Log In</button>
                 </div>
-                <input type="hidden" name="came_from" value="${came_from}"/>
+
                 <div tal:replace="message"/>
               </fieldset>
             </form>
