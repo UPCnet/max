@@ -9,6 +9,7 @@ from max.exceptions import MissingField, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams, canReadContext
+import re
 
 
 @view_config(route_name='user_activities', request_method='GET')
@@ -86,8 +87,8 @@ def getActivities(context, request):
     # regex query to find all contexts within url
     rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
     url = rcontext.url
-    escaped = url.replace('?','\?')
-    url_regex = {'$regex': '^%s' % escaped
+    escaped = re.escape(url)
+    url_regex = {'$regex': '^%s' % escaped}
 
     # search all contexts with public read permissions within url
     query = {'permissions.read': 'public', 'url': url_regex}
