@@ -9,6 +9,7 @@ from max.exceptions import MissingField, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams, canReadContext
+import re
 
 
 @view_config(route_name='user_activities', request_method='GET')
@@ -74,8 +75,8 @@ def getActivities(context, request):
 
          Retorna all activities, optionaly filtered by context
     """
-    url = request.params.get('context', None)
-    if not url:
+    urlhash = request.params.get('context', None)
+    if not urlhash:
         raise MissingField, 'You have to specify one context'
 
     mmdb = MADMaxDB(context.db)
@@ -84,7 +85,10 @@ def getActivities(context, request):
     subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
 
     # regex query to find all contexts within url
-    url_regex = {'$regex': '^%s' % url}
+    rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
+    url = rcontext.url
+    escaped = re.escape(url)
+    url_regex = {'$regex': '^%s' % escaped}
 
     # search all contexts with public read permissions within url
     query = {'permissions.read': 'public', 'url': url_regex}
@@ -116,8 +120,8 @@ def getActivities(context, request):
 
 
 @view_config(route_name='activity', request_method='GET')
-#@MaxResponse
-#@MaxRequest
+@MaxResponse
+@MaxRequest
 def getActivity(context, request):
     """
          /activities/{activity}
