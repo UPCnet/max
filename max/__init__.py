@@ -7,7 +7,10 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from max.resources import Root, loadMAXSettings
 from max.rest.resources import RESOURCES
 
+import pymongo
+
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', join='public', invite='public')
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -30,21 +33,12 @@ def main(global_config, **settings):
     config.add_static_view('less', 'max:less')
     config.add_static_view('js', 'max:js')
     config.add_static_view('fonts', 'max:static/fonts')
-    config.add_route('login', '/login')
-    config.add_route('logout', '/logout')
-    config.add_view('max.views.login.login', route_name='login',
-                     renderer='max:templates/login.pt')
-    config.add_view('max.views.login.logout', route_name='logout')
-    config.add_view('max.views.login.login',
-                    context='pyramid.httpexceptions.HTTPForbidden',
-                    renderer='max:templates/login.pt')
 
     config.add_route('profiles', '/profiles/{username}')
     config.add_route('wadl', '/WADL')
 
     # Store in registry
     db_uri = settings['mongodb.url']
-    import pymongo
     conn = pymongo.Connection(db_uri)
     db = conn[settings['mongodb.db_name']]
     config.registry.max_store = db
@@ -54,7 +48,6 @@ def main(global_config, **settings):
 
     # REST Resources
     # Configure routes based on resources defined in RESOURCES
-
     for name, properties in RESOURCES.items():
         config.add_route(name, properties.get('route'))
 
