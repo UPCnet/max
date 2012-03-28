@@ -86,7 +86,8 @@ def getActivities(context, request):
     # regex query to find all contexts within url
     rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
     url = rcontext.url
-    url_regex = {'$regex': '^%s' % url}
+    escaped = url.replace('?','\?')
+    url_regex = {'$regex': '^%s' % escaped
 
     # search all contexts with public read permissions within url
     query = {'permissions.read': 'public', 'url': url_regex}
@@ -118,8 +119,8 @@ def getActivities(context, request):
 
 
 @view_config(route_name='activity', request_method='GET')
-#@MaxResponse
-#@MaxRequest
+@MaxResponse
+@MaxRequest
 def getActivity(context, request):
     """
          /activities/{activity}
