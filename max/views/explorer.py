@@ -34,13 +34,13 @@ def addNew(context, request):
                       twitterUsername=request.params.get('twitterUsername'),
                       permissions=dict(read=request.params.get('read', 'public'), write=request.params.get('write', 'public')),
                    )
-            req = requests.post('%s/contexts' % api.getAppURL(), data=json.dumps(data), auth=('operations', 'operations'))
+            req = requests.post('%s/contexts' % api.application_url, data=json.dumps(data), auth=('operations', 'operations'))
 
         if objectType == 'user':
             data = dict(
                       displayName=request.params.get('displayName'),
                    )
-            req = requests.post('%s/people/%s' % (api.getAppURL(), request.params.get('username')), data=json.dumps(data), auth=('operations', 'operations'))
+            req = requests.post('%s/people/%s' % (api.application_url, request.params.get('username')), data=json.dumps(data), auth=('operations', 'operations'))
 
         if req.status_code in [200, 201]:
             return HTTPOk()
@@ -105,7 +105,7 @@ def explorerView(context, request):
                   ]
 
     return dict(api=api,
-                url='%s/explorer' % api.getAppURL(),
+                url='%s/explorer' % api.application_url,
                 success=success,
                 message=message,
                 db=collections,
