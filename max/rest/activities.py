@@ -74,8 +74,8 @@ def getActivities(context, request):
 
          Retorna all activities, optionaly filtered by context
     """
-    url = request.params.get('context', None)
-    if not url:
+    urlhash = request.params.get('context', None)
+    if not urlhash:
         raise MissingField, 'You have to specify one context'
 
     mmdb = MADMaxDB(context.db)
@@ -84,6 +84,8 @@ def getActivities(context, request):
     subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
 
     # regex query to find all contexts within url
+    rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
+    url = rcontext.url
     url_regex = {'$regex': '^%s' % url}
 
     # search all contexts with public read permissions within url
