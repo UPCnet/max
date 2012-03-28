@@ -52,6 +52,13 @@ Instal·lació de Erlang i llibreries::
 
     $ sudo apt-get install erlang xsltproc zip
 
+Instal·lació de llibreries accés LDAP
+-------------------------------------
+
+És necessari les últimes llibreries de OpenLDAP de les distribucions corresponents, en cas d'Ubuntu::
+
+    $ apt-get install libsasl2-dev libldap2-dev libssl-dev
+
 Instal·lació de MAX
 --------------------
 

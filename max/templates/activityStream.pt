@@ -6,11 +6,6 @@
 
 <!--    <div metal:use-macro="api.snippets.macros['statusMessage']"/>-->
     <div class="row">
-        <div class="span5 offset3">
-            <h1>Activity Stream</h1>
-        </div>
-    </div>
-    <div class="row">
         <div class="span5 offset3" id="activityStream">
         </div>
     </div>

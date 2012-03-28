@@ -22,6 +22,7 @@ import json
 def login(context, request):
     """ The login view - pyramid_who enabled with the forbidden view logic.
     """
+
     page_title = "MAX Server Login"
     api = TemplateAPI(context, request, page_title)
 
