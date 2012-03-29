@@ -39,7 +39,7 @@ def js_variables(context, request):
 
     variables = {'username': username,
                 'token': request.session.get('oauth_token'),
-                'server': config.get('max_max_server'),
+                'server': config.get('max_server'),
                 'grant': config.get('oauth_grant_type'),
 
     }
