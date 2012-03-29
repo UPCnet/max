@@ -41,7 +41,7 @@ def configView(context, request):
     return dict(api=api, url='%s/control_panel' % api.application_url,
                 oauth_check_endpoint=config.get('max_oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),
                 oauth_grant_type=config.get('max_oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE),
-                max_server=config.get('max_max_server', DEFAULT_MAX_SERVER),
+                max_server=config.get('max_server', DEFAULT_MAX_SERVER),
                 max_ops_username=config.get('max_max_ops_username', DEFAULT_MAX_USERNAME),
                 max_ops_password=config.get('max_max_ops_password', DEFAULT_MAX_PASSWORD),
                 success=success
