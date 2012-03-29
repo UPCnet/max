@@ -66,7 +66,7 @@ def addUserActivity(context, request):
 
 
 @view_config(route_name='activities', request_method='GET')
-@MaxResponse
+#@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def getActivities(context, request):
@@ -84,9 +84,11 @@ def getActivities(context, request):
     # subscribed contexts with read permission
     subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
 
-    # regex query to find all contexts within url
+    # get the defined read context
     rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
     url = rcontext.url
+
+    # regex query to find all contexts within url
     escaped = re.escape(url)
     url_regex = {'$regex': '^%s' % escaped}
 
@@ -115,7 +117,8 @@ def getActivities(context, request):
         # won't get anything
         activities = []
 
-    handler = JSONResourceRoot(activities)
+    # pass the read context as a extension to the resource
+    handler = JSONResourceRoot(activities, extension=dict(context=rcontext.flatten()))
     return handler.buildResponse()
 
 
