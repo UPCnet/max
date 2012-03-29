@@ -11,9 +11,9 @@
 #maxui-preload {height:0px;}
 .activities .maxui-activity {border-top: 1px #fff solid;border-bottom: 1px #ccc solid;width:100%;float:left;padding:8px 0;padding-left:0; min-height:51px;}
 
-#maxui-timeline  .wrapper {}
+#maxui-timeline .wrapper {}
 
-#maxui-newactivity {padding:10px; position:relative; background: #f2f2f2 url(../static/bgact.gif) 0 0 repeat;}
+#maxui-newactivity {padding:10px; position:relative; background: #f2f2f2 url('https://max.upc.edu/maxui/bgact.gif') 0 0 repeat;}
 #maxui-newactivity:after {content: "";display: block;height: 0;clear: both;}
 
 #maxui-newactivity textarea, .maxui-comments textarea {
@@ -86,7 +86,7 @@ text-shadow: 0 1px #fff;
 #maxui-more-activities input.maxui-button:hover, #maxui-more-activities input.maxui-button:hover, #maxui-more-activities input.maxui-button:focus, #maxui-more-activities input.maxui-button:focus {border:1px solid #999; background: #f2f2f2; cursor:pointer; color:#005ea0; box-shadow:0 1px 5px rgba(0,0,0,.1);}
 #maxui-more-activities input.maxui-button:active, #maxui-more-activities input.maxui-button:active {background: #e5e5e5;filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e5e5e5', endColorstr='#f2f2f2'); /* for IE */background: -webkit-gradient(linear, left top, left bottom, from(#e5e5e5), to(#f2f2f2)); /* for webkit browsers */background: -moz-linear-gradient(top,  #e5e5e5,  #f2f2f2); /* for firefox 3.6+ */ color:#666;}
 
-input.maxui-button[disabled] {border:1px solid #b2b2b2; background:#e5e5e5; color:#666; text-shadow:0 1px #fff;  box-shadow:none; cursor: default; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e5e5e5', endColorstr='#f2f2f2');}
+input.maxui-button[disabled] {-webkit-appearance: none;border:1px solid #b2b2b2; background:#e5e5e5; color:#666; text-shadow:0 1px #fff;  box-shadow:none; cursor: default; filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e5e5e5', endColorstr='#f2f2f2'); border-radius:3px;}
 
 
 #maxui-timeline {clear:both;margin:0;overflow: hidden; padding:0 10px; background:#fff;}
@@ -133,10 +133,10 @@ display:inline;
 margin-left: 56px;
 padding-right:10px;
 }
-.maxui-origin {color:#6e6e6e; font-size:11px;}
+.maxui-origin {color:#6e6e6e; font-size:11px; background:url('https://max.upc.edu/maxui/maxcomm.png') 0 -77px no-repeat; padding-left:10px;}
 .maxui-actions a.maxui-commentaction {
 font-size:12px;
-background: url('../static/maxcomm.png') no-repeat 0 2px;
+background: url('https://max.upc.edu/maxui/maxcomm.png') no-repeat 0 2px;
 color:#007bc0;
 text-decoration:none;
 padding-left:18px;
@@ -223,6 +223,7 @@ opacity:.8; filter: alpha(opacity=80);
 position: relative;
 top: 3px;
 }
+#maxui-search-filters .maxui-filter .close img{width:14px; height:15px; margin:0;}
 #maxui-search-filters .maxui-filter .close:hover {opacity:1; filter: alpha(opacity=100);}
 
 #maxui-search-text {
@@ -266,9 +267,11 @@ font-size: 13px;line-height: 20px;
 	.maxui-avatar img {float: left;	}
 	.maxui-comments .maxui-avatar {margin-top:5px; position: absolute;left: -41px; top:0;}
 
-#maxui-search a img {width:14px; height:8px; background: url(../static/maxcomm.png) 2px -60px no-repeat; margin:8px 0px; opacity:.8;  filter: alpha(opacity=80);}
+#maxui-search a img {width:14px; height:8px; background: url('https://max.upc.edu/maxui/maxcomm.png') 2px -60px no-repeat; margin:8px 5px 0; opacity:.8;  filter: alpha(opacity=80);}
 #maxui-search.folded a img {background-position: 2px -40px;}
 #maxui-search a img:hover {opacity:1;  filter: alpha(opacity=100);}
+#maxui-search a.maxui-disabled img {background-position: 2px -100px; }
+#maxui-search a.maxui-disabled {cursor:default;}
 
 img { -ms-interpolation-mode: bicubic; image-rendering: optimizeQuality;}
 
@@ -292,3 +295,16 @@ img { -ms-interpolation-mode: bicubic; image-rendering: optimizeQuality;}
 	box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 0 8px rgba(0,123,192,.5) !important;
  }
 
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+	only screen and (-o-min-device-pixel-ratio: 3/2),
+	only screen and (min--moz-device-pixel-ratio: 1.5),
+	only screen and (min-device-pixel-ratio: 1.5) {
+		#maxui-search .obretanca, .maxui-actions a.maxui-commentaction, .maxui-origin
+			{	background-image:url('https://max.upc.edu/maxui/maxcomm@2x.png');
+				-moz-background-size: 12px 120px;
+				-o-background-size: 12px 120px;
+				-webkit-background-size: 12px 120px;
+				background-size: 12px 120px;
+			}
+}
+html { -webkit-text-size-adjust:none; }
