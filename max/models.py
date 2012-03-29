@@ -6,6 +6,7 @@ from MADMax import MADMaxDB
 from max.rest.utils import getUserIdFromTwitter
 from max import DEFAULT_CONTEXT_PERMISSIONS
 
+
 class Activity(MADBase):
     """
         An activitystrea.ms Activity object representation
@@ -43,8 +44,6 @@ class Activity(MADBase):
 
         if 'generator' in self.data:
             ob['generator'] = self.data['generator']
-
-
 
         if 'contexts' in self.data:
             ob['contexts'] = []
@@ -121,21 +120,7 @@ class User(MADBase):
             Adds a comment to an existing activity
         """
         #XXX TODO Check authentication method, and if is oauth, check if user can auto join the context.
-        subscription = context.flatten()
-        permissions = subscription['permissions']
-
-        #If we are subscribing the user, read permission is granted
-        user_permissions = ['read']
-
-        #Set other permissions based on context defaults
-        if permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
-            user_permissions.append('write')
-        if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
-            user_permissions.append('invite')
-
-        #Assign permissions to the subscription object before adding it
-        subscription['permissions'] = user_permissions
-
+        subscription = context.prepareUserSubscription()
         self.addToList('subscribedTo', subscription, safe=False)
 
     def removeSubscription(self, url):
@@ -173,7 +158,7 @@ class User(MADBase):
 
         self.mdb_collection.update(criteria, what)
 
-    def getSubscriptionByURL(self,url):
+    def getSubscriptionByURL(self, url):
         """
         """
         context_map = {context['url']: context for context in self.subscribedTo['items']}
@@ -195,9 +180,9 @@ class Context(MADBase):
                 'twitterHashtag':   dict(operations_mutable=1),
                 'twitterUsername':  dict(operations_mutable=1),
                 'twitterUsernameId':  dict(operations_mutable=1),
-                'permissions':      dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'], 
-                                                  'write': DEFAULT_CONTEXT_PERMISSIONS['write'], 
-                                                  'join': DEFAULT_CONTEXT_PERMISSIONS['join'], 
+                'permissions':      dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
+                                                  'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
+                                                  'join': DEFAULT_CONTEXT_PERMISSIONS['join'],
                                                   'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']}),
              }
 
@@ -234,6 +219,45 @@ class Context(MADBase):
             properties['twitterUsernameId'] = getUserIdFromTwitter(properties['twitterUsername'])
 
         self.updateFields(properties)
+
+    def subscribedUsers(self):
+        """
+        """
+        criteria = {'subscribedTo.items.urlHash': self.urlHash}
+        subscribed_users = self.mdb_collection.database.users.find(criteria)
+        return [user for user in subscribed_users]
+
+    def prepareUserSubscription(self):
+        """
+        """
+        subscription = self.flatten()
+        permissions = subscription['permissions']
+
+        #If we are subscribing the user, read permission is granted
+        user_permissions = ['read']
+
+        #Set other permissions based on context defaults
+        if permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
+            user_permissions.append('write')
+        if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
+            user_permissions.append('invite')
+
+        #Assign permissions to the subscription object before adding it
+        subscription['permissions'] = user_permissions
+        return subscription
+
+    def updateUsersSubscriptions(self):
+        """
+        """
+        # XXX TODO For now only updates displayName
+        ids = [user['_id'] for user in self.subscribedUsers()]
+
+        for obid in ids:
+            criteria = {'_id': obid, 'subscribedTo.items.urlHash': self.urlHash}
+
+                 # deletes context from subcription list
+            what = {'$set': {'subscribedTo.items.$.displayName': self.displayName}}
+            self.mdb_collection.database.users.update(criteria, what)
 
     def removeUserSubscriptions(self):
         """

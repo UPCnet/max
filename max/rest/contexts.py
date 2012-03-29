@@ -89,8 +89,8 @@ def ModifyContext(context, request):
     properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None)}
 
     maxcontext.modifyContext(properties)
-
     maxcontext = contexts.getItemsByurlHash(urlHash)[0]
+    maxcontext.updateUsersSubscriptions()
     handler = JSONResourceEntity(maxcontext.flatten())
     return handler.buildResponse()
 
@@ -169,7 +169,7 @@ def revokePermissionOnContext(context, request):
         pointer += 1
 
     if not subscription:
-        raise Unauthorized, "You can't rempve permissions on a context where you are not subscribed"
+        raise Unauthorized, "You can't remove permissions on a context where you are not subscribed"
 
     #If we reach here, we are subscribed to a context and ready to remove the permission
 

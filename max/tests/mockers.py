@@ -1,3 +1,4 @@
+from hashlib import sha1
 # -*- coding: utf-8 -*-
 # ===============================================================
 # Format com deurien estar guardades les dades a la base de dades
@@ -212,12 +213,11 @@ user_status_contextAB = {
 }
 
 context_query = {
-    "context": subscribe_context['object']['url']
+    "context": sha1(subscribe_context['object']['url']).hexdigest()
 }
 
 context_queryA = {
-    "contexts": subscribe_contextA['object']['url']
-}
+"context": sha1(subscribe_contextA['object']['url']).hexdigest()}
 
 
 # Un usuari crea un comentari
