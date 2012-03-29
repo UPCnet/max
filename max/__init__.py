@@ -33,6 +33,7 @@ def main(global_config, **settings):
     config.add_static_view('less', 'max:less')
     config.add_static_view('js', 'max:js')
     config.add_static_view('fonts', 'max:static/fonts')
+    config.add_static_view('maxui', 'max:maxui')
 
     config.add_route('profiles', '/profiles/{username}')
     config.add_route('wadl', '/WADL')
