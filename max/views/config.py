@@ -27,7 +27,7 @@ def configView(context, request):
     if request.params.get('form.submitted', None) is not None:
         config['max_oauth_check_endpoint'] = request.POST.get('oauth_check_endpoint')
         config['max_oauth_grant_type'] = request.POST.get('oauth_grant_type')
-        config['max_max_server'] = request.POST.get('max_server')
+        config['max_server'] = request.POST.get('max_server')
         config['max_max_ops_username'] = request.POST.get('max_ops_username')
         config['max_max_ops_password'] = request.POST.get('max_ops_password')
 
