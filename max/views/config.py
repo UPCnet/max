@@ -38,7 +38,7 @@ def configView(context, request):
     if request.params.get('form.cancelled', None) is not None:
         return HTTPFound(request.application_url)
 
-    return dict(api=api, url=api.application_url,
+    return dict(api=api, url='%s/control_panel' % api.application_url,
                 oauth_check_endpoint=config.get('max_oauth_check_endpoint', DEFAULT_OAUTH_CHECK_ENDPOINT),
                 oauth_grant_type=config.get('max_oauth_grant_type', DEFAULT_OAUTH_GRANT_TYPE),
                 max_server=config.get('max_max_server', DEFAULT_MAX_SERVER),
