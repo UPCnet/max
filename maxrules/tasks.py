@@ -1,11 +1,12 @@
 from celery.task import task
-from maxrules.twitter import twitter_generator_name
+from maxrules.twitter import twitter_generator_name, debug_hashtag
 import requests
 import pymongo
 from maxrules.config import mongodb_url, mongodb_db_name
 from max.MADMax import MADMaxCollection
 from max.rest.utils import canWriteInContexts
 from max.rest.utils import findHashtags
+import logging
 
 
 @task
@@ -17,6 +18,13 @@ def processTweet(twitter_username, content):
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)
 
+    # Parse text and determine the second or nth hashtag
+    possible_hastags = findHashtags(content)
+    query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
+
+    if debug_hashtag in possible_hastags:
+        return "Debug hastagh detected!"
+
     # Check if twitter_username is a registered for a valid MAX username
     # if not, discard it
     maxuser = users.getItemsBytwitterUsername(twitter_username)
@@ -24,10 +32,6 @@ def processTweet(twitter_username, content):
         maxuser = maxuser[0]
     else:
         return "Discarding %s tweet: Not such MAX user" % twitter_username
-
-    # Parse text and determine the second or nth hashtag
-    possible_hastags = findHashtags(content)
-    query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
 
     # Check if hashtag is registered for a valid MAX context
     # if not, discard it

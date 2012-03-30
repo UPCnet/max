@@ -5,15 +5,17 @@ import optparse
 #from getpass import getpass
 from textwrap import TextWrapper
 import pymongo
-from max.MADMax import MADMaxCollection
 import tweepy
+
+import logging
 
 # CONFIG
 twitter_generator_name = 'Twitter'
+debug_hashtag = 'debugmaxupcnet'
 
 
 def main(argv=sys.argv, quiet=False):
-    command = MaxTwitterRulesRunner(argv, quiet)
+    command = MaxTwitterRulesRunnerTest(argv, quiet)
     return command.run()
 
 
@@ -23,8 +25,8 @@ class StreamWatcherListener(tweepy.StreamListener):
 
     def on_status(self, status):
         try:
-            print self.status_wrapper.fill(status.text)
-            print '\n %s  %s  via %s\n' % (status.author.screen_name, status.created_at, status.source)
+            logging.warning(self.status_wrapper.fill(status.text))
+            logging.warning('\n %s  %s  via %s\n\n' % (status.author.screen_name, status.created_at, status.source))
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
             processTweet.delay(status.author.screen_name, status.text)
@@ -34,11 +36,11 @@ class StreamWatcherListener(tweepy.StreamListener):
             pass
 
     def on_error(self, status_code):
-        print 'An error has occured! Status code = %s' % status_code
+        logging.error('An error has occured! Status code = %s' % status_code)
         return True  # keep stream alive
 
     def on_timeout(self):
-        print 'Snoozing Zzzzzz'
+        logging.warning('Snoozing Zzzzzz')
 
 
 class MaxTwitterRulesRunner(object):
@@ -73,7 +75,7 @@ class MaxTwitterRulesRunner(object):
 
     def run(self):
         if not self.options.username or not self.options.password:
-            self.out('You must provide a valid username and password.')
+            logging.error('You must provide a valid username and password.')
             return 2
         # Prompt for login credentials and setup stream object
         #username = raw_input('Twitter username: ')
@@ -93,19 +95,55 @@ class MaxTwitterRulesRunner(object):
         readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
 
         # Hardcoded global hashtag(s)
-        track_list = ['#upc', ]
+        track_list = ['#upc', debug_hashtag]
 
-        print "Listening to this Twitter hashtags: %s" % str(track_list)
-        print "Listening to this Twitter userIds: %s" % str(readable_follow_list)
+        logging.warning("Listening to this Twitter hashtags: %s" % str(track_list))
+        logging.warning("Listening to this Twitter userIds: %s" % str(readable_follow_list))
 
         stream.filter(follow=follow_list, track=track_list)
 
-    def out(self, msg):  # pragma: no cover
-        if not self.quiet:
-            print(msg)
+
+# For testing purposes only
+class MaxTwitterRulesRunnerTest(object):
+    verbosity = 1  # required
+    description = "Max rules runner."
+    usage = "usage: %prog [options]"
+    parser = optparse.OptionParser(usage, description=description)
+    parser.add_option('-u', '--twitter-username',
+                      dest='username',
+                      type='string',
+                      action='append',
+                      help=("Twitter username"))
+    parser.add_option('-p', '--twitter-password',
+                      dest='password',
+                      type='string',
+                      action='append',
+                      help=('Twitter password'))
+    parser.add_option('-d', '--mongodb-url',
+                      dest='mongodb_url',
+                      type='string',
+                      action='append',
+                      help=('Twitter password'))
+    parser.add_option('-n', '--mongodb-name',
+                      dest='mongodb_db_name',
+                      type='string',
+                      action='append',
+                      help=('Twitter password'))
+
+    def __init__(self, argv, quiet=False):
+        self.quiet = quiet
+        self.options, self.args = self.parser.parse_args(argv[1:])
+        logging.warning("Running first time!")
+
+    def run(self):
+        while True:
+            import time
+            time.sleep(2)
+            from maxrules.tasks import processTweet
+            processTweet.delay('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf')
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print '\nGoodbye!'
+        logging.warning('\nGoodbye!')
