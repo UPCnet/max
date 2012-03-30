@@ -10,12 +10,14 @@ import tweepy
 import logging
 
 # CONFIG
+max_server_url = 'https://max.upc.edu'
 twitter_generator_name = 'Twitter'
 debug_hashtag = 'debugmaxupcnet'
 
 
 def main(argv=sys.argv, quiet=False):
-    command = MaxTwitterRulesRunnerTest(argv, quiet)
+    #command = MaxTwitterRulesRunnerTest(argv, quiet)
+    command = MaxTwitterRulesRunner(argv, quiet)
     return command.run()
 
 
@@ -29,7 +31,7 @@ class StreamWatcherListener(tweepy.StreamListener):
             logging.warning('\n %s  %s  via %s\n\n' % (status.author.screen_name, status.created_at, status.source))
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
-            processTweet.delay(status.author.screen_name, status.text)
+            processTweet.delay(status.author.screen_name.lower(), status.text)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
