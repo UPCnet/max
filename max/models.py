@@ -177,8 +177,13 @@ class Context(MADBase):
                 'urlHash':          dict(),
                 'displayName':      dict(operations_mutable=1),
                 'published':        dict(),
-                'twitterHashtag':   dict(operations_mutable=1),
-                'twitterUsername':  dict(operations_mutable=1),
+                'twitterHashtag':   dict(operations_mutable=1,
+                                         formatters=['stripHashtag'],
+                                        ),
+                'twitterUsername':  dict(operations_mutable=1,
+                                         formatters=['stripAtSign'],
+                                       ),
+
                 'twitterUsernameId':  dict(operations_mutable=1),
                 'permissions':      dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
                                                   'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
@@ -204,6 +209,8 @@ class Context(MADBase):
                 properties[key] = default
 
         ob['urlHash'] = sha1(self.data['url']).hexdigest()
+
+
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
