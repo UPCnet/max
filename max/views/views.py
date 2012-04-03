@@ -1,23 +1,20 @@
 from pyramid.view import view_config
 from pyramid.renderers import render_to_response
-from pyramid.security import authenticated_userid
 from pyramid.response import Response
 
 import requests
 from urllib2 import urlparse
 
 from max.resources import Root
-from max.views.api import TemplateAPI
 from max.rest.services import WADL
 
 
-@view_config(context=Root, renderer='max:templates/activityStream.pt', permission='restricted')
+@view_config(context=Root)
 def rootView(context, request):
 
-    username = authenticated_userid(request)
-    page_title = "%s's Activity Stream" % username
-    api = TemplateAPI(context, request, page_title)
-    return dict(api=api)
+    message = 'I am a max server'
+    response = Response(message)
+    return response
 
 
 @view_config(route_name="wadl", context=Root)
@@ -29,21 +26,6 @@ def WADLView(context, request):
                               request=request)
     response.content_type = 'application/xml'
     return response
-
-
-@view_config(name='variables.js', context=Root, renderer='max:templates/js_variables.js.pt', permission='restricted')
-def js_variables(context, request):
-
-    username = authenticated_userid(request)
-    config = context.db.config.find_one()
-
-    variables = {'username': username,
-                'token': request.session.get('oauth_token'),
-                'server': config.get('max_server'),
-                'grant': config.get('oauth_grant_type'),
-
-    }
-    return dict(variables=variables)
 
 
 @view_config(name='makeRequest', context=Root)
