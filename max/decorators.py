@@ -1,4 +1,4 @@
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError
 from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest
 from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
@@ -116,7 +116,8 @@ def MaxResponse(fun):
             return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=message.value))
         except InvalidPermission, message:
             return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=message.value))
-
+        except ValidationError, message:
+            return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=message.value))
 
         # JSON decode error????
         except ValueError:
