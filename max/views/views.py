@@ -1,6 +1,7 @@
 from pyramid.view import view_config
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
+from pyramid.view import forbidden_view_config
 
 import requests
 from urllib2 import urlparse
@@ -44,3 +45,13 @@ def makeRequest(context, request):
     response.headers.update(resp.headers)
     print 'finished'
     return response
+
+
+@forbidden_view_config()
+def forbidden(request):
+    """
+        Catch unauthorized requests and answer with an JSON error if is a REST service,
+        and redirect to login form otherwise.
+    """
+
+    return JSONHTTPUnauthorized(error=dict(error='RestrictedService', error_description="You don't have permission to access this service"))
