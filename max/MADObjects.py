@@ -71,6 +71,25 @@ class MADDict(dict):
                 return False
         return True
 
+    def applyFormatters(self):
+        """
+        """
+        for fieldname in self.schema:
+
+            # Check formatters if fieldname in current data
+            if fieldname in self.data:
+                formatters = self.schema.get(fieldname).get('formatters', [])
+                for formatter_name in formatters:
+                    formatter = getattr(sys.modules['max.formatters'], formatter_name, None)
+                    if formatter:
+                        try:
+                            self.data[fieldname] = formatter(self.data.get(fieldname))
+                        except:
+                            # Fails silently if a formatter explodes
+                            pass
+
+        return True
+
     def validate(self):
         """
             Checks if all the required schema fields (required=1) are present in
@@ -138,7 +157,9 @@ class MADBase(MADDict):
             # Since we are building from a request,
             # overwrite actor with the validated one from the request in source
             self.data['actor'] = source.actor
+
             self.validate()
+            self.applyFormatters()
 
             #check if the object we pretend to create already exists
             existing_object = self.alreadyExists()

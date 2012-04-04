@@ -178,11 +178,11 @@ class Context(MADBase):
                 'displayName':      dict(operations_mutable=1),
                 'published':        dict(),
                 'twitterHashtag':   dict(operations_mutable=1,
-                                         formatters=['stripHashtag'],
+                                         formatters=['stripHash'],
                                          validators=['isValidHashtag'],
                                         ),
                 'twitterUsername':  dict(operations_mutable=1,
-                                         formatters=['stripAtSign'],
+                                         formatters=['stripTwitterUsername'],
                                          validators=['isValidTwitterUsername'],
                                        ),
 
