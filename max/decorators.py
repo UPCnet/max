@@ -15,8 +15,8 @@ def MaxRequest(func):
 
         actor = None
         mmdb = MADMaxDB(context.db)
-
-        allowed_ws_without_username = [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
+        admin_ws = [('admin_users', 'GET'), ('admin_activities', 'GET'), ('admin_contexts', 'GET'), ('admin_user', 'DELETE'), ('admin_activity', 'DELETE'), ('admin_context', 'DELETE')]
+        allowed_ws_without_username = admin_ws + [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
         allowed_ws_without_actor = [('user', 'POST')] + allowed_ws_without_username
 
         # If Oauth authorization is used, The actor that will perform the actions will be

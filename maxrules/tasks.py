@@ -1,11 +1,13 @@
 from celery.task import task
-from maxrules.twitter import twitter_generator_name
+from maxrules.twitter import twitter_generator_name, debug_hashtag, max_server_url
 import requests
 import pymongo
 from maxrules.config import mongodb_url, mongodb_db_name
 from max.MADMax import MADMaxCollection
 from max.rest.utils import canWriteInContexts
 from max.rest.utils import findHashtags
+import json
+import logging
 
 
 @task
@@ -17,17 +19,20 @@ def processTweet(twitter_username, content):
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)
 
+    # Parse text and determine the second or nth hashtag
+    possible_hastags = findHashtags(content)
+    query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
+
+    if debug_hashtag in possible_hastags:
+        return "Debug hastagh detected! %s" % content
+
     # Check if twitter_username is a registered for a valid MAX username
     # if not, discard it
-    maxuser = users.getItemsBytwitterUsername(twitter_username)
+    maxuser = users.search({"twitterUsername": twitter_username})
     if maxuser:
         maxuser = maxuser[0]
     else:
         return "Discarding %s tweet: Not such MAX user" % twitter_username
-
-    # Parse text and determine the second or nth hashtag
-    possible_hastags = findHashtags(content)
-    query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
 
     # Check if hashtag is registered for a valid MAX context
     # if not, discard it
@@ -59,10 +64,10 @@ def processTweet(twitter_username, content):
             # Use the restricted REST endpoint for create a new activity in the specified
             # MAX context in name of the specified MAX username
 
-            re = requests.post('https://localhost/admin/people/%s/activities' % maxuser.username, newactivity, auth=('admin', 'admin'), verify=False)
-
+            re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+            if re.status_code == 201:
+                return "Successful tweet insertion from user %s in context %s" % (maxuser, maxcontext)
+            else:
+                return "Error accessing the MAX API at %s" % max_server_url
     else:
         return "Discarding %s tweet: Not such MAX context" % maxuser.username
-
-
-    return "Successful tweet insertion from user %s in context %s" % (maxuser, maxcontext)
