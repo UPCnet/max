@@ -179,9 +179,11 @@ class Context(MADBase):
                 'published':        dict(),
                 'twitterHashtag':   dict(operations_mutable=1,
                                          formatters=['stripHashtag'],
+                                         validators=['isValidHashtag'],
                                         ),
                 'twitterUsername':  dict(operations_mutable=1,
                                          formatters=['stripAtSign'],
+                                         validators=['isValidTwitterUsername'],
                                        ),
 
                 'twitterUsernameId':  dict(operations_mutable=1),
