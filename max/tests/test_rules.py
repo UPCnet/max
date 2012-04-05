@@ -34,7 +34,7 @@ class RulesTests(unittest.TestCase):
     def mock_post(self, *args, **kwargs):
         if '/admin/people/messi/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
-            res = self.testapp.post('/admin/people/%s/activities' % 'messi', json.dumps(args[1]), basicAuthHeader('admin', 'admin'), status=201)
+            res = self.testapp.post('/admin/people/%s/activities' % 'messi', args[1], basicAuthHeader('admin', 'admin'), status=201)
             return mock_post_obj(text=res.text, status_code=201)
 
         return mock_post_obj(text='', status_code=200)
