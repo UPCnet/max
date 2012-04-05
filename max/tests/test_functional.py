@@ -408,6 +408,33 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None), None)
 
+    def test_admin_post_activity_with_context(self):
+        from .mockers import subscribe_context
+        from .mockers import user_status_context
+        from .mockers import create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.testapp.post('/admin/people/%s/activities' % username, json.dumps(user_status_context), basicAuthHeader('admin', 'admin'))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
+    def test_admin_post_activity_with_context_as_actor(self):
+        from .mockers import subscribe_context
+        from .mockers import user_status_context
+        from .mockers import create_context
+        from hashlib import sha1
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.post('/admin/contexts/%s/activities' % url_hash, json.dumps(user_status_context), basicAuthHeader('admin', 'admin'))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('urlHash', None), url_hash)
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
     # CONTEXTS
 
     def test_add_public_context(self):

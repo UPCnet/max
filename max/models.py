@@ -29,15 +29,25 @@ class Activity(MADBase):
             Updates the dict content with the activity structure,
             with data parsed from the request
         """
+        isPerson = isinstance(self.data['actor'], User)
+        isContext = isinstance(self.data['actor'], Context)
+
+        # XXX Assuming here we won't support any other type as actor
+        actorType = isPerson and 'person' or 'context'
         ob = {'actor': {
-                    'objectType': 'person',
+                    'objectType': actorType,
                     '_id': self.data['actor']['_id'],
-                    'username': self.data['actor']['username'],
                     'displayName': self.data['actor']['displayName'],
                     },
                 'verb': self.data['verb'],
                 'object': None,
                 }
+        if isPerson:
+            ob['actor']['username'] = self.data['actor']['username']
+        elif isContext:
+            ob['actor']['urlHash'] = self.data['actor']['urlHash']
+            ob['actor']['url'] = self.data['actor']['url']
+
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
@@ -46,16 +56,25 @@ class Activity(MADBase):
             ob['generator'] = self.data['generator']
 
         if 'contexts' in self.data:
-            ob['contexts'] = []
-
-            for url in self.data['contexts']:
-                subscription = self.data['actor'].getSubscriptionByURL(url)
-                context = dict(url=url,
-                               objectType='context',
-                               displayName=subscription.get('displayName', 'url')
-                               )
-                ob['contexts'].append(context)
-
+            if isPerson:
+                # When a person posts an activity it can be targeted
+                # to mulitple contexts. here we construct the basic info
+                # of each context and store them in contexts key
+                ob['contexts'] = []
+                for url in self.data['contexts']:
+                    subscription = self.data['actor'].getSubscriptionByURL(url)
+                    context = dict(url=url,
+                                   objectType='context',
+                                   displayName=subscription.get('displayName', subscription.get('url'))
+                                   )
+                    ob['contexts'].append(context)
+            if isContext:
+                # When a context posts an activity it can be posted only
+                # to itself, so add it directly
+                    ob['contexts'] = [dict(url=self.data['actor']['url'],
+                                   objectType='context',
+                                   displayName=self.data['actor']['displayName'],
+                                   )]
         self.update(ob)
 
     def addComment(self, comment):
@@ -67,8 +86,14 @@ class Activity(MADBase):
     def _validate(self):
         """
             Perform custom validations on the Activity Object
+
+            * If the actor is a person, check wether can write in all contexts
+            * If the actor is a context, check if the context is the same
         """
-        result = canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
+        if isinstance(self.data['actor'], User):
+            result = canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
+        if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
+            result = self.data['actor']['url'] == self.data.get('contexts')[0]
         return result
 
 
@@ -211,8 +236,6 @@ class Context(MADBase):
                 properties[key] = default
 
         ob['urlHash'] = sha1(self.data['url']).hexdigest()
-
-
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):

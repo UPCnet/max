@@ -5,7 +5,8 @@ from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
 from max.resources import Root
 from max.rest.resources import RESOURCES
-from max.rest.utils import isOauth, isBasic, getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody
+from max.rest.utils import isOauth, isBasic, getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
+from max.models import User, Context
 
 
 def MaxRequest(func):
@@ -23,7 +24,6 @@ def MaxRequest(func):
         # the one specified in oauth headers, so for routes that match username
         # parameter in the URI, we only allow this username to be the same as oauth username
         # for validation purposes. Same thing from actor defined in post request body
-
         if isOauth(request):
             oauth_username = getUsernameFromXOAuth(request)
             rest_username = getUsernameFromURI(request)
@@ -45,6 +45,7 @@ def MaxRequest(func):
         # impersonating him. We will search for this username in several places:
 
         elif isBasic(request):
+            actorType = 'person'
             #Try to get the username from the REST URI
             username = getUsernameFromURI(request)
             #Try to get the username from the POST body
@@ -52,22 +53,35 @@ def MaxRequest(func):
                 username = getUsernameFromPOSTBody(request)
 
             # If no actor specified anywhere, raise an error
-            # except when adding or modifying a context
+            # except when allowed not having a username
+            # or when adding a context activity
             if not username:
-                if not ((request.matched_route.name, request.method) in allowed_ws_without_username):
+                if (request.matched_route.name, request.method) == ('admin_context_activities', 'POST'):
+                    contexthash = getUrlHashFromURI(request)
+                    actorType = 'context'
+                elif not ((request.matched_route.name, request.method) in allowed_ws_without_username):
                     raise UnknownUserError, 'No user specified as actor'
-            #try to load the oauth User from DB
-            try:
-                actor = mmdb.users.getItemsByusername(username)[0]
-            except:
-                # Raise only if we are NOT adding a user or a context. These are the only cases
-                # Were we permit not specifing an ator:
-                #   - Creating a user, beacause the user doesn't exists
-                #   - Creating a context, because context is actor-agnostic
-                #   - Getting a context, because context is actor-agnostic
 
-                if not ((request.matched_route.name, request.method) in allowed_ws_without_actor):
-                    raise UnknownUserError, 'Unknown user: %s' % username
+            # Raise only if we are NOT adding a user or a context. These are the only cases
+            # Were we permit not specifing an ator:
+            #   - Creating a user, beacause the user doesn't exists
+            #   - Creating a context, because context is actor-agnostic
+            #   - Getting a context, because context is actor-agnostic
+
+            #try to load the user actor from DB
+            if actorType == 'person':
+                try:
+                    actor = mmdb.users.getItemsByusername(username)[0]
+                except:
+                    if not ((request.matched_route.name, request.method) in allowed_ws_without_actor):
+                        raise UnknownUserError, 'Unknown actor identified by username: %s' % username
+
+            #try to load the context actor from DB
+            if actorType == 'context':
+                try:
+                    actor = mmdb.contexts.getItemsByurlHash(contexthash)[0]
+                except:
+                    raise UnknownUserError, 'Unknown actor identified by context : %s' % contexthash
 
         # Raise an error if no authentication present
         else:
@@ -78,7 +92,10 @@ def MaxRequest(func):
         # Define a callable to prepare the actor in order to inject it in the request
         def getActor(request):
             try:
-                actor.setdefault('displayName', actor['username'])
+                if isinstance(actor, User):
+                    actor.setdefault('displayName', actor['username'])
+                if isinstance(actor, Context):
+                    actor.setdefault('displayName', actor['url'])
                 return actor
             except:
                 return None

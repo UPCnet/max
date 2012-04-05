@@ -176,22 +176,6 @@ class MADBase(MADDict):
             self.mdb_collection = collection
             self.update(source)
 
-    def getActorFromDB(self):
-        """
-            If a 'actor' object is present in the received params, search for the user
-            record on the DB and set it as actor. Also provides the user object with default
-            displayName if not set.
-        """
-        if 'actor' in self.data:
-            if '_id' not in self.data['actor'].keys():
-                user_username = self.data['actor']['username']
-                user = self.mdb_collection.database.users.find_one({'username': user_username})
-                if user != None:
-                    user.setdefault('displayName', user['username'])
-                    self.data['actor'] = user
-                else:
-                    raise UnknownUserError, 'Unknown user "%s"' % user_username
-
     def insert(self):
         """
             Inserts the item into his defined collection and returns its _id

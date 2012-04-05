@@ -10,6 +10,7 @@ class ASObject(MADDict):
     """
     data = {}
     schema = {}
+    objectType = ''
 
     def __init__(self, data):
         """
@@ -24,6 +25,7 @@ class Note(ASObject):
         An activitystrea.ms Note Object
     """
     data = {}
+    objectType = 'Note'
     schema = {
                 '_id':           dict(),
                 'content':       dict(required=1),
@@ -50,6 +52,7 @@ class Comment(ASObject):
         An activitystrea.ms Comment Object
     """
     data = {}
+    objectType = 'Comment'
     schema = {
                 '_id':         dict(),
                 'content':     dict(required=1),
@@ -75,6 +78,7 @@ class Context(ASObject):
         An Max Context Object
     """
     data = {}
+    objectType = 'Context'
     schema = {
                 '_id':         dict(),
                 'url':         dict(required=1),
@@ -94,6 +98,7 @@ class Person(ASObject):
         An Max Context Object
     """
     data = {}
+    objectType = 'Person'
     schema = {
                 '_id':         dict(),
                 'username':    dict(required=1),

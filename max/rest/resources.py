@@ -30,6 +30,7 @@ OAUTH_RESOURCES = {
 
 ADMIN_RESOURCES = {
 'admin_user_activities': {'route': '/admin/people/{username}/activities'},
+'admin_context_activities': {'route': '/admin/contexts/{urlHash}/activities'},
 'admin_users': {'route': '/admin/people'},
 'admin_activities': {'route': '/admin/activities'},
 'admin_contexts': {'route': '/admin/contexts'},
