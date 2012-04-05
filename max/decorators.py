@@ -1,4 +1,4 @@
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError
 from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest
 from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
@@ -15,8 +15,8 @@ def MaxRequest(func):
 
         actor = None
         mmdb = MADMaxDB(context.db)
-
-        allowed_ws_without_username = [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
+        admin_ws = [('admin_users', 'GET'), ('admin_activities', 'GET'), ('admin_contexts', 'GET'), ('admin_user', 'DELETE'), ('admin_activity', 'DELETE'), ('admin_context', 'DELETE')]
+        allowed_ws_without_username = admin_ws + [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
         allowed_ws_without_actor = [('user', 'POST')] + allowed_ws_without_username
 
         # If Oauth authorization is used, The actor that will perform the actions will be
@@ -116,7 +116,8 @@ def MaxResponse(fun):
             return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=message.value))
         except InvalidPermission, message:
             return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=message.value))
-
+        except ValidationError, message:
+            return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=message.value))
 
         # JSON decode error????
         except ValueError:

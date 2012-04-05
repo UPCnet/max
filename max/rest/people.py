@@ -12,19 +12,6 @@ from max.oauth2 import oauth2
 from max.rest.utils import extractPostData
 
 
-@view_config(route_name='users', request_method='GET')
-@MaxResponse
-@MaxRequest
-@oauth2(['widgetcli'])
-def getUsers(context, request):
-    """
-    """
-    mmdb = MADMaxDB(context.db)
-    users = mmdb.users.dump(flatten=1)
-    handler = JSONResourceRoot(users)
-    return handler.buildResponse()
-
-
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
 @MaxRequest

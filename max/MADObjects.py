@@ -1,5 +1,5 @@
 from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError
+from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError, ValidationError
 import datetime
 from pyramid.request import Request
 import sys
@@ -71,6 +71,25 @@ class MADDict(dict):
                 return False
         return True
 
+    def applyFormatters(self):
+        """
+        """
+        for fieldname in self.schema:
+
+            # Check formatters if fieldname in current data
+            if fieldname in self.data:
+                formatters = self.schema.get(fieldname).get('formatters', [])
+                for formatter_name in formatters:
+                    formatter = getattr(sys.modules['max.formatters'], formatter_name, None)
+                    if formatter:
+                        try:
+                            self.data[fieldname] = formatter(self.data.get(fieldname))
+                        except:
+                            # Fails silently if a formatter explodes
+                            pass
+
+        return True
+
     def validate(self):
         """
             Checks if all the required schema fields (required=1) are present in
@@ -78,9 +97,21 @@ class MADDict(dict):
             Executes custom validations if present
         """
         for fieldname in self.schema:
+            # Check required
             if self.schema.get(fieldname).get('required', 0):
                 if not self.checkParameterExists(fieldname):
                     raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+
+            # Check validators if fieldname in current data
+            if fieldname in self.data:
+                validators = self.schema.get(fieldname).get('validators', [])
+                for validator_name in validators:
+                    validator = getattr(sys.modules['max.validators'], validator_name, None)
+                    if validator:
+                        success, message = validator(self.data.get(fieldname))
+                        if success == False:
+                            raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+
         self._validate()
         return True
 
@@ -126,7 +157,9 @@ class MADBase(MADDict):
             # Since we are building from a request,
             # overwrite actor with the validated one from the request in source
             self.data['actor'] = source.actor
+
             self.validate()
+            self.applyFormatters()
 
             #check if the object we pretend to create already exists
             existing_object = self.alreadyExists()
