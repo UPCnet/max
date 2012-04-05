@@ -2,6 +2,7 @@ from pyramid.view import view_config
 from pyramid.renderers import render_to_response
 from pyramid.response import Response
 from pyramid.view import forbidden_view_config
+from max.exceptions import JSONHTTPUnauthorized
 
 import requests
 from urllib2 import urlparse
