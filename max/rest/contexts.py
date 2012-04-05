@@ -11,6 +11,8 @@ import os
 
 from max.oauth2 import oauth2
 from max.rest.utils import extractPostData
+import requests
+import json
 
 
 @view_config(route_name='context', request_method='GET', permission='operations')
@@ -28,6 +30,26 @@ def getContext(context, request):
 
     handler = JSONResourceEntity(found_context[0].flatten())
     return handler.buildResponse()
+
+
+@view_config(route_name='context_avatar', request_method='GET')
+def getContextAvatar(context, request):
+    """
+    """
+    urlHash = request.matchdict['urlHash']
+    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
+
+    if not os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, urlHash)):
+        req = requests.get('https://api.twitter.com/users/show/sunbit.json')
+        data = json.loads(req.text)
+        image_url = data['profile_image_url_https']
+        req = requests.get(image_url)
+        open('%s/%s.jpg' % (AVATAR_FOLDER, urlHash), 'w').write(req.content)
+    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, urlHash)) and urlHash or 'missing'
+    data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
+    image = Response(data, status_int=200)
+    image.content_type = 'image/jpeg'
+    return image
 
 
 @view_config(route_name='contexts', request_method='POST', permission='operations')

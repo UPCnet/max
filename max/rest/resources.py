@@ -23,6 +23,7 @@ OAUTH_RESOURCES = {
 
 'contexts': {'route': '/contexts'},
 'context': {'route': '/contexts/{urlHash}'},
+'context_avatar': {'route': '/contexts/{urlHash}/avatar'},
 'context_permissions': {'route': '/contexts/{urlHash}/permissions'},
 'context_user_permissions': {'route': '/contexts/{urlHash}/permissions/{username}'},
 'context_user_permission': {'route': '/contexts/{urlHash}/permissions/{username}/{permission}'},

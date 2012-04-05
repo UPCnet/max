@@ -11,7 +11,7 @@ from max.exceptions import ObjectNotFound
 
 @view_config(route_name='admin_context_activities', request_method='POST', permission='admin')
 @view_config(route_name='admin_user_activities', request_method='POST', permission='admin')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 def addAdminUserActivity(context, request):
     """
