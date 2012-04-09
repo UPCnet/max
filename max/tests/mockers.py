@@ -216,6 +216,12 @@ context_query = {
     "context": sha1(subscribe_context['object']['url']).hexdigest()
 }
 
+context_query_kw_search = {
+    "context": sha1(subscribe_context['object']['url']).hexdigest(),
+    "keyword": ['Testejant','creació']
+}
+
+
 context_queryA = {
 "context": sha1(subscribe_contextA['object']['url']).hexdigest()}
 

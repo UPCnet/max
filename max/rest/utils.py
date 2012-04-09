@@ -12,10 +12,11 @@ import requests
 import urllib2
 import re
 
+UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
+
 FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\wñçáéíóúàèìòùïü]+)'
-FIND_KEYWORDS_REGEX = r'(\s|^)#?([\wñçáéíóúàèìòùïü]+)'
-KEYWORD_MIN_LENGTH = 3
+FIND_KEYWORDS_REGEX = r'(\s|^)[#\'\"]?([\w%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
 
 
 def getUserIdFromTwitter(twitterUsername):
@@ -237,10 +238,10 @@ def findKeywords(text):
         excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH.
         Keywords are stored in lowercase.
     """
-    stripped_urls = re.sub(FIND_URL_REGEX, '', text)
-    keywords = [a.groups()[1] for a in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
-    limited = [kw.lower() for kw in keywords if len(kw) >= KEYWORD_MIN_LENGTH]
-    return limited
+    _text = text.lower().decode('utf-8')
+    stripped_urls = re.sub(FIND_URL_REGEX, '', _text)
+    keywords = [kw.groups()[1] for kw in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
+    return keywords
 
 
 def shortenURL(url):

@@ -268,6 +268,24 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[2].get('contexts', None)[0], subscribe_contextA['object'])
 
+    ## SEARCH ##
+    def test_context_activities_keyword_search(self):
+        """
+        """
+        from .mockers import context_query_kw_search
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+
+        res = self.testapp.get('/activities', context_query_kw_search, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
         from .mockers import user_status_context
