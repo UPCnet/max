@@ -13,7 +13,7 @@ from max.oauth2 import oauth2
 from max.rest.utils import extractPostData
 import requests
 import json
-
+import time
 
 @view_config(route_name='context', request_method='GET', permission='operations')
 @MaxResponse
@@ -38,14 +38,33 @@ def getContextAvatar(context, request):
     """
     urlHash = request.matchdict['urlHash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
+    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, urlHash)
 
-    if not os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, urlHash)):
-        req = requests.get('https://api.twitter.com/users/show/sunbit.json')
-        data = json.loads(req.text)
-        image_url = data['profile_image_url_https']
-        req = requests.get(image_url)
-        open('%s/%s.jpg' % (AVATAR_FOLDER, urlHash), 'w').write(req.content)
-    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, urlHash)) and urlHash or 'missing'
+    # Calculate time since last download and set if we have to redownload or not
+    modification_time = os.path.getmtime(context_image_filename)
+    hours_since_last_modification = (time.time() - modification_time) / 60 / 60
+    update_image = hours_since_last_modification > 3
+
+
+    # Download image if it's outated or it's missing
+    if not os.path.exists(context_image_filename) or update_image:
+        urlhash = request.matchdict.get('urlHash', None)
+        mmdb = MADMaxDB(context.db)
+        found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+
+        # Try to download the twitter image, fallback to the missing image if any error
+        try:
+            twitter_username = found_context['twitterUsername']
+            req = requests.get('https://api.twitter.com/users/show/%s.json' % twitter_username)
+            data = json.loads(req.text)
+            image_url = data['profile_image_url_https']
+            req = requests.get(image_url)
+            open('%s/%s.jpg' % (AVATAR_FOLDER, urlHash), 'w').write(req.content)
+        except:
+            filename = 'missing'
+
+    if os.path.exists(context_image_filename):
+        filename = urlHash
     data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/jpeg'
