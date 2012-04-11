@@ -278,6 +278,8 @@ class FunctionalTests(unittest.TestCase):
 
     def test_activities_keyword_generation(self):
         """
+                Tests that all words passing regex are included in _keywords
+                Tests that username that creates the activity is included in keywords
         """
         from .mockers import context_query_kw_search
         from .mockers import create_context
@@ -289,7 +291,9 @@ class FunctionalTests(unittest.TestCase):
         self.subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
         result = json.loads(res.text)
-        self.assertListEqual(result['object']['_keywords'], [u'testejant', u'creaci\xf3', u'canvi', username])
+        expected_keywords = [u'testejant', u'creaci\xf3', u'canvi']
+        expected_keywords.append(username)
+        self.assertListEqual(result['object']['_keywords'], expected_keywords)
 
     def test_context_activities_keyword_search(self):
         """
@@ -307,6 +311,32 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.get('/activities', context_query_kw_search, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
+
+    def test_context_activities_author_search(self):
+        """
+        """
+        from .mockers import context_query_author_search
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        username2 = 'xavi'
+        self.create_user(username2)
+
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username2, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username2, user_status_context)
+
+        res = self.testapp.get('/activities', context_query_author_search, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 2)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+
 
 
     def test_subscribe_to_context(self):

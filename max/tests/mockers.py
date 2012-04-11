@@ -221,6 +221,11 @@ context_query_kw_search = {
     "keyword": ['Testejant','creació']
 }
 
+context_query_author_search = {
+    "context": sha1(subscribe_context['object']['url']).hexdigest(),
+    "author": 'messi'
+}
+
 
 context_queryA = {
 "context": sha1(subscribe_contextA['object']['url']).hexdigest()}
