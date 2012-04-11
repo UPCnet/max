@@ -15,9 +15,9 @@ from max.exceptions import ObjectNotFound
 @MaxRequest
 def addAdminUserActivity(context, request):
     """
-         /admin/people/{username}/activities
+         /admin/people|contexts/{username|urlHash}/activities
 
-         Add activity impersonated as a valid MAX user
+         Add activity impersonated as a valid MAX user or context
     """
     rest_params = {'actor': request.actor,
                    'verb': 'post'}

@@ -275,6 +275,22 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[2].get('contexts', None)[0], subscribe_contextA['object'])
 
     ## SEARCH ##
+
+    def test_activities_keyword_generation(self):
+        """
+        """
+        from .mockers import context_query_kw_search
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        result = json.loads(res.text)
+        self.assertListEqual(result['object']['_keywords'], [u'testejant', u'creaci\xf3', u'canvi', username])
+
     def test_context_activities_keyword_search(self):
         """
         """
@@ -292,6 +308,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
 
+
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
         from .mockers import user_status_context
@@ -301,7 +318,6 @@ class FunctionalTests(unittest.TestCase):
         self.create_context(create_context)
         self.subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
-
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
