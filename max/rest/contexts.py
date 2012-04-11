@@ -10,7 +10,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
 
 from max.oauth2 import oauth2
-from max.rest.utils import extractPostData
+from max.rest.utils import extractPostData, downloadTwitterUserImage
 import requests
 import json
 import time
@@ -40,32 +40,26 @@ def getContextAvatar(context, request):
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, urlHash)
 
-    # Calculate time since last download and set if we have to redownload or not
-    modification_time = os.path.getmtime(context_image_filename)
-    hours_since_last_modification = (time.time() - modification_time) / 60 / 60
-    update_image = hours_since_last_modification > 3
-
-
-    # Download image if it's outated or it's missing
-    if not os.path.exists(context_image_filename) or update_image:
-        urlhash = request.matchdict.get('urlHash', None)
+    if not os.path.exists(context_image_filename):
         mmdb = MADMaxDB(context.db)
         found_context = mmdb.contexts.getItemsByurlHash(urlhash)
-
-        # Try to download the twitter image, fallback to the missing image if any error
-        try:
-            twitter_username = found_context['twitterUsername']
-            req = requests.get('https://api.twitter.com/users/show/%s.json' % twitter_username)
-            data = json.loads(req.text)
-            image_url = data['profile_image_url_https']
-            req = requests.get(image_url)
-            open('%s/%s.jpg' % (AVATAR_FOLDER, urlHash), 'w').write(req.content)
-        except:
-            filename = 'missing'
+        if len(found_context) > 0:
+            twitter_username = found_context[0]['twitterUsername']
+            downloadTwitterUserImage(twitter_username, context_image_filename)
 
     if os.path.exists(context_image_filename):
         filename = urlHash
-    data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
+        # Calculate time since last download and set if we have to redownload or not
+        modification_time = os.path.getmtime(context_image_filename)
+        hours_since_last_modification = (time.time() - modification_time) / 60 / 60
+        if hours_since_last_modification > 3:
+            mmdb = MADMaxDB(context.db)
+            found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+            downloadTwitterUserImage(twitter_username, context_image_filename)
+    else:
+        filename = 'missing'
+
+    data = open(context_image_filename).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/jpeg'
     return image
