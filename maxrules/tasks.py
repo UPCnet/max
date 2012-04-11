@@ -8,10 +8,11 @@ from max.rest.utils import canWriteInContexts
 from max.rest.utils import findHashtags
 import json
 import logging
+import max.models
 
 
 @task
-def processTweet(twitter_username, content):
+def processTweet(twitter_username, content, readable_follow_list):
     """ Process inbound tweet
     """
     conn = pymongo.Connection(mongodb_url)
@@ -19,6 +20,38 @@ def processTweet(twitter_username, content):
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)
 
+    # If we have a tweet from a followed user
+    if twitter_username in readable_follow_list:
+        # Find the context
+        maxcontext = contexts.search({"twitterUsername": twitter_username})
+
+        # Watch for the case when two or more context share twitterUsername
+        for context in maxcontext:
+            url_hash = context.get("urlHash")
+            context_url = context.get("url")
+
+            # Construct the payload with the activity information
+            newactivity = {
+                "object": {
+                    "objectType": "note",
+                    "content": content
+                },
+                "contexts": [
+                    context_url,
+                ],
+                "generator": twitter_generator_name
+            }
+
+            re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+            if re.status_code == 201:
+                logging.warning("Successful %s tweet from context %s" % (twitter_username, context_url))
+                #return "Successful %s tweet from context %s" % (twitter_username, context_url)
+            else:
+                logging.warning("Error accessing the MAX API at %s" % max_server_url)
+                #return "Error accessing the MAX API at %s" % max_server_url
+        return
+
+    # If we have a tweet from a tracked hashtag
     # Parse text and determine the second or nth hashtag
     possible_hastags = findHashtags(content)
     query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
@@ -65,8 +98,11 @@ def processTweet(twitter_username, content):
             # MAX context in name of the specified MAX username
             re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
-                return "Successful tweet insertion from user %s in context %s" % (maxuser, maxcontext)
+                logging.warning("Success tweet from user %s in context %s" % (maxuser, context.url))
+                #return "Success tweet from user %s in context %s" % (maxuser, context.url)
             else:
-                return "Error accessing the MAX API at %s" % max_server_url
+                logging.warning("Error accessing the MAX API at %s" % max_server_url)
+                #return "Error accessing the MAX API at %s" % max_server_url
+        return
     else:
         return "Discarding %s tweet: Not such MAX context" % maxuser.username

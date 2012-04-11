@@ -11,12 +11,13 @@ import logging
 
 # CONFIG
 max_server_url = 'https://max.upc.edu'
+# max_server_url = 'https://sneridagh.upc.es'
 twitter_generator_name = 'Twitter'
 debug_hashtag = 'debugmaxupcnet'
 
 
 def main(argv=sys.argv, quiet=False):
-    #command = MaxTwitterRulesRunnerTest(argv, quiet)
+    # command = MaxTwitterRulesRunnerTest(argv, quiet)
     command = MaxTwitterRulesRunner(argv, quiet)
     return command.run()
 
@@ -25,13 +26,18 @@ class StreamWatcherListener(tweepy.StreamListener):
 
     status_wrapper = TextWrapper(width=60, initial_indent='    ', subsequent_indent='    ')
 
+    def __init__(self, *args, **kw):
+        super(StreamWatcherListener, self).__init__(self, *args)
+        if kw.get('readable_follow_list'):
+            self.readable_follow_list = kw.get('readable_follow_list')
+
     def on_status(self, status):
         try:
             logging.warning(self.status_wrapper.fill(status.text))
             logging.warning('\n %s  %s  via %s\n\n' % (status.author.screen_name, status.created_at, status.source))
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
-            processTweet.delay(status.author.screen_name.lower(), status.text)
+            processTweet.delay(status.author.screen_name.lower(), status.text, self.readable_follow_list)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
@@ -79,12 +85,9 @@ class MaxTwitterRulesRunner(object):
         if not self.options.username or not self.options.password:
             logging.error('You must provide a valid username and password.')
             return 2
-        # Prompt for login credentials and setup stream object
+
         #username = raw_input('Twitter username: ')
         #password = getpass('Twitter password: ')
-        auth = tweepy.auth.BasicAuthHandler(self.options.username[0], self.options.password[0])
-        stream = tweepy.Stream(auth, StreamWatcherListener(), timeout=None)
-
         #follow_list = raw_input('Users to follow (comma separated): ').strip()
         #track_list = raw_input('Keywords to track (comma seperated):').strip()
 
@@ -95,6 +98,10 @@ class MaxTwitterRulesRunner(object):
         follow_list = [users_to_follow.get('twitterUsernameId') for users_to_follow in contexts_with_twitter_username]
         contexts_with_twitter_username.rewind()
         readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
+
+        # Prompt for login credentials and setup stream object
+        auth = tweepy.auth.BasicAuthHandler(self.options.username[0], self.options.password[0])
+        stream = tweepy.Stream(auth, StreamWatcherListener(readable_follow_list=readable_follow_list), timeout=None)
 
         # Hardcoded global hashtag(s)
         track_list = ['#upc', debug_hashtag]
@@ -142,7 +149,9 @@ class MaxTwitterRulesRunnerTest(object):
             import time
             time.sleep(2)
             from maxrules.tasks import processTweet
-            processTweet.delay('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf')
+            processTweet.delay('sneridagh', 'Twitejant com un usuari de twitter assignat a un contexte', ['sneridagh'])
+            time.sleep(2)
+            processTweet.delay('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf', ['sneridagh'])
 
 if __name__ == '__main__':
     try:

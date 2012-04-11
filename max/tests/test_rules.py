@@ -36,7 +36,10 @@ class RulesTests(unittest.TestCase):
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
             res = self.testapp.post('/admin/people/%s/activities' % 'messi', args[1], basicAuthHeader('admin', 'admin'), status=201)
             return mock_post_obj(text=res.text, status_code=201)
-
+        elif '/admin/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
+            # Fake the requests.post thorough the self.testapp instance, and test result later in test
+            res = self.testapp.post('/admin/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], basicAuthHeader('admin', 'admin'), status=201)
+            return mock_post_obj(text=res.text, status_code=201)
         return mock_post_obj(text='', status_code=200)
 
     def create_user(self, username):
@@ -65,7 +68,7 @@ class RulesTests(unittest.TestCase):
     def modify_context(self, context, properties):
         from hashlib import sha1
         url_hash = sha1(context).hexdigest()
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), basicAuthHeader('operations', 'operations'), status=200)
         return res
 
     def subscribe_user_to_context(self, username, context, expect=201):
@@ -74,7 +77,7 @@ class RulesTests(unittest.TestCase):
 
     # Tests
 
-    def test_process_new_tweet(self):
+    def test_process_new_tweet_from_hashtag(self):
         from maxrules.tasks import processTweet
         from .mockers import create_contextA, subscribe_contextA
         username = 'messi'
@@ -85,12 +88,32 @@ class RulesTests(unittest.TestCase):
         self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
         self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #atenea #assignatura1')
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1', ['assignatura2'])
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+
+    def test_process_new_tweet_from_twitter_username(self):
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterUsername": "assignatura2"})
+        self.subscribe_user_to_context(username, subscribe_contextA)
+
+        processTweet('assignatura2', 'Ehteee, acabo de batir el récor de goles en el Barça.', ['assignatura2'])
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'context')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
