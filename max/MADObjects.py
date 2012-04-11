@@ -259,5 +259,8 @@ class MADBase(MADDict):
         """
             Update fields on objects
         """
+        properties_to_unset = {key: value for key, value in fields.items() if value == None}
+        if properties_to_unset:
+            import ipdb; ipdb.set_trace( )
         return self.mdb_collection.update({'_id': self['_id']},
                                           {'$set': fields, },)

@@ -51,6 +51,12 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=expect)
         return res
 
+    def modify_context(self, context, properties):
+        from hashlib import sha1
+        url_hash = sha1(context).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), basicAuthHeader('operations', 'operations'), status=200)
+        return res
+
     def subscribe_user_to_context(self, username, context, expect=201):
         res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
         return res
@@ -503,6 +509,20 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('urlHash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
+        self.assertEqual(result.get('twitterUsernameId', None), '526326641')
+
+    def test_modify_context_unsetting_property(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
+        import ipdb; ipdb.set_trace( )
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": ""}), basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
+        self.assertEqual(result.get('twitterUsername', None), None)
         self.assertEqual(result.get('twitterUsernameId', None), '526326641')
 
     def test_delete_context(self):
