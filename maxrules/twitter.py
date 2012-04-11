@@ -26,18 +26,13 @@ class StreamWatcherListener(tweepy.StreamListener):
 
     status_wrapper = TextWrapper(width=60, initial_indent='    ', subsequent_indent='    ')
 
-    def __init__(self, *args, **kw):
-        super(StreamWatcherListener, self).__init__(self, *args)
-        if kw.get('readable_follow_list'):
-            self.readable_follow_list = kw.get('readable_follow_list')
-
     def on_status(self, status):
         try:
             logging.warning(self.status_wrapper.fill(status.text))
             logging.warning('\n %s  %s  via %s\n\n' % (status.author.screen_name, status.created_at, status.source))
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
-            processTweet.delay(status.author.screen_name.lower(), status.text, self.readable_follow_list)
+            processTweet.delay(status.author.screen_name.lower(), status.text)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
@@ -101,7 +96,7 @@ class MaxTwitterRulesRunner(object):
 
         # Prompt for login credentials and setup stream object
         auth = tweepy.auth.BasicAuthHandler(self.options.username[0], self.options.password[0])
-        stream = tweepy.Stream(auth, StreamWatcherListener(readable_follow_list=readable_follow_list), timeout=None)
+        stream = tweepy.Stream(auth, StreamWatcherListener(), timeout=None)
 
         # Hardcoded global hashtag(s)
         track_list = ['#upc', debug_hashtag]
@@ -149,9 +144,9 @@ class MaxTwitterRulesRunnerTest(object):
             import time
             time.sleep(2)
             from maxrules.tasks import processTweet
-            processTweet.delay('sneridagh', 'Twitejant com un usuari de twitter assignat a un contexte', ['sneridagh'])
+            processTweet('sneridagh', 'Twitejant com un usuari de twitter assignat a un contexte')
             time.sleep(2)
-            processTweet.delay('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf', ['sneridagh'])
+            processTweet('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf')
 
 if __name__ == '__main__':
     try:

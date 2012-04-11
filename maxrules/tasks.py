@@ -12,13 +12,16 @@ import max.models
 
 
 @task
-def processTweet(twitter_username, content, readable_follow_list):
+def processTweet(twitter_username, content):
     """ Process inbound tweet
     """
     conn = pymongo.Connection(mongodb_url)
     db = conn[mongodb_db_name]
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)
+    import ipdb; ipdb.set_trace( )
+    contexts_with_twitter_username = contexts.search({"twitterUsernameId": {"$exists": True}})
+    readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
 
     # If we have a tweet from a followed user
     if twitter_username in readable_follow_list:
