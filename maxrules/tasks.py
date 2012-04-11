@@ -19,7 +19,7 @@ def processTweet(twitter_username, content):
     db = conn[mongodb_db_name]
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)
-    import ipdb; ipdb.set_trace( )
+
     contexts_with_twitter_username = contexts.search({"twitterUsernameId": {"$exists": True}})
     readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
 
