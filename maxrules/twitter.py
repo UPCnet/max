@@ -13,7 +13,7 @@ import logging
 max_server_url = 'https://max.upc.edu'
 # max_server_url = 'https://sneridagh.upc.es'
 twitter_generator_name = 'Twitter'
-debug_hashtag = 'debugmaxupcnet'
+debug_hashtag = '#debugmaxupcnet'
 
 
 def main(argv=sys.argv, quiet=False):
