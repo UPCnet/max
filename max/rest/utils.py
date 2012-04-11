@@ -19,6 +19,21 @@ FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\wñçáéíóúàèìòùïü]+)'
 FIND_KEYWORDS_REGEX = r'(\s|^)[#\'\"]?([\w%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
 
 
+def downloadTwitterUserImage(twitterUsername, filename):
+    """
+    """
+    try:
+        req = requests.get('https://api.twitter.com/users/show/%s.json' % twitterUsername)
+        data = json.loads(req.text)
+        image_url = data['profile_image_url_https']
+        req = requests.get(image_url)
+        open(filename, 'w').write(req.content)
+        return True
+    except:
+        print "An error occurred while downloading twitter user image!"
+        return False
+
+
 def getUserIdFromTwitter(twitterUsername):
 
     res = requests.get('http://api.twitter.com/users/show/%s.json' % twitterUsername)
