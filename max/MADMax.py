@@ -47,6 +47,9 @@ class MADMaxCollection(object):
                 limit: Count of objects to be returned from search
                 before: An id pointing to an activity, whose older fellows will be fetched
                 after: An id pointing to an activity, whose newer fellows will be fetched
+                hashtag: A list of hastags to filter activities by
+                keywords: A list of keywords to filter activities by
+                author: A username to filter activitues by author
         """
 
         #Extract known params from kwargs
@@ -55,6 +58,7 @@ class MADMaxCollection(object):
         before = kwargs.get('before', None)
         hashtag = kwargs.get('hashtag', None)
         keywords = kwargs.get('keywords', None)
+        author = kwargs.get('author', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -76,6 +80,11 @@ class MADMaxCollection(object):
                 for hasht in hashtag:
                     hashtag_query['$and'].append({'object._hashtags': hasht})
                 query.update(hashtag_query)
+
+            if author:
+                # Filter the query to only objects containing certain hashtags
+                username_query = {'actor.username':author}
+                query.update(username_query)
 
             if keywords:
                 # Filter the query to only objects containing certain keywords
