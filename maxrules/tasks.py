@@ -44,9 +44,12 @@ def processTweet(twitter_username, content, readable_follow_list):
 
             re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
-                return "Successful %s tweet from context %s" % (twitter_username, context_url)
+                logging.warning("Successful %s tweet from context %s" % (twitter_username, context_url))
+                #return "Successful %s tweet from context %s" % (twitter_username, context_url)
             else:
-                return "Error accessing the MAX API at %s" % max_server_url
+                logging.warning("Error accessing the MAX API at %s" % max_server_url)
+                #return "Error accessing the MAX API at %s" % max_server_url
+        return
 
     # If we have a tweet from a tracked hashtag
     # Parse text and determine the second or nth hashtag
@@ -95,8 +98,11 @@ def processTweet(twitter_username, content, readable_follow_list):
             # MAX context in name of the specified MAX username
             re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
-                return "Success tweet from user %s in context %s" % (maxuser, context.url)
+                logging.warning("Success tweet from user %s in context %s" % (maxuser, context.url))
+                #return "Success tweet from user %s in context %s" % (maxuser, context.url)
             else:
-                return "Error accessing the MAX API at %s" % max_server_url
+                logging.warning("Error accessing the MAX API at %s" % max_server_url)
+                #return "Error accessing the MAX API at %s" % max_server_url
+        return
     else:
         return "Discarding %s tweet: Not such MAX context" % maxuser.username
