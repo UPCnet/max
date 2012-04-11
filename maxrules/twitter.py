@@ -149,9 +149,9 @@ class MaxTwitterRulesRunnerTest(object):
             import time
             time.sleep(2)
             from maxrules.tasks import processTweet
-            processTweet('sneridagh', 'Twitejant com un usuari de twitter assignat a un contexte', ['sneridagh'])
+            processTweet.delay('sneridagh', 'Twitejant com un usuari de twitter assignat a un contexte', ['sneridagh'])
             time.sleep(2)
-            processTweet('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf', ['sneridagh'])
+            processTweet.delay('maxupcnet', 'Twitejant amb el hashtag #upc #gsxf', ['sneridagh'])
 
 if __name__ == '__main__':
     try:

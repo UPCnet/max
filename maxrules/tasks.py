@@ -23,27 +23,30 @@ def processTweet(twitter_username, content, readable_follow_list):
     # If we have a tweet from a followed user
     if twitter_username in readable_follow_list:
         # Find the context
-        maxcontext = contexts.search({"twitterUsername": twitter_username})[0]
-        url_hash = maxcontext.get("urlHash")
-        context_url = maxcontext.get("url")
+        maxcontext = contexts.search({"twitterUsername": twitter_username})
 
-        # Construct the payload with the activity information
-        newactivity = {
-            "object": {
-                "objectType": "note",
-                "content": content
-            },
-            "contexts": [
-                context_url,
-            ],
-            "generator": twitter_generator_name
-        }
+        # Watch for the case when two or more context share twitterUsername
+        for context in maxcontext:
+            url_hash = context.get("urlHash")
+            context_url = context.get("url")
 
-        re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
-        if re.status_code == 201:
-            return "Successful %s tweet from context %s" % (twitter_username, context_url)
-        else:
-            return "Error accessing the MAX API at %s" % max_server_url
+            # Construct the payload with the activity information
+            newactivity = {
+                "object": {
+                    "objectType": "note",
+                    "content": content
+                },
+                "contexts": [
+                    context_url,
+                ],
+                "generator": twitter_generator_name
+            }
+
+            re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+            if re.status_code == 201:
+                return "Successful %s tweet from context %s" % (twitter_username, context_url)
+            else:
+                return "Error accessing the MAX API at %s" % max_server_url
 
     # If we have a tweet from a tracked hashtag
     # Parse text and determine the second or nth hashtag
