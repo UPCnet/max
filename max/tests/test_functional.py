@@ -517,11 +517,10 @@ class FunctionalTests(unittest.TestCase):
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
-        import ipdb; ipdb.set_trace( )
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": ""}), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura4", "twitterUsername": ""}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('urlHash', None), url_hash)
-        self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
+        self.assertEqual(result.get('twitterHashtag', None), 'assignatura4')
         self.assertEqual(result.get('twitterUsername', None), None)
         self.assertEqual(result.get('twitterUsernameId', None), '526326641')
 

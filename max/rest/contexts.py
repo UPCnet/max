@@ -109,7 +109,7 @@ def ModifyContext(context, request):
 
     params = extractPostData(request)
     allowed_fields = [fieldName for fieldName in maxcontext.schema if maxcontext.schema[fieldName].get('operations_mutable', 0)]
-    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None)}
+    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
 
     maxcontext.modifyContext(properties)
     maxcontext = contexts.getItemsByurlHash(urlHash)[0]

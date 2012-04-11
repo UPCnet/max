@@ -52,9 +52,10 @@ class Activity(MADBase):
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
 
+        # PUT IN THE FRIDGE
         #Append actor as username
-        if ob['object']['_keywords']:
-            ob['object']['_keywords'].append(self.data['actor']['username'])
+        #if ob['object']['_keywords']:
+        #    ob['object']['_keywords'].append(self.data['actor']['username'])
 
         if 'generator' in self.data:
             ob['generator'] = self.data['generator']
