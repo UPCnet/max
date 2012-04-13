@@ -57,7 +57,24 @@ class FunctionalTests(unittest.TestCase):
 
     # BEGIN TESTS
 
+    def test_add_public_context_with_valid_parameters_that_needs_formating(self):
+        """
+            Test formatters acting correctly by testing the extraction of the "@" and "#"
+            on receiving a twitter @username and #hashtag containing extra chars (@,# and trailing/leading whitespace)
+        """
+        from .mockers import create_context_full
+        new_context = dict(create_context_full)
+        new_context['twitterUsername'] = '@%s ' % create_context_full['twitterUsername'] 
+        new_context['twitterHashtag'] = '  #%s' % create_context_full['twitterHashtag']
+        res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=201)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
+        self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
+
     def test_add_public_context_with_bad_twitter_username(self):
+        """
+            Test validation failure on receiving a invalid twitter username
+        """
         from .mockers import create_context_full
         bad_context = dict(create_context_full)
         bad_context['twitterUsername'] = '@@badusername'
@@ -66,6 +83,10 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('error', None), 'ValidationError')
 
     def test_add_public_context_with_bad_hashtag(self):
+        """
+            Test validation failure on receiving a invalid twitter hashtag
+        """
+
         from .mockers import create_context_full
         bad_context = dict(create_context_full)
         bad_context['twitterHashtag'] = '##badhashtag'
