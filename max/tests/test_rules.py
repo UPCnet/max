@@ -104,10 +104,10 @@ class RulesTests(unittest.TestCase):
         self.create_user(username)
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['url'], {"twitterUsername": "assignatura2"})
+        self.modify_context(create_contextA['url'], {"twitterUsername": "maxupcnet"})
         self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('assignatura2', 'Ehteee, acabo de batir el récor de goles en el Barça.')
+        processTweet('maxupcnet', 'Ehteee, acabo de batir el récor de goles en el Barça.')
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
