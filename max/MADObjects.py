@@ -215,6 +215,15 @@ class MADBase(MADDict):
         self.mdb_collection = collection
         self.update(source)
 
+    def getMutablePropertiesFromRequest(self, request, mutable_permission = 'operations_mutable'):
+        """
+        """
+        params = extractPostData(request)
+        allowed_fields = [fieldName for fieldName in self.schema if self.schema[fieldName].get(mutable_permission, 0)]
+        properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
+        return properties
+
+
     def insert(self):
         """
             Inserts the item into his defined collection and returns its _id
@@ -304,23 +313,6 @@ class MADBase(MADDict):
         """
             Update fields on objects
         """
-        #properties_to_unset = {key: 1 for key, value in fields.items() if value == u''}
-        #properties_to_set = {key: value for key, value in fields.items() if value is not u''}
-
-	self.data = fields
+        self.data = fields
         self.processFields(updating=True)
         self.update(fields)
-        self.save()
-
-
-        # properties_to_unset = {}
-        # properties_to_set =
-
-        # if properties_to_unset:
-        #     return self.mdb_collection.update({'_id': self['_id']},
-        #                                       {'$set': properties_to_set, '$unset': properties_to_unset},
-        #                                       )
-        # else:
-        #     return self.mdb_collection.update({'_id': self['_id']},
-        #                                       {'$set': properties_to_set, },
-        #                                       )

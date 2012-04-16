@@ -109,11 +109,8 @@ def ModifyContext(context, request):
     else:
         raise ObjectNotFound, 'Unknown context: %s' % urlHash
 
-    params = extractPostData(request)
-    allowed_fields = [fieldName for fieldName in maxcontext.schema if maxcontext.schema[fieldName].get('operations_mutable', 0)]
-    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
+    properties = maxcontext.getMutablePropertiesFromRequest(request)
     maxcontext.modifyContext(properties)
-    maxcontext = contexts.getItemsByurlHash(urlHash)[0]
     maxcontext.updateUsersSubscriptions()
     handler = JSONResourceEntity(maxcontext.flatten())
     return handler.buildResponse()

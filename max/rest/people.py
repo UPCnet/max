@@ -75,13 +75,9 @@ def ModifyUser(context, request):
     """
     """
     actor = request.actor
-    params = extractPostData(request)
-    allowed_fields = [fieldName for fieldName in actor.schema if actor.schema[fieldName].get('user_mutable', 0)]
-    properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None)}
+    properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
     actor.modifyUser(properties)
-
-    users = MADMaxCollection(context.db.users, query_key='username')
-    handler = JSONResourceEntity(users[actor['username']].flatten())
+    handler = JSONResourceEntity(actor.flatten())
     return handler.buildResponse()
 
 

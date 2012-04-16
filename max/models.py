@@ -163,8 +163,9 @@ class User(MADBase):
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
-        # Comprehension dict (Muahaha)
+
         self.updateFields(properties)
+        self.save()
 
     def grantPermission(self, subscription, permission):
         """
@@ -256,11 +257,13 @@ class Context(MADBase):
         # If updating the twitterUsername, get its Twitter ID
         if properties.get('twitterUsername', None):
             properties['twitterUsernameId'] = getUserIdFromTwitter(properties['twitterUsername'])
-        # processed_props = self.validate()
+
         self.updateFields(properties)
 
         if self.get('twitterUsername', None) == None and self.get('twitterUsernameId', None) != None:
             del self['twitterUsernameId']
+
+        self.save()
 
 
     def subscribedUsers(self):

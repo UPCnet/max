@@ -568,7 +568,7 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('urlHash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura4')
         self.assertEqual(result.get('twitterUsername', None), None)
-        self.assertEqual(result.get('twitterUsernameId', None), '526326641')
+        self.assertEqual(result.get('twitterUsernameId', None), None)
 
     def test_delete_context(self):
         from hashlib import sha1
