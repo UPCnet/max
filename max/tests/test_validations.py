@@ -71,6 +71,20 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
         self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
 
+    def test_modify_public_context_with_valid_parameters_that_need_formating(self):
+        """
+            Test validation failure on receiving a invalid twitter username
+        """
+        from .mockers import create_context_full
+        from hashlib import sha1
+        res = self.testapp.post('/contexts', json.dumps(create_context_full), basicAuthHeader('operations', 'operations'), status=201)
+        url_hash = sha1(create_context_full['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet","twitterHashtag": "#atenea"}), basicAuthHeader('operations', 'operations'), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
+        self.assertEqual(result.get('twitterHashtag', None), 'atenea')
+
+
     def test_add_public_context_with_bad_twitter_username(self):
         """
             Test validation failure on receiving a invalid twitter username
@@ -81,6 +95,7 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(bad_context), basicAuthHeader('operations', 'operations'), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ValidationError')
+
 
     def test_add_public_context_with_bad_hashtag(self):
         """
