@@ -3,7 +3,7 @@ from max.rest.utils import canWriteInContexts
 import datetime
 from hashlib import sha1
 from MADMax import MADMaxDB
-from max.rest.utils import getUserIdFromTwitter
+from max.rest.utils import getUserIdFromTwitter, findKeywords, findHashtags
 from max import DEFAULT_CONTEXT_PERMISSIONS
 
 
@@ -84,9 +84,22 @@ class Activity(MADBase):
 
     def addComment(self, comment):
         """
-            Adds a comment to an existing activity
+            Adds a comment to an existing activity and updates refering activity keywords and hashtags
         """
         self.addToList('replies', comment, allow_duplicates=True)
+
+        activity_keywords = self.object.setdefault('_keywords',[])
+        activity_keywords.extend(comment.get('_keywords',[]))
+        activity_keywords = list(set(activity_keywords))
+
+        activity_hashtags = self.object.setdefault('_hashtags',[])
+        activity_hashtags.extend(comment.get('_hashtags',[]))
+        activity_hashtags = list(set(activity_hashtags))
+
+        self.mdb_collection.update({'_id': self['_id']},
+                                      {'$set': {'object._keywords': activity_keywords,
+                                                'object._hashtags': activity_hashtags}}
+                                      )
 
     def _on_create_custom_validations(self):
         """

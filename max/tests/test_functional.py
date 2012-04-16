@@ -280,20 +280,45 @@ class FunctionalTests(unittest.TestCase):
         """
                 Tests that all words passing regex are included in _keywords
                 Tests that username that creates the activity is included in keywords
+                Tests that a keyword of a comment is included in keywords
         """
         from .mockers import context_query_kw_search
         from .mockers import create_context
-        from .mockers import subscribe_context, user_status_context
+        from .mockers import subscribe_context, user_status_context, user_comment
 
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
         self.subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
+        activity = json.loads(res.text)
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/%s' % str(activity.get('id')), json.dumps({}), oauth2Header(username), status=200)
         result = json.loads(res.text)
-        expected_keywords = [u'testejant', u'creaci\xf3', u'canvi']
-        expected_keywords.append(username)
+        expected_keywords = [u'comentari', u'messi', u'creaci\xf3', u'testejant', u'canvi', u'una', u'nou', u'activitat']
         self.assertListEqual(result['object']['_keywords'], expected_keywords)
+
+    def test_activities_hashtag_generation(self):
+        """
+                Tests that all hashtags passing regex are included in _hashtags
+                Tests that a hashtag of a comment is included in hashtags
+        """
+        from .mockers import context_query_kw_search
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context_with_hashtag, user_comment_with_hashtag
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context_with_hashtag)
+        activity = json.loads(res.text)
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment_with_hashtag), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/%s' % str(activity.get('id')), json.dumps({}), oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        expected_hashtags = [u'canvi', u'comentari', u'nou']
+        self.assertListEqual(result['object']['_hashtags'], expected_hashtags)
+
 
     def test_context_activities_keyword_search(self):
         """

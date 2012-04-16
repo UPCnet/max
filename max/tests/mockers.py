@@ -158,6 +158,17 @@ user_status = {
     },
 }
 
+user_status_context_with_hashtag = {
+    "contexts": [
+        subscribe_context['object']['url']
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un #canvi d'estatus</p>"
+    },
+}
+
+
 user_status_context = {
     "contexts": [
         subscribe_context['object']['url']
@@ -236,6 +247,13 @@ user_comment = {
     "object": {
         "objectType": "comment",
         "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+    }
+}
+
+user_comment_with_hashtag = {
+    "object": {
+        "objectType": "comment",
+        "content": "<p>[C] Testejant un #comentari #nou a una activitat</p>"
     }
 }
 

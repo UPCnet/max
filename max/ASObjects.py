@@ -58,6 +58,8 @@ class Comment(ASObject):
                 'content':     dict(required=1),
                 'objectType':  dict(required=1),
                 'inReplyTo':   dict(required=1),
+                '_hashtags':     dict(),
+                '_keywords':     dict(),                
              }
 
     def __init__(self, data):
