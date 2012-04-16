@@ -134,47 +134,33 @@ class MADBase(MADDict):
     mdb_collection = None
     data = {}
 
-    def __init__(self, source, collection=None, rest_params={}):
-        """
-        """
-        if isinstance(source, Request):
+    def fromRequest(self, request, rest_params={}):
+        self.mdb_collection = request.context.db[self.collection]
 
-            self.mdb_collection = source.context.db[self.collection]
+        self.data = RUDict({})
+        self.data.update(extractPostData(request))
+        self.data.update(rest_params)
 
-            # self.data is a recursive dict, so we can "merge" dictionaries
-            # with similar structure without losing keys
-            # >>> dict1 = RUDict({'A': {'B':1}})
-            # >>> dict2 = {'A': {'C':2}}
-            # >>> dict1.update(dict2)
-            # >>> dict1
-            # {'A': {'B':1, C':2}}
-            #
+        # Since we are building from a request,
+        # overwrite actor with the validated one from the request in source
+        self.data['actor'] = request.actor
 
-            self.data = RUDict({})
-            self.data.update(extractPostData(source))
-            self.data.update(rest_params)
+        self.validate()
+        self.applyFormatters()
 
-            # Since we are building from a request,
-            # overwrite actor with the validated one from the request in source
-            self.data['actor'] = source.actor
-
-            self.validate()
-            self.applyFormatters()
-
-            #check if the object we pretend to create already exists
-            existing_object = self.alreadyExists()
-            if not existing_object:
-                # if we are creating a new object, set the current date and build
-                self['published'] = datetime.datetime.utcnow()
-                self.buildObject()
-            else:
-                # if it's already on the DB, just populate with the object data
-                self.update(existing_object)
+        #check if the object we pretend to create already exists
+        existing_object = self.alreadyExists()
+        if not existing_object:
+            # if we are creating a new object, set the current date and build
+            self['published'] = datetime.datetime.utcnow()
+            self.buildObject()
         else:
             # if it's already on the DB, just populate with the object data
-            # and set the collection
-            self.mdb_collection = collection
-            self.update(source)
+            self.update(existing_object)
+
+    def fromObject(self, source, collection):
+        self.mdb_collection = collection
+        self.update(source)
 
     def insert(self):
         """

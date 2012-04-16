@@ -128,8 +128,9 @@ class MADMaxCollection(object):
                         users='User',
                         contexts='Context')
 
-        module = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
-        wrapped = module(item, collection=self.collection)
+        model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
+        wrapped = model()
+        wrapped.fromObject(item, collection=self.collection)
         if flatten:
             return wrapped.flatten()
         else:

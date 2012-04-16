@@ -30,7 +30,8 @@ def subscribe(context, request):
                    'verb': 'subscribe'}
 
     # Initialize a Activity object from the request
-    newactivity = Activity(request, rest_params=rest_params)
+    newactivity = Activity()
+    newactivity.fromRequest(request, rest_params=rest_params)
 
     code = 201
     newactivity_oid = newactivity.insert()
