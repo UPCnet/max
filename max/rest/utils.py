@@ -9,6 +9,7 @@ from pymongo.objectid import ObjectId
 from max.MADMax import MADMaxCollection
 
 import requests
+import logging
 import urllib2
 import re
 
@@ -25,12 +26,17 @@ def downloadTwitterUserImage(twitterUsername, filename):
     try:
         req = requests.get('https://api.twitter.com/users/show/%s.json' % twitterUsername)
         data = json.loads(req.text)
-        image_url = data['profile_image_url_https']
-        req = requests.get(image_url)
-        open(filename, 'w').write(req.content)
-        return True
+        image_url = data.get('profile_image_url_https', None)
+        if image_url:
+            req = requests.get(image_url)
+            open(filename, 'w').write(req.content)
+            return True
+        else:
+            logger = logging.getLogger('max')
+            logger.error("An error occurred while downloading twitter user image!")
     except:
-        print "An error occurred while downloading twitter user image!"
+        logger = logging.getLogger('max')
+        logger.error("An error occurred while downloading twitter user image!")
         return False
 
 
