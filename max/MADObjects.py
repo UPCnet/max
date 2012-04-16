@@ -52,7 +52,7 @@ class MADDict(dict):
         except AttributeError:
             return self.__getitem__(key)
 
-    def _validate(self):
+    def _on_create_custom_validations(self):
         return True
 
     def checkParameterExists(self, fieldname):
@@ -71,49 +71,102 @@ class MADDict(dict):
                 return False
         return True
 
-    def applyFormatters(self):
+    def checkFieldValueIsNotEmpty(self, data):
         """
         """
-        for fieldname in self.schema:
+        if isinstance(data, str):
+            return data != ''
+        if isinstance(data, list):
+            return data != []
+        if isinstance(data, dict):
+            return data != {}
+        else:
+            if data:
+                return True
+            else:
+                return False
 
-            # Check formatters if fieldname in current data
-            if fieldname in self.data:
-                formatters = self.schema.get(fieldname).get('formatters', [])
-                for formatter_name in formatters:
-                    formatter = getattr(sys.modules['max.formatters'], formatter_name, None)
-                    if formatter:
-                        try:
-                            self.data[fieldname] = formatter(self.data.get(fieldname))
-                        except:
-                            # Fails silently if a formatter explodes
-                            pass
-
-        return True
-
-    def validate(self):
+    def processFields(self, updating=False):
         """
-            Checks if all the required schema fields (required=1) are present in
-            the collected data
-            Executes custom validations if present
+            Processes fields doing validations and formating
+
+            - Checks for required fields present
+            - Checks for emptyness of fields
+            - Validates fields
+            - Formats fields
+
+            Returns a list of empyt fields for future actions
         """
+
         for fieldname in self.schema:
             # Check required
             if self.schema.get(fieldname).get('required', 0):
-                if not self.checkParameterExists(fieldname):
+                field_required = True
+
+		# Raise an error unless we are updating
+                if not self.checkParameterExists(fieldname) and not updating:
                     raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+            else:
+                field_required = False
 
-            # Check validators if fieldname in current data
+            # Check validators if fieldname is present in current data
             if fieldname in self.data:
-                validators = self.schema.get(fieldname).get('validators', [])
-                for validator_name in validators:
-                    validator = getattr(sys.modules['max.validators'], validator_name, None)
-                    if validator:
-                        success, message = validator(self.data.get(fieldname))
-                        if success == False:
-                            raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+                field_value = self.data.get(fieldname)
+                if self.checkFieldValueIsNotEmpty(field_value):
 
-        self._validate()
-        return True
+                    # Validate and format
+                    validators = self.schema.get(fieldname).get('validators', [])
+                    for validator_name in validators:
+                        validator = getattr(sys.modules['max.validators'], validator_name, None)
+                        if validator:
+                            success, message = validator(field_value)
+                            if success == False:
+                                raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+
+                    # Apply formatters to validated fields
+                    formatters = self.schema.get(fieldname).get('formatters', [])
+                    for formatter_name in formatters:
+                        formatter = getattr(sys.modules['max.formatters'], formatter_name, None)
+                        if formatter:
+                            try:
+                                self.data[fieldname] = formatter(field_value)
+                            except:
+                                # XXX Fails silently if a formatter explodes
+                                pass
+                else:
+                    # If field was required and we are not updating, raise
+                    if field_required and not updating:
+                        raise MissingField, 'Required parameter "%s" found but empty' % fieldname
+                    # Otherwise unset the field value by deleting it's key from the data and from the real object
+                    del self.data[fieldname]
+                    if fieldname in self:
+                        del self[fieldname]
+
+
+    # def validate(self):
+    #     """
+    #         Checks if all the required schema fields (required=1) are present in
+    #         the collected data
+    #         Executes custom validations if present
+    #     """
+    #     for fieldname in self.schema:
+    #         # Check required
+    #         if self.schema.get(fieldname).get('required', 0):
+    #             if not self.checkParameterExists(fieldname):
+    #                 raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+
+    #         # Check validators if fieldname in current data
+    #         if fieldname in self.data:
+    #             validators = self.schema.get(fieldname).get('validators', [])
+    #             for validator_name in validators:
+    #                 validator = getattr(sys.modules['max.validators'], validator_name, None)
+    #                 if validator:
+    #                     success, message = validator(self.data.get(fieldname))
+    #                     if success == False:
+    #                         raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+
+    #     self._validate()
+    #     return True
 
 
 class MADBase(MADDict):
@@ -145,14 +198,14 @@ class MADBase(MADDict):
         # overwrite actor with the validated one from the request in source
         self.data['actor'] = request.actor
 
-        self.validate()
-        self.applyFormatters()
+        self.processFields()
 
         #check if the object we pretend to create already exists
         existing_object = self.alreadyExists()
         if not existing_object:
             # if we are creating a new object, set the current date and build
             self['published'] = datetime.datetime.utcnow()
+            self._on_create_custom_validations()
             self.buildObject()
         else:
             # if it's already on the DB, just populate with the object data
@@ -168,6 +221,12 @@ class MADBase(MADDict):
         """
         oid = self.mdb_collection.insert(self)
         return str(oid)
+
+    def save(self):
+        """
+            Updates itself to the database
+        """
+        self.mdb_collection.save(self)
 
     def delete(self):
         """
@@ -245,13 +304,23 @@ class MADBase(MADDict):
         """
             Update fields on objects
         """
-        properties_to_unset = {key: 1 for key, value in fields.items() if value == u''}
-        properties_to_set = {key: value for key, value in fields.items() if value is not u''}
-        if properties_to_unset:
-            return self.mdb_collection.update({'_id': self['_id']},
-                                              {'$set': properties_to_set, '$unset': properties_to_unset},
-                                              )
-        else:
-            return self.mdb_collection.update({'_id': self['_id']},
-                                              {'$set': properties_to_set, },
-                                              )
+        #properties_to_unset = {key: 1 for key, value in fields.items() if value == u''}
+        #properties_to_set = {key: value for key, value in fields.items() if value is not u''}
+
+	self.data = fields
+        self.processFields(updating=True)
+        self.update(fields)
+        self.save()
+
+
+        # properties_to_unset = {}
+        # properties_to_set =
+
+        # if properties_to_unset:
+        #     return self.mdb_collection.update({'_id': self['_id']},
+        #                                       {'$set': properties_to_set, '$unset': properties_to_unset},
+        #                                       )
+        # else:
+        #     return self.mdb_collection.update({'_id': self['_id']},
+        #                                       {'$set': properties_to_set, },
+        #                                       )

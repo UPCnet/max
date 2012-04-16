@@ -16,7 +16,7 @@ class ASObject(MADDict):
         """
         """
         self.data = data
-        self.validate()
+        self.processFields()
         self.update(data)
 
 
@@ -38,7 +38,7 @@ class Note(ASObject):
         """
         """
         self.data = data
-        self.validate()
+        self.processFields()
         self.data['content'] = formatMessageEntities(self.data['content'])
         hashtags = findHashtags(self.data['content'])
         if hashtags:
@@ -64,7 +64,7 @@ class Comment(ASObject):
         """
         """
         self.data = data
-        self.validate()
+        self.processFields()
         self.data['content'] = formatMessageEntities(self.data['content'])
         hashtags = findHashtags(self.data['content'])
         if hashtags:
@@ -89,7 +89,7 @@ class Context(ASObject):
         """
         """
         self.data = data
-        self.validate()
+        self.processFields()
         self.update(data)
 
 
@@ -110,5 +110,5 @@ class Person(ASObject):
         """
         """
         self.data = data
-        self.validate()
+        self.processFields()
         self.update(data)

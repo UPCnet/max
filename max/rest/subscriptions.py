@@ -24,7 +24,6 @@ def subscribe(context, request):
         /people/{username}/subscriptions
     """
     # XXX For now only one context can be subscribed at a time
-
     actor = request.actor
     rest_params = {'actor': actor,
                    'verb': 'subscribe'}

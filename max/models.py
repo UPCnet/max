@@ -88,17 +88,19 @@ class Activity(MADBase):
         """
         self.addToList('replies', comment, allow_duplicates=True)
 
-    def _validate(self):
+    def _on_create_custom_validations(self):
         """
             Perform custom validations on the Activity Object
 
             * If the actor is a person, check wether can write in all contexts
             * If the actor is a context, check if the context is the same
         """
+        # If we are updating, we already have all data on the object, so we read self directly
+        result = True
         if isinstance(self.data['actor'], User):
-            result = canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
+            result = result and canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
         if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
-            result = self.data['actor']['url'] == self.data.get('contexts')[0]
+            result = result and self.data['actor']['url'] == self.data.get('contexts')[0]
         return result
 
 
@@ -254,8 +256,12 @@ class Context(MADBase):
         # If updating the twitterUsername, get its Twitter ID
         if properties.get('twitterUsername', None):
             properties['twitterUsernameId'] = getUserIdFromTwitter(properties['twitterUsername'])
-
+        # processed_props = self.validate()
         self.updateFields(properties)
+
+        if self.get('twitterUsername', None) == None and self.get('twitterUsernameId', None) != None:
+            del self['twitterUsernameId']
+
 
     def subscribedUsers(self):
         """
@@ -305,4 +311,3 @@ class Context(MADBase):
          # deletes context from subcription list
         what = {'$pull': {'subscribedTo.items': {'urlHash': self.urlHash}}}
 
-        self.mdb_collection.database.users.update(criteria, what)
