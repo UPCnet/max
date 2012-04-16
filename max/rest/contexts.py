@@ -59,7 +59,7 @@ def getContextAvatar(context, request):
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
     else:
-        filename = 'missing'
+        context_image_filename = '%s/missing.jpg' % (AVATAR_FOLDER)
 
     data = open(context_image_filename).read()
     image = Response(data, status_int=200)
