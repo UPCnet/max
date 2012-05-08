@@ -21,7 +21,7 @@ def processTweet(twitter_username, content):
     contexts = MADMaxCollection(db.contexts)
 
     contexts_with_twitter_username = contexts.search({"twitterUsernameId": {"$exists": True}})
-    readable_follow_list = [users_to_follow.get('twitterUsername') for users_to_follow in contexts_with_twitter_username]
+    readable_follow_list = [users_to_follow.get('twitterUsername').lower() for users_to_follow in contexts_with_twitter_username]
 
     # If we have a tweet from a followed user
     if twitter_username in readable_follow_list:
