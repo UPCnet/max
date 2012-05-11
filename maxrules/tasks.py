@@ -22,7 +22,7 @@ def processTweet(twitter_username, content):
 
     contexts_with_twitter_username = contexts.search({"twitterUsernameId": {"$exists": True}})
     readable_follow_list = [users_to_follow.get('twitterUsername').lower() for users_to_follow in contexts_with_twitter_username]
-
+    twitter_username = twitter_username.lower()
     # If we have a tweet from a followed user
     if twitter_username in readable_follow_list:
         # Find the context
@@ -57,10 +57,13 @@ def processTweet(twitter_username, content):
     # If we have a tweet from a tracked hashtag
     # Parse text and determine the second or nth hashtag
     possible_hastags = findHashtags(content)
-    query = [dict(twitterHashtag=hashtag) for hashtag in possible_hastags]
+    # Normalize possible_hastags
+    possible_hastags = [hashtag.lower() for hashtag in possible_hastags]
+
+    query = [dict(twitterHashtag={'$regex':hashtag, '$options':'i'}) for hashtag in possible_hastags]
 
     if debug_hashtag in possible_hastags:
-        return "Debug hastagh detected! %s" % content
+        return "Debug hashtag detected! %s" % content
 
     # Check if twitter_username is a registered for a valid MAX username
     # if not, discard it
