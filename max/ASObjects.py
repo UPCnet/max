@@ -59,7 +59,7 @@ class Comment(ASObject):
                 'objectType':  dict(required=1),
                 'inReplyTo':   dict(required=1),
                 '_hashtags':     dict(),
-                '_keywords':     dict(),                
+                '_keywords':     dict(),
              }
 
     def __init__(self, data):
@@ -75,12 +75,12 @@ class Comment(ASObject):
         self.update(self.data)
 
 
-class Context(ASObject):
+class Uri(ASObject):
     """
         An Max Context Object
     """
     data = {}
-    objectType = 'Context'
+    objectType = 'Uri '
     schema = {
                 '_id':         dict(),
                 'url':         dict(required=1),

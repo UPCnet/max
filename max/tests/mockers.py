@@ -125,7 +125,7 @@ create_contextB = {
 # Revisat i actualitzat
 subscribe_context = {
     "object": {
-        "objectType": "context",
+        "objectType": "uri",
         "url": create_context['url'],
         'displayName': create_context['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }
@@ -134,7 +134,7 @@ subscribe_context = {
 # Revisat i actualitzat
 subscribe_contextA = {
     "object": {
-        "objectType": "context",
+        "objectType": "uri",
         "url": create_contextA['url'],
         'displayName': create_contextA['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }
@@ -143,7 +143,7 @@ subscribe_contextA = {
 # Revisat i actualitzat
 subscribe_contextB = {
     "object": {
-        "objectType": "context",
+        "objectType": "uri",
         "url": create_contextB['url'],
         'displayName': create_contextB['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }

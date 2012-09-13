@@ -133,7 +133,7 @@ class RulesTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'context')
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
@@ -153,7 +153,7 @@ class RulesTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'context')
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 

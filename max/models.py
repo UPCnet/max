@@ -32,8 +32,9 @@ class Activity(MADBase):
         isPerson = isinstance(self.data['actor'], User)
         isContext = isinstance(self.data['actor'], Context)
 
-        # XXX Assuming here we won't support any other type as actor
-        actorType = isPerson and 'person' or 'context'
+        # XXX Assuming here we only support Person as actor
+        # XXX Assuming here we only support Uri as context
+        actorType = isPerson and 'person' or 'uri'
         ob = {'actor': {
                     'objectType': actorType,
                     '_id': self.data['actor']['_id'],
@@ -69,7 +70,7 @@ class Activity(MADBase):
                 for url in self.data['contexts']:
                     subscription = self.data['actor'].getSubscriptionByURL(url)
                     context = dict(url=url,
-                                   objectType='context',
+                                   objectType='uri',
                                    displayName=subscription.get('displayName', subscription.get('url'))
                                    )
                     ob['contexts'].append(context)
@@ -77,7 +78,7 @@ class Activity(MADBase):
                 # When a context posts an activity it can be posted only
                 # to itself, so add it directly
                     ob['contexts'] = [dict(url=self.data['actor']['url'],
-                                   objectType='context',
+                                   objectType='uri',
                                    displayName=self.data['actor']['displayName'],
                                    )]
         self.update(ob)
@@ -219,6 +220,7 @@ class Context(MADBase):
     unique = 'url'
     schema = {
                 '_id':              dict(),
+                'object':           dict(),
                 'url':              dict(required=1),
                 'urlHash':          dict(),
                 'displayName':      dict(operations_mutable=1),
@@ -261,6 +263,11 @@ class Context(MADBase):
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
             ob['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
+
+        dataobject = self.data.get('object',{'objectType':'uri'})
+        wrapper = self.getObjectWrapper(dataobject.get('objectType','uri'))
+        subobject = wrapper(dataobject)
+        ob['object'] = subobject
 
         ob.update(properties)
         self.update(ob)

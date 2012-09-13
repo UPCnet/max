@@ -57,6 +57,7 @@ def unsubscribe(context, request):
 # @view_config(context=Root, request_method='POST', name="follow_context")
 # def followContext(context, request):
 #     # import ipdb; ipdb.set_trace()
+
 #     try:
 #         checkRequestConsistency(request)
 #         data = extractPostData(request)
