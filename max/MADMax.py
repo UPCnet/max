@@ -1,7 +1,7 @@
 #MADMax  Mongo Access Delegate for Max
 
 from max.exceptions import ObjectNotFound
-from pymongo.objectid import ObjectId
+from bson.objectid import ObjectId
 import sys
 from pymongo import DESCENDING
 
@@ -71,8 +71,6 @@ class MADMaxCollection(object):
                 # Filter the query to return objects created later or earlier than the one
                 # represented by offset (offset not included)
                 query.update({'_id': {condition: offset}})
-            self.setVisibleResultFields(show_fields)
-            cursor = self.collection.find(query, self.show_fields)
 
             if hashtag:
                 # Filter the query to only objects containing certain hashtags
@@ -92,6 +90,11 @@ class MADMaxCollection(object):
                 for keyw in keywords:
                     keywords_query['$and'].append({'object._keywords': keyw})
                 query.update(keywords_query)
+
+            # Cursor is lazy, but better to execute search here for mental sanity
+            self.setVisibleResultFields(show_fields)
+            cursor = self.collection.find(query, self.show_fields)
+
 
         else:
             cursor = self.collection.find()

@@ -9,7 +9,7 @@ from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.utils import flatten
 
-from pymongo.objectid import ObjectId
+from bson.objectid import ObjectId
 
 
 @view_config(route_name='user_comments', request_method='GET')

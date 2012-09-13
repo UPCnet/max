@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPBadRequest, HTTPOk, HTTPNotImplemented
 
 import json
 from bson import json_util
-from pymongo.objectid import ObjectId
+from bson.objectid import ObjectId
 
 from max.resources import Root
 from max.rest.utils import checkIsValidActivity, checkDataShare, checkIsValidUser, checkRequestConsistency, extractPostData

@@ -5,7 +5,7 @@ from datetime import datetime
 from rfc3339 import rfc3339
 from max.exceptions import InvalidSearchParams, Unauthorized
 
-from pymongo.objectid import ObjectId
+from bson.objectid import ObjectId
 from max.MADMax import MADMaxCollection
 
 import requests
