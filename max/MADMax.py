@@ -81,7 +81,7 @@ class MADMaxCollection(object):
 
             if author:
                 # Filter the query to only objects containing certain hashtags
-                username_query = {'actor.username':author}
+                username_query = {'actor.username': author}
                 query.update(username_query)
 
             if keywords:
@@ -94,7 +94,6 @@ class MADMaxCollection(object):
             # Cursor is lazy, but better to execute search here for mental sanity
             self.setVisibleResultFields(show_fields)
             cursor = self.collection.find(query, self.show_fields)
-
 
         else:
             cursor = self.collection.find()
@@ -158,7 +157,7 @@ class MADMaxCollection(object):
         if item:
             return self.ItemWrapper(item)
         else:
-            raise ObjectNotFound, "Object with id %s not found inside %s" % (itemID,self.collection.name)
+            raise ObjectNotFound("Object with id %s not found inside %s" % (itemID, self.collection.name))
 
     def __getattr__(self, name):
         """
@@ -180,8 +179,9 @@ class MADMaxCollection(object):
 
 
 class MADMaxDB(object):
-    """
-        Wrapper for accessing Database
+    """ Wrapper for accessing Database and a specific collection via a class attribute.
+
+        usage: MADMaxDB.<name_of_the_collection>
     """
 
     def __init__(self, db):
@@ -204,7 +204,7 @@ class MADMaxDB(object):
             except:
                 #If failed and user didn't pass a default value
                 if default == UNDEF:
-                    raise AttributeError, name
+                    raise AttributeError(name)
                 else:
                     attr = default
             return attr

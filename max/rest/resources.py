@@ -11,6 +11,7 @@ OAUTH_RESOURCES = {
 'follow': {'route': '/people/{username}/follows/{followedDN}'},
 'subscriptions': {'route': '/people/{username}/subscriptions'},
 'subscription': {'route': '/people/{username}/subscriptions/{urlHash}'},
+'user_conversations': {'route': '/people/{username}/conversations'},
 
 'activities': {'route': '/activities'},
 'activity': {'route': '/activities/{activity}'},
@@ -27,7 +28,13 @@ OAUTH_RESOURCES = {
 'context_permissions': {'route': '/contexts/{urlHash}/permissions'},
 'context_user_permissions': {'route': '/contexts/{urlHash}/permissions/{username}'},
 'context_user_permission': {'route': '/contexts/{urlHash}/permissions/{username}/{permission}'},
+
+'conversations': {'route': '/conversations'},
+'conversation': {'route': '/conversations/{hash}'},
+'messages': {'route': '/conversations/{hash}/messages'},
 }
+# POST a conversation es enviar un Missatge
+# GET a messages es agafar dades dels missatges de la conversa
 
 ADMIN_RESOURCES = {
 'admin_user_activities': {'route': '/admin/people/{username}/activities'},
