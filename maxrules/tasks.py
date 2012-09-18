@@ -31,7 +31,7 @@ def processTweet(twitter_username, content):
         # Watch for the case when two or more context share twitterUsername
         for context in maxcontext:
             url_hash = context.get("urlHash")
-            context_url = context.get("url")
+            context_url = context.get('object', {}).get("url")
 
             # Construct the payload with the activity information
             newactivity = {
@@ -81,7 +81,7 @@ def processTweet(twitter_username, content):
             # Check if MAX username has permission to post to the MAX context
             # if not, discard it
             try:
-                can_write = canWriteInContexts(maxuser, [context.url])
+                can_write = canWriteInContexts(maxuser, [context.object['url']])
             except:
                 can_write = False
 
@@ -95,7 +95,7 @@ def processTweet(twitter_username, content):
                     "content": content
                 },
                 "contexts": [
-                    context.url,
+                    context.object['url'],
                 ],
                 "generator": twitter_generator_name
             }
@@ -104,7 +104,7 @@ def processTweet(twitter_username, content):
             # MAX context in name of the specified MAX username
             re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
-                logging.warning("Success tweet from user %s in context %s" % (maxuser, context.url))
+                logging.warning("Success tweet from user %s in context %s" % (maxuser, context.object['url']))
                 #return "Success tweet from user %s in context %s" % (maxuser, context.url)
             else:
                 logging.warning("Error accessing the MAX API at %s" % max_server_url)

@@ -83,11 +83,11 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed contexts with read permission
-    subscribed = [context.get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
+    subscribed = [context.get('object', {}).get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
 
     # get the defined read context
     rcontext = mmdb.contexts.getItemsByurlHash(urlhash)[0]
-    url = rcontext.url
+    url = rcontext['object']['url']
 
     # regex query to find all contexts within url
     escaped = re.escape(url)

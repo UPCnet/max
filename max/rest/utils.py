@@ -117,7 +117,7 @@ def searchParams(request):
             raise InvalidSearchParams, 'before must be a valid ObjectId BSON identifier'
 
     if 'before' in params and 'after' in params:
-        raise InvalidSearchParams, 'only one offset filter is allowe, after or before'
+        raise InvalidSearchParams, 'only one offset filter is allowed, after or before'
 
     hashtags = request.params.getall('hashtag')
     if hashtags:
@@ -127,7 +127,7 @@ def searchParams(request):
     if author:
         params['author'] = author.lower()
 
-    keywords = request.params.getall('keyword')
+    keywords = request.params.getall('keywnord')
     if keywords:
         ### XXX Split or regex?
         params['keywords'] = [keyw.lower() for keyw in keywords]
@@ -320,7 +320,7 @@ def canWriteInContexts(actor, urls):
     if urls == []:
         return True
 
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
+    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items']]
     unsubscribed_contexts = [url for url in urls if url not in subscribed_contexts_urls]
 
     # If user is trying to post on a context/s where he's not subscribed
@@ -329,7 +329,7 @@ def canWriteInContexts(actor, urls):
 
     # If user is trying to post on a subscribed context/s
     # Check that has write permission in all the contexts
-    context_map = {context['url']: context for context in actor.subscribedTo['items']}
+    context_map = {context['object']['url']: context for context in actor.subscribedTo['items']}
     unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
 
     if unauthorized_contexts:
@@ -346,7 +346,7 @@ def canReadContext(actor, url):
     if url == []:
         return True
 
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
+    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
 
     if url not in subscribed_contexts_urls:
 

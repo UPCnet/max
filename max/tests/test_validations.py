@@ -64,7 +64,7 @@ class FunctionalTests(unittest.TestCase):
         """
         from .mockers import create_context_full
         new_context = dict(create_context_full)
-        new_context['twitterUsername'] = '@%s ' % create_context_full['twitterUsername'] 
+        new_context['twitterUsername'] = '@%s ' % create_context_full['twitterUsername']
         new_context['twitterHashtag'] = '  #%s' % create_context_full['twitterHashtag']
         res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
@@ -78,7 +78,7 @@ class FunctionalTests(unittest.TestCase):
         from .mockers import create_context_full
         from hashlib import sha1
         res = self.testapp.post('/contexts', json.dumps(create_context_full), basicAuthHeader('operations', 'operations'), status=201)
-        url_hash = sha1(create_context_full['url']).hexdigest()
+        url_hash = sha1(create_context_full['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet","twitterHashtag": "#atenea"}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')

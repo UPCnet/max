@@ -7,6 +7,16 @@ from max.resources import Root
 from max.rest.resources import RESOURCES
 from max.rest.utils import isOauth, isBasic, getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
 from max.models import User, Context
+from beaker.cache import cache_region, Cache
+
+
+def getUserActor(db, username):
+    mmdb = MADMaxDB(db)
+    return mmdb.users.getItemsByusername(username)
+
+def getContextActor(db, hash):
+    mmdb = MADMaxDB(db)
+    return mmdb.contexts.getItemsByurlHash(hash)
 
 
 def MaxRequest(func):
@@ -15,7 +25,6 @@ def MaxRequest(func):
         context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
 
         actor = None
-        mmdb = MADMaxDB(context.db)
         admin_ws = [('admin_users', 'GET'), ('admin_activities', 'GET'), ('admin_contexts', 'GET'), ('admin_user', 'DELETE'), ('admin_activity', 'DELETE'), ('admin_context', 'DELETE')]
         allowed_ws_without_username = admin_ws + [('contexts', 'POST'), ('context', 'GET'), ('context', 'PUT'), ('context', 'DELETE')]
         allowed_ws_without_actor = [('user', 'POST')] + allowed_ws_without_username
@@ -31,13 +40,13 @@ def MaxRequest(func):
             # XXX TODO Define cases where oauth_username MAY/CAN be different
             # to rest_username/post_username
             if rest_username and oauth_username != rest_username:
-                raise Unauthorized, "You don't have permission to access %s resources" % (rest_username)
+                raise Unauthorized,  "You don't have permission to access %s resources" % (rest_username)
             post_username = getUsernameFromPOSTBody(request)
             if post_username and oauth_username != post_username:
                 raise Unauthorized, "You don't have permission to access %s resources" % (post_username)
             # If user validation is successfull, try to load the oauth User from DB
             try:
-                actor = mmdb.users.getItemsByusername(oauth_username)[0]
+                actor = getUserActor(context.db, oauth_username)[0]
             except:
                 raise UnknownUserError, 'Unknown user "%s"' % oauth_username
 
@@ -71,7 +80,7 @@ def MaxRequest(func):
             #try to load the user actor from DB
             if actorType == 'person':
                 try:
-                    actor = mmdb.users.getItemsByusername(username)[0]
+                    actor = getUserActor(context.db, username)[0]
                 except:
                     if not ((request.matched_route.name, request.method) in allowed_ws_without_actor):
                         raise UnknownUserError, 'Unknown actor identified by username: %s' % username
@@ -79,7 +88,7 @@ def MaxRequest(func):
             #try to load the context actor from DB
             if actorType == 'context':
                 try:
-                    actor = mmdb.contexts.getItemsByurlHash(contexthash)[0]
+                    actor = getContextActor(context.db, contexthash)[0]
                 except:
                     raise UnknownUserError, 'Unknown actor identified by context : %s' % contexthash
 
@@ -95,7 +104,7 @@ def MaxRequest(func):
                 if isinstance(actor, User):
                     actor.setdefault('displayName', actor['username'])
                 if isinstance(actor, Context):
-                    actor.setdefault('displayName', actor['url'])
+                    actor.setdefault('displayName', actor['object']['url'])
                 return actor
             except:
                 return None

@@ -16,7 +16,9 @@ requires = [
     'rfc3339',
     'requests',
     'tweepy',
-    'celery'
+    'celery',
+    'beaker'
+
     ]
 
 test_requires = ['WebTest', 'mock', ]

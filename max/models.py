@@ -47,14 +47,14 @@ class Activity(MADBase):
             ob['actor']['username'] = self.data['actor']['username']
         elif isContext:
             ob['actor']['urlHash'] = self.data['actor']['urlHash']
-            ob['actor']['url'] = self.data['actor']['url']
+            ob['actor']['url'] = self.data['actor']['object']['url']
 
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
 
         #Append actor as username if object has keywords and actor is a Person
-        if ob['object'].get('_keywords',None):
+        if ob['object'].get('_keywords', None):
             if isPerson:
                 ob['object']['_keywords'].append(self.data['actor']['username'])
 
@@ -69,18 +69,12 @@ class Activity(MADBase):
                 ob['contexts'] = []
                 for url in self.data['contexts']:
                     subscription = self.data['actor'].getSubscriptionByURL(url)
-                    context = dict(url=url,
-                                   objectType='uri',
-                                   displayName=subscription.get('displayName', subscription.get('url'))
-                                   )
+                    context = subscription.get('object')
                     ob['contexts'].append(context)
             if isContext:
                 # When a context posts an activity it can be posted only
                 # to itself, so add it directly
-                    ob['contexts'] = [dict(url=self.data['actor']['url'],
-                                   objectType='uri',
-                                   displayName=self.data['actor']['displayName'],
-                                   )]
+                    ob['contexts'] = [self.data['actor']['object'], ]
         self.update(ob)
 
     def addComment(self, comment):
@@ -114,7 +108,7 @@ class Activity(MADBase):
         if isinstance(self.data['actor'], User):
             result = result and canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
         if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
-            result = result and self.data['actor']['url'] == self.data.get('contexts')[0]
+            result = result and self.data['actor']['object']['url'] == self.data.get('contexts')[0]
         return result
 
 
@@ -208,7 +202,7 @@ class User(MADBase):
     def getSubscriptionByURL(self, url):
         """
         """
-        context_map = {context['url']: context for context in self.subscribedTo['items']}
+        context_map = {context['object']['url']: context for context in self.subscribedTo['items']}
         return context_map.get(url)
 
 
@@ -217,13 +211,11 @@ class Context(MADBase):
         A max Context object representation
     """
     collection = 'contexts'
-    unique = 'url'
+    unique = 'urlHash'
     schema = {
                 '_id':              dict(),
                 'object':           dict(),
-                'url':              dict(required=1),
                 'urlHash':          dict(),
-                'displayName':      dict(operations_mutable=1),
                 'published':        dict(),
                 'twitterHashtag':   dict(operations_mutable=1,
                                          formatters=['stripHash'],
@@ -258,7 +250,7 @@ class Context(MADBase):
             elif default:
                 properties[key] = default
 
-        ob['urlHash'] = sha1(self.data['url']).hexdigest()
+        ob['urlHash'] = sha1(self.data['object']['url']).hexdigest()
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):

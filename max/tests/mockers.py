@@ -71,54 +71,67 @@ demostatus_with_context = {
 # web service com a arguments
 # =============================================================================
 
-
-
 create_context = {
 
-    'url': 'http://atenea.upc.edu',
-    'displayName': 'Atenea',
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri',
+        'displayName': 'Atenea',
+    }
 }
 
 
 create_context_full = {
-
-    'url': 'http://atenea.upc.edu',
-    'displayName': 'Atenea',
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri',
+        'displayName': 'Atenea'
+    },
     'twitterHashtag': 'atenea',
     'twitterUsername': 'atenaupc',
 }
 
 create_context_private_rw = {
 
-    'url': 'http://atenea.upc.edu',
-    'displayName': 'Atenea',
-    'permissions': {'read':'subscribed',
-                    'write':'subscribed',
-                    'join':'restricted',
-                    'invite':'restricted'}
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri',
+        'displayName': 'Atenea'
+    },
+    'permissions': {'read': 'subscribed',
+                    'write': 'subscribed',
+                    'join': 'restricted',
+                    'invite': 'restricted'}
 }
 
 create_context_private_r = {
 
-    'url': 'http://atenea.upc.edu',
-    'displayName': 'Atenea',
-    'permissions': {'read':'subscribed',
-                    'write':'restricted',
-                    'join':'restricted',
-                    'invite':'restricted'}
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri',
+        'displayName': 'Atenea'
+    },
+    'permissions': {'read': 'subscribed',
+                    'write': 'restricted',
+                    'join': 'restricted',
+                    'invite': 'restricted'}
 
 }
 
 create_contextA = {
-
-    'url': 'http://atenea.upc.edu/A',
-    'displayName': 'Atenea A',
+    'object': {
+        'url': 'http://atenea.upc.edu/A',
+        'objectType': 'uri',
+        'displayName': 'Atenea A'
+    }
 }
 
 create_contextB = {
-
-    'url': 'http://atenea.upc.edu/B',
-    'displayName': 'Atenea B',
+    'object': {
+        'url': 'http://atenea.upc.edu/B',
+        'objectType': 'uri',
+        'displayName': 'Atenea B'
+    }
 }
 
 
@@ -126,8 +139,8 @@ create_contextB = {
 subscribe_context = {
     "object": {
         "objectType": "uri",
-        "url": create_context['url'],
-        'displayName': create_context['displayName']       #displayName not needed, only for assertEquals comparison purposes
+        "url": create_context['object']['url'],
+        'displayName': create_context['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -135,8 +148,8 @@ subscribe_context = {
 subscribe_contextA = {
     "object": {
         "objectType": "uri",
-        "url": create_contextA['url'],
-        'displayName': create_contextA['displayName']       #displayName not needed, only for assertEquals comparison purposes
+        "url": create_contextA['object']['url'],
+        'displayName': create_contextA['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -144,8 +157,8 @@ subscribe_contextA = {
 subscribe_contextB = {
     "object": {
         "objectType": "uri",
-        "url": create_contextB['url'],
-        'displayName': create_contextB['displayName']       #displayName not needed, only for assertEquals comparison purposes
+        "url": create_contextB['object']['url'],
+        'displayName': create_contextB['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -229,7 +242,7 @@ context_query = {
 
 context_query_kw_search = {
     "context": sha1(subscribe_context['object']['url']).hexdigest(),
-    "keyword": ['Testejant','creació']
+    "keyword": ['Testejant', 'creació']
 }
 
 context_query_author_search = {
@@ -282,7 +295,6 @@ unfollow = {
         "username": "javier"
     },
 }
-
 
 
 unfollow_context = {

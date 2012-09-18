@@ -84,6 +84,7 @@ class Uri(ASObject):
     schema = {
                 '_id':         dict(),
                 'url':         dict(required=1),
+                'displayName': dict(operations_mutable=1),
                 'objectType':  dict(required=1),
              }
 

@@ -85,7 +85,7 @@ class RulesTests(unittest.TestCase):
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
         self.subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
@@ -97,65 +97,65 @@ class RulesTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
-    def test_process_new_tweet_from_hashtag_uppercase(self):
-        from maxrules.tasks import processTweet
-        from .mockers import create_contextA, subscribe_contextA
-        username = 'messi'
-        self.create_user(username)
-        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
-        self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+    # def test_process_new_tweet_from_hashtag_uppercase(self):
+    #     from maxrules.tasks import processTweet
+    #     from .mockers import create_contextA, subscribe_contextA
+    #     username = 'messi'
+    #     self.create_user(username)
+    #     self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+    #     context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+    #     self.create_context(create_contextA, permissions=context_permissions)
+    #     self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+    #     self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #UPC #ASSIGNATURA1')
+    #     processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #UPC #ASSIGNATURA1')
 
-        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+    #     res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+    #     result = json.loads(res.text)
+    #     self.assertEqual(result.get('totalItems', None), 1)
+    #     self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+    #     self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+    #     self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
-    def test_process_new_tweet_from_twitter_username(self):
-        from maxrules.tasks import processTweet
-        from .mockers import create_contextA, subscribe_contextA
-        username = 'messi'
-        self.create_user(username)
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
-        self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['url'], {"twitterUsername": "maxupcnet"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+    # def test_process_new_tweet_from_twitter_username(self):
+    #     from maxrules.tasks import processTweet
+    #     from .mockers import create_contextA, subscribe_contextA
+    #     username = 'messi'
+    #     self.create_user(username)
+    #     context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+    #     self.create_context(create_contextA, permissions=context_permissions)
+    #     self.modify_context(create_contextA['object']['url'], {"twitterUsername": "maxupcnet"})
+    #     self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('maxupcnet', 'Ehteee, acabo de batir el récor de goles en el Barça.')
+    #     processTweet('maxupcnet', 'Ehteee, acabo de batir el récor de goles en el Barça.')
 
-        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+    #     res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+    #     result = json.loads(res.text)
+    #     self.assertEqual(result.get('totalItems', None), 1)
+    #     self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
+    #     self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
+    #     self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+    #     self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
-    def test_process_new_tweet_from_twitter_username_uppercase(self):
-        from maxrules.tasks import processTweet
-        from .mockers import create_contextA, subscribe_contextA
-        username = 'messi'
-        self.create_user(username)
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
-        self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['url'], {"twitterUsername": "maxupcnet"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+    # def test_process_new_tweet_from_twitter_username_uppercase(self):
+    #     from maxrules.tasks import processTweet
+    #     from .mockers import create_contextA, subscribe_contextA
+    #     username = 'messi'
+    #     self.create_user(username)
+    #     context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+    #     self.create_context(create_contextA, permissions=context_permissions)
+    #     self.modify_context(create_contextA['object']['url'], {"twitterUsername": "maxupcnet"})
+    #     self.subscribe_user_to_context(username, subscribe_contextA)
 
-        processTweet('MAXUPCNET', 'Ehteee, acabo de batir el récor de goles en el Barça.')
+    #     processTweet('MAXUPCNET', 'Ehteee, acabo de batir el récor de goles en el Barça.')
 
-        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+    #     res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+    #     result = json.loads(res.text)
+    #     self.assertEqual(result.get('totalItems', None), 1)
+    #     self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
+    #     self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
+    #     self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+    #     self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
 
 
 def basicAuthHeader(username, password):
