@@ -6,8 +6,7 @@ from max.decorators import MaxRequest, MaxResponse
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
-from max.oauth2 import oauth2
-from hashlib import sha1
+
 
 @view_config(route_name='subscriptions', request_method='GET')
 def getUserSubscriptions(context, request):
@@ -33,8 +32,8 @@ def subscribe(context, request):
     newactivity.fromRequest(request, rest_params=rest_params)
 
     #Check if user is already subscribed
-    subscribed_contexts_hashes = [a['urlHash'] for a in actor.subscribedTo['items']]
-    if sha1(newactivity.object['url']).hexdigest() in subscribed_contexts_hashes:
+    subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo['items']]
+    if newactivity.object.getHash() in subscribed_contexts_hashes:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was susbcribed. This way in th return data we'll have the date of subscription
         code = 200
@@ -49,8 +48,8 @@ def subscribe(context, request):
         newactivity['_id'] = newactivity_oid
 
         #Register subscription to the actor
-        contexts = MADMaxCollection(context.db.contexts, query_key='urlHash')
-        scontext = contexts[sha1(newactivity['object']['url']).hexdigest()]
+        contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+        scontext = contexts[newactivity['object'].getHash()]
         actor.addSubscription(scontext)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)

@@ -64,7 +64,7 @@ def getUsernameFromURI(request):
 def getUrlHashFromURI(request):
     """
     """
-    return request.matchdict.get('urlHash', None)
+    return request.matchdict.get('hash', None)
 
 
 def getUsernameFromPOSTBody(request):

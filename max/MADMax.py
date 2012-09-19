@@ -128,8 +128,8 @@ class MADMaxCollection(object):
             Flattened or not by demand
         """
         class_map = dict(activity='Activity',
-                        users='User',
-                        contexts='Context')
+                         users='User',
+                         contexts='Context')
 
         model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
         wrapped = model()
@@ -158,7 +158,8 @@ class MADMaxCollection(object):
         if item:
             return self.ItemWrapper(item)
         else:
-            raise ObjectNotFound("Object with id %s not found inside %s" % (itemID, self.collection.name))
+            querykey = len(query.keys()) == 1 and query.keys()[0] or 'id'
+            raise ObjectNotFound("Object with %s %s not found inside %s" % (querykey, itemID, self.collection.name))
 
     def __getattr__(self, name):
         """

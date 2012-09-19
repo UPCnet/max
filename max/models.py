@@ -2,7 +2,6 @@
 from max.MADObjects import MADBase
 from max.rest.utils import canWriteInContexts
 import datetime
-from hashlib import sha1
 from MADMax import MADMaxDB
 from max.rest.utils import getUserIdFromTwitter, findKeywords, findHashtags
 from max import DEFAULT_CONTEXT_PERMISSIONS
@@ -45,7 +44,7 @@ class Activity(MADBase):
         if isPerson:
             ob['actor']['username'] = self.data['actor']['username']
         elif isContext:
-            ob['actor']['urlHash'] = self.data['actor']['urlHash']
+            ob['actor']['hash'] = self.data['actor']['hash']
             ob['actor']['url'] = self.data['actor']['object']['url']
 
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
@@ -177,7 +176,7 @@ class User(MADBase):
         """
         """
         criteria = {}
-        criteria.update({'subscribedTo.items.urlHash': subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'subscribedTo.items.hash': subscription['hash']})   # update object from "items" that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # Add permission to permissions array, of matched object of "items"
@@ -189,7 +188,7 @@ class User(MADBase):
         """
         """
         criteria = {}
-        criteria.update({'subscribedTo.items.urlHash': subscription['urlHash']})   # update object from "items" that matches urlHash
+        criteria.update({'subscribedTo.items.hash': subscription['hash']})   # update object from "items" that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # deletes permission from permissions array, of matched object of "items"
@@ -209,10 +208,10 @@ class Context(MADBase):
         A max Context object representation
     """
     collection = 'contexts'
-    unique = 'urlHash'
+    unique = 'hash'
     schema = {'_id':                dict(),
               'object':             dict(),
-              'urlHash':            dict(),
+              'hash':               dict(),
               'published':          dict(),
               'twitterHashtag':     dict(operations_mutable=1,
                                          formatters=['stripHash'],
@@ -248,8 +247,6 @@ class Context(MADBase):
             elif default:
                 properties[key] = default
 
-        ob['urlHash'] = sha1(self.data['object']['url']).hexdigest()
-
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
             ob['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
@@ -258,6 +255,8 @@ class Context(MADBase):
         wrapper = self.getObjectWrapper(dataobject.get('objectType', 'uri'))
         subobject = wrapper(dataobject)
         ob['object'] = subobject
+
+        ob['hash'] = subobject.getHash()
 
         ob.update(properties)
         self.update(ob)
@@ -278,7 +277,7 @@ class Context(MADBase):
     def subscribedUsers(self):
         """
         """
-        criteria = {'subscribedTo.items.urlHash': self.urlHash}
+        criteria = {'subscribedTo.items.hash': self.hash}
         subscribed_users = self.mdb_collection.database.users.find(criteria)
         return [user for user in subscribed_users]
 
@@ -308,7 +307,7 @@ class Context(MADBase):
         ids = [user['_id'] for user in self.subscribedUsers()]
 
         for obid in ids:
-            criteria = {'_id': obid, 'subscribedTo.items.urlHash': self.urlHash}
+            criteria = {'_id': obid, 'subscribedTo.items.hash': self.hash}
 
                  # deletes context from subcription list
             what = {'$set': {'subscribedTo.items.$.displayName': self.displayName}}
@@ -317,9 +316,9 @@ class Context(MADBase):
     def removeUserSubscriptions(self):
         """
         """
-        # update object from "items" that matches urlHash
-        criteria = {'subscribedTo.items.urlHash': self.urlHash}
+        # update object from "items" that matches hash
+        criteria = {'subscribedTo.items.hash': self.hash}
 
          # deletes context from subcription list
-        what = {'$pull': {'subscribedTo.items': {'urlHash': self.urlHash}}}
+        what = {'$pull': {'subscribedTo.items': {'hash': self.hash}}}
 

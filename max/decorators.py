@@ -18,7 +18,7 @@ def getUserActor(db, username):
 
 def getContextActor(db, hash):
     mmdb = MADMaxDB(db)
-    return mmdb.contexts.getItemsByurlHash(hash)
+    return mmdb.contexts.getItemsByhash(hash)
 
 
 def MaxRequest(func):

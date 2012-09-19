@@ -30,7 +30,7 @@ def processTweet(twitter_username, content):
 
         # Watch for the case when two or more context share twitterUsername
         for context in maxcontext:
-            url_hash = context.get("urlHash")
+            url_hash = context.get("hash")
             context_url = context.get('object', {}).get("url")
 
             # Construct the payload with the activity information

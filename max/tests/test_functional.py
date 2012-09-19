@@ -538,7 +538,7 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['object']['url']).hexdigest()
         res = self.testapp.post('/admin/contexts/%s/activities' % url_hash, json.dumps(user_status_context), basicAuthHeader('admin', 'admin'))
         result = json.loads(res.text)
-        self.assertEqual(result.get('actor', None).get('urlHash', None), url_hash)
+        self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
 
@@ -550,7 +550,7 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(create_context), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         url_hash = sha1(create_context['object']['url']).hexdigest()
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
 
     def test_add_public_context_with_all_params(self):
         from hashlib import sha1
@@ -558,7 +558,7 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(create_context_full), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         url_hash = sha1(create_context_full['object']['url']).hexdigest()
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('object', {}).get('displayName', None), create_context_full['object']['displayName'])
         self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
         self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
@@ -570,7 +570,7 @@ class FunctionalTests(unittest.TestCase):
         self.create_context(create_context)
         res = self.testapp.get('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
 
     def test_modify_context(self):
         from hashlib import sha1
@@ -579,7 +579,7 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
 
     def test_modify_context_with_twitter_username(self):
@@ -589,7 +589,7 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
         self.assertEqual(result.get('twitterUsernameId', None), '526326641')
@@ -602,7 +602,7 @@ class FunctionalTests(unittest.TestCase):
         self.modify_context(create_context['object']['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura4", "twitterUsername": ""}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura4')
         self.assertEqual(result.get('twitterUsername', None), None)
         self.assertEqual(result.get('twitterUsernameId', None), None)
@@ -635,7 +635,7 @@ class FunctionalTests(unittest.TestCase):
         self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
         res = self.testapp.get('/contexts/%s' % url_hashA, "", basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('urlHash', None), url_hashA)
+        self.assertEqual(result.get('hash', None), url_hashA)
 
     # def test_delete_context_removes_subscription_from_user(self):
     #     """
@@ -664,7 +664,7 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(create_context_private_rw), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         url_hash = sha1(create_context_private_rw['object']['url']).hexdigest()
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('permissions', None), create_context_private_rw['permissions'])
 
     def test_add_private_r_context(self):
@@ -673,7 +673,7 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(create_context_private_r), basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         url_hash = sha1(create_context_private_r['object']['url']).hexdigest()
-        self.assertEqual(result.get('urlHash', None), url_hash)
+        self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('permissions', None), create_context_private_r['permissions'])
 
     def test_check_permissions_on_subscribed_rw_context(self):
@@ -731,8 +731,8 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.subscribe_user_to_context(username, subscribe_context)
-        urlhash = sha1(create_context_private_r['object']['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=201)
+        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=201)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
         self.assertEqual('write' in result['permissions'], True)
@@ -744,9 +744,9 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.subscribe_user_to_context(username, subscribe_context)
-        urlhash = sha1(create_context_private_r['object']['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=201)
-        res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=200)
+        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=201)
+        res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
         self.assertEqual('write' not in result['permissions'], True)
@@ -757,8 +757,8 @@ class FunctionalTests(unittest.TestCase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        urlhash = sha1(create_context_private_r['object']['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=401)
+        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
 
@@ -769,8 +769,8 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.subscribe_user_to_context(username, subscribe_context)
-        urlhash = sha1(create_context_private_r['object']['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (urlhash, username), "", basicAuthHeader('operations', 'operations'), status=400)
+        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'InvalidPermission')
 

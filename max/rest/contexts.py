@@ -21,11 +21,11 @@ def getContext(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    urlhash = request.matchdict.get('urlHash', None)
-    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+    chash = request.matchdict.get('hash', None)
+    found_context = mmdb.contexts.getItemsByhash(chash)
 
     if not found_context:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % urlhash)
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
     handler = JSONResourceEntity(found_context[0].flatten())
     return handler.buildResponse()
@@ -35,13 +35,13 @@ def getContext(context, request):
 def getContextAvatar(context, request):
     """
     """
-    urlHash = request.matchdict['urlHash']
+    chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
-    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, urlHash)
+    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, chash)
 
     if not os.path.exists(context_image_filename):
         mmdb = MADMaxDB(context.db)
-        found_context = mmdb.contexts.getItemsByurlHash(urlHash)
+        found_context = mmdb.contexts.getItemsByhash(chash)
         if len(found_context) > 0:
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
@@ -52,7 +52,7 @@ def getContextAvatar(context, request):
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
         if hours_since_last_modification > 3:
             mmdb = MADMaxDB(context.db)
-            found_context = mmdb.contexts.getItemsByurlHash(urlHash)
+            found_context = mmdb.contexts.getItemsByhash(chash)
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
     else:
@@ -98,13 +98,13 @@ def addContext(context, request):
 def ModifyContext(context, request):
     """
     """
-    urlHash = request.matchdict['urlHash']
+    chash = request.matchdict['hash']
     contexts = MADMaxCollection(context.db.contexts)
-    maxcontext = contexts.getItemsByurlHash(urlHash)
+    maxcontext = contexts.getItemsByhash(chash)
     if maxcontext:
         maxcontext = maxcontext[0]
     else:
-        raise ObjectNotFound('Unknown context: %s' % urlHash)
+        raise ObjectNotFound('Unknown context: %s' % chash)
 
     properties = maxcontext.getMutablePropertiesFromRequest(request)
     maxcontext.modifyContext(properties)
@@ -120,11 +120,11 @@ def DeleteContext(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    urlhash = request.matchdict.get('urlHash', None)
-    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+    chash = request.matchdict.get('hash', None)
+    found_context = mmdb.contexts.getItemsByhash(chash)
 
     if not found_context:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % urlhash)
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
     found_context[0].delete()
     found_context[0].removeUserSubscriptions()
@@ -141,11 +141,11 @@ def grantPermissionOnContext(context, request):
     if permission not in ['read', 'write', 'join', 'invite']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
-    urlhash = request.matchdict.get('urlHash', None)
+    chash = request.matchdict.get('hash', None)
     subscription = None
     pointer = 0
     while subscription is None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
+        if request.actor.subscribedTo['items'][pointer]['hash'] == chash:
             subscription = request.actor.subscribedTo['items'][pointer]
         pointer += 1
 
@@ -178,11 +178,11 @@ def revokePermissionOnContext(context, request):
     if permission not in ['read', 'write', 'join', 'invite']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
-    urlhash = request.matchdict.get('urlHash', None)
+    chash = request.matchdict.get('hash', None)
     subscription = None
     pointer = 0
     while subscription is None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
+        if request.actor.subscribedTo['items'][pointer]['hash'] == chash:
             subscription = request.actor.subscribedTo['items'][pointer]
         pointer += 1
 
