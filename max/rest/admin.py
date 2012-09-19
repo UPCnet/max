@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -91,7 +92,7 @@ def deleteUser(context, request):
     try:
         found_user = mmdb.users[userid]
     except:
-        raise ObjectNotFound, "There's no user with id: %s" % userid
+        raise ObjectNotFound("There's no user with id: %s" % userid)
 
     found_user.delete()
     return HTTPNoContent()
@@ -108,7 +109,7 @@ def deleteActivity(context, request):
     try:
         found_activity = mmdb.activity[activityid]
     except:
-        raise ObjectNotFound, "There's no activity with id: %s" % activityid
+        raise ObjectNotFound("There's no activity with id: %s" % activityid)
 
     found_activity.delete()
     return HTTPNoContent()
@@ -125,7 +126,7 @@ def deleteContext(context, request):
     try:
         found_context = mmdb.contexts[contextid]
     except:
-        raise ObjectNotFound, "There's no context with id: %s" % contextid
+        raise ObjectNotFound("There's no context with id: %s" % contextid)
 
     found_context.delete()
 

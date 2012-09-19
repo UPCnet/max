@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from max.rest.utils import extractPostData, flatten, RUDict
 from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError, ValidationError
 import datetime
@@ -103,9 +104,9 @@ class MADDict(dict):
             if self.schema.get(fieldname).get('required', 0):
                 field_required = True
 
-		# Raise an error unless we are updating
+                # Raise an error unless we are updating
                 if not self.checkParameterExists(fieldname) and not updating:
-                    raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+                    raise MissingField('Required parameter "%s" not found in the request' % fieldname)
             else:
                 field_required = False
 
@@ -120,8 +121,8 @@ class MADDict(dict):
                         validator = getattr(sys.modules['max.validators'], validator_name, None)
                         if validator:
                             success, message = validator(field_value)
-                            if success == False:
-                                raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+                            if not success:
+                                raise ValidationError('Validation error on field "%s": %s' % (fieldname, message))
 
                     # Apply formatters to validated fields
                     formatters = self.schema.get(fieldname).get('formatters', [])
@@ -136,7 +137,7 @@ class MADDict(dict):
                 else:
                     # If field was required and we are not updating, raise
                     if field_required and not updating:
-                        raise MissingField, 'Required parameter "%s" found but empty' % fieldname
+                        raise MissingField('Required parameter "%s" found but empty' % fieldname)
                     # Otherwise unset the field value by deleting it's key from the data and from the real object
                     del self.data[fieldname]
                     if fieldname in self:
@@ -215,14 +216,13 @@ class MADBase(MADDict):
         self.mdb_collection = collection
         self.update(source)
 
-    def getMutablePropertiesFromRequest(self, request, mutable_permission = 'operations_mutable'):
+    def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """
         """
         params = extractPostData(request)
         allowed_fields = [fieldName for fieldName in self.schema if self.schema[fieldName].get(mutable_permission, 0)]
         properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
         return properties
-
 
     def insert(self):
         """
@@ -263,13 +263,13 @@ class MADBase(MADDict):
 
         if allow_duplicates or not duplicated:
             self.mdb_collection.update({'_id': self['_id']},
-                                      {'$push': {items: obj},
-                                       '$inc': {count: 1}
-                                      }
-                                     )
+                                       {'$push': {items: obj},
+                                        '$inc': {count: 1}
+                                        }
+                                       )
         else:
             if not safe:
-                raise DuplicatedItemError, 'Item already on list "%s"' % (field)
+                raise DuplicatedItemError('Item already on list "%s"' % (field))
 
     def deleteFromList(self, field, obj, safe=True):
         """
@@ -307,7 +307,7 @@ class MADBase(MADDict):
         if module:
             return module
         else:
-            raise ObjectNotSupported, 'Activitystrea.ms object type %s unknown or unsupported' % objType
+            raise ObjectNotSupported('Activitystrea.ms object type %s unknown or unsupported' % objType)
 
     def updateFields(self, fields):
         """

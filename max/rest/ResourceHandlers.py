@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPNotFound, HTTPInternalServerError
 
@@ -27,7 +28,7 @@ class ResourceRoot(object):
     def buildResponse(self, payload=None):
         """
         """
-        data = payload == None and self.data or payload
+        data = payload is None and self.data or payload
         response = Response(data, status_int=self.status_code)
         response.content_type = self.response_content_type
         return response
@@ -69,7 +70,7 @@ class ResourceEntity(object):
     def buildResponse(self, payload=None):
         """
         """
-        data = payload == None and self.data or payload
+        data = payload is None and self.data or payload
         if data:
             response = Response(data, status_int=self.status_code)
             response.content_type = self.response_content_type

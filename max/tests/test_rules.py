@@ -51,7 +51,7 @@ class RulesTests(unittest.TestCase):
         return res
 
     def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username != None and oauth_username or username
+        oauth_username = oauth_username is not None and oauth_username or username
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 

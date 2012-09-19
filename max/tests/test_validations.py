@@ -37,7 +37,7 @@ class FunctionalTests(unittest.TestCase):
         return res
 
     def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username != None and oauth_username or username
+        oauth_username = oauth_username is not None and oauth_username or username
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
@@ -79,11 +79,10 @@ class FunctionalTests(unittest.TestCase):
         from hashlib import sha1
         res = self.testapp.post('/contexts', json.dumps(create_context_full), basicAuthHeader('operations', 'operations'), status=201)
         url_hash = sha1(create_context_full['object']['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet","twitterHashtag": "#atenea"}), basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet", "twitterHashtag": "#atenea"}), basicAuthHeader('operations', 'operations'), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
         self.assertEqual(result.get('twitterHashtag', None), 'atenea')
-
 
     def test_add_public_context_with_bad_twitter_username(self):
         """
@@ -95,7 +94,6 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/contexts', json.dumps(bad_context), basicAuthHeader('operations', 'operations'), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ValidationError')
-
 
     def test_add_public_context_with_bad_hashtag(self):
         """

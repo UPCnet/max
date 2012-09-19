@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError
 from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest
 from pyramid.httpexceptions import HTTPInternalServerError
@@ -13,6 +14,7 @@ from beaker.cache import cache_region, Cache
 def getUserActor(db, username):
     mmdb = MADMaxDB(db)
     return mmdb.users.getItemsByusername(username)
+
 
 def getContextActor(db, hash):
     mmdb = MADMaxDB(db)
@@ -40,15 +42,15 @@ def MaxRequest(func):
             # XXX TODO Define cases where oauth_username MAY/CAN be different
             # to rest_username/post_username
             if rest_username and oauth_username != rest_username:
-                raise Unauthorized,  "You don't have permission to access %s resources" % (rest_username)
+                raise Unauthorized("You don't have permission to access %s resources" % (rest_username))
             post_username = getUsernameFromPOSTBody(request)
             if post_username and oauth_username != post_username:
-                raise Unauthorized, "You don't have permission to access %s resources" % (post_username)
+                raise Unauthorized("You don't have permission to access %s resources" % (post_username))
             # If user validation is successfull, try to load the oauth User from DB
             try:
                 actor = getUserActor(context.db, oauth_username)[0]
             except:
-                raise UnknownUserError, 'Unknown user "%s"' % oauth_username
+                raise UnknownUserError('Unknown user "%s"' % oauth_username)
 
         # If Basic auth is used, actor username can be any username, as we are
         # impersonating him. We will search for this username in several places:
@@ -61,7 +63,7 @@ def MaxRequest(func):
             if not username and request.method == 'POST':
                 username = getUsernameFromPOSTBody(request)
 
-            # If no actor specified anywhere, raise an error
+            # If no actor specified anywhere, raise an error)
             # except when allowed not having a username
             # or when adding a context activity
             if not username:
@@ -69,7 +71,7 @@ def MaxRequest(func):
                     contexthash = getUrlHashFromURI(request)
                     actorType = 'context'
                 elif not ((request.matched_route.name, request.method) in allowed_ws_without_username):
-                    raise UnknownUserError, 'No user specified as actor'
+                    raise UnknownUserError('No user specified as actor')
 
             # Raise only if we are NOT adding a user or a context. These are the only cases
             # Were we permit not specifing an ator:
@@ -83,18 +85,18 @@ def MaxRequest(func):
                     actor = getUserActor(context.db, username)[0]
                 except:
                     if not ((request.matched_route.name, request.method) in allowed_ws_without_actor):
-                        raise UnknownUserError, 'Unknown actor identified by username: %s' % username
+                        raise UnknownUserError('Unknown actor identified by username: %s' % username)
 
             #try to load the context actor from DB
             if actorType == 'context':
                 try:
                     actor = getContextActor(context.db, contexthash)[0]
                 except:
-                    raise UnknownUserError, 'Unknown actor identified by context : %s' % contexthash
+                    raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
 
         # Raise an error if no authentication present
         else:
-            raise Unauthorized, "There are no supported authentication methods present in this request"
+            raise Unauthorized("There are no supported authentication methods present in this request")
 
         # If we arrive at this point, we have a valid user in actor.
         # (Except in the case of a new users explained 10 lines up)

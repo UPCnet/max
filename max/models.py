@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
 from max.rest.utils import canWriteInContexts
 import datetime
@@ -13,16 +14,15 @@ class Activity(MADBase):
     """
     collection = 'activity'
     unique = '_id'
-    schema = {
-                '_id':         dict(required=0),
-                'actor':       dict(required=1),
-                'verb':        dict(required=1),
-                'object':      dict(required=1),
-                'published':   dict(required=0),
-                'contexts':    dict(required=0),
-                'replies':    dict(required=0),
-                'generator':    dict(required=0),
-             }
+    schema = {'_id':         dict(required=0),
+              'actor':       dict(required=1),
+              'verb':        dict(required=1),
+              'object':      dict(required=1),
+              'published':   dict(required=0),
+              'contexts':    dict(required=0),
+              'replies':     dict(required=0),
+              'generator':   dict(required=0),
+              }
 
     def buildObject(self):
         """
@@ -35,14 +35,13 @@ class Activity(MADBase):
         # XXX Assuming here we only support Person as actor
         # XXX Assuming here we only support Uri as context
         actorType = isPerson and 'person' or 'uri'
-        ob = {'actor': {
-                    'objectType': actorType,
-                    '_id': self.data['actor']['_id'],
-                    'displayName': self.data['actor']['displayName'],
-                    },
-                'verb': self.data['verb'],
-                'object': None,
-                }
+        ob = {'actor': {'objectType': actorType,
+                        '_id': self.data['actor']['_id'],
+                        'displayName': self.data['actor']['displayName'],
+                        },
+              'verb': self.data['verb'],
+              'object': None,
+              }
         if isPerson:
             ob['actor']['username'] = self.data['actor']['username']
         elif isContext:
@@ -83,18 +82,18 @@ class Activity(MADBase):
         """
         self.addToList('replies', comment, allow_duplicates=True)
 
-        activity_keywords = self.object.setdefault('_keywords',[])
-        activity_keywords.extend(comment.get('_keywords',[]))
+        activity_keywords = self.object.setdefault('_keywords', [])
+        activity_keywords.extend(comment.get('_keywords', []))
         activity_keywords = list(set(activity_keywords))
 
-        activity_hashtags = self.object.setdefault('_hashtags',[])
-        activity_hashtags.extend(comment.get('_hashtags',[]))
+        activity_hashtags = self.object.setdefault('_hashtags', [])
+        activity_hashtags.extend(comment.get('_hashtags', []))
         activity_hashtags = list(set(activity_hashtags))
 
         self.mdb_collection.update({'_id': self['_id']},
-                                      {'$set': {'object._keywords': activity_keywords,
-                                                'object._hashtags': activity_hashtags}}
-                                      )
+                                   {'$set': {'object._keywords': activity_keywords,
+                                             'object._hashtags': activity_hashtags}}
+                                   )
 
     def _on_create_custom_validations(self):
         """
@@ -118,16 +117,15 @@ class User(MADBase):
     """
     collection = 'users'
     unique = 'username'
-    schema = {
-                '_id':          dict(),
-                'username':     dict(required=1),
-                'displayName':  dict(user_mutable=1),
-                'last_login':   dict(),
-                'following':    dict(default={'items': []}),
-                'subscribedTo': dict(default={'items': []}),
-                'published':    dict(),
-                'twitterUsername':    dict(user_mutable=1),
-             }
+    schema = {'_id':          dict(),
+              'username':     dict(required=1),
+              'displayName':  dict(user_mutable=1),
+              'last_login':   dict(),
+              'following':    dict(default={'items': []}),
+              'subscribedTo': dict(default={'items': []}),
+              'published':    dict(),
+              'twitterUsername':    dict(user_mutable=1),
+              }
 
     def buildObject(self):
         """
@@ -212,26 +210,26 @@ class Context(MADBase):
     """
     collection = 'contexts'
     unique = 'urlHash'
-    schema = {
-                '_id':              dict(),
-                'object':           dict(),
-                'urlHash':          dict(),
-                'published':        dict(),
-                'twitterHashtag':   dict(operations_mutable=1,
+    schema = {'_id':                dict(),
+              'object':             dict(),
+              'urlHash':            dict(),
+              'published':          dict(),
+              'twitterHashtag':     dict(operations_mutable=1,
                                          formatters=['stripHash'],
                                          validators=['isValidHashtag'],
-                                        ),
-                'twitterUsername':  dict(operations_mutable=1,
+                                         ),
+              'twitterUsername':    dict(operations_mutable=1,
                                          formatters=['stripTwitterUsername'],
                                          validators=['isValidTwitterUsername'],
-                                       ),
-
-                'twitterUsernameId':  dict(operations_mutable=1),
-                'permissions':      dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
+                                         ),
+              'twitterUsernameId':  dict(operations_mutable=1),
+              'permissions':        dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
                                                   'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
                                                   'join': DEFAULT_CONTEXT_PERMISSIONS['join'],
-                                                  'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']}),
-             }
+                                                  'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
+                                                  }
+                                         ),
+              }
 
     def buildObject(self):
         """
@@ -256,8 +254,8 @@ class Context(MADBase):
         if self.data.get('twitterUsername', None):
             ob['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
 
-        dataobject = self.data.get('object',{'objectType':'uri'})
-        wrapper = self.getObjectWrapper(dataobject.get('objectType','uri'))
+        dataobject = self.data.get('object', {'objectType': 'uri'})
+        wrapper = self.getObjectWrapper(dataobject.get('objectType', 'uri'))
         subobject = wrapper(dataobject)
         ob['object'] = subobject
 
@@ -272,11 +270,10 @@ class Context(MADBase):
 
         self.updateFields(properties)
 
-        if self.get('twitterUsername', None) == None and self.get('twitterUsernameId', None) != None:
+        if self.get('twitterUsername', None) is None and self.get('twitterUsernameId', None) is not None:
             del self['twitterUsernameId']
 
         self.save()
-
 
     def subscribedUsers(self):
         """

@@ -100,24 +100,24 @@ def searchParams(request):
     try:
         params['limit'] = int(limit)
     except:
-        raise InvalidSearchParams, 'limit must be a positive integer'
+        raise InvalidSearchParams('limit must be a positive integer')
 
     after = request.params.get('after')
     if after:
         try:
             params['after'] = ObjectId(after)
         except:
-            raise InvalidSearchParams, 'after must be a valid ObjectId BSON identifier'
+            raise InvalidSearchParams('after must be a valid ObjectId BSON identifier')
 
     before = request.params.get('before')
     if before:
         try:
             params['before'] = ObjectId(before)
         except:
-            raise InvalidSearchParams, 'before must be a valid ObjectId BSON identifier'
+            raise InvalidSearchParams('before must be a valid ObjectId BSON identifier')
 
     if 'before' in params and 'after' in params:
-        raise InvalidSearchParams, 'only one offset filter is allowed, after or before'
+        raise InvalidSearchParams('only one offset filter is allowed, after or before')
 
     hashtags = request.params.getall('hashtag')
     if hashtags:
@@ -287,7 +287,7 @@ def shortenURL(url):
               'version': 'v3',
               'endpoint': 'shorten',
               'endpoint_params': 'longUrl=%s' % (urllib2.quote(url))
-             }
+              }
 
     queryurl = '%(api_url)s/%(version)s/%(endpoint)s?%(login)s&%(endpoint_params)s' % params
 
@@ -325,7 +325,7 @@ def canWriteInContexts(actor, urls):
 
     # If user is trying to post on a context/s where he's not subscribed
     if unsubscribed_contexts:
-        raise Unauthorized, "You are not subscribed to one or more of this contexts ,: %s" % ', '.join(unsubscribed_contexts)
+        raise Unauthorized("You are not subscribed to one or more of this contexts ,: %s" % ', '.join(unsubscribed_contexts))
 
     # If user is trying to post on a subscribed context/s
     # Check that has write permission in all the contexts
@@ -333,7 +333,7 @@ def canWriteInContexts(actor, urls):
     unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
 
     if unauthorized_contexts:
-        raise Unauthorized, "You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts)
+        raise Unauthorized("You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts))
 
     # If we reached here, we have permission to post on all contexts
     return True
@@ -354,7 +354,7 @@ def canReadContext(actor, url):
         # unsubscribed context if is subscribed to at least one child context
         containments = [usc.startswith(url) for usc in subscribed_contexts_urls]
         if True not in containments:
-            raise Unauthorized, "You are not subscribed to this context: %s" % url
+            raise Unauthorized("You are not subscribed to this context: %s" % url)
 
     #If we reached here, we have permission to read on all contexts
     return True

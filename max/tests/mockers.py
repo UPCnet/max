@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from hashlib import sha1
 # -*- coding: utf-8 -*-
 # ===============================================================
@@ -252,7 +253,8 @@ context_query_author_search = {
 
 
 context_queryA = {
-"context": sha1(subscribe_contextA['object']['url']).hexdigest()}
+    "context": sha1(subscribe_contextA['object']['url']).hexdigest()
+}
 
 
 # Un usuari crea un comentari
@@ -298,31 +300,31 @@ unfollow = {
 
 
 unfollow_context = {
-        "actor": {
-            "objectType": "person",
-            "id": "4e6e1243aceee91143000000",
-            "username": "victor"
-        },
-        "verb": "unfollow",
-        "object": {
-            "objectType": "service",
-            "username": "Introduccio als computadors",
-            "url": "http://atenea.upc.edu/introcomp"
-        },
-    }
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "username": "victor"
+    },
+    "verb": "unfollow",
+    "object": {
+        "objectType": "service",
+        "username": "Introduccio als computadors",
+        "url": "http://atenea.upc.edu/introcomp"
+    },
+}
 
 like = {
-        "actor": {
-            "objectType": "person",
-            "id": "4e6e1243aceee91143000000",
-            "username": "javier"
-        },
-        "verb": "like",
-        "object": {
-            "objectType": "activity",
-            "id": "4e707f80aceee94f49000002"
-        },
-    }
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "username": "javier"
+    },
+    "verb": "like",
+    "object": {
+        "objectType": "activity",
+        "id": "4e707f80aceee94f49000002"
+    },
+}
 
 share = {
     "actor": {
@@ -335,4 +337,4 @@ share = {
         "objectType": "activity",
         "id": "4e6eefc5aceee9210d000004",
     },
-  }
+}

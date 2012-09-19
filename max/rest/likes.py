@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.response import Response
 
@@ -21,11 +22,13 @@ def getUserLikedActivities(context, request):
     """
     return HTTPNotImplemented()
 
+
 @view_config(route_name='likes', request_method='GET')
 def getActivityLikes(context, request):
     """
     """
     return HTTPNotImplemented()
+
 
 @view_config(route_name='like', request_method='GET')
 def getActivityLike(context, request):
@@ -33,11 +36,13 @@ def getActivityLike(context, request):
     """
     return HTTPNotImplemented()
 
+
 @view_config(route_name='likes', request_method='POST')
 def like(context, request):
     """
     """
     return HTTPNotImplemented()
+
 
 @view_config(route_name='like', request_method='DELETE')
 def unlike(context, request):

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.security import authenticated_userid
 from pyramid.renderers import get_renderer
 

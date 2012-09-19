@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #MADMax  Mongo Access Delegate for Max
 
 from max.exceptions import ObjectNotFound

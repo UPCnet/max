@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
@@ -5,10 +6,10 @@ from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
-from max.exceptions import MissingField, Unauthorized
+from max.exceptions import MissingField
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import searchParams, canReadContext
+from max.rest.utils import searchParams
 import re
 
 
@@ -78,7 +79,7 @@ def getActivities(context, request):
     """
     urlhash = request.params.get('context', None)
     if not urlhash:
-        raise MissingField, 'You have to specify one context'
+        raise MissingField('You have to specify one context')
 
     mmdb = MADMaxDB(context.db)
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 import os
 from paste.deploy import loadapp
@@ -37,7 +38,7 @@ class FunctionalTests(unittest.TestCase):
         return res
 
     def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username != None and oauth_username or username
+        oauth_username = oauth_username is not None and oauth_username or username
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
@@ -282,7 +283,6 @@ class FunctionalTests(unittest.TestCase):
                 Tests that username that creates the activity is included in keywords
                 Tests that a keyword of a comment is included in keywords
         """
-        from .mockers import context_query_kw_search
         from .mockers import create_context
         from .mockers import subscribe_context, user_status_context, user_comment
 
@@ -303,7 +303,6 @@ class FunctionalTests(unittest.TestCase):
                 Tests that all hashtags passing regex are included in _hashtags
                 Tests that a hashtag of a comment is included in hashtags
         """
-        from .mockers import context_query_kw_search
         from .mockers import create_context
         from .mockers import subscribe_context, user_status_context_with_hashtag, user_comment_with_hashtag
 
@@ -318,7 +317,6 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         expected_hashtags = [u'canvi', u'comentari', u'nou']
         self.assertListEqual(result['object']['_hashtags'], expected_hashtags)
-
 
     def test_context_activities_keyword_search(self):
         """
@@ -362,8 +360,6 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
 
-
-
     def test_subscribe_to_context(self):
         from .mockers import subscribe_context
         from .mockers import user_status_context
@@ -392,7 +388,6 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
-
 
     def test_subscribe_to_inexistent_context(self):
         from .mockers import subscribe_context
@@ -564,7 +559,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         url_hash = sha1(create_context_full['object']['url']).hexdigest()
         self.assertEqual(result.get('urlHash', None), url_hash)
-        self.assertEqual(result.get('object',{}).get('displayName', None), create_context_full['object']['displayName'])
+        self.assertEqual(result.get('object', {}).get('displayName', None), create_context_full['object']['displayName'])
         self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
         self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
 

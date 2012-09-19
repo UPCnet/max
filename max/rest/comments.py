@@ -63,7 +63,7 @@ def addActivityComment(context, request):
     # Prepare rest parameters to be merged with post data
     rest_params = {'verb': 'comment',
                    'object': {'inReplyTo': [{'_id':ObjectId(activityid),
-                                              'objectType':refering_activity.object['objectType']}]}}
+                                             'objectType':refering_activity.object['objectType']}]}}
 
     # Initialize a Activity object from the request
     newactivity = Activity()

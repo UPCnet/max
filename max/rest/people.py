@@ -1,15 +1,14 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
-from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import User
 from max.decorators import MaxRequest, MaxResponse
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
 
 from max.oauth2 import oauth2
-from max.rest.utils import extractPostData
 
 
 @view_config(route_name='user', request_method='GET')

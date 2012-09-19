@@ -1,18 +1,16 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
+from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
 from max.decorators import MaxRequest, MaxResponse
 from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceEntity
 import os
 
-from max.oauth2 import oauth2
-from max.rest.utils import extractPostData, downloadTwitterUserImage
-import requests
-import json
+from max.rest.utils import downloadTwitterUserImage
 import time
 
 
@@ -27,7 +25,7 @@ def getContext(context, request):
     found_context = mmdb.contexts.getItemsByurlHash(urlhash)
 
     if not found_context:
-        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
+        raise ObjectNotFound("There's no context matching this url hash: %s" % urlhash)
 
     handler = JSONResourceEntity(found_context[0].flatten())
     return handler.buildResponse()
@@ -49,7 +47,6 @@ def getContextAvatar(context, request):
             downloadTwitterUserImage(twitter_username, context_image_filename)
 
     if os.path.exists(context_image_filename):
-        filename = urlHash
         # Calculate time since last download and set if we have to redownload or not
         modification_time = os.path.getmtime(context_image_filename)
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
@@ -107,7 +104,7 @@ def ModifyContext(context, request):
     if maxcontext:
         maxcontext = maxcontext[0]
     else:
-        raise ObjectNotFound, 'Unknown context: %s' % urlHash
+        raise ObjectNotFound('Unknown context: %s' % urlHash)
 
     properties = maxcontext.getMutablePropertiesFromRequest(request)
     maxcontext.modifyContext(properties)
@@ -127,7 +124,7 @@ def DeleteContext(context, request):
     found_context = mmdb.contexts.getItemsByurlHash(urlhash)
 
     if not found_context:
-        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
+        raise ObjectNotFound("There's no context matching this url hash: %s" % urlhash)
 
     found_context[0].delete()
     found_context[0].removeUserSubscriptions()
@@ -142,18 +139,18 @@ def grantPermissionOnContext(context, request):
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'join', 'invite']:
-        raise InvalidPermission, "There's not any permission named '%s'" % permission
+        raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     urlhash = request.matchdict.get('urlHash', None)
     subscription = None
     pointer = 0
-    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
+    while subscription is None and pointer < len(request.actor.subscribedTo['items']):
         if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
             subscription = request.actor.subscribedTo['items'][pointer]
         pointer += 1
 
     if not subscription:
-        raise Unauthorized, "You can't set permissions on a context where you are not subscribed"
+        raise Unauthorized("You can't set permissions on a context where you are not subscribed")
 
     #If we reach here, we are subscribed to a context and ready to set the permission
 
@@ -179,18 +176,18 @@ def revokePermissionOnContext(context, request):
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'join', 'invite']:
-        raise InvalidPermission, "There's not any permission named '%s'" % permission
+        raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     urlhash = request.matchdict.get('urlHash', None)
     subscription = None
     pointer = 0
-    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
+    while subscription is None and pointer < len(request.actor.subscribedTo['items']):
         if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
             subscription = request.actor.subscribedTo['items'][pointer]
         pointer += 1
 
     if not subscription:
-        raise Unauthorized, "You can't remove permissions on a context where you are not subscribed"
+        raise Unauthorized("You can't remove permissions on a context where you are not subscribed")
 
     #If we reach here, we are subscribed to a context and ready to remove the permission
 

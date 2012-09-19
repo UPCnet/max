@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
 from hashlib import sha1

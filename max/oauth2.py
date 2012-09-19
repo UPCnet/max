@@ -22,11 +22,11 @@ def oauth2(allowed_scopes=[]):
             scope = request.headers.get('X-Oauth-Scope', '')
 
             if not oauth_token or not username:
-                raise Unauthorized, 'No auth headers found.'
+                raise Unauthorized('No auth headers found.')
 
             if allowed_scopes:
                 if scope not in allowed_scopes:
-                    raise Unauthorized, 'The specified scope is not allowed for this resource.'
+                    raise Unauthorized('The specified scope is not allowed for this resource.')
 
             # Validate access token
             payload = {"oauth_token": oauth_token,
@@ -41,7 +41,7 @@ def oauth2(allowed_scopes=[]):
                 # Valid token, proceed.
                 return view_function(*args, **kw)
             else:
-                raise Unauthorized, 'Invalid token.'
+                raise Unauthorized('Invalid token.')
 
         new_function.__doc__ = view_function.__doc__
         return new_function

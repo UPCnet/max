@@ -5,12 +5,11 @@ from pyramid.settings import asbool
 
 class Root(object):
     __parent__ = __name__ = None
-    __acl__ = [
-        (Allow, Everyone, 'anonymous'),
-        (Allow, Authenticated, 'restricted'),
-        (Allow, 'operations', 'operations'),
-        (Allow, 'admin', 'admin')
-        ]
+    __acl__ = [(Allow, Everyone, 'anonymous'),
+               (Allow, Authenticated, 'restricted'),
+               (Allow, 'operations', 'operations'),
+               (Allow, 'admin', 'admin')
+               ]
 
     def __init__(self, request):
         self.request = request
