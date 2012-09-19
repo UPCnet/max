@@ -7,6 +7,7 @@ from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.oauth2 import oauth2
+from hashlib import sha1
 
 
 @view_config(route_name='subscriptions', request_method='GET')
@@ -32,13 +33,26 @@ def subscribe(context, request):
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
-    code = 201
-    newactivity_oid = newactivity.insert()
-    newactivity['_id'] = newactivity_oid
+    #Check if user is already subscribed
+    subscribed_contexts_hashes = [a['urlHash'] for a in actor.subscribedTo['items']]
+    if sha1(newactivity.object['url']).hexdigest() in subscribed_contexts_hashes:
+        # If user already subscribed, send a 200 code and retrieve the original subscribe activity
+        # post when user was susbcribed. This way in th return data we'll have the date of subscription
+        code = 200
+        activities = MADMaxCollection(context.db.activity)
+        query = {'verb': 'subscribe', 'object.url': newactivity.object['url'], 'actor.username': actor.username}
+        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in case a unsbuscription occured sometime...)
 
-    contexts = MADMaxCollection(context.db.contexts, query_key='url')
-    scontext = contexts[newactivity['object']['url']]
-    actor.addSubscription(scontext)
+    else:
+        # If user wasn't created, 201 indicates that the subscription has just been added
+        code = 201
+        newactivity_oid = newactivity.insert()  # Insert a subscribe activity
+        newactivity['_id'] = newactivity_oid
+
+        #Register subscription to the actor
+        contexts = MADMaxCollection(context.db.contexts, query_key='urlHash')
+        scontext = contexts[sha1(newactivity['object']['url']).hexdigest()]
+        actor.addSubscription(scontext)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()

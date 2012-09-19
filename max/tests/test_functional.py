@@ -378,6 +378,21 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
 
+    def test_subscribe_to_context_already_subscribed(self):
+        from .mockers import subscribe_context
+        from .mockers import user_status_context
+        from .mockers import create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username, subscribe_context, expect=200)
+        res = self.create_activity(username, user_status_context)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
     def test_subscribe_to_inexistent_context(self):
         from .mockers import subscribe_context
         username = 'messi'
