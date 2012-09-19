@@ -1,5 +1,6 @@
 from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
+from hashlib import sha1
 
 
 class ASObject(MADDict):
@@ -75,12 +76,41 @@ class Comment(ASObject):
         self.update(self.data)
 
 
+class Conversation(ASObject):
+    """
+        An Max Context Object
+    """
+    data = {}
+    objectType = 'Conversation'
+    schema = {
+                '_id':          dict(),
+                'objectType':   dict(required=1),
+                'participants': dict(required=1),
+             }
+
+    def __init__(self, data):
+        """
+        """
+        self.data = data
+        self.processFields()
+        self.update(data)
+
+    def getHash(self):
+        """
+            Calculates the hash based on the participants of the conversation
+        """
+        participants = list(self.participants)  # Make a copy
+        participants.sort()                     # Sort it
+        alltogether = ''.join(participants)     # Join It
+        return sha1(alltogether).hexdigest()    # Hash it
+
+
 class Uri(ASObject):
     """
         An Max Context Object
     """
     data = {}
-    objectType = 'Uri '
+    objectType = 'Uri'
     schema = {
                 '_id':         dict(),
                 'url':         dict(required=1),
@@ -94,6 +124,12 @@ class Uri(ASObject):
         self.data = data
         self.processFields()
         self.update(data)
+
+    def getHash(self):
+        """
+            Calculates the hash based on the url
+        """
+        return sha1(self.url).hexdigest()
 
 
 class Person(ASObject):
