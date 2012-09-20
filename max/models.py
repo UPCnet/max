@@ -19,7 +19,7 @@ class Activity(MADBase):
               'object':      dict(required=1),
               'published':   dict(required=0),
               'contexts':    dict(required=0),
-              'replies':     dict(required=0),
+              'replies':     dict(required=0, default={'items': [], 'totalItems': 0}),
               'generator':   dict(required=0),
               }
 
@@ -28,6 +28,7 @@ class Activity(MADBase):
             Updates the dict content with the activity structure,
             with data parsed from the request
         """
+
         isPerson = isinstance(self.data['actor'], User)
         isContext = isinstance(self.data['actor'], Context)
 
@@ -77,6 +78,14 @@ class Activity(MADBase):
                     ob['contexts'] = [self.data['actor']['object'], ]
         self.update(ob)
 
+        # Set defaults
+        properties = {}
+        for key, value in self.schema.items():
+            default = value.get('default', None)
+            if key not in self.data and default:
+                properties[key] = default
+        self.update(properties)
+
     def addComment(self, comment):
         """
             Adds a comment to an existing activity and updates refering activity keywords and hashtags
@@ -106,7 +115,8 @@ class Activity(MADBase):
         # If we are updating, we already have all data on the object, so we read self directly
         result = True
         if isinstance(self.data['actor'], User):
-            result = result and canWriteInContexts(self.data['actor'], self.data.get('contexts', []))
+            wrapped_contexts = [self.getObjectWrapper(context['objectType'])(context) for context in self.data.get('contexts', [])]
+            result = result and canWriteInContexts(self.data['actor'], wrapped_contexts)
         if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
             result = result and self.data['actor']['object']['url'] == self.data.get('contexts')[0]
         return result
@@ -122,8 +132,8 @@ class User(MADBase):
               'username':     dict(required=1),
               'displayName':  dict(user_mutable=1),
               'last_login':   dict(),
-              'following':    dict(default={'items': []}),
-              'subscribedTo': dict(default={'items': []}),
+              'following':    dict(default={'items': [], 'totalItems': 0}),
+              'subscribedTo': dict(default={'items': [], 'totalItems': 0}),
               'published':    dict(),
               'twitterUsername':    dict(user_mutable=1),
               }

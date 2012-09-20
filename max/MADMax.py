@@ -134,6 +134,11 @@ class MADMaxCollection(object):
         model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
         wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
+
+        #Also wrap subobjects
+        if 'object' in wrapped:
+            wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
+
         if flatten:
             return wrapped.flatten()
         else:

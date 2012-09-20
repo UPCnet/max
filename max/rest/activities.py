@@ -83,8 +83,8 @@ def getActivities(context, request):
 
     mmdb = MADMaxDB(context.db)
 
-    # subscribed contexts with read permission
-    subscribed = [context.get('object', {}).get('url') for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', [])]
+    # subscribed Uri contexts with read permission
+    subscribed_uris = [context['object']['url'] for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', []) and context['object']['objectType'] == 'uri']
 
     # get the defined read context
     rcontext = mmdb.contexts.getItemsByhash(chash)[0]
@@ -103,8 +103,8 @@ def getActivities(context, request):
     query.update({'contexts.url': url_regex})                      # equal or child of url
 
     contexts_query = []
-    if subscribed:
-        subscribed_query = {'contexts.url': {'$in': subscribed}}  # that are subscribed contexts
+    if subscribed_uris:
+        subscribed_query = {'contexts.url': {'$in': subscribed_uris}}  # that are subscribed contexts
         contexts_query.append(subscribed_query)                    # with read permission
 
     if public:                                                     # OR

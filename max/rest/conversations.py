@@ -9,7 +9,7 @@ from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import searchParams, canReadContext
+from max.rest.utils import searchParams, canReadContext, extractPostData
 import re
 
 
@@ -34,7 +34,7 @@ def getConversations(context, request):
 
 
 @view_config(route_name='conversations', request_method='POST')
-# @MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
@@ -42,9 +42,24 @@ def postMessage2Conversation(context, request):
          /conversations
          Post message to a conversation
     """
-    conversation_params = dict(actor=request.actor)
+    # We are forced the check and extract the context of the conversation here,
+    # We can't initialize the activity first, because it would fail (chiken-egg stuff)
 
-    # Initialize a conversation (context) object from the request
+    data = extractPostData(request)
+    ctxts = data.get('contexts', [])
+    if len(ctxts) == 0:
+        raise ValidationError('Empty contexts parameter')
+    if len(ctxts[0]['participants']) == 0:
+        raise ValidationError('Empty participants parameter')
+
+    # Initialize a conversation (context) object from the request, overriding the object using the context
+    conversation_params = dict(actor=request.actor,
+                               object=ctxts[0],
+                               permissions={'read': 'subscribed',
+                                            'write': 'subscribed',
+                                            'join': 'restricted',
+                                            'invite': 'restricted'}
+                               )
     newconversation = Context()
     newconversation.fromRequest(request, rest_params=conversation_params)
 

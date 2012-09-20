@@ -85,3 +85,6 @@ class FunctionalTests(unittest.TestCase):
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
+        # XXX TODO #Check conversation is created & Assertions
+
+

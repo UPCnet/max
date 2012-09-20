@@ -267,6 +267,9 @@ class MADBase(MADDict):
                                         '$inc': {count: 1}
                                         }
                                        )
+            #Self-update to reflect the addition
+            self[field]['items'].append(obj)
+            self[field]['totalItems'] += 1
         else:
             if not safe:
                 raise DuplicatedItemError('Item already on list "%s"' % (field))

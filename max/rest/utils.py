@@ -320,10 +320,10 @@ def canWriteInContexts(actor, contexts):
     if contexts == []:
         return True
     else:
-        urls = [context['url'] for context in contexts]
+        chashes = [context.getHash() for context in contexts]
 
-    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items']]
-    unsubscribed_contexts = [url for url in urls if url not in subscribed_contexts_urls]
+    subscribed_contexts = [a['hash'] for a in actor['subscribedTo']['items']]
+    unsubscribed_contexts = [chash for chash in chashes if chash not in subscribed_contexts]
 
     # If user is trying to post on a context/s where he's not subscribed
     if unsubscribed_contexts:
@@ -331,8 +331,8 @@ def canWriteInContexts(actor, contexts):
 
     # If user is trying to post on a subscribed context/s
     # Check that has write permission in all the contexts
-    context_map = {context['object']['url']: context for context in actor.subscribedTo['items']}
-    unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
+    context_map = {context['hash']: context for context in actor.subscribedTo['items']}
+    unauthorized_contexts = [chash for chash in subscribed_contexts if 'write' not in context_map[chash].get('permissions', [])]
 
     if unauthorized_contexts:
         raise Unauthorized("You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts))

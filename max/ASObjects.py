@@ -14,7 +14,7 @@ class ASObject(MADDict):
     schema = {}
     objectType = ''
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
@@ -35,16 +35,17 @@ class Note(ASObject):
               '_keywords':     dict(),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
-        self.processFields()
-        self.data['content'] = formatMessageEntities(self.data['content'])
-        hashtags = findHashtags(self.data['content'])
-        if hashtags:
-            self.data['_hashtags'] = hashtags
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(self.data['content'])
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
 
 
@@ -61,16 +62,17 @@ class Message(ASObject):
               '_keywords':     dict(),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
-        self.processFields()
-        self.data['content'] = formatMessageEntities(self.data['content'])
-        hashtags = findHashtags(self.data['content'])
-        if hashtags:
-            self.data['_hashtags'] = hashtags
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(self.data['content'])
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
 
 
@@ -88,16 +90,17 @@ class Comment(ASObject):
               '_keywords':     dict(),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
-        self.processFields()
-        self.data['content'] = formatMessageEntities(self.data['content'])
-        hashtags = findHashtags(self.data['content'])
-        if hashtags:
-            self.data['_hashtags'] = hashtags
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(self.data['content'])
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
 
 
@@ -112,7 +115,7 @@ class Conversation(ASObject):
               'participants': dict(required=1),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
@@ -141,7 +144,7 @@ class Uri(ASObject):
               'objectType':  dict(required=1),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
@@ -167,7 +170,7 @@ class Person(ASObject):
               'objectType':  dict(required=1),
               }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
