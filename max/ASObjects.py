@@ -48,7 +48,7 @@ class Note(ASObject):
         self.update(self.data)
 
 
- class Message(ASObject):
+class Message(ASObject):
     """
         An activitystrea.ms Note Object
     """
