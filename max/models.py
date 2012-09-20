@@ -62,15 +62,15 @@ class Activity(MADBase):
         if 'contexts' in self.data:
             if isPerson:
                 # When a person posts an activity it can be targeted
-                # to mulitple contexts. here we construct the basic info
+                # to multiple contexts. here we construct the basic info
                 # of each context and store them in contexts key
                 ob['contexts'] = []
                 for cobject in self.data['contexts']:
-                    if cobject['objectType'].lower() == 'uri':
-                        url = cobject['url']
-                        subscription = self.data['actor'].getSubscriptionByURL(url)
-                        context = subscription.get('object')
-                        ob['contexts'].append(context)
+                    wrapper = self.getObjectWrapper(cobject['objectType'])
+                    chash = wrapper(cobject).getHash()
+                    subscription = self.data['actor'].getSubscriptionByHash(chash)
+                    context = subscription.get('object')
+                    ob['contexts'].append(context)
             if isContext:
                 # When a context posts an activity it can be posted only
                 # to itself, so add it directly
@@ -198,11 +198,11 @@ class User(MADBase):
 
         self.mdb_collection.update(criteria, what)
 
-    def getSubscriptionByURL(self, url):
+    def getSubscriptionByHash(self, chash):
         """
         """
-        context_map = {context['object']['url']: context for context in self.subscribedTo['items']}
-        return context_map.get(url)
+        context_map = {context['hash']: context for context in self.subscribedTo['items']}
+        return context_map.get(chash)
 
 
 class Context(MADBase):
@@ -212,7 +212,7 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'hash'
     schema = {'_id':                dict(),
-              'object':             dict(),
+              'object':             dict(required=1),
               'hash':               dict(),
               'published':          dict(),
               'twitterHashtag':     dict(operations_mutable=1,
