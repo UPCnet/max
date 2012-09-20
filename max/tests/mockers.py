@@ -190,7 +190,9 @@ user_status = {
 
 user_status_context_with_hashtag = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -201,7 +203,9 @@ user_status_context_with_hashtag = {
 
 user_status_context = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -212,7 +216,9 @@ user_status_context = {
 
 user_status_context_generator = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -224,7 +230,9 @@ user_status_context_generator = {
 
 user_status_contextA = {
     "contexts": [
-        subscribe_contextA['object']['url']
+        {'url': subscribe_contextA['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -234,7 +242,9 @@ user_status_contextA = {
 
 user_status_contextB = {
     "contexts": [
-        subscribe_contextB['object']['url']
+        {'url': subscribe_contextB['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -244,8 +254,12 @@ user_status_contextB = {
 
 user_status_contextAB = {
     "contexts": [
-        subscribe_contextA['object']['url'],
-        subscribe_contextB['object']['url'],
+        {'url': subscribe_contextA['object']['url'],
+         'objectType': 'uri'
+         },
+        {'url': subscribe_contextB['object']['url'],
+         'objectType': 'uri'
+         }
     ],
     "object": {
         "objectType": "note",

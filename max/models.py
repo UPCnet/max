@@ -65,10 +65,12 @@ class Activity(MADBase):
                 # to mulitple contexts. here we construct the basic info
                 # of each context and store them in contexts key
                 ob['contexts'] = []
-                for url in self.data['contexts']:
-                    subscription = self.data['actor'].getSubscriptionByURL(url)
-                    context = subscription.get('object')
-                    ob['contexts'].append(context)
+                for cobject in self.data['contexts']:
+                    if cobject['objectType'].lower() == 'uri':
+                        url = cobject['url']
+                        subscription = self.data['actor'].getSubscriptionByURL(url)
+                        context = subscription.get('object')
+                        ob['contexts'].append(context)
             if isContext:
                 # When a context posts an activity it can be posted only
                 # to itself, so add it directly

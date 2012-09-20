@@ -741,7 +741,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['url'], user_status_context['contexts'][0])
+        self.assertEqual(result.get('contexts', None)[0]['url'], user_status_context['contexts'][0]['url'])
 
     def test_grant_write_permission_on_write_restricted_context(self):
         from .mockers import create_context_private_r, subscribe_context
