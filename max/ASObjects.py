@@ -28,13 +28,12 @@ class Note(ASObject):
     """
     data = {}
     objectType = 'Note'
-    schema = {
-                '_id':           dict(),
-                'content':       dict(required=1),
-                'objectType':    dict(required=1),
-                '_hashtags':     dict(),
-                '_keywords':     dict(),
-             }
+    schema = {'_id':           dict(),
+              'content':       dict(required=1),
+              'objectType':    dict(required=1),
+              '_hashtags':     dict(),
+              '_keywords':     dict(),
+              }
 
     def __init__(self, data):
         """
@@ -55,14 +54,13 @@ class Comment(ASObject):
     """
     data = {}
     objectType = 'Comment'
-    schema = {
-                '_id':         dict(),
-                'content':     dict(required=1),
-                'objectType':  dict(required=1),
-                'inReplyTo':   dict(required=1),
-                '_hashtags':     dict(),
-                '_keywords':     dict(),
-             }
+    schema = {'_id':         dict(),
+              'content':     dict(required=1),
+              'objectType':  dict(required=1),
+              'inReplyTo':   dict(required=1),
+              '_hashtags':     dict(),
+              '_keywords':     dict(),
+              }
 
     def __init__(self, data):
         """
@@ -83,11 +81,10 @@ class Conversation(ASObject):
     """
     data = {}
     objectType = 'Conversation'
-    schema = {
-                '_id':          dict(),
-                'objectType':   dict(required=1),
-                'participants': dict(required=1),
-             }
+    schema = {'_id':          dict(),
+              'objectType':   dict(required=1),
+              'participants': dict(required=1),
+              }
 
     def __init__(self, data):
         """
@@ -112,12 +109,11 @@ class Uri(ASObject):
     """
     data = {}
     objectType = 'Uri'
-    schema = {
-                '_id':         dict(),
-                'url':         dict(required=1),
-                'displayName': dict(operations_mutable=1),
-                'objectType':  dict(required=1),
-             }
+    schema = {'_id':         dict(),
+              'url':         dict(required=1),
+              'displayName': dict(operations_mutable=1),
+              'objectType':  dict(required=1),
+              }
 
     def __init__(self, data):
         """
@@ -139,12 +135,11 @@ class Person(ASObject):
     """
     data = {}
     objectType = 'Person'
-    schema = {
-                '_id':         dict(),
-                'username':    dict(required=1),
-                'displayName': dict(required=0),
-                'objectType':  dict(required=1),
-             }
+    schema = {'_id':         dict(),
+              'username':    dict(required=1),
+              'displayName': dict(required=0),
+              'objectType':  dict(required=1),
+              }
 
     def __init__(self, data):
         """

@@ -30,7 +30,7 @@ def processTweet(twitter_username, content):
 
         # Watch for the case when two or more context share twitterUsername
         for context in maxcontext:
-            url_hash = context.get("urlHash")
+            url_hash = context.get("hash")
             context_url = context.get('object', {}).get("url")
 
             # Construct the payload with the activity information
@@ -39,9 +39,10 @@ def processTweet(twitter_username, content):
                     "objectType": "note",
                     "content": content
                 },
-                "contexts": [
-                    context_url,
-                ],
+                "contexts": [{'url': context_url,
+                              'objectType': 'uri'
+                              }
+                             ],
                 "generator": twitter_generator_name
             }
 
@@ -81,7 +82,7 @@ def processTweet(twitter_username, content):
             # Check if MAX username has permission to post to the MAX context
             # if not, discard it
             try:
-                can_write = canWriteInContexts(maxuser, [context.object['url']])
+                can_write = canWriteInContexts(maxuser, [context.object])
             except:
                 can_write = False
 
@@ -94,9 +95,10 @@ def processTweet(twitter_username, content):
                     "objectType": "note",
                     "content": content
                 },
-                "contexts": [
-                    context.object['url'],
-                ],
+                "contexts": [{'url': context.object['url'],
+                              'objectType': 'uri'
+                              }
+                             ],
                 "generator": twitter_generator_name
             }
 

@@ -16,7 +16,7 @@ from max.exceptions import ObjectNotFound
 @MaxRequest
 def addAdminUserActivity(context, request):
     """
-         /admin/people|contexts/{username|urlHash}/activities
+         /admin/people|contexts/{username|hash}/activities
 
          Add activity impersonated as a valid MAX user or context
     """

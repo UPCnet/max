@@ -64,7 +64,7 @@ def getUsernameFromURI(request):
 def getUrlHashFromURI(request):
     """
     """
-    return request.matchdict.get('urlHash', None)
+    return request.matchdict.get('hash', None)
 
 
 def getUsernameFromPOSTBody(request):
@@ -313,12 +313,14 @@ def extractPostData(request):
     # TODO: Do more syntax and format checks of sent data
 
 
-def canWriteInContexts(actor, urls):
+def canWriteInContexts(actor, contexts):
     """
     """
     # If no context filter defined, write/read is always allowed
-    if urls == []:
+    if contexts == []:
         return True
+    else:
+        urls = [context['url'] for context in contexts]
 
     subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items']]
     unsubscribed_contexts = [url for url in urls if url not in subscribed_contexts_urls]
