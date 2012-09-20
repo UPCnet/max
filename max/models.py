@@ -212,7 +212,7 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'hash'
     schema = {'_id':                dict(),
-              'object':             dict(),
+              'object':             dict(required=1),
               'hash':               dict(),
               'published':          dict(),
               'twitterHashtag':     dict(operations_mutable=1,
