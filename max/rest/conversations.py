@@ -38,7 +38,7 @@ def getConversations(context, request):
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
     """
-         /conversation/{chash}
+         /conversations/{chash}
          Post message to a conversation
     """
     import ipdb;ipdb.set_trace()

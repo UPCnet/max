@@ -304,8 +304,11 @@ user_comment_with_hashtag = {
 # Conversations
 
 message = {
-    "context": "",
-    "participants": ["xavi"],
+    "contexts": [
+        {"objectType":"conversation",
+         "participants": ["messi", "xavi"],
+        }
+    ],
     "object": {
         "objectType": "message",
         "content": "Nos espera una gran temporada, no es cierto?",
