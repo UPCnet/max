@@ -48,6 +48,32 @@ class Note(ASObject):
         self.update(self.data)
 
 
+ class Message(ASObject):
+    """
+        An activitystrea.ms Note Object
+    """
+    data = {}
+    objectType = 'Message'
+    schema = {'_id':           dict(),
+              'content':       dict(required=1),
+              'objectType':    dict(required=1),
+              '_hashtags':     dict(),
+              '_keywords':     dict(),
+              }
+
+    def __init__(self, data):
+        """
+        """
+        self.data = data
+        self.processFields()
+        self.data['content'] = formatMessageEntities(self.data['content'])
+        hashtags = findHashtags(self.data['content'])
+        if hashtags:
+            self.data['_hashtags'] = hashtags
+        self.data['_keywords'] = findKeywords(self.data['content'])
+        self.update(self.data)
+
+
 class Comment(ASObject):
     """
         An activitystrea.ms Comment Object

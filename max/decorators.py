@@ -94,10 +94,10 @@ def MaxRequest(func):
                     actor = getContextActor(context.db, contexthash)[0]
                 except:
                     raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
-                finally:
+                else:
                     #Only Uri contexts are allowed as actors
                     if actor.object['objectType'].lower() not in ['uri']:
-                        raise ObjectNotSupported('%s objectType not supported as an actor' % context.object['objectType'])
+                        raise ObjectNotSupported('%s objectType not supported as an actor' % actor.object['objectType'])
 
         # Raise an error if no authentication present
         else:

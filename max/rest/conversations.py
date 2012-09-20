@@ -33,7 +33,7 @@ def getConversations(context, request):
 
 
 @view_config(route_name='conversation', request_method='POST')
-# @MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
@@ -41,7 +41,6 @@ def postMessage2Conversation(context, request):
          /conversation/{chash}
          Post message to a conversation
     """
-    import ipdb;ipdb.set_trace()
     conversation_params = dict(chash=request.matchdict['chash'],
                                actor=request.actor)
 
