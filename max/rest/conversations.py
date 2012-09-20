@@ -2,6 +2,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
+from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB
 from max.models import Activity, Context
 from max.decorators import MaxRequest, MaxResponse
@@ -32,26 +33,31 @@ def getConversations(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='conversation', request_method='POST')
-@MaxResponse
+@view_config(route_name='conversations', request_method='POST')
+# @MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
     """
-         /conversations/{chash}
+         /conversations
          Post message to a conversation
     """
-    conversation_params = dict(chash=request.matchdict['chash'],
-                               actor=request.actor)
+    conversation_params = dict(actor=request.actor)
 
     # Initialize a conversation (context) object from the request
     newconversation = Context()
     newconversation.fromRequest(request, rest_params=conversation_params)
 
+    if not request.actor.username in newconversation.object['participants']:
+        raise ValidationError('Actor must be part of the participants list.')
+
     if not newconversation.get('_id'):
         # New conversation
         contextid = newconversation.insert()
         newconversation['_id'] = contextid
+
+    # Subscriure user
+    request.actor.addSubscription(newconversation)
 
     message_params = {'actor': request.actor,
                       'verb': 'post'}
@@ -60,21 +66,10 @@ def postMessage2Conversation(context, request):
     newmessage = Activity()
     newmessage.fromRequest(request, rest_params=message_params)
 
-    # If we have the _id setted, then the object already existed in the DB,
-    # otherwise, proceed to insert it into the DB
-    # In both cases, respond with the JSON of the object and the appropiate
-    # HTTP Status Code
+    message_oid = newmessage.insert()
+    newmessage['_id'] = message_oid
 
-    if newmessage.get('_id'):
-        # Already Exists
-        code = 200
-    else:
-        # New conversation
-        code = 201
-        message_oid = newmessage.insert()
-        newmessage['_id'] = message_oid
-
-    handler = JSONResourceEntity(newmessage.flatten(), status_code=code)
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
 
 

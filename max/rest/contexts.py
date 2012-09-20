@@ -83,7 +83,7 @@ def addContext(context, request):
         # Already Exists
         code = 200
     else:
-        # New User
+        # New context
         code = 201
         contextid = newcontext.insert()
         newcontext['_id'] = contextid

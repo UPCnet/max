@@ -83,4 +83,5 @@ class FunctionalTests(unittest.TestCase):
         alltogether = ''.join(participants)      # Join It
         chash = sha1(alltogether).hexdigest()    # Hash it
 
-        res = self.testapp.post('/conversations/%s' % chash, json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+
