@@ -81,6 +81,22 @@ create_context = {
     }
 }
 
+create_invalid_context = {
+
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri Geller',
+        'displayName': 'Atenea',
+    }
+}
+
+create_unauthorized_context = {
+
+    'object': {
+        'objectType': 'Conversation',
+        'participants': ['dummy']
+    }
+}
 
 create_context_full = {
     'object': {

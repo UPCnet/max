@@ -542,6 +542,18 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
 
+    # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
+    #     from .mockers import create_unauthorized_context
+    #     from hashlib import sha1
+
+    #     result = self.create_context(create_invalid_context, expect=201)
+    #     import ipdb;ipdb.set_trace()
+        # url_hash = sha1(create_invalid_context['object']['url']).hexdigest()
+        # res = self.testapp.post('/admin/contexts/%s/activities' % url_hash, json.dumps(user_status_context), basicAuthHeader('admin', 'admin'))
+        # result = json.loads(res.text)
+        # self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
+        # self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        # self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
     # CONTEXTS
 
     def test_add_public_context(self):
@@ -551,6 +563,13 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         url_hash = sha1(create_context['object']['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
+
+    def test_add_invalid_context(self):
+        from .mockers import create_invalid_context
+        from hashlib import sha1
+        result = self.create_context(create_invalid_context, expect=400)
+
+    # CONTEXTS
 
     def test_add_public_context_with_all_params(self):
         from hashlib import sha1

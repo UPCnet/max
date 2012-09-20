@@ -18,7 +18,8 @@ def getUserActor(db, username):
 
 def getContextActor(db, hash):
     mmdb = MADMaxDB(db)
-    return mmdb.contexts.getItemsByhash(hash)
+    context = mmdb.contexts.getItemsByhash(hash)
+    return context
 
 
 def MaxRequest(func):
@@ -93,6 +94,10 @@ def MaxRequest(func):
                     actor = getContextActor(context.db, contexthash)[0]
                 except:
                     raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
+                finally:
+                    #Only Uri contexts are allowed as actors
+                    if actor.object['objectType'].lower() not in ['uri']:
+                        raise ObjectNotSupported('%s objectType not supported as an actor' % context.object['objectType'])
 
         # Raise an error if no authentication present
         else:
