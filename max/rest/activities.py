@@ -58,7 +58,7 @@ def addUserActivity(context, request):
         # Already Exists
         code = 200
     else:
-        # New User
+        # New activity
         code = 201
         activity_oid = newactivity.insert()
         newactivity['_id'] = activity_oid

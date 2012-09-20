@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
-from max.models import Activity
+from max.models import Activity, Context
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
 
@@ -33,20 +33,50 @@ def getConversations(context, request):
 
 
 @view_config(route_name='conversation', request_method='POST')
-@MaxResponse
+# @MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
-def postConversation(context, request):
+def postMessage2Conversation(context, request):
     """
-         /conversation/{hash}
+         /conversation/{chash}
          Post message to a conversation
     """
-    rest_params = {'actor': request.actor,
-                   'verb': 'post'}
+    import ipdb;ipdb.set_trace()
+    conversation_params = dict(chash=request.matchdict['chash'],
+                               actor=request.actor)
 
-    # Initialize a Activity object from the request
-    newactivity = Activity()
-    newactivity.fromRequest(request, rest_params=rest_params)
+    # Initialize a conversation (context) object from the request
+    newconversation = Context()
+    newconversation.fromRequest(request, rest_params=conversation_params)
+
+    if not newconversation.get('_id'):
+        # New conversation
+        contextid = newconversation.insert()
+        newconversation['_id'] = contextid
+
+    message_params = {'actor': request.actor,
+                      'verb': 'post'}
+
+    # Initialize a Message (Activity) object from the request
+    newmessage = Activity()
+    newmessage.fromRequest(request, rest_params=message_params)
+
+    # If we have the _id setted, then the object already existed in the DB,
+    # otherwise, proceed to insert it into the DB
+    # In both cases, respond with the JSON of the object and the appropiate
+    # HTTP Status Code
+
+    if newmessage.get('_id'):
+        # Already Exists
+        code = 200
+    else:
+        # New conversation
+        code = 201
+        message_oid = newmessage.insert()
+        newmessage['_id'] = message_oid
+
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=code)
+    return handler.buildResponse()
 
 
 @view_config(route_name='messages', request_method='GET')

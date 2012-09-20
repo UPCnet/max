@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
-# -*- coding: utf-8 -*-
 # ===============================================================
 # Format com deurien estar guardades les dades a la base de dades
 # ===============================================================
@@ -271,6 +270,20 @@ user_comment_with_hashtag = {
         "content": "<p>[C] Testejant un #comentari #nou a una activitat</p>"
     }
 }
+
+# Conversations
+
+message = {
+    "context": "",
+    "participants": ["xavi"],
+    "object": {
+        "objectType": "message",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+
+# For revision, not implemented yet
 
 follow = {
     "actor": {

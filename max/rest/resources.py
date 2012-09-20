@@ -30,7 +30,7 @@ OAUTH_RESOURCES = {
 'context_user_permission': {'route': '/contexts/{urlHash}/permissions/{username}/{permission}'},
 
 'conversations': {'route': '/conversations'},
-'conversation': {'route': '/conversations/{hash}'},
+'conversation': {'route': '/conversations/{chash}'},
 'messages': {'route': '/conversations/{hash}/messages'},
 }
 # POST a conversation es enviar un Missatge
