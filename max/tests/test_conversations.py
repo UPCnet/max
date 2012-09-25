@@ -82,8 +82,8 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
-        self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result.get("contexts", None)[0].get("object", None).get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("contexts", None)[0].get("object", None).get("objectType", None), "conversation")
         self.assertEqual(result.get("object", None).get("objectType", None), "message")
 
     def test_post_message_to_conversation_check_conversation(self):
@@ -115,8 +115,7 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(recipient)
 
         self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        res = self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
-        result = json.loads(res.text)
+        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
 
         participants = list([sender, recipient])
         participants.sort()
@@ -124,8 +123,52 @@ class FunctionalTests(unittest.TestCase):
         chash = sha1(alltogether).hexdigest()
 
         res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(sender), status=200)
+        result = json.loads(res.text)
 
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
-        self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("object", None).get("objectType", None), "message")
+        self.assertEqual(result.get("totalItems", None), 2)
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("hash", None), chash)
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("object", None).get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("object", None).get("objectType", None), "conversation")
+        self.assertEqual(result.get("items")[0].get("object", None).get("objectType", None), "message")
+
+    def test_get_messages_from_a_conversation_as_a_recipient(self):
+        from .mockers import message, message2
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+
+        participants = list([sender, recipient])
+        participants.sort()
+        alltogether = ''.join(participants)
+        chash = sha1(alltogether).hexdigest()
+
+        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(recipient), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result.get("totalItems", None), 2)
+
+    def test_get_messages_from_a_conversation_for_user_not_in_participants(self):
+        from .mockers import message, message2
+        sender = 'messi'
+        recipient = 'xavi'
+        external = 'casillas'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(external)
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+
+        participants = list([sender, recipient])
+        participants.sort()
+        alltogether = ''.join(participants)
+        chash = sha1(alltogether).hexdigest()
+
+        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result.get("totalItems", None), 2)
