@@ -59,7 +59,6 @@ class Activity(MADBase):
 
         if 'generator' in self.data:
             ob['generator'] = self.data['generator']
-
         if 'contexts' in self.data:
             if isPerson:
                 # When a person posts an activity it can be targeted
@@ -70,12 +69,12 @@ class Activity(MADBase):
                     wrapper = self.getObjectWrapper(cobject['objectType'])
                     chash = wrapper(cobject).getHash()
                     subscription = self.data['actor'].getSubscriptionByHash(chash)
-                    context = subscription.get('object')
-                    ob['contexts'].append(context)
+                    #context = subscription.get('object')
+                    ob['contexts'].append(subscription)
             if isContext:
                 # When a context posts an activity it can be posted only
                 # to itself, so add it directly
-                    ob['contexts'] = [self.data['actor']['object'], ]
+                    ob['contexts'] = [self.data['actor'], ]
         self.update(ob)
 
         # Set defaults

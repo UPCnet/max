@@ -100,15 +100,15 @@ def getActivities(context, request):
 
     query = {}                                                     # Search
     query.update({'verb': 'post'})                                 # 'post' activities
-    query.update({'contexts.url': url_regex})                      # equal or child of url
+    query.update({'contexts.object.url': url_regex})                      # equal or child of url
 
     contexts_query = []
     if subscribed_uris:
-        subscribed_query = {'contexts.url': {'$in': subscribed_uris}}  # that are subscribed contexts
+        subscribed_query = {'contexts.object.url': {'$in': subscribed_uris}}  # that are subscribed contexts
         contexts_query.append(subscribed_query)                    # with read permission
 
     if public:                                                     # OR
-        public_query = {'contexts.url': {'$in': public}}
+        public_query = {'contexts.object.url': {'$in': public}}
         contexts_query.append(public_query)                        # pubic contexts
 
     if contexts_query:
