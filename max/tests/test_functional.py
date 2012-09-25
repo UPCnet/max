@@ -221,10 +221,10 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_context['object'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_get_activities_from_recursive_contexts(self):
         """
@@ -257,23 +257,23 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_contextA['object'])
 
         res = self.testapp.get('/activities', context_query, oauth2Header(username_not_me), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 3)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextB['object'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_contextA['object'])
         self.assertEqual(result.get('items', None)[2].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0]['object'], subscribe_contextA['object'])
 
     ## SEARCH ##
 
@@ -346,7 +346,6 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         username2 = 'xavi'
         self.create_user(username2)
-
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
         self.subscribe_user_to_context(username, subscribe_context)
         self.subscribe_user_to_context(username2, subscribe_context)
@@ -372,7 +371,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_subscribe_to_context_already_subscribed(self):
         from .mockers import subscribe_context
@@ -387,7 +386,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_subscribe_to_inexistent_context(self):
         from .mockers import subscribe_context
@@ -411,7 +410,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_post_activity_with_generator(self):
         """ Post an activity to a context which allows everyone to read and write
@@ -427,7 +426,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
         self.assertEqual(result.get('generator', None), user_status_context_generator['generator'])
 
     def test_post_activity_with_private_read_write_context(self):
@@ -446,7 +445,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_post_activity_with_private_read_context(self):
         """ Try to post an activity to a context which needs the user to be subscribed to read
@@ -482,10 +481,10 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('totalItems', None), 3)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_post_comment(self):
         from .mockers import user_status, user_comment
@@ -527,7 +526,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_admin_post_activity_with_context_as_actor(self):
         from .mockers import subscribe_context
@@ -540,7 +539,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
@@ -741,7 +740,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['url'], user_status_context['contexts'][0]['url'])
+        self.assertEqual(result.get('contexts', None)[0]['object']['url'], user_status_context['contexts'][0]['url'])
 
     def test_grant_write_permission_on_write_restricted_context(self):
         from .mockers import create_context_private_r, subscribe_context
