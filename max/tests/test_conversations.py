@@ -78,13 +78,54 @@ class FunctionalTests(unittest.TestCase):
         recipient = 'xavi'
         self.create_user(sender)
         self.create_user(recipient)
-        participants = list([sender, recipient])  # Make a copy
-        participants.sort()                      # Sort it
-        alltogether = ''.join(participants)      # Join It
-        chash = sha1(alltogether).hexdigest()    # Hash it
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        result = json.loads(res.text)
 
-        # XXX TODO #Check conversation is created & Assertions
+        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result.get("object", None).get("objectType", None), "message")
 
+    def test_post_message_to_conversation_check_conversation(self):
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
 
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+
+        conversation = self.app.registry.max_store.contexts.find_one()
+        permissions = {'read': 'subscribed', 'write': 'subscribed', 'join': 'restricted', 'invite': 'restricted'}
+        participants = list([sender, recipient])
+        participants.sort()
+        alltogether = ''.join(participants)
+        chash = sha1(alltogether).hexdigest()
+
+        self.assertEqual(conversation.get("object", None).get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(conversation.get("object", None).get("objectType", None), "conversation")
+        self.assertEqual(conversation.get("permissions", None), permissions)
+        self.assertEqual(conversation.get("hash", None), chash)
+
+    def test_post_message_to_an_already_existing_conversation(self):
+        from .mockers import message, message2
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+        result = json.loads(res.text)
+
+        participants = list([sender, recipient])
+        participants.sort()
+        alltogether = ''.join(participants)
+        chash = sha1(alltogether).hexdigest()
+
+        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(sender), status=200)
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result.get("object", None).get("objectType", None), "message")

@@ -315,6 +315,18 @@ message = {
     }
 }
 
+message2 = {
+    "contexts": [
+        {"objectType":"conversation",
+         "participants": ["messi", "xavi"],
+        }
+    ],
+    "object": {
+        "objectType": "message",
+        "content": "M'agrada Terrassa!",
+    }
+}
+
 
 # For revision, not implemented yet
 

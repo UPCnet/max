@@ -97,3 +97,12 @@ def getMessages(context, request):
          /conversations/{hash}/messages
          Return all messages from a conversation
     """
+    chash = request.matchdict['hash']
+    mmdb = MADMaxDB(context.db)
+    query = {'context.hash': chash,
+             'object.objectType': 'Conversation',
+             }
+    messages = mmdb.activity.search(query, sort="published", flatten=1)
+
+    handler = JSONResourceRoot(messages)
+    return handler.buildResponse()
