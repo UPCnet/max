@@ -168,7 +168,7 @@ class FunctionalTests(unittest.TestCase):
         alltogether = ''.join(participants)
         chash = sha1(alltogether).hexdigest()
 
-        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=200)
+        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=400)
         result = json.loads(res.text)
 
         self.assertEqual(result.get("totalItems", None), 2)

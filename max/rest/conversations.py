@@ -98,6 +98,10 @@ def getMessages(context, request):
          Return all messages from a conversation
     """
     chash = request.matchdict['hash']
+    import ipdb;ipdb.set_trace()
+    if chash not in request.actor.subscribedTo.get("items", []):
+        raise ValidationError('Actor must be subscribed to the conversation or be part of the participants list.')
+
     mmdb = MADMaxDB(context.db)
     query = {'contexts.hash': chash}
     messages = mmdb.activity.search(query, sort="published", flatten=1)
