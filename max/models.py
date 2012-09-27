@@ -257,11 +257,11 @@ class Context(MADBase):
                 properties[key] = self.data[key]
             elif default:
                 properties[key] = default
+        ob.update(properties)
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
             ob['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
-
         dataobject = self.data.get('object', {'objectType': 'uri'})
         wrapper = self.getObjectWrapper(dataobject.get('objectType', 'uri'))
         subobject = wrapper(dataobject)
@@ -269,7 +269,6 @@ class Context(MADBase):
 
         ob['hash'] = subobject.getHash()
 
-        ob.update(properties)
         self.update(ob)
 
     def modifyContext(self, properties):
