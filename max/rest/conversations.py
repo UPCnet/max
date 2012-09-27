@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.exceptions import ValidationError
-from max.MADMax import MADMaxDB
+from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Activity, Context
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
@@ -34,7 +34,7 @@ def getConversations(context, request):
 
 
 @view_config(route_name='conversations', request_method='POST')
-@MaxResponse
+# @MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
@@ -66,15 +66,24 @@ def postMessage2Conversation(context, request):
     if not request.actor.username in newconversation.object['participants']:
         raise ValidationError('Actor must be part of the participants list.')
 
+    users = MADMaxCollection(context.db.users, query_key='username')
+
     if not newconversation.get('_id'):
         # New conversation
         contextid = newconversation.insert()
         newconversation['_id'] = contextid
 
-    # Subscriure user
-    request.actor.addSubscription(newconversation)
+        # Subscriure a tothom
+        for user in newconversation['object']['participants']:
+            users[user].addSubscription(newconversation)
+    else:
+        # Subscriure users in participants conditionally
+        subs_usernames = [user['username'] for user in newconversation.subscribedUsers()]
+        unsubscribed = set(newconversation['object']['participants']).difference(set(subs_usernames))
+        for user in unsubscribed:
+            users[user].addSubscription(newconversation)
 
-    message_params = {'actor': request.actor,
+    message_params = {'actor': users[request.actor['username']],
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
@@ -98,7 +107,7 @@ def getMessages(context, request):
          Return all messages from a conversation
     """
     chash = request.matchdict['hash']
-    import ipdb;ipdb.set_trace()
+
     if chash not in request.actor.subscribedTo.get("items", []):
         raise ValidationError('Actor must be subscribed to the conversation or be part of the participants list.')
 

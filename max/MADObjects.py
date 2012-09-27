@@ -197,7 +197,8 @@ class MADBase(MADDict):
 
         # Since we are building from a request,
         # overwrite actor with the validated one from the request in source
-        self.data['actor'] = request.actor
+        if 'actor' not in rest_params.keys():
+            self.data['actor'] = request.actor
 
         self.processFields()
 
