@@ -131,6 +131,9 @@ class Conversation(ASObject):
         alltogether = ''.join(participants)     # Join It
         return sha1(alltogether).hexdigest()    # Hash it
 
+    def getDisplayName(self):
+        return ', '.join(self.participants)
+
 
 class Uri(ASObject):
     """
@@ -140,7 +143,7 @@ class Uri(ASObject):
     objectType = 'Uri'
     schema = {'_id':         dict(),
               'url':         dict(required=1),
-              'displayName': dict(operations_mutable=1),
+              'displayName': dict(),
               'objectType':  dict(required=1),
               }
 
@@ -156,6 +159,9 @@ class Uri(ASObject):
             Calculates the hash based on the url
         """
         return sha1(self.url).hexdigest()
+
+    def getDisplayName(self):
+        return self.url
 
 
 class Person(ASObject):

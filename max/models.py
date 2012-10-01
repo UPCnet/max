@@ -32,7 +32,8 @@ class Activity(MADBase):
         isPerson = isinstance(self.data['actor'], User)
         isContext = isinstance(self.data['actor'], Context)
 
-        # XXX Assuming here we only support Person as actor
+        # XXX Assuming here we only support Person as actorn
+
         # XXX Assuming here we only support Uri as context
         actorType = isPerson and 'person' or 'uri'
         ob = {'actor': {'objectType': actorType,
@@ -155,6 +156,7 @@ class User(MADBase):
                 properties[key] = default
 
         ob.update(properties)
+        ob['displayName'] = ob.get('displayName', ob.get('username', 'nobody'))
         self.update(ob)
 
     def addFollower(self, person):
@@ -223,6 +225,7 @@ class Context(MADBase):
     schema = {'_id':                dict(),
               'object':             dict(required=1),
               'hash':               dict(),
+              'displayName':        dict(operations_mutable=1),
               'published':          dict(),
               'twitterHashtag':     dict(operations_mutable=1,
                                          formatters=['stripHash'],
@@ -268,6 +271,8 @@ class Context(MADBase):
         ob['object'] = subobject
 
         ob['hash'] = subobject.getHash()
+        #Set displayName only if it's not specified
+        ob['displayName'] = ob.get('displayName', subobject.getDisplayName())
 
         self.update(ob)
 
