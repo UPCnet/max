@@ -14,6 +14,7 @@ max_server_url = 'https://max.upc.edu'
 # max_server_url = 'https://sneridagh.upc.es'
 twitter_generator_name = 'Twitter'
 debug_hashtag = '#debugmaxupcnet'
+logging_file = '/var/pyramid/maxserver/var/log/twitter.log'
 
 
 def main(argv=sys.argv, quiet=False):
