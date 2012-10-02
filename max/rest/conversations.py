@@ -34,7 +34,7 @@ def getConversations(context, request):
 
 
 @view_config(route_name='conversations', request_method='POST')
-# @MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
@@ -108,8 +108,8 @@ def getMessages(context, request):
     """
     chash = request.matchdict['hash']
 
-    if chash not in request.actor.subscribedTo.get("items", []):
-        raise ValidationError('Actor must be subscribed to the conversation or be part of the participants list.')
+    if chash not in [ctxt.get("hash", '') for ctxt in request.actor.subscribedTo.get("items", [])]:
+        raise ValidationError('Actor must be either subscribed to the conversation or a participant of it.')
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.hash': chash}

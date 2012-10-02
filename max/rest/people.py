@@ -1,14 +1,33 @@
 # -*- coding: utf-8 -*-
+import os
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
 from max.models import User
+from max.oauth2 import oauth2
+from max.MADMax import MADMaxDB
+from max.rest.utils import searchParams
 from max.decorators import MaxRequest, MaxResponse
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-import os
 
-from max.oauth2 import oauth2
+
+@view_config(route_name='users', request_method='GET')
+@MaxResponse
+@MaxRequest
+@oauth2(['widgetcli'])
+def getUsers(context, request):
+    """
+         /people
+
+         Retorna tots els users
+    """
+    mmdb = MADMaxDB(context.db)
+    query = {}
+    users = mmdb.users.search(query, sort="username", flatten=1, **searchParams(request))
+
+    handler = JSONResourceRoot(users)
+    return handler.buildResponse()
 
 
 @view_config(route_name='user', request_method='GET')

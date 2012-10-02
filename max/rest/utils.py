@@ -127,10 +127,14 @@ def searchParams(request):
     if author:
         params['author'] = author.lower()
 
-    keywords = request.params.getall('keywnord')
+    keywords = request.params.getall('keyword')
     if keywords:
         ### XXX Split or regex?
         params['keywords'] = [keyw.lower() for keyw in keywords]
+
+    username = request.params.get('username')
+    if username:
+        params['username'] = username.lower()
 
     return params
 

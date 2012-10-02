@@ -50,7 +50,7 @@ class MADMaxCollection(object):
                 after: An id pointing to an activity, whose newer fellows will be fetched
                 hashtag: A list of hastags to filter activities by
                 keywords: A list of keywords to filter activities by
-                author: A username to filter activitues by author
+                author: A username to filter activities by author
         """
 
         #Extract known params from kwargs
@@ -60,6 +60,7 @@ class MADMaxCollection(object):
         hashtag = kwargs.get('hashtag', None)
         keywords = kwargs.get('keywords', None)
         author = kwargs.get('author', None)
+        username = kwargs.get('username', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -67,37 +68,38 @@ class MADMaxCollection(object):
         else:
             offset = None
 
-        if query:
-            if offset:
-                # Filter the query to return objects created later or earlier than the one
-                # represented by offset (offset not included)
-                query.update({'_id': {condition: offset}})
+        if offset:
+            # Filter the query to return objects created later or earlier than the one
+            # represented by offset (offset not included)
+            query.update({'_id': {condition: offset}})
 
-            if hashtag:
-                # Filter the query to only objects containing certain hashtags
-                hashtag_query = {'$and': []}
-                for hasht in hashtag:
-                    hashtag_query['$and'].append({'object._hashtags': hasht})
-                query.update(hashtag_query)
+        if hashtag:
+            # Filter the query to only objects containing certain hashtags
+            hashtag_query = {'$and': []}
+            for hasht in hashtag:
+                hashtag_query['$and'].append({'object._hashtags': hasht})
+            query.update(hashtag_query)
 
-            if author:
-                # Filter the query to only objects containing certain hashtags
-                username_query = {'actor.username': author}
-                query.update(username_query)
+        if author:
+            # Filter the query to only objects containing certain hashtags
+            username_query = {'actor.username': author}
+            query.update(username_query)
 
-            if keywords:
-                # Filter the query to only objects containing certain keywords
-                keywords_query = {'$and': []}
-                for keyw in keywords:
-                    keywords_query['$and'].append({'object._keywords': keyw})
-                query.update(keywords_query)
+        if keywords:
+            # Filter the query to only objects containing certain keywords
+            keywords_query = {'$and': []}
+            for keyw in keywords:
+                keywords_query['$and'].append({'object._keywords': keyw})
+            query.update(keywords_query)
 
-            # Cursor is lazy, but better to execute search here for mental sanity
-            self.setVisibleResultFields(show_fields)
-            cursor = self.collection.find(query, self.show_fields)
+        if username:
+            # Filter the query to only objects containing certain hashtags
+            username_query = {"username": {"$regex": username, "$options": "i", }}
+            query.update(username_query)
 
-        else:
-            cursor = self.collection.find()
+        # Cursor is lazy, but better to execute search here for mental sanity
+        self.setVisibleResultFields(show_fields)
+        cursor = self.collection.find(query, self.show_fields)
 
         # Sort and limit the results if specified
         if sort:
