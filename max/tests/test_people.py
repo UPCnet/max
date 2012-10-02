@@ -144,7 +144,10 @@ class FunctionalTests(unittest.TestCase):
         self.create_user(username)
         res = self.testapp.get('/people', json.dumps({"username": username}), oauth2Header(username), status=200)
         result = json.loads(res.text)
+
+        self.assertEqual(result.get('totalItems', ''), 1)
         self.assertEqual(result.get('items', '')[0].get('username', ''), username)
+        self.assertEqual(len(result.get('items', '')[0].keys()), 2)
 
     def test_get_all_users_with_regex(self):
         username = 'usuarimoltllarg'
