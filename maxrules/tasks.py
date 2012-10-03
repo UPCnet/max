@@ -129,7 +129,12 @@ def processTweet(twitter_username, content):
                     #return "Error accessing the MAX API at %s" % max_server_url
         error_message = len(maxcontext) == successful_tweets and " We weren't able to send the tweet to all contexts. See above for more information." or ""
         logger.info("Processed tweets to %d of %d possible contexts.%s" % (successful_tweets, len(maxcontext), error_message))
-        return "(401) Some tweets not sent"
+        if error_message:
+            return "(401) Some posts not sent"
+        else:
+            return "(200) All posts sent"
     else:
         logger.info("(404) Discarding %s tweet: Not such MAX context %s" % (maxuser.username, maxcontext))
         return "(404) %s: Not such MAX context %s" % (maxuser.username, maxcontext)
+
+    return "Should not see mee"
