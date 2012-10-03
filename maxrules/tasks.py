@@ -90,6 +90,7 @@ def processTweet(twitter_username, content):
 
     # Check if hashtag is registered for a valid MAX context
     # if not, discard it
+    successful_tweets = 0
     maxcontext = contexts.search({"$or": query})
     if maxcontext:
         for context in maxcontext:
@@ -99,34 +100,41 @@ def processTweet(twitter_username, content):
                 can_write = canWriteInContexts(maxuser, [context.url])
             except:
                 can_write = False
-
-            if not can_write:
                 logger.info("(401) %s can't write to %s" % (maxuser.username, context))
-                return "(401) %s can't write to %s" % (maxuser.username, context)
 
-            # Construct the payload with the activity information
-            newactivity = {
-                "object": {
-                    "objectType": "note",
-                    "content": content
-                },
-                "contexts": [
-                    context.url,
-                ],
-                "generator": twitter_generator_name
-            }
+            if can_write:
 
-            # Use the restricted REST endpoint for create a new activity in the specified
-            # MAX context in name of the specified MAX username
-            re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
-            if re.status_code == 201:
-                logger.info("(201) Successful tweet from user %s in context %s" % (maxuser, context.url))
-                return "(201) Successful tweet from user %s in context %s" % (maxuser, context.url)
-            else:
-                logger.info("(500) Error accessing the MAX API at %s" % max_server_url)
-                return "(500) MAX API error"
+                # Construct the payload with the activity information
+                newactivity = {
+                    "object": {
+                        "objectType": "note",
+                        "content": content
+                    },
+                    "contexts": [
+                        context.url,
+                    ],
+                    "generator": twitter_generator_name
+                }
 
-        return "Should not see me..."
+                # Use the restricted REST endpoint for create a new activity in the specified
+                # MAX context in name of the specified MAX username
+                re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+                if re.status_code == 201:
+                    logger.info("(201) Successful tweet from user %s in context %s" % (maxuser, context.url))
+                    successful_tweets += 1
+                    #return "(201) Successful tweet from user %s in context %s" % (maxuser, context.url)
+                else:
+                    logger.info("(500) Error accessing the MAX API at %s" % max_server_url)
+                    #return "(500) MAX API error"
+
+        error_message = len(maxcontext) == successful_tweets and " We weren't able to send the tweet to all contexts. See above for more information." or ""
+        logger.info("Processed tweets to %d of %d possible contexts.%s" % (successful_tweets, len(maxcontext), error_message))
+        if error_message:
+            return "(401) Some posts not sent"
+        else:
+            return "(200) All posts sent"
     else:
         logger.info("(404) Discarding %s tweet: Not such MAX context %s" % (maxuser.username, maxcontext))
         return "(404) %s: Not such MAX context %s" % (maxuser.username, maxcontext)
+
+    return "Should not see mee"

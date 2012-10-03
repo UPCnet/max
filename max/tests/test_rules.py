@@ -51,7 +51,7 @@ class RulesTests(unittest.TestCase):
         return res
 
     def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username != None and oauth_username or username
+        oauth_username = oauth_username is not None and oauth_username or username
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
@@ -96,6 +96,100 @@ class RulesTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+
+    def test_process_new_tweet_from_hashtag_to_unsubscribed_context(self):
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
+
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 0)
+
+    def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_newest(self):
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, create_contextB
+        from .mockers import subscribe_contextB
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
+
+        self.create_context(create_contextB, permissions=context_permissions)
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
+
+        self.subscribe_user_to_context(username, subscribe_contextB)
+
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+
+    def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_oldest(self):
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, create_contextB
+        from .mockers import subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
+
+        self.create_context(create_contextB, permissions=context_permissions)
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
+
+        self.subscribe_user_to_context(username, subscribe_contextA)
+
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextA['object'])
+
+    def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_both(self):
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, create_contextB
+        from .mockers import subscribe_contextA, subscribe_contextB
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
+        self.subscribe_user_to_context(username, subscribe_contextA)
+
+        self.create_context(create_contextB, permissions=context_permissions)
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
+        self.subscribe_user_to_context(username, subscribe_contextB)
+
+        processTweet('leomessi', 'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 2)
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0], subscribe_contextA['object'])
 
     def test_process_new_tweet_from_hashtag_uppercase(self):
         from maxrules.tasks import processTweet
