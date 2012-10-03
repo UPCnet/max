@@ -99,7 +99,7 @@ class RulesTests(unittest.TestCase):
 
     def test_process_new_tweet_from_hashtag_to_unsubscribed_context(self):
         from maxrules.tasks import processTweet
-        from .mockers import create_contextA, subscribe_contextA, create_contextB
+        from .mockers import create_contextA
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
