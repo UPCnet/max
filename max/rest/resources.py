@@ -29,8 +29,7 @@ OAUTH_RESOURCES = {
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
 
-    'conversations': {'route': '/conversations'},
-    'conversation': {'route': '/conversations/{hash}'},
+    'conversations': {'route': '/conversations'},  # documented
     'messages': {'route': '/conversations/{hash}/messages'},
 
 }

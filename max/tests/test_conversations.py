@@ -169,3 +169,23 @@ class FunctionalTests(unittest.TestCase):
         chash = sha1(alltogether).hexdigest()
 
         self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=400)
+
+    def test_get_conversations_for_an_user(self):
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        result = json.loads(res.text)
+
+        self.assertEqual(result.get("contexts", None)[0].get("object", None).get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("contexts", None)[0].get("object", None).get("objectType", None), "conversation")
+        self.assertEqual(result.get("object", None).get("objectType", None), "message")
+
+        res = self.testapp.get('/conversations', "", oauth2Header(sender), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result.get("totalItems", None), 1)
+        self.assertEqual(result.get("items")[0].get("object", "").get("objectType", ""), "conversation")

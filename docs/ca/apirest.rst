@@ -242,10 +242,10 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
         del MAX.
 
     :query username: (REST) L'identificador de l'usuari al sistema.
-    :query contexts: (Requerit) Tipus d'object al qual ens volem subscriure. De
-        moment només està suportat el tipus `context`. Hem de proporcionar un
-        objecte amb les claus ``objectType`` i el valor 'context', i les dades
-        del context com a l'exemple::
+    :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure, en
+        aquest cas del tipus `context`. Hem de proporcionar un objecte amb les
+        claus ``objectType`` i el valor `context`, i la dada ``url`` del context
+        com a l'exemple::
 
         {
             "object": {
@@ -261,3 +261,49 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
         En cas que l'usuari no existeixi::
 
             {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+
+Missatges i converses
+---------------------
+
+El MAX implementa des de la seva versió 3.0 la funcionalitat de missatgeria
+instantània asíncrona entre els seus usuaris. Aquests són els serveis REST
+associats.
+
+.. http:get:: /conversations
+
+    Retorna totes les converses depenent de l'actor que faci la petició.
+
+    Success
+        Retorna una llista d'objectes del tipus ``Conversation``.
+
+
+.. http:post:: /conversations
+
+    Retorna totes les converses depenent de l'actor que faci la petició.
+    :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure (en
+        aquest cas `conversation`). Hem de proporcionar un objecte amb les claus
+        ``objectType`` i el valor `conversation`, i la llista de
+        ``participants`` com a l'exemple::
+    :query object: (Requerit) Tipus d'objecte de la conversa. Hem de
+        proporcionar un objecte (per ara només es permet el tipus `message`) i
+        el contingut amb les dades ``content`` amb el cos del missatge
+        propiament dit.
+
+    {
+        "contexts": [
+            {"objectType":"conversation",
+             "participants": ["messi", "xavi"],
+            }
+        ],
+        "object": {
+            "objectType": "message",
+            "content": "Nos espera una gran temporada, no es cierto?",
+        }
+    }
+
+    Success
+        Retorna l'objecte ``missatge`` (activity).
+
+
+.. http:get:: /conversations/{hash}/messages

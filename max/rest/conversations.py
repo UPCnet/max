@@ -23,8 +23,8 @@ def getConversations(context, request):
          Return all conversations depending on the actor requester
     """
     mmdb = MADMaxDB(context.db)
-    query = {'object.participants': {'$in': request.actor['username']},
-             'object.objectType': 'Conversation',
+    query = {'object.participants': request.actor['username'],
+             'object.objectType': 'conversation',
              }
 
     conversations = mmdb.contexts.search(query, sort="published", flatten=1)
