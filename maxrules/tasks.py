@@ -1,5 +1,5 @@
 from celery.task import task
-from maxrules.twitter import twitter_generator_name, debug_hashtag, max_server_url, logging_file
+from maxrules.twitter import twitter_generator_name, debug_hashtag, max_server_url
 import requests
 import pymongo
 from maxrules.config import mongodb_url, mongodb_db_name
@@ -8,22 +8,23 @@ from max.rest.utils import canWriteInContexts
 from max.rest.utils import findHashtags
 import json
 import logging
-import max.models
+
+
+# Setup logging
+logging_file = '/var/pyramid/maxserver/var/log/twitter-processor.log'
+logger = logging.getLogger("maxrules")
+fh = logging.FileHandler(logging_file, encoding="utf-8")
+formatter = logging.Formatter('%(asctime)s %(message)s')
+logger.setLevel(logging.DEBUG)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 
 @task
-def processTweet(twitter_username, content):
+def processTweet(twitter_username, content, tweetID='---'):
     """ Process inbound tweet
     """
-    # Setup logging
-    logger = logging.getLogger("maxrules")
-    fh = logging.FileHandler(logging_file, encoding="utf-8")
-    formatter = logging.Formatter('%(asctime)s %(message)s')
-    logger.setLevel(logging.DEBUG)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-
-    logger.info("Processing %s tweet with content: %s" % (twitter_username, content))
+    logger.info("(INFO) Processing tweet %s from %s with content: %s" % (str(tweetID), twitter_username, content))
 
     conn = pymongo.Connection(mongodb_url)
     db = conn[mongodb_db_name]
@@ -58,11 +59,11 @@ def processTweet(twitter_username, content):
             re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
                 # 200: Successful tweet from context
-                logger.info("(201) Successful %s tweet from context %s" % (twitter_username, context_url))
+                logger.info("(201) Successfully posted tweet %s from %s as context %s" % (str(tweetID), twitter_username, context_url))
                 return "(201) %s tweet from context %s" % (twitter_username, context_url)
             else:
                 # 500: Error accessing the MAX API
-                logger.info("(500) Error accessing the MAX API at %s" % max_server_url)
+                logger.info("(404) Discarding tweet %s from %s : There's no MAX user with that twitter username." % (str(tweetID), twitter_username))
                 return "(500) MAX API error"
 
         return "Should not see me..."
@@ -85,7 +86,7 @@ def processTweet(twitter_username, content):
     if maxuser:
         maxuser = maxuser[0]
     else:
-        logger.info("(404) Discarding %s tweet: No such MAX user." % twitter_username)
+        logger.info("(404) Discarding tweet %s from %s : There's no MAX user with that twitter username." % (str(tweetID), twitter_username))
         return "(404) %s: No such MAX user." % twitter_username
 
     # Check if hashtag is registered for a valid MAX context
@@ -120,7 +121,7 @@ def processTweet(twitter_username, content):
                 # MAX context in name of the specified MAX username
                 re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
                 if re.status_code == 201:
-                    logger.info("(201) Successful tweet from user %s in context %s" % (maxuser, context.url))
+                    logger.info("(201) Successfully posted %s tweet from %s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.url))
                     successful_tweets += 1
                     #return "(201) Successful tweet from user %s in context %s" % (maxuser, context.url)
                 else:
@@ -128,13 +129,13 @@ def processTweet(twitter_username, content):
                     #return "(500) MAX API error"
 
         error_message = len(maxcontext) == successful_tweets and " We weren't able to send the tweet to all contexts. See above for more information." or ""
-        logger.info("Processed tweets to %d of %d possible contexts.%s" % (successful_tweets, len(maxcontext), error_message))
+        logger.info("Processed tweet %s to %d of %d possible contexts.%s" % (str(tweetID), successful_tweets, len(maxcontext), error_message))
         if error_message:
             return "(401) Some posts not sent"
         else:
             return "(200) All posts sent"
     else:
-        logger.info("(404) Discarding %s tweet: Not such MAX context %s" % (maxuser.username, maxcontext))
+        logger.info("(404) Discarding tweet %s from %s: There are no MAX context with any of those hashtags" % (str(tweetID), twitter_username))
         return "(404) %s: Not such MAX context %s" % (maxuser.username, maxcontext)
 
     return "Should not see mee"
