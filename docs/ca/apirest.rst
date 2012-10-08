@@ -30,10 +30,21 @@ resultats, indicant el total d'elements retornats::
                  ]
     }
 
+
 Usuaris
 --------
 
 Representa el conjunt d'usuaris del sistema.
+
+.. http:get:: /people
+
+    Retorna el resultat d'una cerca d'usuaris del sistema en forma de llista
+    de noms d'usuaris per l'ús de la UI.
+
+    :query username: El filtre de cerca d'usuaris (per paràmetre)
+
+    Success
+        Retorna una llista d'usuaris (cap objecte en especial).
 
 .. http:post:: /people/{username}
 
@@ -41,7 +52,7 @@ Representa el conjunt d'usuaris del sistema.
     En cas de que l'usuari ja existis, el retorna canviant el codi d'estat HTTP
     en funció de l'acció realitzada.
 
-    :query username: (REST) L'identificador del nou usuari al sistema.
+    :query username: (REST) L'identificador del nou usuari al sistema
     :query displayName: (Opcional) El nom real de l'usuari al sistema
 
     Success
@@ -74,6 +85,15 @@ Representa el conjunt d'usuaris del sistema.
 
     Error
         {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+.. http:get:: /people/{username}/avatar
+
+    Retorna l'avatar (foto) de l'usuari del sistema. Aquest és un servei públic.
+
+    :query username: (REST) L'identificador de l'usuari
+
+    Success
+        Retorna la imatge pel seu ús immediat.
 
 
 Activitats de l'usuari

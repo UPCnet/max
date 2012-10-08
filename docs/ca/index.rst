@@ -24,6 +24,9 @@ Continguts
    funcionalitats.rst
    arquitectura.rst
    definicions.rst
+   permisos.rst
    oauth2.rst
    apirest.rst
-   serialitzacions.rst
+   apioperations.rst
+
+.. En la nevera: serialitzacions.rst

@@ -1,40 +1,38 @@
 OAUTH_RESOURCES = {
-    'users': {'route': '/people'},
-    'user': {'route': '/people/{username}'},
-    'avatar': {'route': '/people/{username}/avatar'},
-    'user_activities': {'route': '/people/{username}/activities'},
-    'timeline': {'route': '/people/{username}/timeline'},
-    'user_comments': {'route': '/people/{username}/comments'},
-    'user_shares': {'route': '/people/{username}/shares'},
-    'user_likes': {'route': '/people/{username}/likes'},
-    'follows': {'route': '/people/{username}/follows'},
-    'follow': {'route': '/people/{username}/follows/{followedDN}'},
-    'subscriptions': {'route': '/people/{username}/subscriptions'},
-    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},
-    'user_conversations': {'route': '/people/{username}/conversations'},
+    'users': {'route': '/people'},  # documented
+    'user': {'route': '/people/{username}'},  # documented
+    'avatar': {'route': '/people/{username}/avatar'},  # documented
+    'user_activities': {'route': '/people/{username}/activities'},  # documented
+    'timeline': {'route': '/people/{username}/timeline'},  # documented
+    'user_comments': {'route': '/people/{username}/comments'},  # not implemented
+    'user_shares': {'route': '/people/{username}/shares'},  # not implemented
+    'user_likes': {'route': '/people/{username}/likes'},  # not implemented
+    'follows': {'route': '/people/{username}/follows'},  # not implemented
+    'follow': {'route': '/people/{username}/follows/{followedDN}'},  # not implemented
+    'subscriptions': {'route': '/people/{username}/subscriptions'},  # documented
+    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # not implemented
+    'user_conversations': {'route': '/people/{username}/conversations'},  # not implemented
 
-    'activities': {'route': '/activities'},
-    'activity': {'route': '/activities/{activity}'},
-    'comments': {'route': '/activities/{activity}/comments'},
-    'comment': {'route': '/activities/{activity}/comments/{commentId}'},
-    'likes': {'route': '/activities/{activity}/likes'},
-    'like': {'route': '/activities/{activity}/likes/{likeId}'},
-    'shares': {'route': '/activities/{activity}/shares'},
-    'share': {'route': '/activities/{activity}/shares/{shareId}'},
+    'activities': {'route': '/activities'},  # documented
+    'activity': {'route': '/activities/{activity}'},  # not public API
+    'comments': {'route': '/activities/{activity}/comments'},  # documented
+    'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
+    'likes': {'route': '/activities/{activity}/likes'},  # not implemented
+    'like': {'route': '/activities/{activity}/likes/{likeId}'},  # not implemented
+    'shares': {'route': '/activities/{activity}/shares'},  # not implemented
+    'share': {'route': '/activities/{activity}/shares/{shareId}'},  # not implemented
 
-    'contexts': {'route': '/contexts'},
-    'context': {'route': '/contexts/{hash}'},
-    'context_avatar': {'route': '/contexts/{hash}/avatar'},
+    'contexts': {'route': '/contexts'},  # documented
+    'context': {'route': '/contexts/{hash}'},  # documented
+    'context_avatar': {'route': '/contexts/{hash}/avatar'},  # documented
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
 
     'conversations': {'route': '/conversations'},  # documented
-    'messages': {'route': '/conversations/{hash}/messages'},
+    'conversation': {'route': '/conversations'}  # documented
 
 }
-# POST a conversation es enviar un Missatge
-# GET a messages es agafar dades dels missatges de la conversa
 
 ADMIN_RESOURCES = {
     'admin_user_activities': {'route': '/admin/people/{username}/activities'},

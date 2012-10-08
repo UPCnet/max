@@ -27,6 +27,9 @@ def getUserComments(context, request):
 @oauth2(['widgetcli'])
 def getActivityComments(context, request):
     """
+        /activities/{activity}/comments
+
+        Return the comments for an activity.
     """
     activityid = request.matchdict['activity']
 
@@ -51,7 +54,9 @@ def getActivityComments(context, request):
 @oauth2(['widgetcli'])
 def addActivityComment(context, request):
     """
-    POST /activities/{activity}/comments
+        /activities/{activity}/comments
+
+        Post a comment to an activity.
     """
     #XXX TODO ara només es tracta la primera activitat,
     # s'ha de iterar si es vol que el comentari sigui de N activitats

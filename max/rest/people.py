@@ -20,7 +20,8 @@ def getUsers(context, request):
     """
          /people
 
-         Retorna tots els users
+         Return the result of a query specified by the username param as
+         a list of usernames. For UI use only.
     """
     mmdb = MADMaxDB(context.db)
     query = {}
@@ -36,6 +37,9 @@ def getUsers(context, request):
 @oauth2(['widgetcli'])
 def getUser(context, request):
     """
+        /people/{username}
+
+        Return the required user object.
     """
     handler = JSONResourceEntity(request.actor.flatten())
     return handler.buildResponse()
@@ -46,6 +50,9 @@ def getUser(context, request):
 @MaxRequest
 def addUser(context, request):
     """
+        /people/{username}
+
+        Creates a system user.
     """
     username = request.matchdict['username']
     rest_params = {'username': username}
@@ -75,6 +82,9 @@ def addUser(context, request):
 @view_config(route_name='avatar', request_method='GET')
 def getUserAvatar(context, request):
     """
+        /people/{username}/avatar
+
+        Returns user avatar. Public endpoint.
     """
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
@@ -91,6 +101,10 @@ def getUserAvatar(context, request):
 @oauth2(['widgetcli'])
 def ModifyUser(context, request):
     """
+        /people/{username}
+
+        Modifies a system user via oauth, so only the user can modify its own
+        properties.
     """
     actor = request.actor
     properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")

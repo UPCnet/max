@@ -19,6 +19,9 @@ import time
 @MaxRequest
 def getContext(context, request):
     """
+        /contexts/{hash}
+
+        Return a context by its hash.
     """
     mmdb = MADMaxDB(context.db)
     chash = request.matchdict.get('hash', None)
@@ -34,6 +37,10 @@ def getContext(context, request):
 @view_config(route_name='context_avatar', request_method='GET')
 def getContextAvatar(context, request):
     """
+        /contexts/{hash}/avatar
+
+        Return the context's avatar. To the date, this is only implemented to
+        work integrated with Twitter.
     """
     chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
@@ -69,6 +76,9 @@ def getContextAvatar(context, request):
 @MaxRequest
 def addContext(context, request):
     """
+        /contexts
+
+        Adds a context.
     """
     # Initialize a Context object from the request
     newcontext = Context()
@@ -97,6 +107,9 @@ def addContext(context, request):
 @MaxRequest
 def ModifyContext(context, request):
     """
+        /contexts/{hash}
+
+        Modify the given context.
     """
     chash = request.matchdict['hash']
     contexts = MADMaxCollection(context.db.contexts)

@@ -21,6 +21,8 @@ def getUserSubscriptions(context, request):
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
+
+        Subscribe an username to the suplied context.
     """
     # XXX For now only one context can be subscribed at a time
     actor = request.actor
