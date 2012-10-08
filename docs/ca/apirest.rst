@@ -306,7 +306,7 @@ associats.
     :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure (en
         aquest cas `conversation`). Hem de proporcionar un objecte amb les claus
         ``objectType`` i el valor `conversation`, i la llista de
-        ``participants`` com a l'exemple::
+        ``participants`` com a l'exemple.
     :query object: (Requerit) Tipus d'objecte de la conversa. Hem de
         proporcionar un objecte (per ara només es permet el tipus `message`) i
         el contingut amb les dades ``content`` amb el cos del missatge
