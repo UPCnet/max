@@ -32,7 +32,7 @@ Contexts
     Aquest és un servei públic.
 
     :query hash: (REST) El hash del context en concret. Aquest hash es calcula
-    fent una suma de verificació sha1 de la URL del context.
+        fent una suma de verificació sha1 de la URL del context.
 
     Success
         Retorna la imatge del context.
