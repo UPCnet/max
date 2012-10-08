@@ -264,8 +264,9 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
     :query username: (REST) L'identificador de l'usuari al sistema.
     :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure, en
         aquest cas del tipus `context`. Hem de proporcionar un objecte amb les
-        claus ``objectType`` i el valor `context`, i la dada ``url`` del context
-        com a l'exemple::
+        claus ``objectType`` i el valor `context`, i la dada ``url`` del context.
+
+    Aquest és un exemple::
 
         {
             "object": {
@@ -301,6 +302,7 @@ associats.
 .. http:post:: /conversations
 
     Retorna totes les converses depenent de l'actor que faci la petició.
+
     :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure (en
         aquest cas `conversation`). Hem de proporcionar un objecte amb les claus
         ``objectType`` i el valor `conversation`, i la llista de
@@ -310,17 +312,19 @@ associats.
         el contingut amb les dades ``content`` amb el cos del missatge
         propiament dit.
 
-    {
-        "contexts": [
-            {"objectType":"conversation",
-             "participants": ["messi", "xavi"],
+    Aquest és un exemple::
+
+        {
+            "contexts": [
+                {"objectType":"conversation",
+                 "participants": ["messi", "xavi"],
+                }
+            ],
+            "object": {
+                "objectType": "message",
+                "content": "Nos espera una gran temporada, no es cierto?",
             }
-        ],
-        "object": {
-            "objectType": "message",
-            "content": "Nos espera una gran temporada, no es cierto?",
         }
-    }
 
     Success
         Retorna l'objecte ``missatge`` (activity).
