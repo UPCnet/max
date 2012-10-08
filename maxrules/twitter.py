@@ -14,7 +14,14 @@ max_server_url = 'https://max.upc.edu'
 # max_server_url = 'https://sneridagh.upc.es'
 twitter_generator_name = 'Twitter'
 debug_hashtag = '#debugmaxupcnet'
-logging_file = '/var/pyramid/maxserver/var/log/twitter.log'
+logging_file = '/var/pyramid/maxserver/var/log/twitter-listener.log'
+
+logger = logging.getLogger("tweeterlistener")
+fh = logging.FileHandler(logging_file, encoding="utf-8")
+formatter = logging.Formatter('%(asctime)s %(message)s')
+logger.setLevel(logging.DEBUG)
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 
 def main(argv=sys.argv, quiet=False):
@@ -29,11 +36,10 @@ class StreamWatcherListener(tweepy.StreamListener):
 
     def on_status(self, status):
         try:
-            logging.warning(self.status_wrapper.fill(status.text))
-            logging.warning('\n %s  %s  via %s\n\n' % (status.author.screen_name, status.created_at, status.source))
+            logger.info('Got tweet %d from %s via %s with content: %s' % (status.id, status.author.screen_name, status.source, status.text))
             # Insert the new data in MAX
             from maxrules.tasks import processTweet
-            processTweet.delay(status.author.screen_name.lower(), status.text)
+            processTweet.delay(status.author.screen_name.lower(), status.text, status.id)
         except:
             # Catch any unicode errors while printing to console
             # and just ignore them to avoid breaking application.
