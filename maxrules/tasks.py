@@ -71,10 +71,9 @@ def processTweet(twitter_username, content, tweetID='---'):
     # If we have a tweet from a tracked hashtag
     # Parse text and determine the second or nth hashtag
     possible_hastags = findHashtags(content)
-    # Normalize possible_hastags
-    possible_hastags = [hashtag.lower() for hashtag in possible_hastags]
+    # Prepare query with normalized possible_hastags
 
-    query = [dict(twitterHashtag={'$regex':hashtag, '$options':'i'}) for hashtag in possible_hastags]
+    query = [dict(twitterHashtag=hashtag.lower()) for hashtag in possible_hastags]
 
     if debug_hashtag in possible_hastags:
         logger.info("%s Debug hashtag detected!" % content)
