@@ -113,6 +113,7 @@ class MaxTwitterRulesRunner(object):
         logging.warning("Listening to this Twitter hashtags: %s" % str(track_list))
         logging.warning("Listening to this Twitter userIds: %s" % str(readable_follow_list))
 
+	follow_list = ['82759832', '526326641', '126348277', '557927304', '812654863', '811321218', '215323992', '862576398']
         stream.filter(follow=follow_list, track=track_list)
 
 
