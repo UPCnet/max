@@ -58,6 +58,7 @@ class RegexTests(unittest.TestCase):
         self.assertIsNotNone(re.match(RE_VALID_TWITTER_USERNAME, '@johndoe89_12345'))  # username with maximum length
 
         #invalid
+        self.assertIsNone(re.match(RE_VALID_TWITTER_USERNAME, 'twitter.com/@leo_struni'))  # No comments... real PICNIC case
         self.assertIsNone(re.match(RE_VALID_TWITTER_USERNAME, '@@johndow'))          # username with more than one starting #
         self.assertIsNone(re.match(RE_VALID_TWITTER_USERNAME, '@johndoe89_123456'))  # username with invalid length
         self.assertIsNone(re.match(RE_VALID_TWITTER_USERNAME, '@'))                  # username with invalid length
