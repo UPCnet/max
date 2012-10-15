@@ -24,7 +24,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
     """
     """
     try:
-        req = requests.get('https://api.twitter.com/users/show/%s.json' % twitterUsername)
+        req = requests.get('https://api.twitter.com/1/users/show/%s.json' % twitterUsername)
         data = json.loads(req.text)
         image_url = data.get('profile_image_url_https', None)
         if image_url:
