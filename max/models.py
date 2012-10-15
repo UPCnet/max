@@ -135,7 +135,10 @@ class User(MADBase):
               'following':    dict(default={'items': [], 'totalItems': 0}),
               'subscribedTo': dict(default={'items': [], 'totalItems': 0}),
               'published':    dict(),
-              'twitterUsername':    dict(user_mutable=1),
+              'twitterUsername':    dict(user_mutable=1,
+                                         formatters=['stripTwitterUsername'],
+                                         validators=['isValidTwitterUsername']
+                                         )
               }
 
     def buildObject(self):

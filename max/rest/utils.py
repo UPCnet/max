@@ -41,7 +41,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
 
 
 def getUserIdFromTwitter(twitterUsername):
-    res = requests.get('http://api.twitter.com/users/show/%s.json' % twitterUsername)
+    res = requests.get('http://api.twitter.com/1/users/show/%s.json' % twitterUsername)
 
     if res.status_code == 404:
         return None
