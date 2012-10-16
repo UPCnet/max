@@ -107,7 +107,21 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(conversation.get("permissions", None), permissions)
         self.assertEqual(conversation.get("hash", None), chash)
 
-    def test_post_message_to_an_already_existing_conversation(self):
+    def test_post_messages_to_an_already_existing_conversation_check_not_duplicated_conversation(self):
+        from .mockers import message, message2
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations', {}, oauth2Header(sender), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get("totalItems", None), 1)
+
+    def test_post_messages_to_an_already_existing_conversation(self):
         from .mockers import message, message2
         sender = 'messi'
         recipient = 'xavi'

@@ -5,6 +5,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Activity, Context
+from max.ASObjects import Conversation
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
 
@@ -58,7 +59,8 @@ def postMessage2Conversation(context, request):
                                permissions={'read': 'subscribed',
                                             'write': 'subscribed',
                                             'join': 'restricted',
-                                            'invite': 'restricted'}
+                                            'invite': 'restricted'},
+                               hash=Conversation(ctxts[0]).getHash()
                                )
     newconversation = Context()
     newconversation.fromRequest(request, rest_params=conversation_params)
