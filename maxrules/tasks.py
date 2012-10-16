@@ -125,7 +125,7 @@ def processTweet(twitter_username, content, tweetID='---'):
                 # MAX context in name of the specified MAX username
                 re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
                 if re.status_code == 201:
-                    logger.info("(201) Successfully posted tweet %s from @%s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.url))
+                    logger.info("(201) Successfully posted tweet %s from @%s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.object.url))
                     successful_tweets += 1
                     #return "Success tweet from user %s in context %s" % (maxuser, context.url)
                 else:

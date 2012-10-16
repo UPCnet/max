@@ -289,8 +289,15 @@ class MADBase(MADDict):
             If present, return the object, otherwise returns None
         """
         unique = self.unique
-        query = {unique: self.data.get(unique)}
-        return self.mdb_collection.find_one(query)
+        value = self.data.get(unique)
+        if value:
+            query = {unique: value}
+            return self.mdb_collection.find_one(query)
+        else:
+            # in the case that we don't have the unique value in the request data
+            # Assume that the object doesn't exist
+            # XXX TODO - Test it!!
+            return None
 
     def flatten(self):
         """

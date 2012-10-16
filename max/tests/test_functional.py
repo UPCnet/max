@@ -499,8 +499,17 @@ class FunctionalTests(unittest.TestCase):
 
     def test_add_invalid_context(self):
         from .mockers import create_invalid_context
-        from hashlib import sha1
-        result = self.create_context(create_invalid_context, expect=400)
+        self.create_context(create_invalid_context, expect=400)
+
+    def test_add_uri_context_without_displayName(self):
+        """
+            Add a Uri context without a displayName and check that the default displayName is set
+            with the url from the uri object
+        """
+        from .mockers import create_context_without_displayname
+        res = self.create_context(create_context_without_displayname, expect=201)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('displayName', None), create_context_without_displayname['object']['url'])
 
     # CONTEXTS
 
@@ -511,7 +520,7 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         url_hash = sha1(create_context_full['object']['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
-        self.assertEqual(result.get('object', {}).get('displayName', None), create_context_full['object']['displayName'])
+        self.assertEqual(result.get('displayName', None), create_context_full['displayName'])
         self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
         self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
 

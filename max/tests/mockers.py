@@ -76,8 +76,16 @@ create_context = {
     'object': {
         'url': 'http://atenea.upc.edu',
         'objectType': 'uri',
-        'displayName': 'Atenea',
-    }
+    },
+    'displayName': 'Atenea',
+}
+
+create_context_without_displayname = {
+
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri',
+    },
 }
 
 create_invalid_context = {
@@ -85,8 +93,8 @@ create_invalid_context = {
     'object': {
         'url': 'http://atenea.upc.edu',
         'objectType': 'uri Geller',
-        'displayName': 'Atenea',
-    }
+    },
+    'displayName': 'Atenea',
 }
 
 create_unauthorized_context = {
@@ -101,8 +109,8 @@ create_context_full = {
     'object': {
         'url': 'http://atenea.upc.edu',
         'objectType': 'uri',
-        'displayName': 'Atenea'
     },
+    'displayName': 'Atenea',
     'twitterHashtag': 'atenea',
     'twitterUsername': 'atenaupc',
 }
@@ -112,8 +120,8 @@ create_context_private_rw = {
     'object': {
         'url': 'http://atenea.upc.edu',
         'objectType': 'uri',
-        'displayName': 'Atenea'
     },
+    'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'subscribed',
                     'join': 'restricted',
@@ -125,8 +133,8 @@ create_context_private_r = {
     'object': {
         'url': 'http://atenea.upc.edu',
         'objectType': 'uri',
-        'displayName': 'Atenea'
     },
+    'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'restricted',
                     'join': 'restricted',
@@ -138,16 +146,16 @@ create_contextA = {
     'object': {
         'url': 'http://atenea.upc.edu/A',
         'objectType': 'uri',
-        'displayName': 'Atenea A'
-    }
+    },
+    'displayName': 'Atenea A'
 }
 
 create_contextB = {
     'object': {
         'url': 'http://atenea.upc.edu/B',
         'objectType': 'uri',
-        'displayName': 'Atenea B'
-    }
+    },
+   'displayName': 'Atenea B'
 }
 
 
@@ -156,7 +164,6 @@ subscribe_context = {
     "object": {
         "objectType": "uri",
         "url": create_context['object']['url'],
-        'displayName': create_context['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -165,7 +172,6 @@ subscribe_contextA = {
     "object": {
         "objectType": "uri",
         "url": create_contextA['object']['url'],
-        'displayName': create_contextA['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -174,7 +180,6 @@ subscribe_contextB = {
     "object": {
         "objectType": "uri",
         "url": create_contextB['object']['url'],
-        'displayName': create_contextB['object']['displayName']  # displayName not needed, only for assertEquals comparison purposes
     }
 }
 
