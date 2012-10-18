@@ -134,3 +134,27 @@ def getMessages(context, request):
 
     handler = JSONResourceRoot(messages)
     return handler.buildResponse()
+
+@view_config(route_name='messages', request_method='POST')
+@MaxResponse
+@MaxRequest
+@oauth2(['widgetcli'])
+def getMessages(context, request):
+    """
+         /conversations/{hash}/messages
+         Post a message to an existing conversation
+    """
+    message_params = {'actor': users[request.actor['username']],
+                      'verb': 'post'}
+
+    # Initialize a Message (Activity) object from the request
+    newmessage = Activity()
+    newmessage.fromRequest(request, rest_params=message_params)
+
+    message_oid = newmessage.insert()
+    newmessage['_id'] = message_oid
+
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+    return handler.buildResponse()
+    
+
