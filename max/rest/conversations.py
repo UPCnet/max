@@ -54,13 +54,19 @@ def postMessage2Conversation(context, request):
     """
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
-
     data = extractPostData(request)
     ctxts = data.get('contexts', [])
     if len(ctxts) == 0:
         raise ValidationError('Empty contexts parameter')
     if len(ctxts[0]['participants']) == 0:
         raise ValidationError('Empty participants parameter')
+
+    #Loop trough all participants, if there's one that doesn't exists, an exception will raise
+    #This check is to avoid any conversation creation if there's any invalid participant
+    users = MADMaxCollection(context.db.users, query_key='username')   
+    for participant in ctxts[0]['participants']:
+        user = users[participant]
+
 
     # Initialize a conversation (context) object from the request, overriding the object using the context
     conversation_params = dict(actor=request.actor,
@@ -77,14 +83,14 @@ def postMessage2Conversation(context, request):
     if not request.actor.username in newconversation.object['participants']:
         raise ValidationError('Actor must be part of the participants list.')
 
-    users = MADMaxCollection(context.db.users, query_key='username')
+   
 
     if not newconversation.get('_id'):
         # New conversation
         contextid = newconversation.insert()
         newconversation['_id'] = contextid
 
-        # Subscriure a tothom
+        # Subscribe everyone,
         for user in newconversation['object']['participants']:
             users[user].addSubscription(newconversation)
     else:
