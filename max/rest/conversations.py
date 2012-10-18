@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pymongo import ASCENDING
 
 from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB, MADMaxCollection
@@ -10,8 +10,7 @@ from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import searchParams, canReadContext, extractPostData
-import re
+from max.rest.utils import extractPostData
 
 
 @view_config(route_name='conversations', request_method='GET')
@@ -29,6 +28,16 @@ def getConversations(context, request):
              }
 
     conversations = mmdb.contexts.search(query, sort="published", flatten=1)
+    for conversation in conversations:
+        query = {'object.objectType': 'message',
+                 'contexts.hash': conversation['hash']
+                 }
+        messages = mmdb.activity.search(query, flatten=1)
+        lastMessage = messages[-1]
+        conversation['object']['lastMessage'] = {'published': lastMessage['published'],
+                                                 'content': lastMessage['object']['content']
+                                                 }
+        conversation['object']['messages'] = len(messages)
 
     handler = JSONResourceRoot(conversations)
     return handler.buildResponse()
@@ -115,7 +124,7 @@ def getMessages(context, request):
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.hash': chash}
-    messages = mmdb.activity.search(query, sort="published", flatten=1)
+    messages = mmdb.activity.search(query, sort="published", sort_dir=ASCENDING, flatten=1)
 
     handler = JSONResourceRoot(messages)
     return handler.buildResponse()
