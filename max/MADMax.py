@@ -137,8 +137,8 @@ class MADMaxCollection(object):
         wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
 
-        #Also wrap subobjects
-        if 'object' in wrapped:
+        #Also wrap subobjects, only if we are not flattening
+        if not flatten and 'object' in wrapped:
             wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
 
         if flatten:
