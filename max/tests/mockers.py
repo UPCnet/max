@@ -332,6 +332,12 @@ message2 = {
     }
 }
 
+message3 = {
+    "object": {
+        "objectType": "message",
+        "content": "M'agrada Taradell!",
+    }
+}
 
 # For revision, not implemented yet
 

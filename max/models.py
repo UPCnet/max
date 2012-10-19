@@ -2,7 +2,7 @@
 from max.MADObjects import MADBase
 from max.rest.utils import canWriteInContexts
 import datetime
-from MADMax import MADMaxDB
+from MADMax import MADMaxDB, MADMaxCollection
 from max.rest.utils import getUserIdFromTwitter, findKeywords, findHashtags
 from max import DEFAULT_CONTEXT_PERMISSIONS
 
@@ -67,8 +67,12 @@ class Activity(MADBase):
                 # of each context and store them in contexts key
                 ob['contexts'] = []
                 for cobject in self.data['contexts']:
-                    wrapper = self.getObjectWrapper(cobject['objectType'])
-                    chash = wrapper(cobject).getHash()
+                    #if hash is directly specified, use it to speed up process
+                    if 'hash' in cobject.keys():
+                        chash = cobject.get('hash')
+                    else:
+                        wrapper = self.getObjectWrapper(cobject['objectType'])
+                        chash = wrapper(cobject).getHash()
                     subscription = self.data['actor'].getSubscriptionByHash(chash)
                     #context = subscription.get('object')
                     ob['contexts'].append(subscription)
@@ -112,10 +116,18 @@ class Activity(MADBase):
             * If the actor is a person, check wether can write in all contexts
             * If the actor is a context, check if the context is the same
         """
+        contextsdb = MADMaxCollection(self.mdb_collection.database.contexts, query_key='hash')
         # If we are updating, we already have all data on the object, so we read self directly
         result = True
         if isinstance(self.data['actor'], User):
-            wrapped_contexts = [self.getObjectWrapper(context['objectType'])(context) for context in self.data.get('contexts', [])]
+            wrapped_contexts = []
+            for context in self.data.get('contexts', []):
+                if 'hash' in context.keys():
+                    wrapped = contextsdb[context['hash']]['object']
+                else:
+                    wrapped = self.getObjectWrapper(context['objectType'])(context)
+                wrapped_contexts.append(wrapped)
+
             result = result and canWriteInContexts(self.data['actor'], wrapped_contexts)
         if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
             result = result and self.data['actor']['object']['url'] == self.data.get('contexts')[0]

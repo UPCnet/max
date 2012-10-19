@@ -145,6 +145,30 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("object", None).get("objectType", None), "conversation")
         self.assertEqual(result.get("items")[0].get("object", None).get("objectType", None), "message")
 
+    def test_post_messages_to_a_known_conversation_without_specifying_participants(self):
+        from .mockers import message, message3
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        participants = list([sender, recipient])
+        participants.sort()
+        alltogether = ''.join(participants)
+        chash = sha1(alltogether).hexdigest()
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/%s/messages' % chash, json.dumps(message3), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(sender), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result.get("totalItems", None), 2)
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("hash", None), chash)
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("object", None).get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("object", None).get("objectType", None), "conversation")
+        self.assertEqual(result.get("items")[0].get("object", None).get("objectType", None), "message")
+
     def test_get_messages_from_a_conversation_as_a_recipient(self):
         from .mockers import message, message2
         sender = 'messi'

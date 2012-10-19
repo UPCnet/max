@@ -63,10 +63,9 @@ def postMessage2Conversation(context, request):
 
     #Loop trough all participants, if there's one that doesn't exists, an exception will raise
     #This check is to avoid any conversation creation if there's any invalid participant
-    users = MADMaxCollection(context.db.users, query_key='username')   
+    users = MADMaxCollection(context.db.users, query_key='username')
     for participant in ctxts[0]['participants']:
         user = users[participant]
-
 
     # Initialize a conversation (context) object from the request, overriding the object using the context
     conversation_params = dict(actor=request.actor,
@@ -83,8 +82,6 @@ def postMessage2Conversation(context, request):
     if not request.actor.username in newconversation.object['participants']:
         raise ValidationError('Actor must be part of the participants list.')
 
-   
-
     if not newconversation.get('_id'):
         # New conversation
         contextid = newconversation.insert()
@@ -100,6 +97,7 @@ def postMessage2Conversation(context, request):
         for user in unsubscribed:
             users[user].addSubscription(newconversation)
 
+    # We have to re-get the actor, in order to have the subscription updated
     message_params = {'actor': users[request.actor['username']],
                       'verb': 'post'}
 
@@ -135,17 +133,23 @@ def getMessages(context, request):
     handler = JSONResourceRoot(messages)
     return handler.buildResponse()
 
+
 @view_config(route_name='messages', request_method='POST')
-@MaxResponse
+#@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
-def getMessages(context, request):
+def addMessage(context, request):
     """
          /conversations/{hash}/messages
-         Post a message to an existing conversation
+         Post a message to 1 (one) existing conversation
     """
-    message_params = {'actor': users[request.actor['username']],
-                      'verb': 'post'}
+    chash = request.matchdict['hash']
+    message_params = {'actor': request.actor,
+                      'verb': 'post',
+                      'contexts': [{'objectType': 'conversation',
+                                    'hash': chash
+                                    }]
+                      }
 
     # Initialize a Message (Activity) object from the request
     newmessage = Activity()
@@ -156,5 +160,5 @@ def getMessages(context, request):
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
-    
+
 
