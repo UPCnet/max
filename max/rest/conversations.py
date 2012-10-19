@@ -135,7 +135,7 @@ def getMessages(context, request):
 
 
 @view_config(route_name='messages', request_method='POST')
-#@MaxResponse
+@MaxResponse
 @MaxRequest
 @oauth2(['widgetcli'])
 def addMessage(context, request):
