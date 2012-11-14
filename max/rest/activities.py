@@ -6,7 +6,7 @@ from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxRequest, MaxResponse
 from max.oauth2 import oauth2
-from max.exceptions import MissingField
+from max.exceptions import MissingField, ObjectNotFound
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
@@ -87,7 +87,11 @@ def getActivities(context, request):
     subscribed_uris = [context['object']['url'] for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', []) and context['object']['objectType'] == 'uri']
 
     # get the defined read context
-    rcontext = mmdb.contexts.getItemsByhash(chash)[0]
+    result_contexts = mmdb.contexts.getItemsByhash(chash)
+    if result_contexts:
+        rcontext = result_contexts[0]
+    else:
+        raise ObjectNotFound("Context with hash %s not found inside contexts" % (chash))
     url = rcontext['object']['url']
 
     # regex query to find all contexts within url

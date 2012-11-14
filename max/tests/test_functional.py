@@ -160,6 +160,11 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
 
+    def test_get_activities_from_inexistent_context(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.get('/activities', {'context': '01234567890abcdef01234567890abcdef012345'}, oauth2Header(username), status=404)
+
     def test_get_activities_from_recursive_contexts(self):
         """
             Create 3 contexts, one parent and two childs
@@ -326,7 +331,7 @@ class FunctionalTests(unittest.TestCase):
         from .mockers import subscribe_context
         username = 'messi'
         self.create_user(username)
-        res = self.subscribe_user_to_context(username, subscribe_context, expect=400)
+        res = self.subscribe_user_to_context(username, subscribe_context, expect=404)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
@@ -581,7 +586,7 @@ class FunctionalTests(unittest.TestCase):
         url_hash = sha1(create_context['object']['url']).hexdigest()
         self.create_context(create_context)
         self.testapp.delete('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=204)
-        res = self.testapp.get('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=400)
+        res = self.testapp.get('/contexts/%s' % url_hash, "", basicAuthHeader('operations', 'operations'), status=404)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 

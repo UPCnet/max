@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError
-from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest
+from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound
 from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
@@ -136,7 +136,7 @@ def MaxResponse(fun):
         except ObjectNotSupported, message:
             return JSONHTTPBadRequest(error=dict(error=ObjectNotSupported.__name__, error_description=message.value))
         except ObjectNotFound, message:
-            return JSONHTTPBadRequest(error=dict(error=ObjectNotFound.__name__, error_description=message.value))
+            return JSONHTTPNotFound(error=dict(error=ObjectNotFound.__name__, error_description=message.value))
         except MissingField, message:
             return JSONHTTPBadRequest(error=dict(error=MissingField.__name__, error_description=message.value))
         except DuplicatedItemError, message:
