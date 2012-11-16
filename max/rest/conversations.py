@@ -52,6 +52,7 @@ def postMessage2Conversation(context, request):
          /conversations
          Post message to a conversation
     """
+
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
     data = extractPostData(request)
@@ -63,6 +64,7 @@ def postMessage2Conversation(context, request):
 
     #Loop trough all participants, if there's one that doesn't exists, an exception will raise
     #This check is to avoid any conversation creation if there's any invalid participant
+
     users = MADMaxCollection(context.db.users, query_key='username')
     for participant in ctxts[0]['participants']:
         user = users[participant]
@@ -76,7 +78,7 @@ def postMessage2Conversation(context, request):
                                             'invite': 'restricted'},
                                hash=Conversation(ctxts[0]).getHash()
                                )
-    newconversation = Context()
+    newconversation = Context(request)
     newconversation.fromRequest(request, rest_params=conversation_params)
 
     if not request.actor.username in newconversation.object['participants']:
@@ -102,7 +104,7 @@ def postMessage2Conversation(context, request):
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Activity()
+    newmessage = Activity(request)
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()
@@ -152,7 +154,7 @@ def addMessage(context, request):
                       }
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Activity()
+    newmessage = Activity(request)
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()

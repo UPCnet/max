@@ -24,7 +24,7 @@ def addAdminUserActivity(context, request):
                    'verb': 'post'}
 
     # Initialize a Activity object from the request
-    newactivity = Activity()
+    newactivity = Activity(request)
     newactivity.fromRequest(request, rest_params=rest_params)
 
     # If we have the _id setted, then the object already existed in the DB,

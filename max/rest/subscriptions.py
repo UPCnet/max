@@ -30,7 +30,7 @@ def subscribe(context, request):
                    'verb': 'subscribe'}
 
     # Initialize a Activity object from the request
-    newactivity = Activity()
+    newactivity = Activity(request)
     newactivity.fromRequest(request, rest_params=rest_params)
 
     #Check if user is already subscribed

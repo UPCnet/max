@@ -188,10 +188,13 @@ class MADBase(MADDict):
     mdb_collection = None
     data = {}
 
-    def fromRequest(self, request, rest_params={}):
-        self.mdb_collection = request.context.db[self.collection]
-
+    def __init__(self, request):
+        if request:
+            self.mdb_collection = request.context.db[self.collection]
         self.data = RUDict({})
+
+    def fromRequest(self, request, rest_params={}):
+
         self.data.update(extractPostData(request))
         self.data.update(rest_params)
 
@@ -216,6 +219,12 @@ class MADBase(MADDict):
     def fromObject(self, source, collection):
         self.mdb_collection = collection
         self.update(source)
+
+    def fromDatabase(self, key):
+        self.data[self.unique] = key
+        obj = self.alreadyExists()
+        if obj:
+            self.update(obj)
 
     def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """

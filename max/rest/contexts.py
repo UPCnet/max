@@ -81,7 +81,7 @@ def addContext(context, request):
         Adds a context.
     """
     # Initialize a Context object from the request
-    newcontext = Context()
+    newcontext = Context(request)
     newcontext.fromRequest(request)
 
     # If we have the _id setted, then the object already existed in the DB,
