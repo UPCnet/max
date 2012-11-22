@@ -39,7 +39,7 @@ def getConversations(context, request):
                                                  }
         conversation['object']['messages'] = len(messages)
 
-    handler = JSONResourceRoot(conversations)
+    handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['object']['lastMessage']['published']))
     return handler.buildResponse()
 
 
