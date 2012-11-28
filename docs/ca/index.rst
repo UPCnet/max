@@ -28,5 +28,6 @@ Continguts
    oauth2.rst
    apirest.rst
    apioperations.rst
+   maxui.rst
 
 .. En la nevera: serialitzacions.rst
