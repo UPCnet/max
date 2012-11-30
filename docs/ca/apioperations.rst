@@ -8,6 +8,60 @@ Aquest usuari no te cap privilegi addicional sobre el sistema que el que
 s'exposa en la descripció de cada servei.
 
 
+Activitats
+----------
+
+.. http:post:: /admin/people/{username}/activities
+
+    Afegeix una activitat en nom d'un usuari qualsevol
+
+    :query username: (REST) El nom d'usuari en nom del qual es crearà l'activitat
+    :query contexts: (Opcional) Per fer que una activitat estigui associada a un
+        context determinat fa falta que enviem una llista d'objectes contexts,
+        indicant com a (``objectType``) el tipus 'context', i les dades del
+        context com a l'exemple.
+    :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
+        `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot
+        tractar-se d'un camp codificat amb HTML.
+
+    Cos de la petició::
+
+        {
+            "contexts": [
+                "http://atenea.upc.edu/4127368123"
+            ],
+            "object": {
+                "objectType": "note",
+                "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+            },
+        }
+
+
+.. http:post:: /admin/contexts/{hash}/activities
+
+    Afegeix una activitat en nom d'un context qualsevol
+
+    :query hash: (REST) El hash del context en nom del qual es crearà l'activitat
+    :query contexts: (Requerit) Per fer que una activitat estigui associada a un
+        context determinat fa falta que enviem una llista d'objectes contexts,
+        indicant com a (``objectType``) el tipus 'context', i les dades del
+        context com a l'exemple. En aquest cas d'ús el contexte especificat aquí ha de ser el mateix que l'especificat al paràmetre {hash}
+    :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
+        `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot
+        tractar-se d'un camp codificat amb HTML.
+
+    Cos de la petició::
+
+        {
+            "contexts": [
+                "http://atenea.upc.edu/4127368123"
+            ],
+            "object": {
+                "objectType": "note",
+                "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+            },
+        }
+
 Contexts
 --------
 
