@@ -36,7 +36,9 @@ def getUserTimeline(context, request):
     # Add the activity of the people that posts to a particular context
     contexts_followings = []
     for subscribed in actor['subscribedTo']['items']:
-        contexts_followings.append({'contexts.object.url': subscribed['object']['url']})
+        # Don't show conversations in timeline
+        if subscribed['object']['objectType'] not in ['conversation']:
+            contexts_followings.append({'contexts.object.url': subscribed['object']['url']})
 
     query_items = []
 
@@ -54,6 +56,8 @@ def getUserTimeline(context, request):
     if query_items:
         query = {'$or': query_items}
         query['verb'] = 'post'
+        #Exclude messages from timeline
+        query['object.objectType'] = {'$ne': 'message'}
         activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
     else:
         activities = []
