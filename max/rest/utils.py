@@ -84,7 +84,7 @@ def isBasic(request):
     """
     """
     if request.authorization:
-        return request.authorization[0] == 'Basic'
+        return request.authorization[0].lower() == 'basic'
     else:
         return False
 
