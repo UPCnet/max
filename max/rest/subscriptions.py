@@ -2,17 +2,32 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
+from max.oauth2 import oauth2
 from max.decorators import MaxRequest, MaxResponse
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
+from max.MADMax import MADMaxDB
+from max.rest.utils import searchParams
+from max.rest.ResourceHandlers import JSONResourceRoot
 
 
 @view_config(route_name='subscriptions', request_method='GET')
+@MaxResponse
+@MaxRequest
+@oauth2(['widgetcli'])
 def getUserSubscriptions(context, request):
     """
+        /people/{username}/subscriptions
+
+        List all subscriptions for the the suplied oauth user.
     """
-    return HTTPNotImplemented()
+    mmdb = MADMaxDB(context.db)
+    query = {'username': request.actor['username']}
+    users = mmdb.users.search(query, show_fields=["username", "subscribedTo"], flatten=1, **searchParams(request))
+
+    handler = JSONResourceRoot(users)
+    return handler.buildResponse()
 
 
 @view_config(route_name='subscriptions', request_method='POST', permission='operations')

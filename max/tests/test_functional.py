@@ -335,6 +335,29 @@ class FunctionalTests(unittest.TestCase):
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
+    def test_get_all_subscribed_contexts_for_user(self):
+        from .mockers import create_context
+        from .mockers import subscribe_contextA, create_contextA
+        from .mockers import subscribe_contextB, create_contextB
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
+        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.subscribe_user_to_context(username_not_me, subscribe_contextA)
+        self.subscribe_user_to_context(username, subscribe_contextB)
+
+        res = self.testapp.get('/people/%s/subscriptions' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('username', None), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('totalItems'), 2)
+        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('items')[0].get('object').get('url'), 'http://atenea.upc.edu/A')
+        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('items')[1].get('object').get('url'), 'http://atenea.upc.edu/B')
+
     def test_post_activity_with_public_context(self):
         """ Post an activity to a context which allows everyone to read and write
         """
