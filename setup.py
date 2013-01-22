@@ -51,5 +51,6 @@ setup(name='max',
       main = max:main
       [console_scripts]
       maxrules.twitter = maxrules.twitter:main
+      initialize_max_db = max.scripts:main
       """,
       )
