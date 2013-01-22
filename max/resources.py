@@ -1,6 +1,6 @@
-import pymongo
 from pyramid.security import Everyone, Allow, Authenticated
-from pyramid.settings import asbool
+
+from max import maxlogger
 
 
 class Root(object):
@@ -25,3 +25,11 @@ def getMAXSettings(request):
 def loadMAXSettings(settings, config):
     max_ini_settings = {key.replace('max.', 'max_'): settings[key] for key in settings.keys() if 'max' in key}
     return max_ini_settings
+
+
+def loadMAXSecurity(registry):
+    security_settings = [a for a in registry.max_store.security.find({})]
+    if security_settings:
+        return security_settings[0]
+    else:
+        maxlogger.info("No security info found. Please run initialization database script.")

@@ -7,6 +7,12 @@ import json
 
 from mock import patch
 
+test_default_security = {
+    "Manager": ["test_manager"],
+}
+
+test_manager = test_default_security['Manager'][0]
+
 
 class mock_post(object):
 
@@ -26,6 +32,8 @@ class FunctionalTests(unittest.TestCase):
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
+        self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.security.insert(test_default_security)
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
@@ -63,6 +71,10 @@ class FunctionalTests(unittest.TestCase):
         return res
 
     # BEGIN TESTS
+
+    def test_create_user(self):
+        username = 'messi'
+        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
 
     def test_get_all_users(self):
         username = 'messi'

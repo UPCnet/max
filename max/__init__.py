@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from pyramid.config import Configurator
+import logging
+import pymongo
 
+from pyramid.config import Configurator
 from pyramid.session import UnencryptedCookieSessionFactoryConfig
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from max.resources import Root, loadMAXSettings
-from max.rest.resources import RESOURCES
+# logger has to be BEFORE the import of the following resources import
+maxlogger = logging.getLogger('max')
 
-import pymongo
+from max.resources import Root, loadMAXSettings, loadMAXSecurity
+from max.rest.resources import RESOURCES
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', join='public', invite='public')
 
@@ -47,6 +50,9 @@ def main(global_config, **settings):
 
     # Set MAX settings
     config.registry.max_settings = loadMAXSettings(settings, config)
+
+    # Set security
+    config.registry.max_security = loadMAXSecurity(config.registry)
 
     # REST Resources
     # Configure routes based on resources defined in RESOURCES
