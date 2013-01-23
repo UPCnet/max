@@ -22,6 +22,102 @@ def getContextActor(db, hash):
     return context
 
 
+def require_person_actor(exists=True):
+    def wrap(view_function):
+        def new_function(*args, **kw):
+            nkargs = [a for a in args]
+            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
+
+            # Get user from Oauth headers
+            username = getUsernameFromXOAuth(request)
+
+            if not username:
+                # Something went really, really wrong, because when we get here, we shoud
+                # have succesfully passed OAuth authentication
+                raise Unauthorized("Invalid Authentication")
+
+            # If we have a username in the URI, take it
+            uri_username = getUsernameFromURI(request)
+            if uri_username:
+                username = uri_username
+
+            # If we have a username in a POST body, take it
+            if request.method == 'POST':
+                post_username = getUsernameFromPOSTBody(request)
+                if post_username:
+                    username = post_username
+
+            # Check a valid actor exists in the tdatabase
+            if exists:
+                try:
+                    actor = getUserActor(context.db, username)[0]
+                except:
+                    raise UnknownUserError('Unknown actor identified by username: %s' % username)
+
+            def getActor(request):
+                try:
+                    if isinstance(actor, User):
+                        actor.setdefault('displayName', actor['username'])
+                    if isinstance(actor, Context):
+                        actor.setdefault('displayName', actor['object']['url'])
+                    return actor
+                except:
+                    return None
+
+            request.set_property(getActor, name='actor', reify=True)
+
+            return view_function(*args, **kw)
+
+        new_function.__doc__ = view_function.__doc__
+        return new_function
+    if type(exists) == type(wrap):
+        return wrap(exists)
+    return wrap
+
+
+def require_context_actor(exists=True):
+    def wrap(view_function):
+        def new_function(*args, **kw):
+            nkargs = [a for a in args]
+            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
+
+            #check we have a hash in the uri
+            contexthash = getUrlHashFromURI(request)
+            if not contexthash:
+                raise UnknownUserError('No context specified as actor')
+
+            # Check a valid context exists in the tdatabase
+            if exists:
+                try:
+                    actor = getContextActor(context.db, contexthash)[0]
+                except:
+                    raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
+                else:
+                    #Only Uri contexts are allowed as actors
+                    if actor.object['objectType'].lower() not in ['uri']:
+                        raise ObjectNotSupported('%s objectType not supported as an actor' % actor.object['objectType'])
+
+            def getActor(request):
+                try:
+                    if isinstance(actor, User):
+                        actor.setdefault('displayName', actor['username'])
+                    if isinstance(actor, Context):
+                        actor.setdefault('displayName', actor['object']['url'])
+                    return actor
+                except:
+                    return None
+
+            request.set_property(getActor, name='actor', reify=True)
+
+            return view_function(*args, **kw)
+
+        new_function.__doc__ = view_function.__doc__
+        return new_function
+    if type(exists) == type(wrap):
+        return wrap(exists)
+    return wrap
+
+
 def MaxRequest(func):
     def replacement(*args, **kwargs):
         nkargs = [a for a in args]
