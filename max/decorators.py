@@ -22,7 +22,7 @@ def getContextActor(db, hash):
     return context
 
 
-def require_person_actor(exists=True):
+def requirePersonActor(exists=True):
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
@@ -75,7 +75,7 @@ def require_person_actor(exists=True):
     return wrap
 
 
-def require_context_actor(exists=True):
+def requireContextActor(exists=True):
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
