@@ -22,16 +22,16 @@ def getContextActor(db, hash):
     return context
 
 
-def requirePersonActor(exists=True):
+def requirePersonActor(exists=True, resource=True):
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
             context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
 
             # Get user from Oauth headers
-            username = getUsernameFromXOAuth(request)
+            oauth_username = getUsernameFromXOAuth(request)
 
-            if not username:
+            if not oauth_username:
                 # Something went really, really wrong, because when we get here, we shoud
                 # have succesfully passed OAuth authentication
                 raise Unauthorized("Invalid Authentication")
@@ -53,6 +53,10 @@ def requirePersonActor(exists=True):
                     actor = getUserActor(context.db, username)[0]
                 except:
                     raise UnknownUserError('Unknown actor identified by username: %s' % username)
+
+            if resource:
+                if username != oauth_username:
+                    raise Unauthorized("You don't have permission to access %s resources" % (oauth_username))
 
             def getActor(request):
                 try:

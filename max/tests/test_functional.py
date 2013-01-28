@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-import unittest
 import os
-from paste.deploy import loadapp
-import base64
 import json
+import unittest
 
 from mock import patch
+from paste.deploy import loadapp
 
-test_default_security = {
-    "Manager": ["test_manager"],
-}
-
-test_manager = test_default_security['Manager'][0]
+from max.tests.base import oauth2Header, basicAuthHeader
+from max.tests import test_manager, test_default_security
 
 
 class mock_post(object):
@@ -37,52 +33,7 @@ class FunctionalTests(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
-    def create_user(self, username):
-        res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
-        return res
-
-    def modify_user(self, username, properties):
-        res = self.testapp.put('/people/%s' % username, json.dumps(properties), oauth2Header(username))
-        return res
-
-    def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username is not None and oauth_username or username
-        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
-        return res
-
-    def create_context(self, context, permissions=None, expect=201):
-        default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
-        new_context = dict(context)
-        if 'permissions' not in new_context:
-            new_context['permissions'] = default_permissions
-        if permissions:
-            new_context['permissions'].update(permissions)
-        res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=expect)
-        return res
-
-    def modify_context(self, context, properties):
-        from hashlib import sha1
-        url_hash = sha1(context).hexdigest()
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), basicAuthHeader('operations', 'operations'), status=200)
-        return res
-
-    def subscribe_user_to_context(self, username, context, expect=201):
-        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
-        return res
-
     # BEGIN TESTS
-
-    def test_create_user(self):
-        username = 'messi'
-        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
-
-    def test_get_all_users(self):
-        username = 'messi'
-        self.create_user(username)
-        res = self.testapp.get('/admin/people', "", basicAuthHeader('operations', 'operations'))
-        result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('username'), 'messi')
 
     def test_post_activity_without_context(self):
         from .mockers import user_status
@@ -774,12 +725,3 @@ class FunctionalTests(unittest.TestCase):
         res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (chash, username), "", basicAuthHeader('operations', 'operations'), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'InvalidPermission')
-
-
-def basicAuthHeader(username, password):
-    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
-    return dict(Authorization="Basic %s" % base64string)
-
-
-def oauth2Header(username):
-    return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}

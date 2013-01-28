@@ -3,7 +3,8 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
 from max.models import Activity
-from max.decorators import MaxRequest, MaxResponse
+from max.oauth2 import oauth2, oauth2_restricted
+from max.decorators import MaxRequest, MaxResponse, requirePersonActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
@@ -45,9 +46,10 @@ def addAdminUserActivity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_users', request_method='GET', permission='operations')
+@view_config(route_name='admin_users', request_method='GET')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@oauth2_restricted(['Manager'])
 def getUsers(context, request):
     """
     """

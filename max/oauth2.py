@@ -61,15 +61,12 @@ def oauth2_restricted(allowed_roles=[]):
             username = request.headers.get('X-Oauth-Username', '')
 
             security = request.registry.max_security
-
-            import ipdb;ipdb.set_trace()
-
-            if r.status_code == 200:
-                # Valid user token, proceed.
-                return view_function(*args, **kw)
-            else:
-                return view_function(*args, **kw)
-                # raise Unauthorized('Invalid token.')
+            for role in allowed_roles:
+                if username in security.get(role):
+                    # Valid allowed user token, proceed.
+                    return view_function(*args, **kw)
+                else:
+                    raise Unauthorized('The provided credentials are not allowed to perform this operation.')
 
         new_function.__doc__ = view_function.__doc__
         return new_function

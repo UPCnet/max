@@ -8,7 +8,7 @@ from max.models import User
 from max.oauth2 import oauth2, oauth2_restricted
 from max.MADMax import MADMaxDB
 from max.rest.utils import searchParams
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxRequest, MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
@@ -33,7 +33,7 @@ def getUsers(context, request):
 
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getUser(context, request):
     """
@@ -46,8 +46,8 @@ def getUser(context, request):
 
 
 @view_config(route_name='user', request_method='POST')
-# @MaxResponse
-@MaxRequest
+@MaxResponse
+@requirePersonActor(exists=False, resource=False)
 @oauth2(['widgetcli'])
 @oauth2_restricted(['Manager'])
 def addUser(context, request):
@@ -99,7 +99,7 @@ def getUserAvatar(context, request):
 
 @view_config(route_name='user', request_method='PUT')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def ModifyUser(context, request):
     """

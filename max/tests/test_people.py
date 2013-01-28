@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
-import unittest
 import os
-from paste.deploy import loadapp
-import base64
 import json
 
+from paste.deploy import loadapp
 from mock import patch
 
-
-def basicAuthHeader(username, password):
-    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
-    return dict(Authorization="Basic %s" % base64string)
-
-
-def oauth2Header(username):
-    return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}
+from max.tests.base import MaxTestBase, oauth2Header
+from max.tests import test_manager, test_default_security
 
 
 class mock_post(object):
@@ -27,7 +19,7 @@ class mock_post(object):
 
 
 @patch('requests.post', new=mock_post)
-class FunctionalTests(unittest.TestCase):
+class FunctionalTests(MaxTestBase):
 
     def setUp(self):
         conf_dir = os.path.dirname(__file__)
@@ -35,55 +27,33 @@ class FunctionalTests(unittest.TestCase):
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
+        self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.security.insert(test_default_security)
         from webtest import TestApp
         self.testapp = TestApp(self.app)
 
-    def create_user(self, username):
-        res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
-        return res
-
-    def modify_user(self, username, properties):
-        res = self.testapp.put('/people/%s' % username, json.dumps(properties), oauth2Header(username))
-        return res
-
-    def create_activity(self, username, activity, oauth_username=None, expect=201):
-        oauth_username = oauth_username is not None and oauth_username or username
-        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
-        return res
-
-    def create_context(self, context, permissions=None, expect=201):
-        default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
-        new_context = dict(context)
-        if 'permissions' not in new_context:
-            new_context['permissions'] = default_permissions
-        if permissions:
-            new_context['permissions'].update(permissions)
-        res = self.testapp.post('/contexts', json.dumps(new_context), basicAuthHeader('operations', 'operations'), status=expect)
-        return res
-
-    def modify_context(self, context, properties):
-        from hashlib import sha1
-        url_hash = sha1(context).hexdigest()
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), basicAuthHeader('operations', 'operations'), status=200)
-        return res
-
-    def subscribe_user_to_context(self, username, context, expect=201):
-        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), basicAuthHeader('operations', 'operations'), status=expect)
-        return res
-
     # BEGIN TESTS
 
-    def test_add_user(self):
+    def test_create_user(self):
         username = 'messi'
-        res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=201)
+        self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+
+    def test_create_user_not_manager(self):
+        username = 'messi'
+        self.testapp.post('/people/%s' % username, "", oauth2Header('imnotallowed'), status=401)
+
+    def test_get_all_users_admin(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/admin/people', "", oauth2Header(test_manager))
         result = json.loads(res.text)
-        self.assertEqual(result.get('username', None), 'messi')
-        u'{"username": "messi", "subscribedTo": {"items": []}, "last_login": "2012-03-07T22:32:19Z", "published": "2012-03-07T22:32:19Z", "following": {"items": []}, "id": "4f57e1f3530a693147000000"}'
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('username'), 'messi')
 
     def test_user_exist(self):
         username = 'messi'
         self.create_user(username)
-        res = self.testapp.post('/people/%s' % username, "", basicAuthHeader('operations', 'operations'), status=200)
+        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
 
