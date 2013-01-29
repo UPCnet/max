@@ -41,8 +41,7 @@ def oauth2(allowed_scopes=[]):
                 # Valid token, proceed.
                 return view_function(*args, **kw)
             else:
-                return view_function(*args, **kw)
-                # raise Unauthorized('Invalid token.')
+                raise Unauthorized('Invalid token.')
 
         new_function.__doc__ = view_function.__doc__
         return new_function
