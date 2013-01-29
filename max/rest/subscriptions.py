@@ -2,8 +2,8 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
-from max.oauth2 import oauth2
-from max.decorators import MaxRequest, MaxResponse
+from max.oauth2 import oauth2, restricted
+from max.decorators import MaxRequest, MaxResponse, requirePersonActor
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
@@ -30,9 +30,11 @@ def getUserSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='POST', permission='operations')
+@view_config(route_name='subscriptions', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def subscribe(context, request):
     """
         /people/{username}/subscriptions

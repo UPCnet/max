@@ -5,7 +5,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
 from max.models import User
-from max.oauth2 import oauth2, oauth2_restricted
+from max.oauth2 import oauth2, restricted
 from max.MADMax import MADMaxDB
 from max.rest.utils import searchParams
 from max.decorators import MaxRequest, MaxResponse, requirePersonActor
@@ -47,9 +47,9 @@ def getUser(context, request):
 
 @view_config(route_name='user', request_method='POST')
 @MaxResponse
-@requirePersonActor(exists=False, resource=False)
+@requirePersonActor(exists=False, force_own=False)
 @oauth2(['widgetcli'])
-@oauth2_restricted(['Manager'])
+@restricted(['Manager'])
 def addUser(context, request):
     """
         /people/{username}

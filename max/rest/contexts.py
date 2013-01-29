@@ -5,7 +5,8 @@ from pyramid.response import Response
 
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
-from max.decorators import MaxRequest, MaxResponse
+from max.oauth2 import oauth2, restricted
+from max.decorators import MaxResponse, requirePersonActor
 from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
 from max.rest.ResourceHandlers import JSONResourceEntity
 import os
@@ -14,9 +15,10 @@ from max.rest.utils import downloadTwitterUserImage
 import time
 
 
-@view_config(route_name='context', request_method='GET', permission='operations')
+@view_config(route_name='context', request_method='GET')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def getContext(context, request):
     """
         /contexts/{hash}
@@ -71,15 +73,18 @@ def getContextAvatar(context, request):
     return image
 
 
-@view_config(route_name='contexts', request_method='POST', permission='operations')
+@view_config(route_name='contexts', request_method='POST')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def addContext(context, request):
     """
         /contexts
 
         Adds a context.
     """
+    request.actor = None
+
     # Initialize a Context object from the request
     newcontext = Context(request)
     newcontext.fromRequest(request)
@@ -102,9 +107,10 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT', permission='operations')
+@view_config(route_name='context', request_method='PUT')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def ModifyContext(context, request):
     """
         /contexts/{hash}
@@ -126,9 +132,10 @@ def ModifyContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='DELETE', permission='operations')
+@view_config(route_name='context', request_method='DELETE')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def DeleteContext(context, request):
     """
     """
@@ -144,9 +151,11 @@ def DeleteContext(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='context_user_permission', request_method='PUT', permission='operations')
+@view_config(route_name='context_user_permission', request_method='PUT')
 @MaxResponse
-@MaxRequest
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def grantPermissionOnContext(context, request):
     """
     """
@@ -181,9 +190,11 @@ def grantPermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permission', request_method='DELETE', permission='operations')
+@view_config(route_name='context_user_permission', request_method='DELETE')
 @MaxResponse
-@MaxRequest
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def revokePermissionOnContext(context, request):
     """
     """

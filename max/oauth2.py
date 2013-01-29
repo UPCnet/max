@@ -51,7 +51,7 @@ def oauth2(allowed_scopes=[]):
     return wrap
 
 
-def oauth2_restricted(allowed_roles=[]):
+def restricted(allowed_roles=[]):
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]

@@ -3,19 +3,56 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
 from max.models import Activity
-from max.oauth2 import oauth2, oauth2_restricted
-from max.decorators import MaxRequest, MaxResponse, requirePersonActor
+from max.oauth2 import oauth2, restricted
+from max.decorators import MaxResponse, requirePersonActor, requireContextActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 
 
-@view_config(route_name='admin_context_activities', request_method='POST', permission='admin')
-@view_config(route_name='admin_user_activities', request_method='POST', permission='admin')
+@view_config(route_name='admin_user_activities', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def addAdminUserActivity(context, request):
+    """
+         /admin/people|contexts/{username|hash}/activities
+
+         Add activity impersonated as a valid MAX user or context
+    """
+    rest_params = {'actor': request.actor,
+                   'verb': 'post'}
+
+    # Initialize a Activity object from the request
+    newactivity = Activity(request)
+    newactivity.fromRequest(request, rest_params=rest_params)
+
+    # If we have the _id setted, then the object already existed in the DB,
+    # otherwise, proceed to insert it into the DB
+    # In both cases, respond with the JSON of the object and the appropiate
+    # HTTP Status Code
+
+    if newactivity.get('_id'):
+        # Already Exists
+        code = 200
+    else:
+        # New User
+        code = 201
+        activity_oid = newactivity.insert()
+        newactivity['_id'] = activity_oid
+
+    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    return handler.buildResponse()
+
+
+@view_config(route_name='admin_context_activities', request_method='POST')
+@MaxResponse
+@requireContextActor
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
+def addAdminContextActivity(context, request):
     """
          /admin/people|contexts/{username|hash}/activities
 
@@ -49,7 +86,7 @@ def addAdminUserActivity(context, request):
 @view_config(route_name='admin_users', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
-@oauth2_restricted(['Manager'])
+@restricted(['Manager'])
 def getUsers(context, request):
     """
     """
@@ -59,9 +96,10 @@ def getUsers(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_activities', request_method='GET', permission='operations')
+@view_config(route_name='admin_activities', request_method='GET')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def getActivities(context, request):
     """
     """
@@ -71,9 +109,10 @@ def getActivities(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_contexts', request_method='GET', permission='operations')
+@view_config(route_name='admin_contexts', request_method='GET')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def getContexts(context, request):
     """
     """
@@ -83,9 +122,10 @@ def getContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_user', request_method='DELETE', permission='operations')
+@view_config(route_name='admin_user', request_method='DELETE')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def deleteUser(context, request):
     """
     """
@@ -100,9 +140,10 @@ def deleteUser(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='admin_activity', request_method='DELETE', permission='operations')
+@view_config(route_name='admin_activity', request_method='DELETE')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def deleteActivity(context, request):
     """
     """
@@ -117,9 +158,10 @@ def deleteActivity(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='admin_context', request_method='DELETE', permission='operations')
+@view_config(route_name='admin_context', request_method='DELETE')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def deleteContext(context, request):
     """
     """

@@ -22,7 +22,7 @@ def getContextActor(db, hash):
     return context
 
 
-def requirePersonActor(exists=True, resource=True):
+def requirePersonActor(exists=True, force_own=True):
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
@@ -30,6 +30,7 @@ def requirePersonActor(exists=True, resource=True):
 
             # Get user from Oauth headers
             oauth_username = getUsernameFromXOAuth(request)
+            username = str(oauth_username)  # To avoid variable reference
 
             if not oauth_username:
                 # Something went really, really wrong, because when we get here, we shoud
@@ -54,7 +55,7 @@ def requirePersonActor(exists=True, resource=True):
                 except:
                     raise UnknownUserError('Unknown actor identified by username: %s' % username)
 
-            if resource:
+            if force_own:
                 if username != oauth_username:
                     raise Unauthorized("You don't have permission to access %s resources" % (oauth_username))
 

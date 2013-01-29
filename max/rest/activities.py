@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.models import Activity
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxRequest, MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max.exceptions import MissingField, ObjectNotFound
 
@@ -15,7 +15,7 @@ import re
 
 @view_config(route_name='user_activities', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getUserActivities(context, request):
     """
@@ -34,7 +34,7 @@ def getUserActivities(context, request):
 
 @view_config(route_name='user_activities', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def addUserActivity(context, request):
     """
@@ -69,7 +69,7 @@ def addUserActivity(context, request):
 
 @view_config(route_name='activities', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getActivities(context, request):
     """
@@ -130,7 +130,7 @@ def getActivities(context, request):
 
 @view_config(route_name='activity', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 def getActivity(context, request):
     """
          /activities/{activity}
