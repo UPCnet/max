@@ -62,7 +62,7 @@ def restricted(allowed_roles=[]):
 
             security = request.registry.max_security
             for role in allowed_roles:
-                if username in security.get(role):
+                if username in security.get("roles").get(role):
                     # Valid allowed user token, proceed.
                     return view_function(*args, **kw)
                 else:

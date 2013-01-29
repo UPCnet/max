@@ -45,6 +45,8 @@ ADMIN_RESOURCES = {
     'admin_user': {'route': '/admin/people/{id}'},
     'admin_activity': {'route': '/admin/activities/{id}'},
     'admin_context': {'route': '/admin/contexts/{id}'},
+
+    'admin_security': {'route': '/admin/security'},
 }
 
 RESOURCES = {}

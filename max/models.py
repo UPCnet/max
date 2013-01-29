@@ -352,3 +352,12 @@ class Context(MADBase):
          # deletes context from subcription list
         what = {'$pull': {'subscribedTo.items': {'hash': self.hash}}}
 
+
+class Security(MADBase):
+    """
+        The Security object representation
+    """
+    collection = 'security'
+    unique = '_id'
+    schema = {'_id':         dict(required=0),
+              'roles':        dict(required=0)}

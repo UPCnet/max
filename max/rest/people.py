@@ -8,13 +8,13 @@ from max.models import User
 from max.oauth2 import oauth2, restricted
 from max.MADMax import MADMaxDB
 from max.rest.utils import searchParams
-from max.decorators import MaxRequest, MaxResponse, requirePersonActor
+from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='users', request_method='GET')
-@MaxResponse
-@MaxRequest
+# @MaxResponse
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getUsers(context, request):
     """

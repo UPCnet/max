@@ -71,6 +71,12 @@ class FunctionalTests(MaxTestBase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
+    def test_get_security(self):
+        res = self.testapp.get('/admin/security', "", status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('roles', None).get('Manager')[0], 'test_manager')
+
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
     #     from hashlib import sha1

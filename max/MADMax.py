@@ -131,7 +131,8 @@ class MADMaxCollection(object):
         """
         class_map = dict(activity='Activity',
                          users='User',
-                         contexts='Context')
+                         contexts='Context',
+                         security='Security')
 
         model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
         wrapped = model(None)

@@ -1,5 +1,5 @@
 test_default_security = {
-    "Manager": ["test_manager"],
+    'roles': {"Manager": ["test_manager"]}
 }
 
-test_manager = test_default_security['Manager'][0]
+test_manager = test_default_security['roles']['Manager'][0]

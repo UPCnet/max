@@ -11,6 +11,25 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 
 
+@view_config(route_name='admin_security', request_method='GET')
+@MaxResponse
+def getSecurity(context, request):
+    """
+         /admin/security
+
+         Expose the current MAX security roles and its members
+
+         It's intended to be a protected by IP endpoint as we do not want
+         eavesdroping on this information
+    """
+    mmdb = MADMaxDB(context.db)
+    query = {}
+    roles = mmdb.security.search(query, flatten=1)
+
+    handler = JSONResourceRoot(roles)
+    return handler.buildResponse()
+
+
 @view_config(route_name='admin_user_activities', request_method='POST')
 @MaxResponse
 @requirePersonActor(force_own=False)

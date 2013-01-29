@@ -7,9 +7,13 @@ from pyramid.paster import (
     setup_logging,
     )
 
-default_security = {
-    "Manager": ["victor.fernandez", "carles.bruguera", "usuari.atenea", "usuari.somupc"],
-}
+default_security = {'roles': {"Manager": ["victor.fernandez",
+                                           "carles.bruguera",
+                                           "usuari.atenea",
+                                           "usuari.somupc"
+                                           ]
+                               }
+                    }
 
 
 def init_security(settings):
