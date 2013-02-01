@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-import unittest
 
 from mock import patch
 from paste.deploy import loadapp

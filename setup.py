@@ -44,7 +44,7 @@ setup(name='max',
       tests_require=requires + test_requires,
       test_suite="max.tests",
       extras_require={
-        'test': ['WebTest', 'mock', ]
+        'test': ['WebTest', 'mock', 'HTTPretty', 'manuel']
       },
       entry_points="""\
       [paste.app_factory]

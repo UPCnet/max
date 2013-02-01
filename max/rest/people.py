@@ -13,7 +13,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 
 @view_config(route_name='users', request_method='GET')
-# @MaxResponse
+@MaxResponse
 @requirePersonActor
 @oauth2(['widgetcli'])
 def getUsers(context, request):

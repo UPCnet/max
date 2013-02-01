@@ -33,6 +33,14 @@ class FunctionalTests(MaxTestBase):
         self.testapp = TestApp(self.app)
 
     # BEGIN TESTS
+    def test_get_all_users_admin(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/admin/people', "", oauth2Header(test_manager))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0].get('username'), 'messi')
+
     def test_admin_post_activity_without_context(self):
         from .mockers import user_status
         username = 'messi'

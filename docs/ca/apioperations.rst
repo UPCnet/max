@@ -7,6 +7,30 @@ BasicAuth i està dissenyada per ĺ'ús d'un usuari restringit d'aplicació.
 Aquest usuari no te cap privilegi addicional sobre el sistema que el que
 s'exposa en la descripció de cada servei.
 
+Usuaris
+--------
+
+.. http:post:: /people/{username}
+
+    Crea un usuari remotament al sistema pel seu posterior us si no existeix.
+    En cas de que l'usuari ja existis, el retorna canviant el codi d'estat HTTP
+    en funció de l'acció realitzada.
+
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query displayName: (Opcional) El nom real (de pantalla) de l'usuari al
+        sistema
+
+    Cos de la petició::
+
+        {"username": "messi", "displayName": "Lionel Messi"}
+
+    .. -> payload
+
+    >>> testapp.post('/people', payload, oauth2Header(username), status=200)
+
+    Success
+        Retorna un objecte ``Person``.
+
 
 Activitats
 ----------

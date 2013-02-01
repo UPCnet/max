@@ -1,9 +1,10 @@
 API REST
 ========
 
-Aquest document exposa els serveis web creats pel motor d'activitat i
-subscripcions. Organitzats per recursos. Tots els serveis web són de tipus
-RESTful i l'intercanvi d'informació es realitza en format JSON.
+Aquest document exposa els serveis web públics creats pel motor d'activitat i
+subscripcions. Aquests estan organitzats per recursos i les operacions sobre
+ells. Tots els serveis web són de tipus RESTful i l'intercanvi d'informació es
+realitza en format JSON.
 
 Els paràmetres indicats a les seccions Query parameters, poden ser de 3 tipus:
 
@@ -22,41 +23,57 @@ l'accés a una entitat concreta, o una estructura que englobi un conjunt de
 resultats, indicant el total d'elements retornats::
 
     {
-
         "totalItems": 2,
         "items": [
-                   { ... }
+                   { ... },
                    { ... }
                  ]
     }
 
+.. this is some setup, it is hidden in a reST comment
+
+    >>> from httpretty import HTTPretty
+    >>> HTTPretty.enable()
+    >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
+    >>> username = "messi"
 
 Usuaris
 --------
 
-Representa el conjunt d'usuaris del sistema.
+Operacions sobre el recurs *usuari* del sistema.
 
 .. http:get:: /people
 
     Retorna el resultat d'una cerca d'usuaris del sistema en forma de llista
     de noms d'usuaris per l'ús de la UI.
 
-    :query username: El filtre de cerca d'usuaris (per paràmetre)
+    :query username: El filtre de cerca d'usuaris.
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {"username": "messi"}
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            u'{"totalItems": 1, "items": [{"username": "messi", "id": "..."}]}'
+
+        .. -> expected
+            >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"totalIt..."}]}'/85>
+            >>> response = popIdfromResponse(response.text)
+            >>> expected = popIdfromResponse(eval(expected))
+            >>> response == expected
+            True
 
     Success
-        Retorna una llista d'usuaris (cap objecte en especial).
-
-.. http:post:: /people/{username}
-
-    Crea un usuari remotament al sistema pel seu posterior us, si no existeix.
-    En cas de que l'usuari ja existis, el retorna canviant el codi d'estat HTTP
-    en funció de l'acció realitzada.
-
-    :query username: (REST) L'identificador del nou usuari al sistema
-    :query displayName: (Opcional) El nom real de l'usuari al sistema
-
-    Success
-        Retorna un objecte ``Person``.
+        Retorna la llista d'usuaris que compleix la query especificada.
 
 .. http:put:: /people/{username}
 
