@@ -519,3 +519,8 @@ associats.
 
 
 .. http:get:: /conversations/{hash}/messages
+
+
+.. doctests teardown (absolutelly needed)
+
+    >>> HTTPretty.disable()
