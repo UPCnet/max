@@ -6,7 +6,7 @@ import unittest
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header, basicAuthHeader
+from max.tests.base import MaxTestBase, oauth2Header
 from max.tests import test_manager, test_default_security
 
 
@@ -20,7 +20,7 @@ class mock_post(object):
 
 
 @patch('requests.post', new=mock_post)
-class FunctionalTests(MaxTestBase):
+class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         conf_dir = os.path.dirname(__file__)

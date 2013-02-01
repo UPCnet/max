@@ -36,6 +36,9 @@ resultats, indicant el total d'elements retornats::
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> username = "messi"
+    >>> utils = MaxTestBase(testapp)
+    >>> utils.create_user(username)
+    <201 Created application/json body='{"usernam...>
 
 Usuaris
 --------
@@ -61,14 +64,14 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. code-block:: python
 
-            u'{"totalItems": 1, "items": [{"username": "messi", "id": "..."}]}'
+            {"totalItems": 1, "items": [{"username": "messi", "id": "..."}]}
 
         .. -> expected
             >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
             >>> response
-            <200 OK application/json body='{"totalIt..."}]}'/85>
+            <200 OK application/json body='{"totalIt...>
             >>> response = popIdfromResponse(response.text)
-            >>> expected = popIdfromResponse(eval(expected))
+            >>> expected = popIdfromResponse(expected)
             >>> response == expected
             True
 
@@ -77,31 +80,113 @@ Operacions sobre el recurs *usuari* del sistema.
 
 .. http:put:: /people/{username}
 
-    Modifica un usuari del sistema pel seu posterior us, si no existeix. En cas
-    de que l'usuari no existis, retorna un error. La llista de paràmetres
-    actualitzables de moment és limita a 1 'displayName'.
+    Modifica un usuari del sistema pel seu posterior us si existeix. En cas de
+    que l'usuari no existeixi retorna un error. La llista de paràmetres
+    actualitzables de moment es limita a ``displayName`` i a
+    ``twitterUsername``.
 
     :query username: (REST) L'identificador de l'usuari
     :query displayName: (Opcional) El nom real de l'usuari al sistema
+    :query twitterUsername: (Opcional) El nom d'usuari de Twitter de l'usuari
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {"displayName": "Lionel Messi", "twitterUsername": "messi10oficial"}
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "messi",
+                "displayName": "Lionel Messi",
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2013-02-01T19:33:16Z",
+                "published": "2013-02-01T19:33:16Z",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "twitterUsername": "messi10oficial",
+                "id": "..."
+            }
+
+        .. -> expected
+            >>> response = testapp.put('/people/{}'.format(username), payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"usernam...>
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            True
 
     Success
+
         Retorna un objecte ``Person`` amb els paràmetres indicats modificats.
 
     Error
-        {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+        .. code-block:: python
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 .. http:get:: /people/{username}
 
     Retorna la informació d'un usuari del sistema. En cas de que l'usuari no
-    existis, retorna l'error especificat.
+    existeixi retorna l'error especificat.
 
     :query username: (REST) L'identificador de l'usuari
 
+    Cos de la petició
+
+        Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "messi",
+                "displayName": "Lionel Messi",
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2013-02-01T19:33:16Z",
+                "published": "2013-02-01T19:33:16Z",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "twitterUsername": "messi10oficial",
+                "id": "..."
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/people/{}'.format(username), payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"usernam...>
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            True
+
     Success
+
         Retorna un objecte ``Person``.
 
     Error
-        {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+        .. code-block:: python
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 .. http:get:: /people/{username}/avatar
 
@@ -117,26 +202,7 @@ Activitats de l'usuari
 ----------------------
 
 Representa el conjunt d'activitats creades per un usuari i permet tant
-llistarles com crear-ne de noves.
-
-.. http:get:: /people/{username}/activities
-
-    Llistat totes les activitats generades al sistema d'un usuari concret.
-
-    :query username: (REST) Nom de l'usuari que crea l'activitat
-
-    Success
-        Retorna una col·lecció d'objecte del tipus ``Activity``.
-
-    Error
-        En cas de que l'usuari actor no sigui el mateix usuari que s'autentica
-        via oAuth::
-
-            {u'error_description': u"You don't have permission to access xavi resources", u'error': u'Unauthorized'}
-
-        En cas que l'usuari no existeixi::
-
-            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+llistar-les com crear-ne de noves.
 
 .. http:post:: /people/{username}/activities
 
@@ -151,6 +217,52 @@ llistarles com crear-ne de noves.
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
         `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot
         tractar-se d'un camp codificat amb HTML.
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {
+                "contexts": [
+                    "http://atenea.upc.edu/4127368123"
+                ],
+                "object": {
+                    "objectType": "note",
+                    "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+                },
+            }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "messi",
+                "displayName": "Lionel Messi",
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2013-02-01T19:33:16Z",
+                "published": "2013-02-01T19:33:16Z",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "twitterUsername": "messi10oficial",
+                "id": "..."
+            }
+
+        .. -> expected
+            .. >>> response = testapp.post('/people/{}'.format(username), payload, oauth2Header(username), status=200)
+            .. >>> response
+            .. <200 OK application/json body='{"usernam...>
+            .. >>> response.json.get('displayName') == eval(expected).get('displayName')
+            .. True
+            .. >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            .. True
 
     Cos de la petició::
 
@@ -186,6 +298,65 @@ llistarles com crear-ne de noves.
      * `Image`
      * `Video`
      * `Question`
+
+.. http:get:: /people/{username}/activities
+
+    Llistat totes les activitats generades al sistema d'un usuari concret.
+
+    :query username: (REST) Nom de l'usuari que crea l'activitat
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {"displayName": "Lionel Messi", "twitterUsername": "messi10oficial"}
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "messi",
+                "displayName": "Lionel Messi",
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2013-02-01T19:33:16Z",
+                "published": "2013-02-01T19:33:16Z",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "twitterUsername": "messi10oficial",
+                "id": "..."
+            }
+
+        .. -> expected
+            >>> response = testapp.put('/people/{}'.format(username), payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"usernam...>
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            True
+
+    Success
+        Retorna una col·lecció d'objecte del tipus ``Activity``.
+
+    Error
+        En cas de que l'usuari actor no sigui el mateix usuari que s'autentica
+        via oAuth::
+
+            {u'error_description': u"You don't have permission to access xavi resources", u'error': u'Unauthorized'}
+
+        En cas que l'usuari no existeixi::
+
+            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+
 
 
 Activitats globals

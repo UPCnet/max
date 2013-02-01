@@ -14,7 +14,10 @@ def oauth2Header(username):
     return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}
 
 
-class MaxTestBase(unittest.TestCase):
+class MaxTestBase(object):
+
+    def __init__(self, testapp):
+        self.testapp = testapp
 
     def create_user(self, username):
         res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)

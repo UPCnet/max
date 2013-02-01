@@ -6,7 +6,7 @@ import json
 from httpretty import HTTPretty
 from paste.deploy import loadapp
 
-from max.tests.base import oauth2Header, basicAuthHeader
+from max.tests.base import MaxTestBase, oauth2Header, basicAuthHeader
 from max.tests import test_manager, test_default_security
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
@@ -59,11 +59,12 @@ class DoctestCase(unittest.TestCase):
         from webtest import TestApp
         testapp = TestApp(app)
 
-        create_user(testapp, 'messi')
+        # create_user(testapp, 'messi')
 
         test.globs['testapp'] = testapp
         test.globs['oauth2Header'] = oauth2Header
         test.globs['popIdfromResponse'] = popIdfromResponse
+        test.globs['MaxTestBase'] = MaxTestBase
 
     @staticmethod
     def tearDown(test):
@@ -78,6 +79,17 @@ def create_user(testapp, username):
                            body="",
                            status=200)
     testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+
+
+def create_context(testapp, context, permissions=None, expect=201):
+    default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
+    new_context = dict(context)
+    if 'permissions' not in new_context:
+        new_context['permissions'] = default_permissions
+    if permissions:
+        new_context['permissions'].update(permissions)
+    res = testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=expect)
+    return res
 
 
 def popIdfromResponse(response):

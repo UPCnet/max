@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import unittest
 
 from mock import patch
 from paste.deploy import loadapp
@@ -19,7 +20,7 @@ class mock_post(object):
 
 
 @patch('requests.post', new=mock_post)
-class FunctionalTests(MaxTestBase):
+class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         conf_dir = os.path.dirname(__file__)

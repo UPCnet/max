@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import unittest
 
 from paste.deploy import loadapp
 from mock import patch
@@ -19,7 +20,7 @@ class mock_post(object):
 
 
 @patch('requests.post', new=mock_post)
-class FunctionalTests(MaxTestBase):
+class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         conf_dir = os.path.dirname(__file__)
@@ -31,6 +32,10 @@ class FunctionalTests(MaxTestBase):
         self.app.registry.max_store.security.insert(test_default_security)
         from webtest import TestApp
         self.testapp = TestApp(self.app)
+
+    def tearDown(self):
+        import pyramid.testing
+        pyramid.testing.tearDown()
 
     # BEGIN TESTS
 
@@ -50,6 +55,7 @@ class FunctionalTests(MaxTestBase):
         self.assertEqual(result.get('username', None), 'messi')
 
     def test_get_user(self):
+        """ Doctest .. http:get:: /people/{username} """
         username = 'messi'
         self.create_user(username)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
@@ -90,6 +96,7 @@ class FunctionalTests(MaxTestBase):
         self.assertEqual(result.get('displayName', None), 'Lionel Messi')
 
     def test_modify_user_several_parameters(self):
+        """ Doctest .. http:put:: /people/{username} """
         username = 'messi'
         self.create_user(username)
         res = self.testapp.put('/people/%s' % username, json.dumps({"displayName": "Lionel Messi", "twitterUsername": "leomessi"}), oauth2Header(username))

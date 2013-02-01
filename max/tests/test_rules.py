@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import json
+import unittest
 
 from paste.deploy import loadapp
 from mock import patch
@@ -19,7 +20,7 @@ class mock_post_obj(object):
         self.status_code = kwargs['status_code']
 
 
-class RulesTests(MaxTestBase):
+class RulesTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         conf_dir = os.path.dirname(__file__)
