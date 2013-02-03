@@ -1,6 +1,5 @@
 import json
 import base64
-import unittest
 
 from max.tests import test_manager
 

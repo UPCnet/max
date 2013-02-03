@@ -36,6 +36,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     # BEGIN TESTS
 
     def test_create_activity(self):
+        """ doctest .. http:post:: /people/{username}/activities """
         from .mockers import user_status as activity
         username = 'messi'
         self.create_user(username)
@@ -85,6 +86,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_activity(self):
+        """ doctest .. http:get:: /people/{username}/activities """
         from .mockers import user_status
         username = 'messi'
         self.create_user(username)

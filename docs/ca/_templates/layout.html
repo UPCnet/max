@@ -1,2 +1,46 @@
-{% extends "pylons/layout.html" %}
-{%- block sidebarlogo %}<h2 style="font-family: 'NeutonRegular', sans-serif; font-weight: normal; padding: 5px 10px;"><a href="../en/index.html">English version</a></h2>{%- endblock %}
+{% extends "bootstrap/layout.html" %}
+{% macro navBar2() %}
+  <div id="navbar" class="{{ theme_navbar_class }} {% if theme_navbar_fixed_top == 'true' -%} navbar-fixed-top{%- endif -%}">
+    <div class="navbar-inner">
+      <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+      <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a class="brand" href="{{ pathto(master_doc) }}">{{ project|e }}</a>
+      <span class="navbar-text pull-left"><b>{{ version|e }}</b></span>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="divider-vertical"></li>
+          {% block sidebartoc %}
+            {% include "globaltoc.html" %}
+            {% include "localtoc.html" %}
+          {% endblock %}
+          {% block sidebarrel %}
+            {% include "relations.html" %}
+          {% endblock %}
+          {% if theme_source_link_position == "nav" %}
+            <li>{% include "sourcelink.html" %}</li>
+          {% endif %}
+          <li>
+            <a href="../en/index.html">English version</a>
+          </li>
+        </ul>
+
+        {% block sidebarsearch %}
+          {% include "searchbox.html" %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+{%- block content %}
+<div class="container">
+  {{ navBar2() }}
+  {% block body %}{% endblock %}
+</div>
+{%- endblock %}
