@@ -39,7 +39,7 @@ resultats, indicant el total d'elements retornats::
     >>> utils = MaxTestBase(testapp)
     >>> utils.create_user(username)
     <201 Created application/json body='{"usernam...>
-    >>> from max.tests.mockers import create_context, subscribe_context, context_query
+    >>> from max.tests.mockers import create_context, subscribe_context, context_query, user_status
     >>> utils.create_context(create_context)
     <201 Created application/json body='{"display...>
     >>> utils.subscribe_user_to_context(username, subscribe_context)
@@ -69,15 +69,15 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. code-block:: python
 
-            {"totalItems": 1, "items": [{"username": "messi", "id": "..."}]}
+            {"totalItems": 1, "items": [{"username": "messi", "id": "510fd582aceee925d0f1ecd1"}]}
 
         .. -> expected
             >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
             >>> response
             <200 OK application/json body='{"totalIt...>
-            >>> response = popIdfromResponse(response.text)
-            >>> expected = popIdfromResponse(expected)
-            >>> response == expected
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
             True
 
     Success
@@ -120,7 +120,7 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "twitterUsername": "messi10oficial",
-                "id": "..."
+                "id": "510fd582aceee925d0f1ecd1"
             }
 
         .. -> expected
@@ -171,7 +171,7 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "twitterUsername": "messi10oficial",
-                "id": "..."
+                "id": "510fd582aceee925d0f1ecd1"
             }
 
         .. -> expected
@@ -266,7 +266,7 @@ llistar-les com crear-ne de noves.
                 },
                 "verb": "post",
                 "published": "2013-02-03T20:11:15Z",
-                "id": "..."
+                "id": "510fd582aceee925d0f1ecd1"
             }
 
         .. -> expected
@@ -657,11 +657,108 @@ indirectament.
 
 .. http:get:: /people/{username}/timeline
 
-    Llistat totes les activitats del timeline de l'usuari.
+    Llistat de totes les activitats del timeline de l'usuari. Actualment filtra
+    les activitats i només mostra les de tipus *post*.
 
     :query username: (REST) Nom de l'usuari que del qual volem el llistat
 
+    Cos de la petició
+
+        Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 2,
+                "items": [
+                    {
+                        "contexts": [
+                            {
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "object": {
+                                    "url": "http://atenea.upc.edu",
+                                    "objectType": "uri"
+                                },
+                                "published": "2013-02-04T09:37:47Z",
+                                "displayName": "Atenea",
+                                "id": "510f816baceee9158ef3046c",
+                                "permissions": [
+                                    "read",
+                                    "write",
+                                    "invite"
+                                ]
+                            }
+                        ],
+                        "object": {
+                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
+                            "_keywords": [
+                                "testejant",
+                                "creaci\\u00f3",
+                                "canvi",
+                                "context",
+                                "messi"
+                            ],
+                            "objectType": "note"
+                        },
+                        "actor": {
+                            "username": "messi",
+                            "displayName": "Lionel Messi",
+                            "id": "510f816baceee9158ef3046b",
+                            "objectType": "person"
+                        },
+                        "verb": "post",
+                        "replies": {
+                            "totalItems": 0,
+                            "items": [
+
+                            ]
+                        },
+                        "id": "510f816baceee9158ef3046f",
+                        "published": "2013-02-04T09:37:47Z"
+                    },
+                    {
+                        "replies": {
+                            "totalItems": 0,
+                            "items": [
+
+                            ]
+                        },
+                        "object": {
+                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus</p>",
+                            "_keywords": [
+                                "testejant",
+                                "creaci\\u00f3",
+                                "canvi",
+                                "messi"
+                            ],
+                            "objectType": "note"
+                        },
+                        "actor": {
+                            "username": "messi",
+                            "displayName": "Lionel Messi",
+                            "id": "510f816baceee9158ef3046b",
+                            "objectType": "person"
+                        },
+                        "verb": "post",
+                        "published": "2013-02-04T09:37:47Z",
+                        "id": "510f816baceee9158ef3046e"
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"totalIt...>
+            >>> response.json.get('items')[0].get('actor').get('displayName') == eval(expected).get('items')[0].get('actor').get('displayName')
+            True
+            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            True
+
     Success
+
         Retorna una col·lecció d'objectes del tipus ``Activity``.
 
 
@@ -674,37 +771,158 @@ Representa el conjunt de comentaris fets a una activitat.
 
     Afegeix un comentari a una activitat ja existent al sistema. Aquest servei
     crea el comentari pròpiament dit dins de l'activitat i genera una activitat
-    nova (l'usuari ha comentat l'activitat... )
+    nova del tipus *comment* (l'usuari ha comentat l'activitat... )
 
-    :query activity: (REST) ha de ser un identificador vàlid d'una activitat
+    :query activity: (REST) Ha de ser un identificador vàlid d'una activitat
         existent, per exemple: 4e6eefc5aceee9210d000004
-    :query actor: (Requerit) Objecte diccionari. Ha de contindre les claus
-        ``username`` i ``objectType`` sent l'unic valor suportat d'aquesta
-        ultima `person`.
     :query object: (Requerit) El tipus (``objectType``) d'una activitat
-        comentari ha de ser `comment`. Ha de contindre les claus ``objectType``
+        comentari ha de ser *comment*. Ha de contindre les claus ``objectType``
         i ``content``.
 
-    Cos de la petició::
+    Cos de la petició
 
-        {
-            "actor": {
-                "objectType": "person",
-                "username": "javier"
-            },
-            "object": {
-                "objectType": "comment",
-                "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+        .. code-block:: python
+
+            {
+                "object": {
+                    "objectType": "comment",
+                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+                }
             }
-        }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "object": {
+                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                    "inReplyTo": [
+                        {
+                            "id": "510f88e6aceee91b02bc5a91",
+                            "objectType": "note"
+                        }
+                    ],
+                    "_keywords": [
+                        "testejant",
+                        "comentari",
+                        "nou",
+                        "una",
+                        "activitat",
+                        "messi"
+                    ],
+                    "objectType": "comment"
+                },
+                "actor": {
+                    "username": "messi",
+                    "displayName": "Lionel Messi",
+                    "id": "510f88e6aceee91b02bc5a8c",
+                    "objectType": "person"
+                },
+                "verb": "comment",
+                "published": "2013-02-04T10:09:42Z",
+                "id": "510f88e6aceee91b02bc5a92"
+            }
+
+        .. -> expected
+            >>> activity = utils.create_activity(username, user_status)
+            >>> response = testapp.post('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json body='{"replies...>
+            >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
+            True
+            >>> response.json.get('verb') == eval(expected).get('verb')
+            True
+
+    Success
+
+        Retorna l'objecte ``Activity`` del comentari.
 
 .. http:get:: /activities/{activity}/comments
 
-    Llistat de tots els comentaris d'una activitat
+    Llista tots els comentaris d'una activitat
 
-    :query activity: (REST) ha de ser un identificador vàlid d'una activitat existent, per
+    :query activity: (REST) ha de ser un identificador vàlid d'una activitat
+        existent, per exemple: 4e6eefc5aceee9210d000004
 
-    Retorna una col·lecció d'objectes del tipus ``Comment``
+    Cos de la petició
+
+         Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "_keywords": [
+                            "testejant",
+                            "comentari",
+                            "nou",
+                            "una",
+                            "activitat",
+                            "messi"
+                        ],
+                        "author": {
+                            "username": "messi",
+                            "displayName": "Lionel Messi",
+                            "subscribedTo": {
+                                "totalItems": 1,
+                                "items": [
+                                    {
+                                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                        "object": {
+                                            "url": "http://atenea.upc.edu",
+                                            "objectType": "uri"
+                                        },
+                                        "published": "2013-02-04T10:31:18Z",
+                                        "displayName": "Atenea",
+                                        "id": "510f8df6aceee91ead30bf2d",
+                                        "permissions": [
+                                            "read",
+                                            "write",
+                                            "invite"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "last_login": "2013-02-04T10:31:18Z",
+                            "published": "2013-02-04T10:31:18Z",
+                            "following": {
+                                "totalItems": 0,
+                                "items": []
+                            },
+                            "twitterUsername": "messi10oficial",
+                            "id": "510f8df6aceee91ead30bf2c"
+                        },
+                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                        "published": "2013-02-04T10:31:18Z",
+                        "id": "510f8df6aceee91ead30bf32",
+                        "objectType": "comment"
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"totalIt...>
+            >>> response.json.get('items')[0].get('author').get('displayName') == eval(expected).get('items')[0].get('author').get('displayName')
+            True
+            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            True
+
+    Success
+
+        Retorna una col·lecció d'objectes del tipus ``Comment``
 
 
 Subscripcions
@@ -712,35 +930,7 @@ Subscripcions
 
 Representa el conjunt de contextes als quals esta subscrit un usuari.
 
-.. http:post:: /people/{username}/subscriptions
 
-    Subscriu l'usuari a un context determinat.
-
-    ..note::
-        Aquest servei requereix autenticació basicAuth amb l'usuari d'operacions
-        del MAX.
-
-    :query username: (REST) L'identificador de l'usuari al sistema.
-    :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure, en
-        aquest cas del tipus `context`. Hem de proporcionar un objecte amb les
-        claus ``objectType`` i el valor `context`, i la dada ``url`` del context.
-
-    Aquest és un exemple::
-
-        {
-            "object": {
-                "objectType": "context",
-                "url": "http://atenea.upc.edu/4127368123"
-            }
-        }
-
-    Success
-        Retorna un objecte del tipus ``Activity``.
-
-    Error
-        En cas que l'usuari no existeixi::
-
-            {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 
 Missatges i converses

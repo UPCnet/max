@@ -23,7 +23,7 @@ def getContext(context, request):
     """
         /contexts/{hash}
 
-        Return a context by its hash.
+        [RESTRICTED] Return a context by its hash.
     """
     mmdb = MADMaxDB(context.db)
     chash = request.matchdict.get('hash', None)

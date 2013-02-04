@@ -36,6 +36,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     # BEGIN TESTS
 
     def test_create_context(self):
+        """ doctests .. http:post:: /contexts"""
         from .mockers import create_context
         permissions = dict(read='public', write='restricted', join='restricted', invite='restricted')
         default_permissions = dict(read='public', write='public', join='public', invite='subscribed')

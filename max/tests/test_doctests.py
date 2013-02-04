@@ -1,26 +1,15 @@
 import os
 import unittest
 import doctest
-import json
 
-from httpretty import HTTPretty
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header, basicAuthHeader
+from max.tests.base import MaxTestBase, oauth2Header
 from max.tests import test_manager, test_default_security
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE |
                doctest.REPORT_ONLY_FIRST_FAILURE)
-
-
-class mock_post(object):
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    text = ""
-    status_code = 200
 
 
 class DoctestCase(unittest.TestCase):
@@ -43,6 +32,8 @@ class DoctestCase(unittest.TestCase):
             m,
             os.path.join(pkg_resources.get_distribution('max').location,
                          'docs', 'ca', 'apirest.rst'),
+            os.path.join(pkg_resources.get_distribution('max').location,
+                         'docs', 'ca', 'apioperations.rst'),
             setUp=cls.setUp,
             tearDown=cls.tearDown,
             )
@@ -61,7 +52,6 @@ class DoctestCase(unittest.TestCase):
 
         test.globs['testapp'] = testapp
         test.globs['oauth2Header'] = oauth2Header
-        test.globs['popIdfromResponse'] = popIdfromResponse
         test.globs['MaxTestBase'] = MaxTestBase
 
     @staticmethod
@@ -69,9 +59,3 @@ class DoctestCase(unittest.TestCase):
         test.globs.clear()
         import pyramid.testing
         pyramid.testing.tearDown()
-
-
-def popIdfromResponse(response):
-    result = json.loads(response)
-    del result['items'][0]['id']
-    return result

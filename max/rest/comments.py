@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxRequest, MaxResponse, requirePersonActor
 from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.utils import flatten
@@ -23,7 +23,7 @@ def getUserComments(context, request):
 
 @view_config(route_name='comments', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getActivityComments(context, request):
     """
@@ -50,7 +50,7 @@ def getActivityComments(context, request):
 
 @view_config(route_name='comments', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def addActivityComment(context, request):
     """

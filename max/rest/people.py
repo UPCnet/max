@@ -54,7 +54,7 @@ def addUser(context, request):
     """
         /people/{username}
 
-        Creates a system user.
+        [RESTRICTED] Creates a system user.
     """
     username = request.matchdict['username']
     rest_params = {'username': username}

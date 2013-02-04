@@ -1,41 +1,50 @@
-OAUTH_RESOURCES = {
-    'users': {'route': '/people'},  # documented
-    'user': {'route': '/people/{username}'},  # documented
-    'avatar': {'route': '/people/{username}/avatar'},  # documented
-    'user_activities': {'route': '/people/{username}/activities'},  # documented
-    'timeline': {'route': '/people/{username}/timeline'},  # documented
-    'user_comments': {'route': '/people/{username}/comments'},  # not implemented
-    'user_shares': {'route': '/people/{username}/shares'},  # not implemented
-    'user_likes': {'route': '/people/{username}/likes'},  # not implemented
-    'follows': {'route': '/people/{username}/follows'},  # not implemented
-    'follow': {'route': '/people/{username}/follows/{followedDN}'},  # not implemented
-    'subscriptions': {'route': '/people/{username}/subscriptions'},  # documented
-    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # not implemented
-    'user_conversations': {'route': '/people/{username}/conversations'},  # not implemented
+PUBLIC_RESOURCES = {
+    'users': {'route': '/people'},  # (GET) documented tested
+    'user': {'route': '/people/{username}'},  # (GET, PUT, POST) documented tested
+    'avatar': {'route': '/people/{username}/avatar'},  # (GET) documented
+    'user_activities': {'route': '/people/{username}/activities'},  # (GET, POST) documented tested
 
-    'activities': {'route': '/activities'},  # documented
-    'activity': {'route': '/activities/{activity}'},  # not public API
-    'comments': {'route': '/activities/{activity}/comments'},  # documented
-    'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
-    'likes': {'route': '/activities/{activity}/likes'},  # not implemented
-    'like': {'route': '/activities/{activity}/likes/{likeId}'},  # not implemented
-    'shares': {'route': '/activities/{activity}/shares'},  # not implemented
-    'share': {'route': '/activities/{activity}/shares/{shareId}'},  # not implemented
+    'activities': {'route': '/activities'},  # (GET) documented tested
+    'timeline': {'route': '/people/{username}/timeline'},  # (GET) documented tested
 
-    'contexts': {'route': '/contexts'},  # documented
+    'comments': {'route': '/activities/{activity}/comments'},  # (GET, POST) documented tested
+
     'context': {'route': '/contexts/{hash}'},  # documented
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # documented
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
 
+    'subscriptions': {'route': '/people/{username}/subscriptions'},  # documented
+
+    # MAX 3.0
     'conversations': {'route': '/conversations'},  # documented
     'conversation': {'route': '/conversations/{hash}'},  # documented
-    'messages': {'route': '/conversations/{hash}/messages'}  # not documented
+    'messages': {'route': '/conversations/{hash}/messages'},  # not documented
+
+    # MAX 4.0
+    'user_shares': {'route': '/people/{username}/shares'},  # not implemented
+    'user_likes': {'route': '/people/{username}/likes'},  # not implemented
+    'follows': {'route': '/people/{username}/follows'},  # not implemented
+    'follow': {'route': '/people/{username}/follows/{followedDN}'},  # not implemented
+    'likes': {'route': '/activities/{activity}/likes'},  # not implemented
+    'like': {'route': '/activities/{activity}/likes/{likeId}'},  # not implemented
+    'shares': {'route': '/activities/{activity}/shares'},  # not implemented
+    'share': {'route': '/activities/{activity}/shares/{shareId}'},  # not implemented
+
+    # Not implemented / Not in roadmap
+    'user_comments': {'route': '/people/{username}/comments'},  # not implemented
+    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # not implemented
+    'user_conversations': {'route': '/people/{username}/conversations'},  # not implemented
+    'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
 
 }
 
-ADMIN_RESOURCES = {
+RESTRICTED_RESOURCES = {
+
+    'contexts': {'route': '/contexts'},  # (POST) documented tested
+    'activity': {'route': '/activities/{activity}'},  # not public API
+
     'admin_user_activities': {'route': '/admin/people/{username}/activities'},
     'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},
     'admin_users': {'route': '/admin/people'},
@@ -50,5 +59,5 @@ ADMIN_RESOURCES = {
 }
 
 RESOURCES = {}
-RESOURCES.update(OAUTH_RESOURCES)
-RESOURCES.update(ADMIN_RESOURCES)
+RESOURCES.update(PUBLIC_RESOURCES)
+RESOURCES.update(RESTRICTED_RESOURCES)
