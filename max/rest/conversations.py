@@ -6,7 +6,7 @@ from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Activity, Context
 from max.ASObjects import Conversation
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
@@ -15,7 +15,7 @@ from max.rest.utils import extractPostData
 
 @view_config(route_name='conversations', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getConversations(context, request):
     """
@@ -45,7 +45,7 @@ def getConversations(context, request):
 
 @view_config(route_name='conversations', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def postMessage2Conversation(context, request):
     """
@@ -116,7 +116,7 @@ def postMessage2Conversation(context, request):
 
 @view_config(route_name='messages', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getMessages(context, request):
     """
@@ -138,7 +138,7 @@ def getMessages(context, request):
 
 @view_config(route_name='messages', request_method='POST')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def addMessage(context, request):
     """
@@ -162,5 +162,3 @@ def addMessage(context, request):
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
-
-

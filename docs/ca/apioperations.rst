@@ -259,7 +259,7 @@ Contexts
 
 .. Create the context to delete in this test
 
-    >>> create_context = { "object": {"url": "http://atenea.upc.edu", "objectType": "uri" }}
+    >>> create_context = { "object": {"url": "http://atenea.upc.edu", "objectType": "uri" } }
     >>> resp = utils.create_context(create_context)
     >>> context_hash_for_deleting = resp.json.get('hash')
 
@@ -277,7 +277,7 @@ Contexts
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
 
- .. http:get:: /contexts/{hash}/avatar
+.. http:get:: /contexts/{hash}/avatar
 
     Retorna la imatge que li correspon al context depenent del usuari de
     Twitter que te assignat. Si no en te cap, retorna una imatge estàndar. Per
@@ -293,6 +293,7 @@ Contexts
     Success
 
         Retorna la imatge del context.
+
 
 Subscripcions
 -------------
@@ -363,6 +364,110 @@ Subscripcions
             .. code-block:: python
 
                 { "error_description": "Unknown user: messi", "error": "UnknownUserError" }
+
+
+Permisos a contexts
+-------------------
+
+Sobre els objectes context es poden otorgar o revocar permisos a usuaris del
+sistema. Aquests permisos són bàsicament de lectura/escriptura, tal i com
+s'explica amb profunditat en l'apartat de permisos.
+
+.. http:put:: /contexts/{hash}/permissions/{username}/{permission}
+
+    Afegeix els permisos per un context donat un identificador d'usuari i el
+    permís que li vols donar.
+
+    :query hash: (REST) El hash del context en concret. Aquest hash es calcula
+        fent una suma de verificació sha1 de la URL del context.
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query permission: (REST) El permís que li volem otorgar a l'usuari
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "displayName": "http://atenea.upc.edu",
+                "object": {
+                    "url": "http://atenea.upc.edu",
+                    "objectType": "uri"
+                },
+                "published": "2013-02-05T19:38:25Z",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "id": "51115fb1e999fb0cabd43ba8",
+                "permissions": [
+                    "read",
+                    "write",
+                    "invite"
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
+            >>> response
+            <200 OK application/json body='{"display...>
+
+    Success
+
+        Si el permís ja estava otorgat, el codi HTTP de resposta és 200, si no, torna un 201.
+        En el cos, torna l'objecte ``Context`` modificat.
+
+.. http:delete:: /contexts/{hash}/permissions/{username}/{permission}
+
+    Esborra els permisos per un context donat un identificador d'usuari i el
+    permís que li vols donar.
+
+    :query hash: (REST) El hash del context en concret. Aquest hash es calcula
+        fent una suma de verificació sha1 de la URL del context.
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query permission: (REST) El permís que li volem otorgar a l'usuari
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "displayName": "http://atenea.upc.edu",
+                "object": {
+                    "url": "http://atenea.upc.edu",
+                    "objectType": "uri"
+                },
+                "published": "2013-02-05T19:40:25Z",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "id": "51116029e999fb0cb57338b3",
+                "permissions": [
+                    "read",
+                    "invite"
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.delete('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
+            >>> response
+            <200 OK application/json body='{"display...>
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('permissions') == eval(expected).get('permissions')
+            True
+
+.. put the write permissions of the test user back for further testing :)
+
+    >>> testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201)
+    <201 Created application/json body='{"hash": ...>
+
+    Success
+
+        Torna l'objecte ``Context`` modificat.
+
 
 Activitats
 ----------
@@ -476,6 +581,10 @@ Activitats
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
         `note`. Ha de contindre les claus ``objectType`` i ``content`` que pot
         tractar-se d'un camp codificat amb HTML.
+
+    Cos de la petició
+
+        .. code-block:: python
 
             {
                 "contexts": [

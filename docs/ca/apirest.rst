@@ -990,50 +990,332 @@ Missatges i converses
 ---------------------
 
 El MAX implementa des de la seva versió 3.0 la funcionalitat de missatgeria
-instantània asíncrona entre els seus usuaris. Aquests són els serveis REST
-associats.
+instantània asíncrona entre els seus usuaris. Aquests són els serveis associats.
 
-.. http:get:: /conversations
+.. setup other user for conversations interaction
 
-    Retorna totes les converses depenent de l'actor que faci la petició.
-
-    Success
-        Retorna una llista d'objectes del tipus ``Conversation``.
-
+    >>> username2 = 'xavi'
+    >>> utils.create_user(username2)
+    <201 Created application/json body='{"usernam...>
 
 .. http:post:: /conversations
 
     Retorna totes les converses depenent de l'actor que faci la petició.
 
     :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure (en
-        aquest cas `conversation`). Hem de proporcionar un objecte amb les claus
-        ``objectType`` i el valor `conversation`, i la llista de
-        ``participants`` com a l'exemple.
+        aquest cas ``conversation``). Hem de proporcionar un objecte amb les claus
+        ``objectType`` i el valor ``conversation``, i la llista de
+        ``participants`` com a l'exemple
     :query object: (Requerit) Tipus d'objecte de la conversa. Hem de
         proporcionar un objecte (per ara només es permet el tipus `message`) i
         el contingut amb les dades ``content`` amb el cos del missatge
-        propiament dit.
+        propiament dit
 
-    Aquest és un exemple::
+    Cos de la petició
 
-        {
-            "contexts": [
-                {"objectType":"conversation",
-                 "participants": ["messi", "xavi"],
+        .. code-block:: python
+
+            {
+                "contexts": [
+                    {
+                        "objectType":"conversation",
+                        "participants": ["messi", "xavi"]
+                    }
+                ],
+                "object": {
+                    "objectType": "message",
+                    "content": "Nos espera una gran temporada, no es cierto?"
                 }
-            ],
-            "object": {
-                "objectType": "message",
-                "content": "Nos espera una gran temporada, no es cierto?",
             }
-        }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "contexts": [
+                    {
+                        "displayName": "messi, xavi",
+                        "object": {
+                            "participants": [
+                                "messi",
+                                "xavi"
+                            ],
+                            "objectType": "conversation"
+                        },
+                        "published": "2013-02-05T20:07:23Z",
+                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
+                        "id": "5111667be999fb0d6a01d44b",
+                        "permissions": [
+                            "read",
+                            "write"
+                        ]
+                    }
+                ],
+                "object": {
+                    "content": "Nos espera una gran temporada, no es cierto?",
+                    "_keywords": [
+                        "nos",
+                        "espera",
+                        "una",
+                        "gran",
+                        "temporada",
+                        "cierto",
+                        "messi"
+                    ],
+                    "objectType": "message"
+                },
+                "actor": {
+                    "username": "messi",
+                    "displayName": "Lionel Messi",
+                    "id": "5111667ae999fb0d6a01d443",
+                    "objectType": "person"
+                },
+                "verb": "post",
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "id": "5111667be999fb0d6a01d44c",
+                "published": "2013-02-05T20:07:23Z"
+            }
+
+        .. -> expected
+            >>> response = testapp.post('/conversations', payload, oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json body='{"context...>
+            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            True
+            >>> response.json.get('contexts')[0].get('displayName') == eval(expected).get('contexts')[0].get('displayName')
+            True
+            >>> conversation_hash = response.json.get('contexts')[0].get('hash')
 
     Success
-        Retorna l'objecte ``missatge`` (activity).
+
+        Retorna l'objecte ``Message`` (activitat).
 
 
 .. http:get:: /conversations/{hash}/messages
 
+    Retorna tots els missatges d'una conversa
+
+    :query hash: (REST) El hash de la conversa en concret. Aquest hash es
+        calcula fent una suma de verificació sha1 de la llista de participants
+        (ordenada alfabèticament i sense espais) de la conversa
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "contexts": [
+                            {
+                                "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
+                                "object": {
+                                    "participants": [
+                                        "messi",
+                                        "xavi"
+                                    ],
+                                    "objectType": "conversation"
+                                },
+                                "published": "2013-02-05T20:21:07Z",
+                                "displayName": "messi, xavi",
+                                "id": "511169b3e999fb0dd75b20d4",
+                                "permissions": [
+                                    "read",
+                                    "write"
+                                ]
+                            }
+                        ],
+                        "object": {
+                            "content": "Nos espera una gran temporada, no es cierto?",
+                            "_keywords": [
+                                "nos",
+                                "espera",
+                                "una",
+                                "gran",
+                                "temporada",
+                                "cierto",
+                                "messi"
+                            ],
+                            "objectType": "message"
+                        },
+                        "actor": {
+                            "username": "messi",
+                            "displayName": "Lionel Messi",
+                            "id": "511169b3e999fb0dd75b20cc",
+                            "objectType": "person"
+                        },
+                        "verb": "post",
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
+                        "id": "511169b3e999fb0dd75b20d5",
+                        "published": "2013-02-05T20:21:07Z"
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/conversations/{}/messages'.format(conversation_hash), "", oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"totalIt...>
+            >>> response.json.get('items')[0].get('object').get('objectType') == eval(expected).get('items')[0].get('object').get('objectType')
+            True
+            >>> response.json.get('items')[0].get('contexts')[0].get('displayName') == eval(expected).get('items')[0].get('contexts')[0].get('displayName')
+            True
+
+    Success
+
+        Retorna una llista d'objectes ``Message`
+
+.. http:get:: /conversations
+
+    Retorna totes les converses depenent de l'actor que faci la petició
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
+                        "object": {
+                            "participants": [
+                                "messi",
+                                "xavi"
+                            ],
+                            "messages": 1,
+                            "lastMessage": {
+                                "content": "Nos espera una gran temporada, no es cierto?",
+                                "published": "2013-02-05T20:28:24Z"
+                            },
+                            "objectType": "conversation"
+                        },
+                        "published": "2013-02-05T20:28:24Z",
+                        "displayName": "messi, xavi",
+                        "id": "51116b68e999fb0e12a9cf9b",
+                        "permissions": {
+                            "read": "subscribed",
+                            "write": "subscribed",
+                            "join": "restricted",
+                            "invite": "restricted"
+                        }
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/conversations', "", oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json body='{"totalIt...>
+            >>> response.json.get('items')[0].get('object').get('objectType') == eval(expected).get('items')[0].get('object').get('objectType')
+            True
+            >>> response.json.get('items')[0].get('displayName') == eval(expected).get('items')[0].get('displayName')
+            True
+
+    Success
+
+        Retorna una llista d'objectes del tipus ``Conversation``.
+
+.. http:post:: /conversations/{hash}/messages
+
+    Crea un missatge nou a una conversa ja existent
+
+    :query hash: (REST) El hash de la conversa en concret. Aquest hash es
+        calcula fent una suma de verificació sha1 de la llista de participants
+        (ordenada alfabèticament i sense espais) de la conversa
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {
+                "object": {
+                    "objectType": "message",
+                    "content": "M'agrada Taradell!"
+                }
+            }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "contexts": [
+                    {
+                        "displayName": "messi, xavi",
+                        "object": {
+                            "participants": [
+                                "messi",
+                                "xavi"
+                            ],
+                            "objectType": "conversation"
+                        },
+                        "published": "2013-02-05T20:34:48Z",
+                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
+                        "id": "51116ce8e999fb0e3f274d6a",
+                        "permissions": [
+                            "read",
+                            "write"
+                        ]
+                    }
+                ],
+                "object": {
+                    "content": "M\'agrada Taradell!",
+                    "_keywords": [
+                        "taradell",
+                        "messi"
+                    ],
+                    "objectType": "message"
+                },
+                "actor": {
+                    "username": "messi",
+                    "displayName": "Lionel Messi",
+                    "id": "51116ce8e999fb0e3f274d62",
+                    "objectType": "person"
+                },
+                "verb": "post",
+                "replies": {
+                    "totalItems": 0,
+                    "items": [
+
+                    ]
+                },
+                "id": "51116ce8e999fb0e3f274d6c",
+                "published": "2013-02-05T20:34:48Z"
+            }
+
+        .. -> expected
+            >>> response = testapp.post('/conversations/{}/messages'.format(conversation_hash), payload, oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json body='{"context...>
+            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            True
+            >>> response.json.get('contexts')[0].get('displayName') == eval(expected).get('contexts')[0].get('displayName')
+            True
+
+    Success
+
+        Retorna l'objecte ``Message`` (activitat).
 
 .. doctests teardown (absolutelly needed)
 

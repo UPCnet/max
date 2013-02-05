@@ -37,6 +37,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     # BEGIN TESTS
 
     def test_post_message_to_conversation_does_not_exists_yet(self):
+        """ doctest .. http:post:: /conversations """
         from .mockers import message
         sender = 'messi'
         recipient = 'xavi'
@@ -134,6 +135,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get("items")[0].get("object", None).get("objectType", None), "message")
 
     def test_get_messages_from_a_conversation_as_a_recipient(self):
+        """ doctest .. http:get:: /conversations/{hash}/messages """
         from .mockers import message, message2
         sender = 'messi'
         recipient = 'xavi'
@@ -173,6 +175,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=400)
 
     def test_get_conversations_for_an_user(self):
+        """ doctest .. http:get:: /conversations """
         from .mockers import message
         sender = 'messi'
         recipient = 'xavi'

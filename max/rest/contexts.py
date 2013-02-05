@@ -157,7 +157,7 @@ def DeleteContext(context, request):
 @oauth2(['widgetcli'])
 @restricted(['Manager'])
 def grantPermissionOnContext(context, request):
-    """
+    """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'join', 'invite']:
@@ -196,7 +196,7 @@ def grantPermissionOnContext(context, request):
 @oauth2(['widgetcli'])
 @restricted(['Manager'])
 def revokePermissionOnContext(context, request):
-    """
+    """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'join', 'invite']:

@@ -10,16 +10,12 @@ PUBLIC_RESOURCES = {
     'comments': {'route': '/activities/{activity}/comments'},  # (GET, POST) documented tested
 
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented
-    'context_permissions': {'route': '/contexts/{hash}/permissions'},
-    'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
-    'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
 
     'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
 
     # MAX 3.0
-    'conversations': {'route': '/conversations'},  # documented
-    'conversation': {'route': '/conversations/{hash}'},  # documented
-    'messages': {'route': '/conversations/{hash}/messages'},  # not documented
+    'conversations': {'route': '/conversations'},  # (GET, POST) documented tested
+    'messages': {'route': '/conversations/{hash}/messages'},  # (GET, POST) documented tested
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},  # not implemented
@@ -36,6 +32,9 @@ PUBLIC_RESOURCES = {
     'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # not implemented
     'user_conversations': {'route': '/people/{username}/conversations'},  # not implemented
     'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
+    'context_permissions': {'route': '/contexts/{hash}/permissions'},  # not implemented
+    'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},  # not implemented
+    'conversation': {'route': '/conversations/{hash}'},  # not implemented
 
 }
 
@@ -44,6 +43,8 @@ RESTRICTED_RESOURCES = {
     'context': {'route': '/contexts/{hash}'},  # (GET, PUT, DELETE) documented tested
     'contexts': {'route': '/contexts'},  # (POST) documented tested
     'activity': {'route': '/activities/{activity}'},  # not public API
+
+    'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},  # (PUT, DELETE) documented tested
 
     'admin_user_activities': {'route': '/admin/people/{username}/activities'},  # (POST) documented tested
     'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},  # (POST) documented tested

@@ -364,6 +364,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None)[0]['object']['url'], user_status_context['contexts'][0]['url'])
 
     def test_grant_write_permission_on_write_restricted_context(self):
+        """ doctest .. http:put:: /contexts/{hash}/permissions/{username}/{permission} """
         from .mockers import create_context_private_r, subscribe_context
         from hashlib import sha1
         username = 'messi'
@@ -377,6 +378,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual('write' in result['permissions'], True)
 
     def test_revoke_write_permission_on_write_restricted_context(self):
+        """ doctest .. http:delete:: /contexts/{hash}/permissions/{username}/{permission} """
         from .mockers import create_context_private_r, subscribe_context
         from hashlib import sha1
         username = 'messi'
