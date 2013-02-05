@@ -9,13 +9,12 @@ PUBLIC_RESOURCES = {
 
     'comments': {'route': '/activities/{activity}/comments'},  # (GET, POST) documented tested
 
-    'context': {'route': '/contexts/{hash}'},  # documented
-    'context_avatar': {'route': '/contexts/{hash}/avatar'},  # documented
+    'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
 
-    'subscriptions': {'route': '/people/{username}/subscriptions'},  # documented
+    'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},  # documented
@@ -42,11 +41,12 @@ PUBLIC_RESOURCES = {
 
 RESTRICTED_RESOURCES = {
 
+    'context': {'route': '/contexts/{hash}'},  # (GET, PUT, DELETE) documented tested
     'contexts': {'route': '/contexts'},  # (POST) documented tested
     'activity': {'route': '/activities/{activity}'},  # not public API
 
-    'admin_user_activities': {'route': '/admin/people/{username}/activities'},
-    'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},
+    'admin_user_activities': {'route': '/admin/people/{username}/activities'},  # (POST) documented tested
+    'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},  # (POST) documented tested
     'admin_users': {'route': '/admin/people'},
     'admin_activities': {'route': '/admin/activities'},
     'admin_contexts': {'route': '/admin/contexts'},

@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.oauth2 import oauth2, restricted
-from max.decorators import MaxRequest, MaxResponse, requirePersonActor
+from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
@@ -14,7 +14,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 
 @view_config(route_name='subscriptions', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getUserSubscriptions(context, request):
     """
@@ -39,7 +39,7 @@ def subscribe(context, request):
     """
         /people/{username}/subscriptions
 
-        Subscribe an username to the suplied context.
+        [RESTRICTED] Subscribe an username to the suplied context.
     """
     # XXX For now only one context can be subscribed at a time
     actor = request.actor

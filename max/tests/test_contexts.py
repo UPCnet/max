@@ -55,6 +55,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/people/%s/subscriptions' % username, json.dumps(create_context), oauth2Header(test_manager), status=201)
 
     def test_subscribe_to_context(self):
+        """ doctest .. http:post:: /people/{username}/subscriptions """
         from .mockers import subscribe_context
         from .mockers import user_status_context
         from .mockers import create_context
@@ -92,6 +93,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
     def test_get_all_subscribed_contexts_for_user(self):
+        """ doctest .. http:get:: /people/{username}/subscriptions """
         from .mockers import create_context
         from .mockers import subscribe_contextA, create_contextA
         from .mockers import subscribe_contextB, create_contextB
@@ -198,6 +200,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('twitterUsername', None), create_context_full['twitterUsername'])
 
     def test_context_exists(self):
+        """ doctest .. http:get:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
         url_hash = sha1(create_context['object']['url']).hexdigest()
@@ -207,6 +210,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('hash', None), url_hash)
 
     def test_modify_context(self):
+        """ doctest .. http:put:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
         self.create_context(create_context)
@@ -242,6 +246,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('twitterUsernameId', None), None)
 
     def test_delete_context(self):
+        """ doctest .. http:delete:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
         url_hash = sha1(create_context['object']['url']).hexdigest()

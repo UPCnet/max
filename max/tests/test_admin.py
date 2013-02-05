@@ -53,6 +53,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None), None)
 
     def test_admin_post_activity_with_context(self):
+        """ doctest .. http:post:: /admin/people/{username}/activities """
         from .mockers import subscribe_context
         from .mockers import user_status_context
         from .mockers import create_context
@@ -68,6 +69,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
 
     def test_admin_post_activity_with_context_as_actor(self):
+        """ doctest .. http:post:: /admin/contexts/{hash}/activities """
         from .mockers import subscribe_context
         from .mockers import user_status_context
         from .mockers import create_context
