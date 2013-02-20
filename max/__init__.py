@@ -3,9 +3,6 @@ import logging
 import pymongo
 
 from pyramid.config import Configurator
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
-from pyramid_who.whov2 import WhoV2AuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
 
 # logger has to be BEFORE the import of the following resources import
 maxlogger = logging.getLogger('max')
@@ -19,27 +16,11 @@ DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', join='public',
 def main(global_config, **settings):
     """ This function returns a WSGI application.
     """
-    # Security
-    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
-    whoconfig_file = settings['whoconfig_file']
-    identifier_id = 'auth_tkt'
-    authn_policy = WhoV2AuthenticationPolicy(whoconfig_file, identifier_id)
-    authz_policy = ACLAuthorizationPolicy()
 
     # App config
     config = Configurator(settings=settings,
-                          root_factory=Root,
-                          session_factory=my_session_factory,
-                          authentication_policy=authn_policy,
-                          authorization_policy=authz_policy)
-    config.add_static_view('static', 'max:static')
-    config.add_static_view('css', 'max:css')
-    config.add_static_view('less', 'max:less')
-    config.add_static_view('js', 'max:js')
-    config.add_static_view('fonts', 'max:static/fonts')
-    config.add_static_view('maxui', 'max:maxui')
+                          root_factory=Root)
 
-    config.add_route('profiles', '/profiles/{username}')
     config.add_route('wadl', '/WADL')
 
     # Store in registry
