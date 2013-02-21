@@ -22,7 +22,8 @@ def init_security(settings):
     db = conn[settings['mongodb.db_name']]
     if not [items for items in db.security.find({})]:
         db.security.insert(default_security)
-        print("Created default security info in MAXDB.")
+        print("Created default security info in MAXDB.\n"
+              "Remember to restart max process!")
 
 
 def usage(argv):
