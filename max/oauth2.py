@@ -14,7 +14,6 @@ def oauth2(allowed_scopes=[]):
             # Extract the username and token from request headers
             # It will be like:
             # headers = {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": "messi", "X-Oauth-Scope": "widgetcli"}
-
             settings = getMAXSettings(request)
 
             oauth_token = request.headers.get('X-Oauth-Token', '')
@@ -35,9 +34,9 @@ def oauth2(allowed_scopes=[]):
             if scope:
                 payload['scope'] = scope
 
-            r = requests.post(settings['max_oauth_check_endpoint'], data=payload, verify=False)
+            req = requests.post(settings['max_oauth_check_endpoint'], data=payload, verify=False)
 
-            if r.status_code == 200:
+            if req.status_code == 200:
                 # Valid token, proceed.
                 return view_function(*args, **kw)
             else:

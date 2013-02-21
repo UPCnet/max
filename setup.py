@@ -18,7 +18,8 @@ requires = [
     'tweepy',
     'celery',
     'beaker',
-    'waitress'
+    'waitress',
+    'Paste'
     ]
 
 test_requires = ['WebTest', 'mock', ]
@@ -51,6 +52,7 @@ setup(name='max',
       main = max:main
       [console_scripts]
       maxrules.twitter = maxrules.twitter:main
-      initialize_max_db = max.scripts:main
+      initialize_max_db = max.scripts.security:main
+      max.devel = max.scripts.devel:main
       """,
       )
