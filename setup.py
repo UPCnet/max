@@ -54,5 +54,6 @@ setup(name='max',
       maxrules.twitter = maxrules.twitter:main
       initialize_max_db = max.scripts.security:main
       max.devel = max.scripts.devel:main
+      maxui.setup = max.scripts.maxui:main
       """,
       )

@@ -96,10 +96,7 @@ def _add_context(client, *args):
             print 'Oops! An error occurred...'
 
 
-def main(argv=sys.argv):
-    if len(argv) < 2:
-        usage(argv)
-
+def load_settings():
     save_settings = False
     buildout_path = re.search(r'^(.*?)/src.*', bigmax.__path__[0]).groups()[0]
     settings_file = '%s/.max_settings' % buildout_path
@@ -127,5 +124,12 @@ def main(argv=sys.argv):
 
     if save_settings:
         open(settings_file, 'w').write(json.dumps(settings, indent=4, sort_keys=True))
+    return client, settings, buildout_path
 
+
+def main(argv=sys.argv):
+    if len(argv) < 2:
+        usage(argv)
+
+    client, settings, path = load_settings()
     doAction(client, argv[1], argv[2], *argv[3:])
