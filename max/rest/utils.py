@@ -24,7 +24,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
     """
     """
     try:
-        req = requests.get('https://api.twitter.com/1/users/show/%s.json' % twitterUsername)
+        req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
         data = json.loads(req.text)
         image_url = data.get('profile_image_url_https', None)
         if image_url:
@@ -41,7 +41,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
 
 
 def getUserIdFromTwitter(twitterUsername):
-    res = requests.get('http://api.twitter.com/1/users/show/%s.json' % twitterUsername)
+    res = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
 
     if res.status_code == 404:
         return None
