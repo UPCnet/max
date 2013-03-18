@@ -47,6 +47,6 @@ class MaxTestBase(object):
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), oauth2Header(test_manager), status=200)
         return res
 
-    def subscribe_user_to_context(self, username, context, expect=201):
-        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(test_manager), status=expect)
+    def subscribe_user_to_context(self, username, context, expect=201, auth=test_manager):
+        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(auth), status=expect)
         return res
