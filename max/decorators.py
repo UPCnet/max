@@ -230,6 +230,8 @@ def MaxResponse(fun):
         # issue proper status code with message
         nkargs = [a for a in args]
         context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
+        # response = fun(*args, **kwargs)
+        # return response
         try:
             response = fun(*args, **kwargs)
         except InvalidId, message:

@@ -266,7 +266,7 @@ def findKeywords(text):
         excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH.
         Keywords are stored in lowercase.
     """
-    _text = text.lower().decode('utf-8')
+    _text = text.lower()
     stripped_urls = re.sub(FIND_URL_REGEX, '', _text)
     keywords = [kw.groups()[1] for kw in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
     return keywords
