@@ -40,6 +40,6 @@ def main(global_config, **settings):
     for name, properties in RESOURCES.items():
         config.add_route(name, properties.get('route'))
 
-    config.scan('max', ignore='max.tests')
+    config.scan('max', ignore=['max.tests', 'max.scripts'])
 
     return config.make_wsgi_app()
