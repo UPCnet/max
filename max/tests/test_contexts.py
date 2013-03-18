@@ -280,8 +280,35 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         """
         from hashlib import sha1
-        from .mockers import subscribe_context, create_context
+        from .mockers import subscribe_context, subscribe_contextA
+        from .mockers import create_context, create_contextA
+        from .mockers import user_status_context, user_status_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_contextA)
+
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
+
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('username', None), 'messi')
+        self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 1)
+        self.assertEqual(result.get('subscribedTo', {}).get('items', [None, ])[0]['object'], subscribe_contextA['object'])
+
+    def test_user_cannot_see_activity_from_deleted_context(self):
+        """
+        """
+        from hashlib import sha1
+        from .mockers import subscribe_context
+        from .mockers import create_context
         from .mockers import user_status_context
+        from .mockers import context_query
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
@@ -290,12 +317,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         url_hash = sha1(create_context['object']['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
+        self.testapp.get('/activities', context_query, oauth2Header(username), status=404)
 
-        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+    def test_user_only_sees_own_activity_from_deleted_context_in_timeline(self):
+        """
+        """
+        from hashlib import sha1
+        from .mockers import subscribe_context
+        from .mockers import create_context
+        from .mockers import user_status_context
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.create_user(username2)
+        self.create_context(create_context)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.subscribe_user_to_context(username2, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username2, user_status_context)
+
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/people/%s/timeline' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-
-        self.assertEqual(result.get('username', None), 'messi')
-        self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 0)
+        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('items', None)[0]['actor']['username'], username)
 
     def test_add_private_rw_context(self):
         from hashlib import sha1
