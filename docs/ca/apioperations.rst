@@ -248,10 +248,12 @@ Contexts
 
 .. http:delete:: /contexts/{hash}
 
-    Esborra un objecte ``Context``
+    Esborra un objecte ``Context`` i les subscripcions de tots els usuaris subscrits a aquell contexte
+    NO esborra les activitats que s'hagin creat previament a l'esborrat. Tot i que les activitats que queden
+    a la base de dades no es poden consultar direcatament, en el timeline de un usuari coninuarà veient les activitats que va crear ell.
 
     :query hash: (REST) El hash del context en concret. Aquest hash es calcula
-        fent una suma de verificació sha1 de la URL del context.
+        fent una suma de verificació sha1 dels paràmetres del context
 
     Cos de la petició
 
