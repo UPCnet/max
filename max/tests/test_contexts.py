@@ -276,26 +276,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hashA)
 
-    # def test_delete_context_removes_subscription_from_user(self):
-    #     """
-    #     """
-    #     from hashlib import sha1
-    #     from .mockers import subscribe_context, create_context
-    #     from .mockers import user_status_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context)
-    #     self.subscribe_user_to_context(username, subscribe_context)
-    #     self.create_activity(username, user_status_context)
+    def test_delete_context_removes_subscription_from_user(self):
+        """
+        """
+        from hashlib import sha1
+        from .mockers import subscribe_context, create_context
+        from .mockers import user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
 
-    #     url_hash = sha1(create_context['object']['url']).hexdigest()
-    #     self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
 
-    #     res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
-    #     result = json.loads(res.text)
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
 
-    #     self.assertEqual(result.get('username', None), 'messi')
-    #     self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 0)
+        self.assertEqual(result.get('username', None), 'messi')
+        self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 0)
 
     def test_add_private_rw_context(self):
         from hashlib import sha1

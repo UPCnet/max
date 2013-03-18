@@ -188,11 +188,11 @@ class User(MADBase):
         subscription = context.prepareUserSubscription()
         self.addToList('subscribedTo', subscription, safe=False)
 
-    def removeSubscription(self, url):
+    def removeSubscription(self, chash):
         """
             Adds a comment to an existing activity
         """
-        self.deleteFromList('subscribedTo', url)
+        self.deleteFromList('subscribedTo', {'hash': chash})
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
@@ -346,11 +346,11 @@ class Context(MADBase):
     def removeUserSubscriptions(self):
         """
         """
-        # update object from "items" that matches hash
+        usersdb = MADMaxCollection(self.mdb_collection.database.users)
         criteria = {'subscribedTo.items.hash': self.hash}
-
-         # deletes context from subcription list
-        what = {'$pull': {'subscribedTo.items': {'hash': self.hash}}}
+        users = usersdb.search(criteria)
+        for user in users:
+            user.removeSubscription(self.hash)
 
 
 class Security(MADBase):

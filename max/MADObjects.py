@@ -284,13 +284,21 @@ class MADBase(MADDict):
             if not safe:
                 raise DuplicatedItemError('Item already on list "%s"' % (field))
 
-    def deleteFromList(self, field, obj, safe=True):
+    def deleteFromList(self, field, obj):
         """
-            Updates an array field of a existing DB object removing the object
+            Updates an array field of a existing DB object removing the object.
 
-            If safe == False, don't perform any deletion, otherwise remove the found objects.
+            If the array contains plain values, obj is the value to delete.
+            If the array contains dicts, obj must be a dict to match its key-value with
+            the value to delete on the array.
+
+            XXX TODO allow object to be either a single object or a list of objects
         """
-        pass
+
+        items = '%s.items' % field
+        count = '%s.totalItems' % field
+
+        self.mdb_collection.update({'_id': self['_id']}, {'$pull': {items: obj}, '$inc': {count: -1}})
 
     def alreadyExists(self):
         """
