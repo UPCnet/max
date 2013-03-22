@@ -47,28 +47,28 @@ class MaxTestBase(object):
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), oauth2Header(test_manager), status=200)
         return res
 
-    def subscribe_to_context(self, username, context, expect=201,):
+    def admin_subscribe_user_to_context(self, username, context, expect=201,):
         """
             Subscribes an user to a context as a manager user
         """
         res = self.testapp.post('/admin/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(test_manager), status=expect)
         return res
 
-    def user_subscribe_to_context(self, username, context, expect=201,):
+    def user_subscribe_user_to_context(self, username, context, expect=201,):
         """
             Subscribes an user to a context as himself
         """
         res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(username), status=expect)
         return res
 
-    def unsubscribe_from_context(self, username, chash, expect=204):
+    def admin_unsubscribe_user_from_context(self, username, chash, expect=204):
         """
             UnSubscribes an user to a context as himself
         """
         res = self.testapp.delete('/admin/people/%s/subscriptions/%s' % (username, chash), {}, oauth2Header(test_manager), status=expect)
         return res
 
-    def user_unsubscribe_from_context(self, username, chash, expect=204):
+    def user_unsubscribe_user_from_context(self, username, chash, expect=204):
         """
             UnSubscribes an user to a context as himself
         """

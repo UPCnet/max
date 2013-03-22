@@ -57,7 +57,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
 
@@ -99,7 +99,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextB, permissions=context_permissions)
         self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
 
-        self.subscribe_user_to_context(username, subscribe_contextB)
+        self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
 
@@ -125,7 +125,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextB, permissions=context_permissions)
         self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
 
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
 
@@ -147,11 +147,11 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         self.create_context(create_contextB, permissions=context_permissions)
         self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextB)
+        self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
 
@@ -178,7 +178,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #ASSIGNATURA1')
 
@@ -201,7 +201,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
         processTweet('MAXUPCNET', u'Ehteee, acabo de batir el récor de goles en el Barça.')
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
@@ -224,7 +224,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('maxUpcnet', u'Ehteee, acabo de batir el récor de goles en el Barça.')
 
@@ -249,7 +249,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "Assignatura1"})
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #assignaTURA1')
 

@@ -47,7 +47,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
         activity = json.loads(res.text)
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
@@ -67,7 +67,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context_with_hashtag)
         activity = json.loads(res.text)
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment_with_hashtag), oauth2Header(username), status=201)
@@ -86,7 +86,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
         res = self.testapp.get('/activities', context_query_kw_search, oauth2Header(username), status=200)
@@ -105,8 +105,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username2 = 'xavi'
         self.create_user(username2)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username2, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username2, user_status_context)

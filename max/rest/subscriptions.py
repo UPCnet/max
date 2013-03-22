@@ -30,7 +30,7 @@ def getUserSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='POST')
+@view_config(route_name='admin_subscriptions', request_method='POST')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])

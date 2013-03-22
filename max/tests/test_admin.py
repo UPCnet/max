@@ -61,7 +61,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.testapp.post('/admin/people/%s/activities' % username, json.dumps(user_status_context), oauth2Header(test_manager))
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')

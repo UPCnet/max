@@ -117,8 +117,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_user(username_not_me)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username_not_me, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username_not_me, user_status_context)
         res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
@@ -155,9 +155,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
         self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
         self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_contextA)
-        self.subscribe_user_to_context(username_not_me, subscribe_contextA)
-        self.subscribe_user_to_context(username_not_me, subscribe_contextB)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextB)
         self.create_activity(username, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextB)
@@ -193,7 +193,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context_generator)
 
         result = json.loads(res.text)
@@ -211,8 +211,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context)
         self.create_context(create_contextA)
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
         self.create_activity(username, user_status)
         self.create_activity(username, user_status_context)
         self.create_activity(username, user_status_contextA)
@@ -233,7 +233,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         activity = self.create_activity(username, user_status)
         activity = activity.json
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
@@ -249,7 +249,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         activity = self.create_activity(username, user_status)
         activity = activity.json
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)

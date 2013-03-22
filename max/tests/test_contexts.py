@@ -52,7 +52,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
-        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(create_context), oauth2Header(test_manager), status=201)
+        self.testapp.post('/admin/people/%s/subscriptions' % username, json.dumps(create_context), oauth2Header(test_manager), status=201)
 
     def test_subscribe_to_context(self):
         """ doctest .. http:post:: /people/{username}/subscriptions """
@@ -62,7 +62,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
@@ -76,8 +76,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username, subscribe_context, expect=200)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=200)
         res = self.create_activity(username, user_status_context)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
@@ -88,7 +88,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         username = 'messi'
         self.create_user(username)
-        res = self.subscribe_user_to_context(username, subscribe_context, expect=404)
+        res = self.admin_subscribe_user_to_context(username, subscribe_context, expect=404)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
 
@@ -104,9 +104,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
         self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
         self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
-        self.subscribe_user_to_context(username, subscribe_contextA)
-        self.subscribe_user_to_context(username_not_me, subscribe_contextA)
-        self.subscribe_user_to_context(username, subscribe_contextB)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
         res = self.testapp.get('/people/%s/subscriptions' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
@@ -124,7 +124,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
 
         result = json.loads(res.text)
@@ -142,7 +142,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
 
         result = json.loads(res.text)
@@ -161,7 +161,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         context_permissions = dict(read='subscribed', write='restricted', join='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context, expect=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
@@ -287,8 +287,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context)
         self.create_context(create_contextA)
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
         self.create_activity(username, user_status_context)
         self.create_activity(username, user_status_contextA)
 
@@ -312,7 +312,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
         url_hash = sha1(create_context['object']['url']).hexdigest()
@@ -331,8 +331,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_user(username2)
         self.create_context(create_context)
-        self.subscribe_user_to_context(username, subscribe_context)
-        self.subscribe_user_to_context(username2, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username2, user_status_context)
 
@@ -366,7 +366,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_rw)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
@@ -379,7 +379,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
@@ -392,7 +392,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context, expect=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
@@ -402,7 +402,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_rw)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
@@ -416,7 +416,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
@@ -430,7 +430,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
         res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=200)
@@ -455,7 +455,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        self.subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['object']['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (chash, username), "", oauth2Header(test_manager), status=400)
         result = json.loads(res.text)

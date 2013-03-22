@@ -11,7 +11,7 @@ PUBLIC_RESOURCES = {
 
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented
 
-    'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
+    'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested (NEED DOC REVIEW)
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},  # (GET, POST) documented tested
@@ -48,6 +48,7 @@ RESTRICTED_RESOURCES = {
 
     'admin_user_activities': {'route': '/admin/people/{username}/activities'},  # (POST) documented tested
     'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},  # (POST) documented tested
+    'admin_subscriptions': {'route': '/admin/people/{username}/subscriptions'},  # (POST) documented tested (NEED DOC REVIEW)
     'admin_users': {'route': '/admin/people'},
     'admin_activities': {'route': '/admin/activities'},
     'admin_contexts': {'route': '/admin/contexts'},
