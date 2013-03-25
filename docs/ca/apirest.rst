@@ -42,7 +42,7 @@ resultats, indicant el total d'elements retornats::
     >>> from max.tests.mockers import create_context, subscribe_context, context_query, user_status
     >>> utils.create_context(create_context)
     <201 Created application/json body='{"display...>
-    >>> utils.subscribe_user_to_context(username, subscribe_context)
+    >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
     <201 Created application/json body='{"replies...>
 
 Usuaris

@@ -300,7 +300,7 @@ Contexts
 Subscripcions
 -------------
 
-.. http:post:: /people/{username}/subscriptions
+.. http:post:: /admin/people/{username}/subscriptions
 
     Subscriu l'usuari a un context determinat.
 
@@ -347,7 +347,7 @@ Subscripcions
             }
 
         .. -> expected
-            >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
+            >>> response = testapp.post('/admin/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json body='{"replies...>
             >>> response.json.get('displayName') == eval(expected).get('displayName')
