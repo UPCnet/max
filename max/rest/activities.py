@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.models import Activity
-from max.decorators import MaxRequest, MaxResponse, requirePersonActor
+from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max.exceptions import MissingField, ObjectNotFound
 

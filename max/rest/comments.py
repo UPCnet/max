@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.decorators import MaxRequest, MaxResponse, requirePersonActor
+from max.decorators import MaxResponse, requirePersonActor
 from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.utils import flatten
@@ -14,7 +14,6 @@ from bson.objectid import ObjectId
 
 @view_config(route_name='user_comments', request_method='GET')
 @MaxResponse
-@MaxRequest
 def getUserComments(context, request):
     """
     """
@@ -66,9 +65,15 @@ def addActivityComment(context, request):
     refering_activity = mmdb.activity[activityid]
 
     # Prepare rest parameters to be merged with post data
-    rest_params = {'verb': 'comment',
-                   'object': {'inReplyTo': [{'_id':ObjectId(activityid),
-                                             'objectType':refering_activity.object['objectType']}]}}
+    rest_params = {
+        'verb': 'comment',
+        'object': {
+            'inReplyTo': [{
+                '_id': ObjectId(activityid),
+                'objectType': refering_activity.object['objectType']
+            }]
+        }
+    }
 
     # Initialize a Activity object from the request
     newactivity = Activity(request)
