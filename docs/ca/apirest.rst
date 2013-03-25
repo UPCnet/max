@@ -39,8 +39,10 @@ resultats, indicant el total d'elements retornats::
     >>> utils = MaxTestBase(testapp)
     >>> utils.create_user(username)
     <201 Created application/json body='{"usernam...>
-    >>> from max.tests.mockers import create_context, subscribe_context, context_query, user_status
+    >>> from max.tests.mockers import create_context, create_contextA, subscribe_context, context_query, user_status
     >>> utils.create_context(create_context)
+    <201 Created application/json body='{"display...>
+    >>> utils.create_context(create_contextA)
     <201 Created application/json body='{"display...>
     >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
     <201 Created application/json body='{"replies...>
@@ -928,6 +930,77 @@ Representa el conjunt de comentaris fets a una activitat.
 Subscripcions
 --------------
 
+Subscripcions
+-------------
+
+.. http:post:: /people/{username}/subscriptions
+
+    Subscriu l'usuari a un context determinat. El context al qual es vol subscriure l'usuari ha de ser de tipus
+    public, sinó obtindrem un error d'autorització ``401 Unauthorized``
+
+    :query username: (REST) L'identificador de l'usuari al sistema.
+    :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure, en
+        aquest cas del tipus `context`. Hem de proporcionar un objecte amb les
+        claus ``objectType`` i el valor *context*, i la dada ``url`` del context.
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {
+                "object": {
+                    "objectType": "uri",
+                    "url": "http://atenea.upc.edu/A"
+                }
+            }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "object": {
+                    "url": "http://atenea.upc.edu/A",
+                    "objectType": "uri"
+                },
+                "actor": {
+                    "username": "messi",
+                    "displayName": "messi",
+                    "id": "511121f6aceee949e9da50d4",
+                    "objectType": "person"
+                },
+                "verb": "subscribe",
+                "published": "2013-02-05T15:15:02Z",
+                "id": "511121f6aceee949e9da50d6"
+            }
+
+        .. -> expected
+            >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json body='{"replies...>
+            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            True
+            >>> response.json.get('verb') == eval(expected).get('verb')
+            True
+
+    Success
+
+        Retorna un objecte del tipus ``Activity``.
+
+    Error
+
+        En cas que l'usuari no existeixi
+
+            .. code-block:: python
+
+                { "error_description": "Unknown user: messi", "error": "UnknownUserError" }
+
 Representa el conjunt de contextes als quals esta subscrit un usuari.
 
 .. http:get:: /people/{username}/subscriptions
@@ -945,7 +1018,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 2,
                 "items": [
                     {
                         "displayName": "Atenea",
