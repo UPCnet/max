@@ -23,6 +23,12 @@ def getContextActor(db, hash):
 
 
 def requirePersonActor(exists=True, force_own=True):
+    """
+        Requires the actor provided in the request to be of type Person.
+
+        exists:    Actor username must match an existing user on DB
+        force_own: Actor username must match the username provided in auhentication
+    """
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
@@ -81,6 +87,11 @@ def requirePersonActor(exists=True, force_own=True):
 
 
 def requireContextActor(exists=True):
+    """
+        Requires the actor provided in the request to be of type Context.
+
+        exists:    Actor context must match an existing context on DB
+    """
     def wrap(view_function):
         def new_function(*args, **kw):
             nkargs = [a for a in args]
