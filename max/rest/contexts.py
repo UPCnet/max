@@ -160,7 +160,7 @@ def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'join', 'invite']:
+    if permission not in ['read', 'write', 'subscribe', 'invite']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     chash = request.matchdict.get('hash', None)
@@ -199,7 +199,7 @@ def revokePermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'join', 'invite']:
+    if permission not in ['read', 'write', 'subscribe', 'invite']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     chash = request.matchdict.get('hash', None)

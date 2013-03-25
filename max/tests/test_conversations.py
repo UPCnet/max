@@ -61,7 +61,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
         conversation = self.app.registry.max_store.contexts.find_one()
-        permissions = {'read': 'subscribed', 'write': 'subscribed', 'join': 'restricted', 'invite': 'restricted'}
+        permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'invite': 'restricted'}
         participants = list([sender, recipient])
         participants.sort()
         alltogether = ''.join(participants)

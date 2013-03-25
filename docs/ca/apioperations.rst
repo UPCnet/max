@@ -122,7 +122,7 @@ Contexts
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "join": "public",
+                    "subscribe": "public",
                     "invite": "public"
                 }
             }
@@ -182,7 +182,7 @@ Contexts
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "join": "public",
+                    "subscribe": "public",
                     "invite": "public"
                 }
             }
@@ -228,7 +228,7 @@ Contexts
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "join": "public",
+                    "subscribe": "public",
                     "invite": "public"
                 }
             }
@@ -448,7 +448,8 @@ s'explica amb profunditat en l'apartat de permisos.
                 "id": "51116029e999fb0cb57338b3",
                 "permissions": [
                     "read",
-                    "invite"
+                    "invite",
+                    "unsubscribe"
                 ]
             }
 

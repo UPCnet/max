@@ -152,9 +152,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
-        self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
-        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
-        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
         self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
         self.admin_subscribe_user_to_context(username_not_me, subscribe_contextB)

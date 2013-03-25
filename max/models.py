@@ -184,7 +184,6 @@ class User(MADBase):
         """
             Adds a comment to an existing activity
         """
-        #XXX TODO Check authentication method, and if is oauth, check if user can auto join the context.
         subscription = context.prepareUserSubscription()
         self.addToList('subscribedTo', subscription, safe=False)
 
@@ -253,7 +252,7 @@ class Context(MADBase):
               'twitterUsernameId':  dict(operations_mutable=1),
               'permissions':        dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
                                                   'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
-                                                  'join': DEFAULT_CONTEXT_PERMISSIONS['join'],
+                                                  'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
                                                   'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
                                                   }
                                          ),
@@ -325,6 +324,8 @@ class Context(MADBase):
             user_permissions.append('write')
         if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
             user_permissions.append('invite')
+        if permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) in ['public']:
+            user_permissions.append('unsubscribe')
 
         #Assign permissions to the subscription object before adding it
         subscription['permissions'] = user_permissions

@@ -54,7 +54,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
@@ -74,7 +74,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
 
@@ -91,7 +91,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
@@ -117,7 +117,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
@@ -143,7 +143,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
@@ -175,7 +175,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
@@ -198,7 +198,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_contextA, subscribe_contextA
         username = 'messi'
         self.create_user(username)
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
@@ -221,7 +221,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_contextA, subscribe_contextA
         username = 'messi'
         self.create_user(username)
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
@@ -246,7 +246,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
         self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "Assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)

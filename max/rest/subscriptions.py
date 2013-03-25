@@ -2,7 +2,9 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 
-from max.oauth2 import oauth2, restricted
+from max import DEFAULT_CONTEXT_PERMISSIONS
+from max.oauth2 import oauth2
+from max.exceptions import Unauthorized, ObjectNotFound
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxCollection
 from max.models import Activity
@@ -26,7 +28,9 @@ def getUserSubscriptions(context, request):
     query = {'username': request.actor['username']}
     users = mmdb.users.search(query, show_fields=["username", "subscribedTo"], flatten=1, **searchParams(request))
 
-    handler = JSONResourceRoot(users)
+    if len(users) == 0:
+        raise ObjectNotFound('User {0} is not subscribed to any context').format(request.actor['username'])
+    handler = JSONResourceRoot(users[0]['subscribedTo']['items'])
     return handler.buildResponse()
 
 
@@ -64,6 +68,9 @@ def subscribe(context, request):
         #Register subscription to the actor
         contexts = MADMaxCollection(context.db.contexts, query_key='hash')
         scontext = contexts[newactivity['object'].getHash()]
+        if scontext.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted':
+            raise Unauthorized('User {0} cannot subscribe himself to to this context'.format(actor['username']))
+
         actor.addSubscription(scontext)
 
         # If user wasn't created, 201 will show that the subscription has just been added

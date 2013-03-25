@@ -26,6 +26,12 @@ WRITE
     - public -  Qualsevol usuari sense esta subscrit al context poden escriure
       al context
 
+SUBSCRIBE
+~~~~~~~~~
+
+    - restricted - Només els usuaris administradors poden efectuar subscripcions al context
+    - public - Qualsevol usuari pot subscriure's al context (i dessubscriure's)
+
 Si no s'especifiquen en la creació del context, els permisos per defecte són:
 
-    read='public', write='public', join='public', invite='public'
+    read='public', write='public', subscribe='public', invite='public'

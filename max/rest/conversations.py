@@ -74,7 +74,7 @@ def postMessage2Conversation(context, request):
                                object=ctxts[0],
                                permissions={'read': 'subscribed',
                                             'write': 'subscribed',
-                                            'join': 'restricted',
+                                            'subscribe': 'restricted',
                                             'invite': 'restricted'},
                                hash=Conversation(ctxts[0]).getHash()
                                )

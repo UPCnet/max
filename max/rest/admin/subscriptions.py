@@ -57,7 +57,7 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='DELETE')
+@view_config(route_name='admin_subscriptions', request_method='DELETE')
 def unsubscribe(context, request):
     """
     """

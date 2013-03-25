@@ -38,7 +38,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_create_context(self):
         """ doctests .. http:post:: /contexts"""
         from .mockers import create_context
-        permissions = dict(read='public', write='restricted', join='restricted', invite='restricted')
+        permissions = dict(read='public', write='restricted', subscribe='restricted', invite='restricted')
         default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
         new_context = dict(create_context)
         if 'permissions' not in new_context:
@@ -51,7 +51,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         username = 'messi'
         self.create_user(username)
-        self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
         self.testapp.post('/admin/people/%s/subscriptions' % username, json.dumps(create_context), oauth2Header(test_manager), status=201)
 
     def test_subscribe_to_context(self):
@@ -101,20 +101,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
-        self.create_context(create_context, permissions=dict(read='public', write='restricted', join='restricted', invite='restricted'))
-        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
-        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
         self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
         self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
         res = self.testapp.get('/people/%s/subscriptions' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('username', None), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('totalItems'), 2)
-        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('items')[0].get('object').get('url'), 'http://atenea.upc.edu/A')
-        self.assertEqual(result.get('items', None)[0].get('subscribedTo', None).get('items')[1].get('object').get('url'), 'http://atenea.upc.edu/B')
+        self.assertEqual(result.get('totalItems'), 2)
+        self.assertEqual(result.get('items')[0].get('object').get('url'), 'http://atenea.upc.edu/A')
+        self.assertEqual(result.get('items')[1].get('object').get('url'), 'http://atenea.upc.edu/B')
 
     def test_post_activity_with_public_context(self):
         """ Post an activity to a context which allows everyone to read and write
@@ -140,7 +138,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import user_status_context
         username = 'messi'
         self.create_user(username)
-        context_permissions = dict(read='subscribed', write='subscribed', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
@@ -159,7 +157,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import user_status_context
         username = 'messi'
         self.create_user(username)
-        context_permissions = dict(read='subscribed', write='restricted', join='restricted', invite='restricted')
+        context_permissions = dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context, expect=401)

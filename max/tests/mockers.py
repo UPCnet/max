@@ -124,7 +124,7 @@ create_context_private_rw = {
     'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'subscribed',
-                    'join': 'restricted',
+                    'subscribe': 'restricted',
                     'invite': 'restricted'}
 }
 
@@ -137,7 +137,7 @@ create_context_private_r = {
     'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'restricted',
-                    'join': 'restricted',
+                    'subscribe': 'restricted',
                     'invite': 'restricted'}
 
 }

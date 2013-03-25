@@ -46,7 +46,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         username = 'messi'
         self.create_user(username)
-        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context)
         activity = json.loads(res.text)
@@ -66,7 +66,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         username = 'messi'
         self.create_user(username)
-        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.create_activity(username, user_status_context_with_hashtag)
         activity = json.loads(res.text)
@@ -85,7 +85,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         username = 'messi'
         self.create_user(username)
-        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
@@ -104,7 +104,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         username2 = 'xavi'
         self.create_user(username2)
-        self.create_context(create_context, permissions=dict(read='public', write='subscribed', join='restricted', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)

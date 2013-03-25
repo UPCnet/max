@@ -628,7 +628,7 @@ concret.
                     "permissions": {
                         "write": "public",
                         "read": "public",
-                        "join": "public",
+                        "subscribe": "public",
                         "invite": "subscribed"
                     }
                 }
@@ -948,28 +948,19 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                 "totalItems": 1,
                 "items": [
                     {
-                        "username": "messi",
-                        "id": "51112aafaceee94e58dcf34d",
-                        "subscribedTo": {
-                            "totalItems": 1,
-                            "items": [
-                                {
-                                    "displayName": "Atenea",
-                                    "object": {
-                                        "url": "http://atenea.upc.edu",
-                                        "objectType": "uri"
-                                    },
-                                    "published": "2013-02-05T15:52:15Z",
-                                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                                    "id": "51112aafaceee94e58dcf34e",
-                                    "permissions": [
-                                        "read",
-                                        "write",
-                                        "invite"
-                                    ]
-                                }
-                            ]
-                        }
+                        "displayName": "Atenea",
+                        "object": {
+                            "url": "http://atenea.upc.edu",
+                            "objectType": "uri"
+                        },
+                        "published": "2013-02-05T15:52:15Z",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "id": "51112aafaceee94e58dcf34e",
+                        "permissions": [
+                            "read",
+                            "write",
+                            "invite"
+                        ]
                     }
                 ]
             }
@@ -978,8 +969,6 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
             >>> response = testapp.get('/people/{}/subscriptions'.format(username), "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json body='{"totalIt...>
-            >>> response.json.get('items')[0].get('subscribedTo').get('totalItems') == eval(expected).get('items')[0].get('subscribedTo').get('totalItems')
-            True
             >>> response.json.get('totalItems') == eval(expected).get('totalItems')
             True
 
@@ -1214,7 +1203,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                         "permissions": {
                             "read": "subscribed",
                             "write": "subscribed",
-                            "join": "restricted",
+                            "subscribe": "restricted",
                             "invite": "restricted"
                         }
                     }
