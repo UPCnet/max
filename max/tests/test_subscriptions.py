@@ -143,23 +143,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         username = 'messi'
         self.create_user(username)
-        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', join='public', invite='restricted'))
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertIn('unsubscribe', result['items'][0]['permissions'])
 
-    # def test_list_all_public_subcribtable_contexts(self):
-    #     """
-    #         Create one public context and a restricted one, then list the contexts filtered by join permission=public
-    #     """
-    #     from .mockers import create_context, create_contextA
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', join='public', invite='restricted'))
-    #     self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     res = self.testapp.get('/contexts/public' % username, {}, oauth2Header(username), status=200)
-    #     result = json.loads(res.text)
+    def test_list_all_public_subcribable_contexts(self):
+        """
+            As a plain user
+            When i look for public contexts
+            Then i get a list with only the public ones
+        """
+        from .mockers import create_context, create_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        res = self.testapp.get('/contexts/public', {}, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result['totalItems'], 1)
 
     def test_unsubscribe_from_inexistent_subscription_as_plain_user(self):
         """
@@ -268,7 +271,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     #     from .mockers import subscribe_context
     #     username = 'messi'
     #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', join='public', invite='restricted'))
+    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
     #     self.user_subscribe_user_to_context(username, subscribe_context, expect=200)
     #     self.user_unsubscribe_user_from_context(username, subscribe_context, expect=401)
 

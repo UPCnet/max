@@ -90,7 +90,8 @@ Contexts
         s'importarà i apareixerà a l'activitat del context com activitat
         (impersonat) del propi context.
     :query permissions: (Opcional) Els permisos i parametrització de seguretat
-        relacionada amb el context.
+        relacionada amb el context. Per defecte els contextos són públics a tots
+        els efectes.
 
     Cos de la petició
 

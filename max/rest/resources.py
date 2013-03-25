@@ -10,6 +10,7 @@ PUBLIC_RESOURCES = {
     'comments': {'route': '/activities/{activity}/comments'},  # (GET, POST) documented tested
 
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented
+    'public_contexts': {'route': '/contexts/public'},  # (GET)
 
     'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
     'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # (DELETE) documented tested

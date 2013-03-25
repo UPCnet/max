@@ -75,7 +75,7 @@ def getActivities(context, request):
     """
          /activities
 
-         Return all activities, optionaly filtered by context.
+         Return all activities, filtered by context.
     """
     chash = request.params.get('context', None)
     if not chash:

@@ -930,6 +930,70 @@ Representa el conjunt de comentaris fets a una activitat.
 Subscripcions
 -------------
 
+
+.. http:get:: /contexts/public
+
+    Dona una llista de tots els contextes als qual un usuari es pot subscriure lliurement
+
+    Cos de la petició
+
+        Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 2,
+                "items": [
+                    {
+                        "displayName": "Atenea",
+                        "object": {
+                            "url": "http://atenea.upc.edu",
+                            "objectType": "uri"
+                        },
+                        "published": "2013-03-25T12:23:13Z",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "id": "515041b1fcfff25b557f72f6",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
+                        }
+                    },
+                    {
+                        "displayName": "Atenea A",
+                        "object": {
+                            "url": "http://atenea.upc.edu/A",
+                            "objectType": "uri"
+                        },
+                        "published": "2013-03-25T12:23:13Z",
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
+                        "id": "515041b1fcfff25b557f72f7",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
+                        }
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/contexts/public', payload, oauth2Header(username), status=200)
+            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            True
+            >>> response.json.get('items')[0]['object']['objectType'] == eval(expected).get('items')[0]['object']['objectType']
+            True
+
+
+    Success
+
+        Retorna un objecte del tipus ``Activity``.
+
+
 .. http:post:: /people/{username}/subscriptions
 
     Subscriu l'usuari a un context determinat. El context al qual es vol subscriure l'usuari ha de ser de tipus

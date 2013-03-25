@@ -123,6 +123,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username_not_me, user_status_context)
         res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
         result = json.loads(res.text)
+        self.assertIn('context', result)
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')

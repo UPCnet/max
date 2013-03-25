@@ -32,7 +32,7 @@ class MaxTestBase(object):
         return res
 
     def create_context(self, context, permissions=None, expect=201):
-        default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
+        default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(context)
         if 'permissions' not in new_context:
             new_context['permissions'] = default_permissions

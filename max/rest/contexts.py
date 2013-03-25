@@ -8,7 +8,7 @@ from max.models import Context
 from max.oauth2 import oauth2, restricted
 from max.decorators import MaxResponse, requirePersonActor
 from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
-from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 import os
 
 from max.rest.utils import downloadTwitterUserImage
@@ -33,6 +33,23 @@ def getContext(context, request):
         raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
     handler = JSONResourceEntity(found_context[0].flatten())
+    return handler.buildResponse()
+
+
+@view_config(route_name='public_contexts', request_method='GET')
+@MaxResponse
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+def getPublicContexts(context, request):
+    """
+        /contexts/public
+
+        Return a list of public-subscribable contexts
+    """
+    mmdb = MADMaxDB(context.db)
+    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, flatten=1)
+
+    handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
 
 

@@ -39,7 +39,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ doctests .. http:post:: /contexts"""
         from .mockers import create_context
         permissions = dict(read='public', write='restricted', subscribe='restricted', invite='restricted')
-        default_permissions = dict(read='public', write='public', join='public', invite='subscribed')
+        default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(create_context)
         if 'permissions' not in new_context:
             new_context['permissions'] = default_permissions
