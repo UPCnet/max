@@ -12,6 +12,7 @@ PUBLIC_RESOURCES = {
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented
 
     'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
+    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # (DELETE) documented tested
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},  # (GET, POST) documented tested
@@ -29,7 +30,6 @@ PUBLIC_RESOURCES = {
 
     # Not implemented / Not in roadmap
     'user_comments': {'route': '/people/{username}/comments'},  # not implemented
-    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # not implemented
     'user_conversations': {'route': '/people/{username}/conversations'},  # not implemented
     'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
     'context_permissions': {'route': '/contexts/{hash}/permissions'},  # not implemented
@@ -49,6 +49,7 @@ RESTRICTED_RESOURCES = {
     'admin_user_activities': {'route': '/admin/people/{username}/activities'},  # (POST) documented tested
     'admin_context_activities': {'route': '/admin/contexts/{hash}/activities'},  # (POST) documented tested
     'admin_subscriptions': {'route': '/admin/people/{username}/subscriptions'},  # (POST) documented tested
+    'admin_subscription': {'route': '/admin/people/{username}/subscriptions/{hash}'},  # (DELETE) documented tested
     'admin_users': {'route': '/admin/people'},
     'admin_activities': {'route': '/admin/activities'},
     'admin_contexts': {'route': '/admin/contexts'},

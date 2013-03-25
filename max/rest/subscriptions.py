@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNoContent
 
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.oauth2 import oauth2
@@ -81,11 +81,31 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='DELETE')
+@view_config(route_name='subscription', request_method='DELETE')
+@MaxResponse
+@requirePersonActor(force_own=True)
+@oauth2(['widgetcli'])
 def unsubscribe(context, request):
     """
     """
-    return HTTPNotImplemented()
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
+    chash = request.matchdict.get('hash', None)
+    subscription = actor.getSubscriptionByHash(chash)
+
+    if subscription is None:
+        raise ObjectNotFound("User {0} is not subscribed to context with hash: {1}".format(actor.username, chash))
+
+    if 'unsubscribe' not in subscription.get('permissions', []):
+        raise Unauthorized('User {0} cannot unsubscribe himself from this context'.format(actor.username))
+
+    found_context = mmdb.contexts.getItemsByhash(chash)
+
+    if not found_context:
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
+
+    found_context[0].removeUserSubscriptions(users_to_delete=[actor.username])
+    return HTTPNoContent()
 
 
 ###################### Per comprovar els follows/unfollows al afegir, cal comprovar que no el segueixi previament

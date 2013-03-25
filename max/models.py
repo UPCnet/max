@@ -344,14 +344,17 @@ class Context(MADBase):
             what = {'$set': {'subscribedTo.items.$.displayName': self.displayName}}
             self.mdb_collection.database.users.update(criteria, what)
 
-    def removeUserSubscriptions(self):
+    def removeUserSubscriptions(self, users_to_delete=[]):
         """
+            Removes all users subscribed to the context, or only specifiyed
+            user if userd_to_delete is provided
         """
         usersdb = MADMaxCollection(self.mdb_collection.database.users)
         criteria = {'subscribedTo.items.hash': self.hash}
         users = usersdb.search(criteria)
         for user in users:
-            user.removeSubscription(self.hash)
+            if users_to_delete == [] or user.username in users_to_delete:
+                user.removeSubscription(self.hash)
 
 
 class Security(MADBase):

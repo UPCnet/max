@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNoContent
 
+from max.exceptions import ObjectNotFound
 from max.oauth2 import oauth2, restricted
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.MADMax import MADMaxDB
-from max.rest.utils import searchParams
-from max.rest.ResourceHandlers import JSONResourceRoot
 
 
 @view_config(route_name='admin_subscriptions', request_method='POST')
@@ -57,8 +56,26 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_subscriptions', request_method='DELETE')
+@view_config(route_name='admin_subscription', request_method='DELETE')
+@MaxResponse
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+@restricted(['Manager'])
 def unsubscribe(context, request):
     """
     """
-    return HTTPNotImplemented()
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
+    chash = request.matchdict.get('hash', None)
+    subscription = actor.getSubscriptionByHash(chash)
+
+    if subscription is None:
+        raise ObjectNotFound("User {0} is not subscribed to context with hash: {1}".format(actor.username, chash))
+
+    found_context = mmdb.contexts.getItemsByhash(chash)
+
+    if not found_context:
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
+
+    found_context[0].removeUserSubscriptions(users_to_delete=[actor.username])
+    return HTTPNoContent()

@@ -1042,7 +1042,40 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
             >>> response.json.get('totalItems') == eval(expected).get('totalItems')
             True
 
+.. http:delete:: /people/{username}/subscriptions/{hash}
 
+    Elimina la subscripció d'un usuari, si l'usuari té permis per dessubscriure's.
+    NO esborra les activitats que s'hagin creat previament al context del qual ens hem dessubscrit. Tot i que les activitats que queden a la base de dades no es poden consultar directament, en el timeline de un usuari coninuarà veient les activitats que va crear ell.
+
+    :query username: (REST) L'identificador de l'usuari al sistema.
+    :query hash: (REST) El hash del context la subscripció al qual es vol esborrar. Aquest hash es calcula
+        fent una suma de verificació sha1 dels paràmetres del context
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+.. Create the context unsubscribe and subcribe user to it
+
+    >>> create_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "uri" } }
+    >>> resp = utils.create_context(create_context_d)
+    >>> context_hash_for_deleting = resp.json.get('hash')
+    >>> utils.admin_subscribe_user_to_context(username, create_context_d)
+    <201 Created application/json body='{"replies...>
+
+
+    Resposta esperada
+
+        Retorna un codi HTTP 204 (deleted) amb el cos buit
+
+        .. actual test
+            >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(username), status=204)
+            >>> response
+            <204 No Content no body>
+
+    Success
+
+        Retorna un codi HTTP 204 (deleted) amb el cos buit
 
 
 Missatges i converses

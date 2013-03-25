@@ -123,7 +123,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
             As a plain user
             When I subscribe to a public subscription context
-            Then the subscription process fail
+            Then i get an authorization error
         """
         from .mockers import create_context
         from .mockers import subscribe_context
@@ -161,57 +161,103 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     #     res = self.testapp.get('/contexts/public' % username, {}, oauth2Header(username), status=200)
     #     result = json.loads(res.text)
 
-    # def test_unsubscribe_from_restricted_context_as_plain_user(self):
-    #     """
-    #         Create a restricted context, make admin subscribe the user, user fails to removes subscription
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     self.admin_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     url_hash = sha1(create_context['object']['url']).hexdigest()
-    #     res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=401)
-    #     result = json.loads(res.text)
+    def test_unsubscribe_from_inexistent_subscription_as_plain_user(self):
+        """
+            As a plain user
+            When I try to unsubscribe from a context
+            And I'm not subscribed to that context
+            Then I get a not found error
+        """
+        from .mockers import create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=404)
 
-    # def test_unsubscribe_from_restricted_context_as_admin(self):
-    #     """
-    #         Create a restricted context, make admin subscribe the user, admin successfully removes subscription
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     self.admin_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     url_hash = sha1(create_context['object']['url']).hexdigest()
-    #     res = self.testapp.delete('/admin/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=200)
-    #     result = json.loads(res.text)
+    def test_unsubscribe_from_inexistent_subscription_as_admin(self):
+        """
+            As an admin user
+            When I try to unsubscribe a user from a context
+            And the user is not subscribed to that context
+            Then I get a not found error
+        """
+        from .mockers import create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/admin//people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=404)
 
-    # def test_unsubscribe_from_public_context_as_plain_user(self):
-    #     """
-    #         Create a restricted context, user subscribes himself, user successfully removes subscription
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     self.user_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     self.user_unsubscribe_from_context(username, subscribe_context, expect=200)
+    def test_unsubscribe_from_restricted_context_as_plain_user(self):
+        """
+            As a plain user
+            When I try to unsubscribe from a restricted subscription context
+            Then i get an authorization error
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=401)
 
-    # def test_unsubscribe_from_public_context_as_admin(self):
-    #     """
-    #         Create a restricted context, user subscribes himself, admin succesfully removes subscription
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     self.user_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     self.unsubscribe_from_context(username, subscribe_context, expect=200)
+    def test_unsubscribe_from_restricted_context_as_admin(self):
+        """
+            As a admin user
+            When I try to unsubscribe a plain user from a restricted subscription context
+            Then the user is not subscribed to the context anymore
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.testapp.delete('/admin/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result['totalItems'], 0)
+
+    def test_unsubscribe_from_public_context_as_plain_user(self):
+        """
+            As a plain user
+            When I try to unsubscribe from a public subscription context
+            Then I am not subscribed to the context anymore
+
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.user_unsubscribe_user_from_context(username, url_hash, expect=204)
+        res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result['totalItems'], 0)
+
+    def test_unsubscribe_from_public_context_as_admin(self):
+        """
+            As a admin user
+            When I try to unsubscribe a plain user from a public subscription context
+            Then I am not subscribed to the context anymore
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        self.admin_unsubscribe_user_from_context(username, url_hash, expect=204)
+        res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result['totalItems'], 0)
 
     # def test_change_public_context_to_restricted(self):
     #     """
