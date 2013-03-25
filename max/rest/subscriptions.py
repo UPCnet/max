@@ -30,16 +30,15 @@ def getUserSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_subscriptions', request_method='POST')
+@view_config(route_name='subscriptions', request_method='POST')
 @MaxResponse
-@requirePersonActor(force_own=False)
+@requirePersonActor(force_own=True)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
 
-        [RESTRICTED] Subscribe an username to the suplied context.
+        [RESTRICTED] Subscribe the actor to the suplied context.
     """
     # XXX For now only one context can be subscribed at a time
     actor = request.actor
@@ -61,16 +60,16 @@ def subscribe(context, request):
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
-        # If user wasn't created, 201 indicates that the subscription has just been added
-        code = 201
-        newactivity_oid = newactivity.insert()  # Insert a subscribe activity
-        newactivity['_id'] = newactivity_oid
 
         #Register subscription to the actor
         contexts = MADMaxCollection(context.db.contexts, query_key='hash')
         scontext = contexts[newactivity['object'].getHash()]
         actor.addSubscription(scontext)
 
+        # If user wasn't created, 201 will show that the subscription has just been added
+        code = 201
+        newactivity_oid = newactivity.insert()  # Insert a subscribe activity
+        newactivity['_id'] = newactivity_oid
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
