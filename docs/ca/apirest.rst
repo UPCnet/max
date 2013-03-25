@@ -928,9 +928,6 @@ Representa el conjunt de comentaris fets a una activitat.
 
 
 Subscripcions
---------------
-
-Subscripcions
 -------------
 
 .. http:post:: /people/{username}/subscriptions

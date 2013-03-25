@@ -16,7 +16,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 
 @view_config(route_name='subscriptions', request_method='GET')
 @MaxResponse
-@requirePersonActor
+@requirePersonActor(force_own=True)
 @oauth2(['widgetcli'])
 def getUserSubscriptions(context, request):
     """
