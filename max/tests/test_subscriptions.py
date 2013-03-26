@@ -105,7 +105,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_get_subscriptions_from_another_user(self):
         """
-            As a plain user
+            Given a plain user
             When I try to get another user subscriptions list
             Then i get an authorization error
         """
@@ -121,7 +121,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_subcribe_to_restricted_context_as_plain_user(self):
         """
-            As a plain user
+            Given a plain user
             When I subscribe to a public subscription context
             Then i get an authorization error
         """
@@ -134,7 +134,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_subscribe_to_public_context_as_plain_user(self):
         """
-            As a plain user
+            Given a plain user
             When I subscribe to a public subscription context
             Then the subscription is created
             And I will be able to unsubscribe in the future
@@ -151,7 +151,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_list_all_public_subcribable_contexts(self):
         """
-            As a plain user
+            Given a plain user
             When i look for public contexts
             Then i get a list with only the public ones
         """
@@ -166,7 +166,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_unsubscribe_from_inexistent_subscription_as_plain_user(self):
         """
-            As a plain user
+            Given a plain user
             When I try to unsubscribe from a context
             And I'm not subscribed to that context
             Then I get a not found error
@@ -194,7 +194,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_unsubscribe_from_restricted_context_as_plain_user(self):
         """
-            As a plain user
+            Given a plain user
             When I try to unsubscribe from a restricted subscription context
             Then i get an authorization error
         """
@@ -209,7 +209,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_unsubscribe_from_restricted_context_as_admin(self):
         """
-            As a admin user
+            Given a admin user
             When I try to unsubscribe a plain user from a restricted subscription context
             Then the user is not subscribed to the context anymore
         """
@@ -227,7 +227,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_unsubscribe_from_public_context_as_plain_user(self):
         """
-            As a plain user
+            Given a plain user
             When I try to unsubscribe from a public subscription context
             Then I am not subscribed to the context anymore
 
@@ -246,7 +246,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_unsubscribe_from_public_context_as_admin(self):
         """
-            As a admin user
+            Given a admin user
             When I try to unsubscribe a plain user from a public subscription context
             Then I am not subscribed to the context anymore
         """
