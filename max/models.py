@@ -18,10 +18,15 @@ class Activity(MADBase):
               'verb':        dict(required=1),
               'object':      dict(required=1),
               'published':   dict(required=0),
+              'commented':   dict(required=0),
               'contexts':    dict(required=0),
               'replies':     dict(required=0, default={'items': [], 'totalItems': 0}),
               'generator':   dict(required=0),
               }
+
+    def setDates(self):
+        super(Activity, self).setDates()
+        self['commented'] = datetime.datetime.utcnow()
 
     def buildObject(self):
         """
@@ -90,6 +95,12 @@ class Activity(MADBase):
                 properties[key] = default
         self.update(properties)
 
+    def modifyActivity(self, properties):
+        """Update the Activity object with the given properties"""
+
+        self.updateFields(properties)
+        self.save()
+
     def addComment(self, comment):
         """
             Adds a comment to an existing activity and updates refering activity keywords and hashtags
@@ -98,16 +109,14 @@ class Activity(MADBase):
 
         activity_keywords = self.object.setdefault('_keywords', [])
         activity_keywords.extend(comment.get('_keywords', []))
-        activity_keywords = list(set(activity_keywords))
+        self.object['_keywords'] = list(set(activity_keywords))
 
         activity_hashtags = self.object.setdefault('_hashtags', [])
         activity_hashtags.extend(comment.get('_hashtags', []))
-        activity_hashtags = list(set(activity_hashtags))
+        self.object['_hashtags'] = list(set(activity_hashtags))
+        self.commented = comment['published']
 
-        self.mdb_collection.update({'_id': self['_id']},
-                                   {'$set': {'object._keywords': activity_keywords,
-                                             'object._hashtags': activity_hashtags}}
-                                   )
+        self.save()
 
     def _on_create_custom_validations(self):
         """

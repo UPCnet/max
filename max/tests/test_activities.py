@@ -259,3 +259,50 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('author', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('objectType', None), 'comment')
+
+    def test_timeline_order_sorted_by_last_comment_publish_date(self):
+        """
+            Given a plain user
+            When I post activities
+            and I comment on an old activity
+            Then the in the coment-sorted timeline, the commented activity becomes the first
+        """
+        from .mockers import user_status, user_comment
+        from time import sleep
+        username = 'messi'
+        self.create_user(username)
+        activity_0_id = self.create_activity(username, user_status).json['id']
+        sleep(1)
+        activity_1_id = self.create_activity(username, user_status).json['id']
+        sleep(1)
+        activity_2_id = self.create_activity(username, user_status).json['id']
+        sleep(1)
+        res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.get('/people/%s/timeline?sortBy=comments' % username, "", oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems', None), 3)
+        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_1_id)
+        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_2_id)
+        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)
+
+    def test_timeline_order_sorted_by_activity_publish_date(self):
+        """
+            Given a plain user
+            When I post activities
+            and I comment on an old activity
+            Then the in the activities-sorted timeline, the order equals the activity order
+        """
+        from .mockers import user_status, user_comment
+        from time import sleep
+        username = 'messi'
+        self.create_user(username)
+        activity_0_id = self.create_activity(username, user_status).json['id']
+        activity_1_id = self.create_activity(username, user_status).json['id']
+        activity_2_id = self.create_activity(username, user_status).json['id']
+        res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.get('/people/%s/timeline?sortBy=activities' % username, "", oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems', None), 3)
+        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_2_id)
+        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_1_id)
+        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)

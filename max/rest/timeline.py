@@ -58,7 +58,13 @@ def getUserTimeline(context, request):
         query['verb'] = 'post'
         #Exclude messages from timeline
         query['object.objectType'] = {'$ne': 'message'}
-        activities = mmdb.activity.search(query, sort="_id", flatten=1, **searchParams(request))
+
+        sortBy_fields = {
+            'activities': '_id',
+            'comments': 'commented',
+        }
+        sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
+        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, **searchParams(request))
     else:
         activities = []
 
