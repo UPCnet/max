@@ -21,7 +21,7 @@ class MADDict(dict):
             Allow only fields defined in schema to be inserted in the dict
             ignore non schema values
         """
-        if key in self.schema.keys():
+        if key in object.__getattribute__(self, 'schema'):
             dict.__setitem__(self, key, val)
         else:
             pass
@@ -39,19 +39,19 @@ class MADDict(dict):
             Enables setting values of dict's items trough attribute assignment,
             while preserving default setting of class attributes
         """
-        if hasattr(self, key):
-            dict.__setattr__(self, key, value)
-        else:
+        if key in object.__getattribute__(self, 'schema'):
             self.__setitem__(key, value)
+        else:
+            object.__setattr__(self, key, value)
 
     def __getattr__(self, key):
         """
             Maps dict items access to attributes, while preserving access to class attributes
         """
         try:
-            return self.__getattribute__(key)
+            return object.__getattribute__(self, key)
         except AttributeError:
-            return self.__getitem__(key)
+            return dict.__getitem__(self, key)
 
     def _on_create_custom_validations(self):
         return True
@@ -193,6 +193,9 @@ class MADBase(MADDict):
             self.mdb_collection = request.context.db[self.collection]
         self.data = RUDict({})
 
+    def setDates(self):
+        self['published'] = datetime.datetime.utcnow()
+
     def fromRequest(self, request, rest_params={}):
 
         self.data.update(extractPostData(request))
@@ -208,8 +211,9 @@ class MADBase(MADDict):
         #check if the object we pretend to create already exists
         existing_object = self.alreadyExists()
         if not existing_object:
-            # if we are creating a new object, set the current date and build
-            self['published'] = datetime.datetime.utcnow()
+            # if we are creating a new object, set the object dates.
+            # It uses MADBase.setDates as default, override to set custom dates
+            self.setDates()
             self._on_create_custom_validations()
             self.buildObject()
         else:
