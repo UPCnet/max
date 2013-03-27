@@ -158,13 +158,15 @@ def DeleteContext(context, request):
     """
     mmdb = MADMaxDB(context.db)
     chash = request.matchdict.get('hash', None)
-    found_context = mmdb.contexts.getItemsByhash(chash)
+    found_contexts = mmdb.contexts.getItemsByhash(chash)
 
-    if not found_context:
+    if not found_contexts:
         raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
-    found_context[0].delete()
-    found_context[0].removeUserSubscriptions()
+    ctx = found_contexts[0]
+    ctx.removeUserSubscriptions()
+    ctx.removeActivities(logical=True)
+    ctx.delete()
     return HTTPNoContent()
 
 

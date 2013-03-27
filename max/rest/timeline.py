@@ -56,8 +56,11 @@ def getUserTimeline(context, request):
     if query_items:
         query = {'$or': query_items}
         query['verb'] = 'post'
-        #Exclude messages from timeline
+        # Exclude messages from timeline
         query['object.objectType'] = {'$ne': 'message'}
+        # Include only visible activity, this includes activity with visible=True
+        # and activity WITHOUT the visible field
+        query['visible'] = {'$ne': False}
 
         sortBy_fields = {
             'activities': '_id',

@@ -365,6 +365,17 @@ class Context(MADBase):
             if users_to_delete == [] or user.username in users_to_delete:
                 user.removeSubscription(self.hash)
 
+    def removeActivities(self, logical=False):
+        """
+            Removes all activity posted to a context. If logical is set to True
+            Activities are not actually deleted, only marked as not visible
+        """
+        activitydb = MADMaxCollection(self.mdb_collection.database.activity)
+        which_to_delete = {
+            'contexts.hash': self.hash
+        }
+        activitydb.remove(which_to_delete, logical=logical)
+
 
 class Security(MADBase):
     """

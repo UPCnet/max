@@ -187,6 +187,15 @@ class MADMaxCollection(object):
 
         return self.search({}, flatten=flatten)
 
+    def remove(self, query, logical=False):
+        """
+            deletes items matched by query, or marks as not visible if logical.
+        """
+        if logical:
+            self.collection.update(query, {'$set': {'visible': False}}, multi=True)
+        else:
+            self.collection.remove(query)
+
 
 class MADMaxDB(object):
     """ Wrapper for accessing Database and a specific collection via a class attribute.

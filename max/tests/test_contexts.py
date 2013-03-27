@@ -250,7 +250,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         self.testapp.get('/activities', context_query, oauth2Header(username), status=404)
 
-    def test_user_only_sees_own_activity_from_deleted_context_in_timeline(self):
+    def test_user_cannot_see_own_activity_from_deleted_context_in_timeline(self):
         """
         """
         from hashlib import sha1
@@ -258,21 +258,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         from .mockers import user_status_context
         username = 'messi'
-        username2 = 'xavi'
         self.create_user(username)
-        self.create_user(username2)
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)
-        self.create_activity(username2, user_status_context)
 
         url_hash = sha1(create_context['object']['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         res = self.testapp.get('/people/%s/timeline' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0]['actor']['username'], username)
+        self.assertEqual(result.get('totalItems', None), 0)
 
     def test_add_private_rw_context(self):
         from hashlib import sha1
