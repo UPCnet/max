@@ -5,7 +5,8 @@ from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
 from max.models import User
-from max.oauth2 import oauth2, restricted
+from max.exceptions import Unauthorized
+from max.oauth2 import oauth2
 from max.MADMax import MADMaxDB
 from max.rest.utils import searchParams
 from max.decorators import MaxResponse, requirePersonActor
@@ -47,9 +48,15 @@ def getUser(context, request):
 
 @view_config(route_name='user', request_method='POST')
 @MaxResponse
+@oauth2(['widgetcli'])
+def ForbiddenaddUser(context, request):
+    raise Unauthorized('The provided credentials are not allowed to perform this operation.')
+
+
+@view_config(route_name='user', request_method='POST', restricted='Manager')
+@MaxResponse
 @requirePersonActor(exists=False, force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def addUser(context, request):
     """
         /people/{username}

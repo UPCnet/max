@@ -2,17 +2,16 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
-from max.oauth2 import oauth2, restricted
+from max.oauth2 import oauth2
 from max.decorators import MaxResponse
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 
 
-@view_config(route_name='admin_contexts', request_method='GET')
+@view_config(route_name='contexts', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def getContexts(context, request):
     """
     """
@@ -22,22 +21,21 @@ def getContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_context', request_method='DELETE')
+@view_config(route_name='context', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
-def deleteContext(context, request):
+def DeleteContext(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    contextid = request.matchdict.get('id', None)
-    try:
-        found_context = mmdb.contexts[contextid]
-    except:
-        raise ObjectNotFound("There's no context with id: %s" % contextid)
+    chash = request.matchdict.get('hash', None)
+    found_contexts = mmdb.contexts.getItemsByhash(chash)
 
-    found_context.delete()
+    if not found_contexts:
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
-    # XXX in admin too ?
-    #found_context[0].removeUserSubscriptions()
+    ctx = found_contexts[0]
+    ctx.removeUserSubscriptions()
+    ctx.removeActivities(logical=True)
+    ctx.delete()
     return HTTPNoContent()

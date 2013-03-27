@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
 from max.models import Activity
-from max.oauth2 import oauth2, restricted
+from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor, requireContextActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity
@@ -11,14 +11,13 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 
 
-@view_config(route_name='admin_user_activities', request_method='POST')
+@view_config(route_name='user_activities', request_method='POST', restricted='Manager')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def addAdminUserActivity(context, request):
     """
-         /admin/people|contexts/{username|hash}/activities
+         /people|contexts/{username|hash}/activities
 
          Add activity impersonated as a valid MAX user or context
     """
@@ -47,14 +46,13 @@ def addAdminUserActivity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_context_activities', request_method='POST')
+@view_config(route_name='context_activities', request_method='POST', restricted='Manager')
 @MaxResponse
 @requireContextActor
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def addAdminContextActivity(context, request):
     """
-         /admin/people|contexts/{username|hash}/activities
+         /people|contexts/{username|hash}/activities
 
          Add activity impersonated as a valid MAX user or context
     """
@@ -83,10 +81,9 @@ def addAdminContextActivity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_activities', request_method='GET')
+@view_config(route_name='activities', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def getActivities(context, request):
     """
     """
@@ -96,10 +93,9 @@ def getActivities(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_activity', request_method='DELETE')
+@view_config(route_name='activity', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def deleteActivity(context, request):
     """
     """

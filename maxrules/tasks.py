@@ -58,7 +58,7 @@ def processTweet(twitter_username, content, tweetID='---'):
                 "generator": twitter_generator_name
             }
 
-            re = requests.post('%s/admin/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+            re = requests.post('%s/contexts/%s/activities' % (max_server_url, url_hash), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
             if re.status_code == 201:
                 # 200: Successful tweet from context
                 logger.info(u"(201) Successfully posted tweet %s from %s as context %s" % (str(tweetID), twitter_username, context_url))
@@ -123,7 +123,7 @@ def processTweet(twitter_username, content, tweetID='---'):
 
                 # Use the restricted REST endpoint for create a new activity in the specified
                 # MAX context in name of the specified MAX username
-                re = requests.post('%s/admin/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
+                re = requests.post('%s/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
                 if re.status_code == 201:
                     logger.info(u"(201) Successfully posted tweet %s from @%s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.object.url))
                     successful_tweets += 1

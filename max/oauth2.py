@@ -47,27 +47,3 @@ def oauth2(allowed_scopes=[]):
     if type(allowed_scopes) == type(wrap):
         return wrap(allowed_scopes)
     return wrap
-
-
-def restricted(allowed_roles=[]):
-    def wrap(view_function):
-        def new_function(*args, **kw):
-            nkargs = [a for a in args]
-            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
-
-            # Extract the username and token from request headers
-            username = request.headers.get('X-Oauth-Username', '')
-
-            security = request.registry.max_security
-            for role in allowed_roles:
-                if username in security.get("roles").get(role):
-                    # Valid allowed user token, proceed.
-                    return view_function(*args, **kw)
-                else:
-                    raise Unauthorized('The provided credentials are not allowed to perform this operation.')
-
-        new_function.__doc__ = view_function.__doc__
-        return new_function
-    if type(allowed_roles) == type(wrap):
-        return wrap(allowed_roles)
-    return wrap

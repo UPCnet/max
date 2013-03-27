@@ -36,13 +36,13 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.patched.start()
 
     def mock_post(self, *args, **kwargs):
-        if '/admin/people/messi/activities' in args[0]:
+        if '/people/messi/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
-            res = self.testapp.post('/admin/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
+            res = self.testapp.post('/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
             return mock_post_obj(text=res.text, status_code=201)
-        elif '/admin/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
+        elif '/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
-            res = self.testapp.post('/admin/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
+            res = self.testapp.post('/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
             return mock_post_obj(text=res.text, status_code=201)
         return mock_post_obj(text='', status_code=200)
 

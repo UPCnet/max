@@ -301,7 +301,7 @@ Contexts
 Subscripcions
 -------------
 
-.. http:post:: /admin/people/{username}/subscriptions
+.. http:post:: /people/{username}/subscriptions
 
     Subscriu l'usuari a un context determinat.
 
@@ -348,7 +348,7 @@ Subscripcions
             }
 
         .. -> expected
-            >>> response = testapp.post('/admin/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
+            >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
             >>> response # doctest: +ELLIPSIS
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
@@ -368,7 +368,7 @@ Subscripcions
 
                 { "error_description": "Unknown user: messi", "error": "UnknownUserError" }
 
-.. http:delete:: /admin/people/{username}/subscriptions/{hash}
+.. http:delete:: /people/{username}/subscriptions/{hash}
 
     Elimina la subscripció d'un usuari Esborra un objecte ``Context`` i les subscripcions de tots els usuaris subscrits a aquell contexte.
     NO esborra les activitats que s'hagin creat previament al context del qual ens hem dessubscrit. Tot i que les activitats que queden a la base de dades no es poden consultar directament, en el timeline de un usuari coninuarà veient les activitats que va crear ell.
@@ -394,7 +394,7 @@ Subscripcions
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
         .. actual test
-            >>> response = testapp.delete('/admin/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
+            >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
             >>> response # doctest: +ELLIPSIS
             <204 No Content ...
 
@@ -509,7 +509,7 @@ s'explica amb profunditat en l'apartat de permisos.
 Activitats
 ----------
 
-.. http:post:: /admin/people/{username}/activities
+.. http:post:: /people/{username}/activities
 
     Afegeix una activitat en nom d'un usuari qualsevol
 
@@ -594,7 +594,7 @@ Activitats
             }
 
         .. -> expected
-            >>> response = testapp.post('/admin/people/{}/activities'.format(username), payload, oauth2Header(test_manager), status=201)
+            >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(test_manager), status=201)
             >>> response # doctest: +ELLIPSIS
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
@@ -602,7 +602,7 @@ Activitats
             >>> response.json.get('verb') == eval(expected).get('verb')
             True
 
-.. http:post:: /admin/contexts/{hash}/activities
+.. http:post:: /contexts/{hash}/activities
 
     Afegeix una activitat en nom d'un context qualsevol
 
@@ -689,7 +689,7 @@ Activitats
             }
 
         .. -> expected
-            >>> response = testapp.post('/admin/contexts/{}/activities'.format(context_hash), payload, oauth2Header(test_manager), status=201)
+            >>> response = testapp.post('/contexts/{}/activities'.format(context_hash), payload, oauth2Header(test_manager), status=201)
             >>> response # doctest: +ELLIPSIS
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')

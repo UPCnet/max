@@ -3,7 +3,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
 from max.exceptions import ObjectNotFound
-from max.oauth2 import oauth2, restricted
+from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxCollection
 from max.models import Activity
@@ -11,14 +11,13 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 from max.MADMax import MADMaxDB
 
 
-@view_config(route_name='admin_subscriptions', request_method='POST')
+@view_config(route_name='subscriptions', request_method='POST', restricted='Manager')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def subscribe(context, request):
     """
-        /admin/people/{username}/subscriptions
+        /people/{username}/subscriptions
 
         [RESTRICTED] Subscribe an username to the suplied context.
     """
@@ -56,11 +55,10 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_subscription', request_method='DELETE')
+@view_config(route_name='subscription', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def unsubscribe(context, request):
     """
     """

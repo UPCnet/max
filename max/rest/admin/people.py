@@ -2,17 +2,16 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
-from max.oauth2 import oauth2, restricted
+from max.oauth2 import oauth2
 from max.decorators import MaxResponse
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 
 
-@view_config(route_name='admin_users', request_method='GET')
+@view_config(route_name='users', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def getUsers(context, request):
     """
     """
@@ -22,10 +21,9 @@ def getUsers(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_user', request_method='DELETE')
+@view_config(route_name='user', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def deleteUser(context, request):
     """
     """

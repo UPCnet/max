@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 import pymongo
+from copy import copy
+import operator
 
 from pyramid.config import Configurator
 
@@ -11,6 +13,28 @@ from max.resources import Root, loadMAXSettings, loadMAXSecurity
 from max.rest.resources import RESOURCES
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
+
+
+class RestrictedPredicate(object):
+    def __init__(self, val, config):
+        self.val = val
+
+    def text(self):
+        return 'Restricted permissions to = %s' % (self.val,)
+
+    phash = text
+
+    def __call__(self, context, request):
+        # Extract the username and token from request headers
+        username = request.headers.get('X-Oauth-Username', '')
+        allowed_roles = copy(self.val)
+        if not isinstance(self.val, list):
+            allowed_roles = [self.val, ]
+        security = request.registry.max_security
+        user_has_roles = [username in security.get("roles").get(role) for role in allowed_roles]
+        user_is_allowed = reduce(operator.and_, user_has_roles, True)
+
+        return user_is_allowed
 
 
 def main(global_config, **settings):
@@ -41,5 +65,7 @@ def main(global_config, **settings):
         config.add_route(name, properties.get('route'))
 
     config.scan('max', ignore=['max.tests', 'max.scripts'])
+
+    config.add_view_predicate('restricted', RestrictedPredicate)
 
     return config.make_wsgi_app()

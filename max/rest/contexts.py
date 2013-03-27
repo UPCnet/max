@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNoContent
+from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
-from max.oauth2 import oauth2, restricted
+from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
 from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
@@ -15,10 +15,9 @@ from max.rest.utils import downloadTwitterUserImage
 import time
 
 
-@view_config(route_name='context', request_method='GET')
+@view_config(route_name='context', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def getContext(context, request):
     """
         /contexts/{hash}
@@ -90,10 +89,9 @@ def getContextAvatar(context, request):
     return image
 
 
-@view_config(route_name='contexts', request_method='POST')
+@view_config(route_name='contexts', request_method='POST', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def addContext(context, request):
     """
         /contexts
@@ -124,10 +122,9 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT')
+@view_config(route_name='context', request_method='PUT', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def ModifyContext(context, request):
     """
         /contexts/{hash}
@@ -152,29 +149,16 @@ def ModifyContext(context, request):
 @view_config(route_name='context', request_method='DELETE')
 @MaxResponse
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def DeleteContext(context, request):
     """
     """
-    mmdb = MADMaxDB(context.db)
-    chash = request.matchdict.get('hash', None)
-    found_contexts = mmdb.contexts.getItemsByhash(chash)
-
-    if not found_contexts:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
-
-    ctx = found_contexts[0]
-    ctx.removeUserSubscriptions()
-    ctx.removeActivities(logical=True)
-    ctx.delete()
-    return HTTPNoContent()
+    return HTTPNotImplemented
 
 
-@view_config(route_name='context_user_permission', request_method='PUT')
+@view_config(route_name='context_user_permission', request_method='PUT', restricted='Manager')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
@@ -209,11 +193,10 @@ def grantPermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permission', request_method='DELETE')
+@view_config(route_name='context_user_permission', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-@restricted(['Manager'])
 def revokePermissionOnContext(context, request):
     """ [RESTRICTED]
     """
