@@ -42,7 +42,7 @@ def subscribe(context, request):
     """
         /people/{username}/subscriptions
 
-        [RESTRICTED] Subscribe the actor to the suplied context.
+        Subscribe the actor to the suplied context.
     """
     # XXX For now only one context can be subscribed at a time
     actor = request.actor
