@@ -137,6 +137,37 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.get('/activities', {'context': '01234567890abcdef01234567890abcdef012345'}, oauth2Header(username), status=404)
 
+    def test_get_activities_order_sorted_by_last_comment_publish_date(self):
+        """
+            Given a plain user
+            When I post activities on a context
+            and I comment on an old activity
+            Then the in the comment-sorted activities, the commented activity becomes the first
+        """
+        from .mockers import user_comment
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        from .mockers import context_query
+
+        from time import sleep
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity_0_id = self.create_activity(username, user_status_context).json['id']
+        sleep(1)
+        activity_1_id = self.create_activity(username, user_status_context).json['id']
+        sleep(1)
+        activity_2_id = self.create_activity(username, user_status_context).json['id']
+        sleep(1)
+        res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.get('/activities?sortBy=activities', context_query, oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems', None), 3)
+        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_2_id)
+        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_1_id)
+        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)
+
     def test_get_activities_from_recursive_contexts(self):
         """
             Create 3 contexts, one parent and two childs
@@ -265,7 +296,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             When I post activities
             and I comment on an old activity
-            Then the in the coment-sorted timeline, the commented activity becomes the first
+            Then the in the comment-sorted timeline, the commented activity becomes the first
         """
         from .mockers import user_status, user_comment
         from time import sleep

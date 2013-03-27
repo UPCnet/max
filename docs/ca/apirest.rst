@@ -557,6 +557,10 @@ concret.
     Llistat de totes les activitats del sistema, filtrada sota algun criteri
 
     :query context: (Requerit) El hash (sha1) de la URL del context
+    :query sortBy: (Opcional) Tipus d'ordenació que s'aplicarà als resultats. Per defecte és
+    ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
+    possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
+
 
     Cos de la petició
 
