@@ -10,7 +10,8 @@ Els paràmetres indicats a les seccions Query parameters, poden ser de 3 tipus:
 
 :REST: Són obligatoris ja que formen part de la URI
 :Requerits: Són obligatoris, però formen part de l'estructura JSON que s'envia
-    amb el cos de la petició
+    amb el cos de la petició. En el cas de peticions GET, aquesta estructura equival
+    a paràmetres de la URL. (i.e. ?context=ab0012313...)
 :Opcionals: Com el nom indica, no son obligatoris, indiquen alguna funcionalitat
     extra
 
@@ -663,6 +664,9 @@ indirectament.
     les activitats i només mostra les de tipus *post*.
 
     :query username: (REST) Nom de l'usuari que del qual volem el llistat
+    :query sortBy: (Opcional) Tipus d'ordenació que s'aplicarà als resultats. Per defecte és
+        ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
+        possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
 
     Cos de la petició
 
