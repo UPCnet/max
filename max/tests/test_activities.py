@@ -42,6 +42,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
 
+    def test_create_activity_actor_is_creator(self):
+        """
+            Given a plain user
+            When I post an activity
+            And I am authenticated as myself
+            Then the actor and the creator must be the same
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        self.assertEqual(res.json['actor']['username'], res.json['creator'])
+
+    def test_create_activity_as_admin_actor_is_not_creator(self):
+        """
+            Given a admin user
+            When I post an activity in the name of someone else
+            And I am authenticated as the admin user
+            Then the actor will be that someone else
+            And the creator will be the admin user
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=201)
+        self.assertEqual(res.json['actor']['username'], username)
+        self.assertEqual(res.json['creator'], test_manager)
+
     def test_create_activity_default_fields(self):
         """
             Given a plain user

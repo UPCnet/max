@@ -88,7 +88,6 @@ def addActivityComment(context, request):
     comment['actor'] = request.actor
     comment['id'] = newactivity._id
     del comment['inReplyTo']
-
     refering_activity.addComment(comment)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)

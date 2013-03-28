@@ -43,6 +43,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
 
+    def test_create_user_creator_is_admin(self):
+        """
+            Given an admin user
+            When I create a user
+            Then the creator must be the admin user
+        """
+        username = 'messi'
+        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+        self.assertEqual(res.json['creator'], test_manager)
+
     def test_create_user_default_fields(self):
         """
             Given an admin user

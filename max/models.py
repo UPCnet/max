@@ -14,6 +14,7 @@ class Activity(MADBase):
     collection = 'activity'
     unique = '_id'
     schema = {'_id':         dict(required=0),
+              '_creator':    dict(required=0),
               'objectType':  dict(required=0, default='activity'),
               'actor':       dict(required=1),
               'verb':        dict(required=1),
@@ -162,7 +163,8 @@ class User(MADBase):
     collection = 'users'
     unique = 'username'
     schema = {'_id':          dict(),
-              'objectType':  dict(required=0, default='person'),
+              '_creator':     dict(required=0),
+              'objectType':   dict(required=0, default='person'),
               'username':     dict(required=1),
               'displayName':  dict(user_mutable=1),
               'last_login':   dict(),
@@ -259,6 +261,7 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'hash'
     schema = {'_id':                dict(),
+              '_creator':           dict(required=0),
               'objectType':         dict(required=0, default='context'),
               'tags':               dict(default=[]),
               'object':             dict(required=1,

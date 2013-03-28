@@ -38,6 +38,12 @@ def oauth2(allowed_scopes=[]):
 
             if req.status_code == 200:
                 # Valid token, proceed.
+
+                def getCreator(request):
+                    return username
+
+                request.set_property(getCreator, name='creator', reify=True)
+
                 return view_function(*args, **kw)
             else:
                 raise Unauthorized('Invalid token.')

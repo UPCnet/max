@@ -206,6 +206,10 @@ class MADBase(MADDict):
         if 'actor' not in rest_params.keys():
             self.data['actor'] = request.actor
 
+        # Who is actually doing this?
+        # - The one that is authenticated
+        self.data['_creator'] = request.creator
+
         self.processFields()
 
         #check if the object we pretend to create already exists

@@ -47,9 +47,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             new_context['permissions'].update(permissions)
         self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=201)
 
+    def test_create_context_creator_is_admin(self):
+        """
+            Given a admin user
+            When I create a context
+            Then the creator of the context is the admin user
+        """
+        from .mockers import create_context
+        res = self.testapp.post('/contexts', json.dumps(create_context), oauth2Header(test_manager), status=201)
+        self.assertEqual(res.json['creator'], test_manager)
+
     def test_create_context_default_fields(self):
         """
-            Given a plain user
+            Given an admin user
             When I create a context
             Then non-required fields with defaults are set
         """
