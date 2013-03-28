@@ -41,7 +41,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
+    def search(self, query, show_fields=None, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -114,7 +114,7 @@ class MADMaxCollection(object):
         # Unpack the lazy cursor,
         # Wrap the result in its Mad Class,
         # and flattens it if specified
-        return [self.ItemWrapper(result, flatten=flatten) for result in cursor]
+        return [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
 
     def _getQuery(self, itemID):
         """
@@ -127,7 +127,7 @@ class MADMaxCollection(object):
             query[self.query_key] = itemID
         return query
 
-    def ItemWrapper(self, item, flatten=0):
+    def ItemWrapper(self, item, flatten=0, **kwargs):
         """
             Transforms a mongoDB item to a wrapped representation of it using
             the appropiate class, mapped by the origin collection of the item.
@@ -147,7 +147,7 @@ class MADMaxCollection(object):
             wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
 
         if flatten:
-            return wrapped.flatten()
+            return wrapped.flatten(**kwargs)
         else:
             return wrapped
 

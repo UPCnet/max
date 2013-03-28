@@ -218,28 +218,45 @@ def deUnderescore(di, key):
         del di[key]
 
 
-def flattendict(di):
+def clearPrivateFields(di):
+    """
+        Clears all fields starting with _ except _id
+    """
+    for key in di.keys():
+        if key.startswith('_') and key not in ['_id']:
+            del di[key]
+
+
+def flattendict(di, **kwargs):
     """
         Flattens key/values of a dict and continues the recursion
     """
+    di = dict(di)
+    if not kwargs.get('keep_private_fields', True):
+        clearPrivateFields(di)
+
     for key in di.keys():
         value = di[key]
         if isinstance(value, dict) or isinstance(value, list):
-            flatten(value)
+            di[key] = flatten(value, **kwargs)
         else:
             decodeBSONEntity(di, key)
-            deUnderescore(di, key)
+        deUnderescore(di, key)
+    return di
 
 
-def flatten(data):
+def flatten(data, **kwargs):
     """
         Recursively flatten a dict or list
     """
     if isinstance(data, list):
+        newitems = []
         for item in data:
-            flatten(item)
+            newitems.append(flatten(item, **kwargs))
+        data = newitems
     if isinstance(data, dict):
-        flattendict(data)
+        data = flattendict(data, **kwargs)
+    return data
 
 
 def formatMessageEntities(text):

@@ -147,6 +147,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
 
+    def test_get_activities_does_not_show_private_fields(self):
+        """
+            Given a plain user
+            When I search for activities of a context
+            Then i don't have to see any private fields
+        """
+        from .mockers import context_query
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems', None), 1)
+        self.assertNotIn('_keywords', res.json['items'][0]['object'])
+
     def test_get_activities_from_inexistent_context(self):
         username = 'messi'
         self.create_user(username)
@@ -272,6 +290,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
+
+    def test_get_timeline_does_not_show_private_fields(self):
+        """
+            Given a plain user
+            When I search for activities in timeline
+            Then i don't have to see any private fields
+        """
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+        self.create_activity(username, user_status)
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems', None), 1)
+        self.assertNotIn('_keywords', res.json['items'][0]['object'])
 
     def test_post_comment(self):
         """ doctest .. http:post:: /activities/{activity}/comments """

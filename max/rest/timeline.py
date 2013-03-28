@@ -24,7 +24,7 @@ def getUserTimeline(context, request):
 
     mmdb = MADMaxDB(context.db)
 
-    actor_query = {'actor._id': actor['_id']}
+    actor_query = {'actor.username': actor['username']}
 
     # Add the activity of the people that the user follows
     actors_followings = []
@@ -67,7 +67,7 @@ def getUserTimeline(context, request):
             'comments': 'commented',
         }
         sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, **searchParams(request))
+        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
     else:
         activities = []
 

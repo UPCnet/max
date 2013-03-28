@@ -38,12 +38,10 @@ class Activity(MADBase):
         isPerson = isinstance(self.data['actor'], User)
         isContext = isinstance(self.data['actor'], Context)
 
-        # XXX Assuming here we only support Person as actorn
-
+        # XXX Assuming here we only support Person as user
         # XXX Assuming here we only support Uri as context
         actorType = isPerson and 'person' or 'uri'
         ob = {'actor': {'objectType': actorType,
-                        '_id': self.data['actor']['_id'],
                         'displayName': self.data['actor']['displayName'],
                         },
               'verb': self.data['verb'],
@@ -77,8 +75,12 @@ class Activity(MADBase):
                     else:
                         wrapper = self.getObjectWrapper(cobject['objectType'])
                         chash = wrapper(cobject).getHash()
-                    subscription = self.data['actor'].getSubscriptionByHash(chash)
-                    #context = subscription.get('object')
+                    subscription = dict(self.data['actor'].getSubscriptionByHash(chash))
+                    # Clean unnecessary fields
+                    del subscription['tags']
+                    del subscription['published']
+                    del subscription['permissions']
+                    del subscription['id']
                     ob['contexts'].append(subscription)
             if isContext:
                 # When a context posts an activity it can be posted only
@@ -108,6 +110,14 @@ class Activity(MADBase):
         """
             Adds a comment to an existing activity and updates refering activity keywords and hashtags
         """
+
+        #Clean innecessary fields
+        del comment['author']['subscribedTo']
+        del comment['author']['following']
+        del comment['author']['last_login']
+        del comment['author']['_id']
+        del comment['author']['published']
+
         self.addToList('replies', comment, allow_duplicates=True)
 
         activity_keywords = self.object.setdefault('_keywords', [])

@@ -320,14 +320,14 @@ class MADBase(MADDict):
             # XXX TODO - Test it!!
             return None
 
-    def flatten(self):
+    def flatten(self, **kwargs):
         """
             Recursively transforms non-json-serializable values and simplifies
             $oid and $data BISON structures. Intended for final output
+            Also removes fields starting with underscore _fieldname
         """
-        dd = dict([(key, self[key]) for key in self.keys()])
-        flatten(dd)
-        return dd
+        dd = dict(self)
+        return flatten(dd, **kwargs)
 
     def getObjectWrapper(self, objType):
         """

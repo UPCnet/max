@@ -37,7 +37,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_activities_keyword_generation(self):
         """
-                Tests that all words passing regex are included in _keywords
+                Tests that all words passing regex are included in keywords
                 Tests that username that creates the activity is included in keywords
                 Tests that a keyword of a comment is included in keywords
         """
@@ -53,8 +53,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
         res = self.testapp.get('/activities/%s' % str(activity.get('id')), json.dumps({}), oauth2Header(username), status=200)
         result = json.loads(res.text)
+
         expected_keywords = [u'comentari', u'messi', u'creaci\xf3', u'testejant', u'canvi', u'una', u'nou', u'activitat']
-        self.assertListEqual(result['object']['_keywords'], expected_keywords)
+        self.assertListEqual(result['object']['keywords'], expected_keywords)
 
     def test_activities_hashtag_generation(self):
         """
@@ -74,7 +75,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/activities/%s' % str(activity.get('id')), json.dumps({}), oauth2Header(username), status=200)
         result = json.loads(res.text)
         expected_hashtags = [u'canvi', u'comentari', u'nou']
-        self.assertListEqual(result['object']['_hashtags'], expected_hashtags)
+        self.assertListEqual(result['object']['hashtags'], expected_hashtags)
 
     def test_context_activities_keyword_search(self):
         """

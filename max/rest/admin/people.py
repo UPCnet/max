@@ -69,6 +69,5 @@ def addUser(context, request):
         code = 201
         userid = newuser.insert()
         newuser['_id'] = userid
-
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()
