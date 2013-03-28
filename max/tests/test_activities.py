@@ -335,7 +335,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/activities/%s/comments' % str(activity.get('id')), "", oauth2Header(username), status=200)
         result = res.json
         self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('author', None).get('username'), 'messi')
+        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('objectType', None), 'comment')
 
     def test_timeline_order_sorted_by_last_comment_publish_date(self):

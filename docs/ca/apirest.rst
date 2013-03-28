@@ -836,7 +836,7 @@ Representa el conjunt de comentaris fets a una activitat.
                 "items": [
                     {
                         "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-                        "author": {
+                        "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
@@ -853,7 +853,7 @@ Representa el conjunt de comentaris fets a una activitat.
             >>> response = testapp.get('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('author').get('displayName') == expected.get('items')[0].get('author').get('displayName')
+            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
             >>> response.json.get('totalItems') == expected.get('totalItems')
             True
@@ -1206,7 +1206,6 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
             >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations', payload, oauth2Header(username), status=201)
             >>> response # doctest: +ELLIPSIS
-            >>> print response
             <201 Created application/json ...
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
@@ -1280,7 +1279,6 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/conversations/{}/messages'.format(conversation_hash), "", oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
-            >>> print response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('object').get('objectType') == expected.get('items')[0].get('object').get('objectType')
             True

@@ -112,10 +112,10 @@ class Activity(MADBase):
         """
 
         #Clean innecessary fields
-        non_needed_author_fields = ['subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
-        for fieldname in non_needed_author_fields:
-            if fieldname in comment['author']:
-                del comment['author'][fieldname]
+        non_needed_actor_fields = ['subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
+        for fieldname in non_needed_actor_fields:
+            if fieldname in comment['actor']:
+                del comment['actor'][fieldname]
 
         self.addToList('replies', comment, allow_duplicates=True)
 

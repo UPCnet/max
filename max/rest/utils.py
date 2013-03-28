@@ -123,9 +123,9 @@ def searchParams(request):
     if hashtags:
         params['hashtag'] = [hasht.lower() for hasht in hashtags]
 
-    author = request.params.get('author')
-    if author:
-        params['author'] = author.lower()
+    actor = request.params.get('actor')
+    if actor:
+        params['actor'] = actor.lower()
 
     keywords = request.params.getall('keyword')
     if keywords:

@@ -85,7 +85,7 @@ def addActivityComment(context, request):
 
     comment = dict(newactivity.object)
     comment['published'] = newactivity.published
-    comment['author'] = request.actor
+    comment['actor'] = request.actor
     comment['id'] = newactivity._id
     del comment['inReplyTo']
 

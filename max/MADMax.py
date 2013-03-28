@@ -50,7 +50,7 @@ class MADMaxCollection(object):
                 after: An id pointing to an activity, whose newer fellows will be fetched
                 hashtag: A list of hastags to filter activities by
                 keywords: A list of keywords to filter activities by
-                author: A username to filter activities by author
+                actor: A username to filter activities by actor
                 tags: A list of tags to filter contexts
         """
 
@@ -60,7 +60,7 @@ class MADMaxCollection(object):
         before = kwargs.get('before', None)
         hashtag = kwargs.get('hashtag', None)
         keywords = kwargs.get('keywords', None)
-        author = kwargs.get('author', None)
+        actor = kwargs.get('actor', None)
         username = kwargs.get('username', None)
         tags = kwargs.get('tags', None)
 
@@ -81,9 +81,9 @@ class MADMaxCollection(object):
             hashtag_query = {'object._hashtags': {'$all': hashtag}}
             query.update(hashtag_query)
 
-        if author:
+        if actor:
             # Filter the query to only objects containing certain hashtags
-            username_query = {'actor.username': author}
+            username_query = {'actor.username': actor}
             query.update(username_query)
 
         if keywords:
