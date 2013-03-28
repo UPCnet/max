@@ -246,7 +246,9 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'hash'
     schema = {'_id':                dict(),
-              'object':             dict(required=1),
+              'tags':               dict(required=0),
+              'object':             dict(required=1,
+                                         operations_mutable=1),
               'hash':               dict(),
               'displayName':        dict(operations_mutable=1),
               'published':          dict(),

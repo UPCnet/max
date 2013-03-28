@@ -6,6 +6,7 @@ from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
+from max.rest.utils import searchParams
 from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
 from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 
@@ -17,8 +18,8 @@ def getContexts(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    contexts = mmdb.contexts.dump(flatten=1)
-    handler = JSONResourceRoot(contexts)
+    found_contexts = mmdb.contexts.search({}, flatten=1, **searchParams(request))
+    handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
 
 

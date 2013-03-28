@@ -78,6 +78,7 @@ create_context = {
         'objectType': 'uri',
     },
     'displayName': 'Atenea',
+    'tags': ['Assignatura']
 }
 
 create_context_without_displayname = {
@@ -290,6 +291,9 @@ context_queryA = {
     "context": sha1(subscribe_contextA['object']['url']).hexdigest()
 }
 
+context_search_by_tags = {
+    "tags": ['Assignatura']
+}
 
 # Un usuari crea un comentari
 user_comment = {

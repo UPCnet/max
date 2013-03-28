@@ -51,6 +51,7 @@ class MADMaxCollection(object):
                 hashtag: A list of hastags to filter activities by
                 keywords: A list of keywords to filter activities by
                 author: A username to filter activities by author
+                tags: A list of tags to filter contexts
         """
 
         #Extract known params from kwargs
@@ -61,6 +62,7 @@ class MADMaxCollection(object):
         keywords = kwargs.get('keywords', None)
         author = kwargs.get('author', None)
         username = kwargs.get('username', None)
+        tags = kwargs.get('tags', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -75,9 +77,8 @@ class MADMaxCollection(object):
 
         if hashtag:
             # Filter the query to only objects containing certain hashtags
-            hashtag_query = {'$and': []}
-            for hasht in hashtag:
-                hashtag_query['$and'].append({'object._hashtags': hasht})
+            # Filter the query to only objects containing certain hashtags
+            hashtag_query = {'object._hashtags': {'$all': hashtag}}
             query.update(hashtag_query)
 
         if author:
@@ -87,15 +88,18 @@ class MADMaxCollection(object):
 
         if keywords:
             # Filter the query to only objects containing certain keywords
-            keywords_query = {'$and': []}
-            for keyw in keywords:
-                keywords_query['$and'].append({'object._keywords': keyw})
+            keywords_query = {'object._keywords': {'$all': keywords}}
             query.update(keywords_query)
 
         if username:
             # Filter the query to only objects containing certain hashtags
             username_query = {"username": {"$regex": username, "$options": "i", }}
             query.update(username_query)
+
+        if tags:
+            # Filter the query to only objects containing certain hashtags
+            tags_query = {'tags': {'$all': tags}}
+            query.update(tags_query)
 
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)

@@ -116,3 +116,33 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+
+    def test_contexts_search(self):
+        """
+            Given an admin user
+            When I search for all contexts
+            Then I get them all
+        """
+        from .mockers import create_context, create_contextA, create_contextB
+
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+        self.create_context(create_contextB)
+        res = self.testapp.get('/contexts', {}, oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['totalItems'], 3)
+
+    def test_contexts_search_with_tags(self):
+        """
+            Given an admin user
+            When I search for contexts with a tag
+            Then I get tthe ones with that tag
+        """
+        from .mockers import create_context, create_contextA, create_contextB
+        from .mockers import context_search_by_tags
+
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+        self.create_context(create_contextB)
+        res = self.testapp.get('/contexts?tags', context_search_by_tags, oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['totalItems'], 1)
+

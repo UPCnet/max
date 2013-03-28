@@ -136,6 +136,16 @@ def searchParams(request):
     if username:
         params['username'] = username.lower()
 
+    tags = request.params.getall('tags')
+    if tags:
+        retags = []
+        for tag in tags:
+            retag = re.sub(r'\s*(\w+)\s*', r'\1', tag, re.UNICODE)
+            if retag:
+                retags.append(retag)
+        if retags:
+            params['tags'] = retags
+
     return params
 
 

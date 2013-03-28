@@ -102,7 +102,8 @@ Contexts
                     "url": "http://atenea.upc.edu",
                     "objectType": "uri"
                 },
-                "displayName": "Atenea"
+                "displayName": "Atenea",
+                "tags": ["Assignatura"]
             }
 
         .. -> payload
@@ -141,6 +142,58 @@ Contexts
     Success
 
         Retorna l'objecte ``Context``.
+
+.. http:get:: /contexts
+
+    Cerca un context al sistema
+
+    :tags: (Opcional)
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {
+                "tags": "Assignatura"
+            }
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "object": {
+                            "url": "http://atenea.upc.edu",
+                            "objectType": "uri"
+                        },
+                        "published": "2013-03-28T13:08:12Z",
+                        "displayName": "Atenea",
+                        "id": "515440bc71c75c67ea6453d8",
+                        "permissions": {
+                            "read": "public",
+                            "write": "public",
+                            "invite": "public",
+                            "subscribe": "public"
+                        }
+                    }
+                ]
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/contexts', payload, oauth2Header(test_manager), status=200)
+            >>> response # doctest: +ELLIPSIS
+            <200 OK application/json ...
+            >>> response.json.get('totalItems') == 1
+            True
 
 .. http:put:: /contexts/{hash}
 
