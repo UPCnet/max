@@ -34,6 +34,7 @@ resultats, indicant el total d'elements retornats::
 .. this is some setup, it is hidden in a reST comment
 
     >>> from httpretty import HTTPretty
+    >>> import json
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> username = "messi"
@@ -414,84 +415,60 @@ l'usuari ha estat previament subscrit a aquest context.
                 "totalItems": 3,
                 "items": [
                     {
+                        "generator": null,
                         "contexts": [
                             {
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "object": {
                                     "url": "http://atenea.upc.edu",
                                     "objectType": "uri"
                                 },
-                                "published": "2013-02-03T21:00:10Z",
-                                "displayName": "Atenea",
-                                "id": "510ecfdae999fb1424c14902",
-                                "permissions": [
-                                    "read",
-                                    "write",
-                                    "invite"
-                                ]
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                            "_keywords": [
-                                "testejant",
-                                "creaci\\u00f3",
-                                "canvi",
-                                "context",
-                                "messi"
-                            ],
+                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "510ecfdae999fb1424c14901",
                             "objectType": "person"
                         },
+                        "id": "5154947c71c75c91e7dc5d6e",
+                        "published": "2013-03-28T19:05:32Z",
                         "verb": "post",
                         "replies": {
                             "totalItems": 0,
-                            "items": [
-
-                            ]
+                            "items": []
                         },
-                        "id": "510ecfdae999fb1424c14905",
-                        "published": "2013-02-03T21:00:10Z"
+                        "commented": "2013-03-28T19:05:32Z",
+                        "objectType": "activity"
                     },
                     {
-                        "replies": {
-                            "totalItems": 0,
-                            "items": [
-
-                            ]
-                        },
+                        "generator": null,
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus</p>",
-                            "_keywords": [
-                                "testejant",
-                                "creaci\\u00f3",
-                                "canvi",
-                                "messi"
-                            ],
+                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
                             "objectType": "note"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "510ecfdae999fb1424c14901",
                             "objectType": "person"
                         },
+                        "id": "5154947c71c75c91e7dc5d6d",
+                        "published": "2013-03-28T19:05:32Z",
                         "verb": "post",
-                        "published": "2013-02-03T21:00:10Z",
-                        "id": "510ecfdae999fb1424c14904"
-                    },
-                    {
                         "replies": {
                             "totalItems": 0,
-                            "items": [
-
-                            ]
+                            "items": []
                         },
+                        "commented": "2013-03-28T19:05:32Z",
+                        "objectType": "activity"
+                    },
+                    {
+                        "generator": null,
                         "object": {
                             "url": "http://atenea.upc.edu",
                             "objectType": "uri"
@@ -499,23 +476,29 @@ l'usuari ha estat previament subscrit a aquest context.
                         "actor": {
                             "username": "messi",
                             "displayName": "messi",
-                            "id": "510ecfdae999fb1424c14901",
                             "objectType": "person"
                         },
+                        "id": "5154947c71c75c91e7dc5d6c",
+                        "published": "2013-03-28T19:05:32Z",
                         "verb": "subscribe",
-                        "published": "2013-02-03T21:00:10Z",
-                        "id": "510ecfdae999fb1424c14903"
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
+                        "commented": "2013-03-28T19:05:32Z",
+                        "objectType": "activity"
                     }
                 ]
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/people/{}/activities'.format(username), "", oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == eval(expected).get('items')[0].get('actor').get('displayName')
+            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> response.json.get('totalItems') == expected.get('totalItems')
             True
 
     .. note::
@@ -580,76 +563,68 @@ concret.
                 "totalItems": 1,
                 "items": [
                     {
+                        "generator": null,
                         "contexts": [
                             {
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "object": {
                                     "url": "http://atenea.upc.edu",
                                     "objectType": "uri"
                                 },
-                                "published": "2013-02-03T22:14:50Z",
-                                "displayName": "Atenea",
-                                "id": "510ee15ae999fb15726fa1ec",
-                                "permissions": [
-                                    "read",
-                                    "write",
-                                    "invite"
-                                ]
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                            "_keywords": [
-                                "testejant",
-                                "creaci\\u00f3",
-                                "canvi",
-                                "context",
-                                "messi"
-                            ],
+                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "510ee15ae999fb15726fa1eb",
                             "objectType": "person"
                         },
+                        "id": "5154957271c75c92480afde8",
+                        "published": "2013-03-28T19:09:38Z",
                         "verb": "post",
                         "replies": {
                             "totalItems": 0,
-                            "items": [
-
-                            ]
+                            "items": []
                         },
-                        "id": "510ee15ae999fb15726fa1ef",
-                        "published": "2013-02-03T22:14:50Z"
+                        "commented": "2013-03-28T19:09:38Z",
+                        "objectType": "activity"
                     }
                 ],
                 "context": {
                     "displayName": "Atenea",
+                    "tags": [
+                        "Assignatura"
+                    ],
                     "object": {
                         "url": "http://atenea.upc.edu",
                         "objectType": "uri"
                     },
-                    "published": "2013-02-03T22:14:50Z",
+                    "published": "2013-03-28T19:09:38Z",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                    "id": "510ee15ae999fb15726fa1ec",
                     "permissions": {
                         "write": "public",
-                        "read": "public",
                         "subscribe": "public",
+                        "read": "public",
                         "invite": "subscribed"
-                    }
+                    },
+                    "id": "5154957271c75c92480afde4",
+                    "objectType": "context"
                 }
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/activities', eval(payload), oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == eval(expected).get('items')[0].get('actor').get('displayName')
+            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> response.json.get('totalItems') == expected.get('totalItems')
             True
 
     Success
@@ -686,87 +661,69 @@ indirectament.
                 "totalItems": 2,
                 "items": [
                     {
+                        "generator": null,
                         "contexts": [
                             {
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "object": {
                                     "url": "http://atenea.upc.edu",
                                     "objectType": "uri"
                                 },
-                                "published": "2013-02-04T09:37:47Z",
-                                "displayName": "Atenea",
-                                "id": "510f816baceee9158ef3046c",
-                                "permissions": [
-                                    "read",
-                                    "write",
-                                    "invite"
-                                ]
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                            "_keywords": [
-                                "testejant",
-                                "creaci\\u00f3",
-                                "canvi",
-                                "context",
-                                "messi"
-                            ],
+                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "510f816baceee9158ef3046b",
                             "objectType": "person"
                         },
+                        "id": "5154961171c75c92a6f0ba38",
+                        "published": "2013-03-28T19:12:17Z",
                         "verb": "post",
                         "replies": {
                             "totalItems": 0,
-                            "items": [
-
-                            ]
+                            "items": []
                         },
-                        "id": "510f816baceee9158ef3046f",
-                        "published": "2013-02-04T09:37:47Z"
+                        "commented": "2013-03-28T19:12:17Z",
+                        "objectType": "activity"
                     },
                     {
-                        "replies": {
-                            "totalItems": 0,
-                            "items": [
-
-                            ]
-                        },
+                        "generator": null,
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus</p>",
-                            "_keywords": [
-                                "testejant",
-                                "creaci\\u00f3",
-                                "canvi",
-                                "messi"
-                            ],
+                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
                             "objectType": "note"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "510f816baceee9158ef3046b",
                             "objectType": "person"
                         },
+                        "id": "5154961171c75c92a6f0ba37",
+                        "published": "2013-03-28T19:12:17Z",
                         "verb": "post",
-                        "published": "2013-02-04T09:37:47Z",
-                        "id": "510f816baceee9158ef3046e"
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
+                        "commented": "2013-03-28T19:12:17Z",
+                        "objectType": "activity"
                     }
                 ]
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == eval(expected).get('items')[0].get('actor').get('displayName')
+            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> response.json.get('totalItems') == expected.get('totalItems')
             True
 
     Success
@@ -809,6 +766,7 @@ Representa el conjunt de comentaris fets a una activitat.
         .. code-block:: python
 
             {
+                "generator": null,
                 "replies": {
                     "totalItems": 0,
                     "items": []
@@ -817,11 +775,11 @@ Representa el conjunt de comentaris fets a una activitat.
                     "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
                     "inReplyTo": [
                         {
-                            "id": "510f88e6aceee91b02bc5a91",
+                            "id": "51549c0371c75c94c025dff5",
                             "objectType": "note"
                         }
                     ],
-                    "_keywords": [
+                    "keywords": [
                         "testejant",
                         "comentari",
                         "nou",
@@ -834,22 +792,24 @@ Representa el conjunt de comentaris fets a una activitat.
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
-                    "id": "510f88e6aceee91b02bc5a8c",
                     "objectType": "person"
                 },
+                "id": "51549c0371c75c94c025dff6",
                 "verb": "comment",
-                "published": "2013-02-04T10:09:42Z",
-                "id": "510f88e6aceee91b02bc5a92"
+                "published": "2013-03-28T19:37:39Z",
+                "commented": "2013-03-28T19:37:39Z",
+                "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> activity = utils.create_activity(username, user_status)
             >>> response = testapp.post('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=201)
             >>> response # doctest: +ELLIPSIS
             <201 Created application/json ...
-            >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
+            >>> response.json.get('actor').get('displayName') == expected.get('actor').get('displayName')
             True
-            >>> response.json.get('verb') == eval(expected).get('verb')
+            >>> response.json.get('verb') == expected.get('verb')
             True
 
     Success
@@ -875,61 +835,27 @@ Representa el conjunt de comentaris fets a una activitat.
                 "totalItems": 1,
                 "items": [
                     {
-                        "_keywords": [
-                            "testejant",
-                            "comentari",
-                            "nou",
-                            "una",
-                            "activitat",
-                            "messi"
-                        ],
+                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
                         "author": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "subscribedTo": {
-                                "totalItems": 1,
-                                "items": [
-                                    {
-                                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                                        "object": {
-                                            "url": "http://atenea.upc.edu",
-                                            "objectType": "uri"
-                                        },
-                                        "published": "2013-02-04T10:31:18Z",
-                                        "displayName": "Atenea",
-                                        "id": "510f8df6aceee91ead30bf2d",
-                                        "permissions": [
-                                            "read",
-                                            "write",
-                                            "invite"
-                                        ]
-                                    }
-                                ]
-                            },
-                            "last_login": "2013-02-04T10:31:18Z",
-                            "published": "2013-02-04T10:31:18Z",
-                            "following": {
-                                "totalItems": 0,
-                                "items": []
-                            },
-                            "twitterUsername": "messi10oficial",
-                            "id": "510f8df6aceee91ead30bf2c"
+                            "objectType": "person"
                         },
-                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-                        "published": "2013-02-04T10:31:18Z",
-                        "id": "510f8df6aceee91ead30bf32",
+                        "published": "2013-03-28T19:50:32Z",
+                        "id": "51549f0871c75c969de018aa",
                         "objectType": "comment"
                     }
                 ]
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('author').get('displayName') == eval(expected).get('items')[0].get('author').get('displayName')
+            >>> response.json.get('items')[0].get('author').get('displayName') == expected.get('items')[0].get('author').get('displayName')
             True
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> response.json.get('totalItems') == expected.get('totalItems')
             True
 
     Success
@@ -958,46 +884,51 @@ Subscripcions
                 "items": [
                     {
                         "displayName": "Atenea",
+                        "tags": [
+                            "Assignatura"
+                        ],
                         "object": {
                             "url": "http://atenea.upc.edu",
                             "objectType": "uri"
                         },
-                        "published": "2013-03-25T12:23:13Z",
+                        "published": "2013-03-28T19:54:27Z",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "id": "515041b1fcfff25b557f72f6",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
                         },
+                        "id": "51549ff371c75c9732101768",
                         "objectType": "context"
                     },
                     {
                         "displayName": "Atenea A",
+                        "tags": [],
                         "object": {
                             "url": "http://atenea.upc.edu/A",
                             "objectType": "uri"
                         },
-                        "published": "2013-03-25T12:23:13Z",
+                        "published": "2013-03-28T19:54:27Z",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "id": "515041b1fcfff25b557f72f7",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
                         },
+                        "id": "51549ff371c75c9732101769",
                         "objectType": "context"
                     }
                 ]
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/contexts/public', payload, oauth2Header(username), status=200)
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> response.json.get('totalItems') == expected.get('totalItems')
             True
-            >>> response.json.get('items')[0]['object']['objectType'] == eval(expected).get('items')[0]['object']['objectType']
+            >>> response.json.get('items')[0]['object']['objectType'] == expected.get('items')[0]['object']['objectType']
             True
 
 
@@ -1096,18 +1027,40 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                 "items": [
                     {
                         "displayName": "Atenea",
+                        "tags": [
+                            "Assignatura"
+                        ],
                         "object": {
                             "url": "http://atenea.upc.edu",
                             "objectType": "uri"
                         },
-                        "published": "2013-02-05T15:52:15Z",
+                        "published": "2013-03-28T19:57:57Z",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "id": "51112aafaceee94e58dcf34e",
+                        "objectType": "context",
+                        "id": "5154a0c571c75c97a89a81b7",
                         "permissions": [
                             "read",
                             "write",
-                            "invite"
+                            "invite",
+                            "unsubscribe"
+                        ]
+                    },
+                    {
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
+                        "tags": [],
+                        "object": {
+                            "url": "http://atenea.upc.edu/A",
+                            "objectType": "uri"
+                        },
+                        "published": "2013-03-28T19:57:57Z",
+                        "displayName": "Atenea A",
+                        "permissions": [
+                            "read",
+                            "write",
+                            "invite",
+                            "unsubscribe"
                         ],
+                        "id": "5154a0c571c75c97a89a81b8",
                         "objectType": "context"
                     }
                 ]
@@ -1205,9 +1158,10 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
+                "generator": null,
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
+                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
                         "object": {
                             "participants": [
                                 "messi",
@@ -1215,19 +1169,13 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             ],
                             "objectType": "conversation"
                         },
-                        "published": "2013-02-05T20:07:23Z",
-                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                        "id": "5111667be999fb0d6a01d44b",
-                        "permissions": [
-                            "read",
-                            "write"
-                        ],
+                        "displayName": "messi, xavi",
                         "objectType": "context"
                     }
                 ],
                 "object": {
                     "content": "Nos espera una gran temporada, no es cierto?",
-                    "_keywords": [
+                    "keywords": [
                         "nos",
                         "espera",
                         "una",
@@ -1241,26 +1189,28 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
-                    "id": "5111667ae999fb0d6a01d443",
                     "objectType": "person"
                 },
+                "id": "5154a20d71c75c9887431ba3",
+                "published": "2013-03-28T20:03:25Z",
                 "verb": "post",
                 "replies": {
                     "totalItems": 0,
                     "items": []
                 },
-                "id": "5111667be999fb0d6a01d44c",
-                "published": "2013-02-05T20:07:23Z",
-                "objectType": "context"
+                "commented": "2013-03-28T20:03:25Z",
+                "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations', payload, oauth2Header(username), status=201)
             >>> response # doctest: +ELLIPSIS
+            >>> print response
             <201 Created application/json ...
-            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
-            >>> response.json.get('contexts')[0].get('displayName') == eval(expected).get('contexts')[0].get('displayName')
+            >>> response.json.get('contexts')[0].get('displayName') == expected.get('contexts')[0].get('displayName')
             True
             >>> conversation_hash = response.json.get('contexts')[0].get('hash')
 
@@ -1289,9 +1239,10 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                 "totalItems": 1,
                 "items": [
                     {
+                        "generator": null,
                         "contexts": [
                             {
-                                "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
+                                "displayName": "messi, xavi",
                                 "object": {
                                     "participants": [
                                         "messi",
@@ -1299,54 +1250,41 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                                     ],
                                     "objectType": "conversation"
                                 },
-                                "published": "2013-02-05T20:21:07Z",
-                                "displayName": "messi, xavi",
-                                "id": "511169b3e999fb0dd75b20d4",
-                                "permissions": [
-                                    "read",
-                                    "write"
-                                ],
+                                "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
                                 "objectType": "context"
                             }
                         ],
                         "object": {
                             "content": "Nos espera una gran temporada, no es cierto?",
-                            "_keywords": [
-                                "nos",
-                                "espera",
-                                "una",
-                                "gran",
-                                "temporada",
-                                "cierto",
-                                "messi"
-                            ],
                             "objectType": "message"
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
-                            "id": "511169b3e999fb0dd75b20cc",
                             "objectType": "person"
                         },
+                        "id": "5154a2e971c75c993518f51b",
+                        "published": "2013-03-28T20:07:05Z",
                         "verb": "post",
                         "replies": {
                             "totalItems": 0,
                             "items": []
                         },
-                        "id": "511169b3e999fb0dd75b20d5",
-                        "published": "2013-02-05T20:21:07Z",
+                        "commented": "2013-03-28T20:07:05Z",
                         "objectType": "activity"
                     }
                 ]
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/conversations/{}/messages'.format(conversation_hash), "", oauth2Header(username), status=200)
             >>> response # doctest: +ELLIPSIS
+            >>> print response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('object').get('objectType') == eval(expected).get('items')[0].get('object').get('objectType')
+            >>> response.json.get('items')[0].get('object').get('objectType') == expected.get('items')[0].get('object').get('objectType')
             True
-            >>> response.json.get('items')[0].get('contexts')[0].get('displayName') == eval(expected).get('items')[0].get('contexts')[0].get('displayName')
+            >>> response.json.get('items')[0].get('contexts')[0].get('displayName') == expected.get('items')[0].get('contexts')[0].get('displayName')
             True
 
     Success
@@ -1435,9 +1373,10 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
+                "generator": null,
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
+                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
                         "object": {
                             "participants": [
                                 "messi",
@@ -1445,19 +1384,13 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             ],
                             "objectType": "conversation"
                         },
-                        "published": "2013-02-05T20:34:48Z",
-                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                        "id": "51116ce8e999fb0e3f274d6a",
-                        "permissions": [
-                            "read",
-                            "write"
-                        ],
+                        "displayName": "messi, xavi",
                         "objectType": "context"
                     }
                 ],
                 "object": {
-                    "content": "M\'agrada Taradell!",
-                    "_keywords": [
+                    "content": "M'agrada Taradell!",
+                    "keywords": [
                         "taradell",
                         "messi"
                     ],
@@ -1466,28 +1399,27 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
-                    "id": "51116ce8e999fb0e3f274d62",
                     "objectType": "person"
                 },
+                "id": "5154a39971c75c997dcd55c9",
+                "published": "2013-03-28T20:10:01Z",
                 "verb": "post",
                 "replies": {
                     "totalItems": 0,
-                    "items": [
-
-                    ]
+                    "items": []
                 },
-                "id": "51116ce8e999fb0e3f274d6c",
-                "published": "2013-02-05T20:34:48Z",
+                "commented": "2013-03-28T20:10:01Z",
                 "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations/{}/messages'.format(conversation_hash), payload, oauth2Header(username), status=201)
             >>> response # doctest: +ELLIPSIS
             <201 Created application/json ...
-            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
-            >>> response.json.get('contexts')[0].get('displayName') == eval(expected).get('contexts')[0].get('displayName')
+            >>> response.json.get('contexts')[0].get('displayName') == expected.get('contexts')[0].get('displayName')
             True
 
     Success
