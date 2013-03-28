@@ -27,7 +27,7 @@ def getConversations(context, request):
              'object.objectType': 'conversation',
              }
 
-    conversations = mmdb.contexts.search(query, sort="published", flatten=1)
+    conversations = mmdb.contexts.search(query, sort="published", flatten=1, keep_private_fields=False)
     for conversation in conversations:
         query = {'object.objectType': 'message',
                  'contexts.hash': conversation['hash']
@@ -130,7 +130,7 @@ def getMessages(context, request):
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.hash': chash}
-    messages = mmdb.activity.search(query, sort="published", sort_dir=ASCENDING, flatten=1)
+    messages = mmdb.activity.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
 
     handler = JSONResourceRoot(messages)
     return handler.buildResponse()

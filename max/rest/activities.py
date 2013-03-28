@@ -25,7 +25,7 @@ def getUserActivities(context, request):
     """
     mmdb = MADMaxDB(context.db)
     query = {'actor.username': request.actor['username']}
-    activities = mmdb.activity.search(query, sort="_id", flatten=1)
+    activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, flatten=1)
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
@@ -122,7 +122,7 @@ def getActivities(context, request):
             'comments': 'commented',
         }
         sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, **searchParams(request))
+        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
     else:
         # we have no public contexts and we are not subscribed to any context, so we
         # won't get anything
