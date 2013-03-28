@@ -15,6 +15,7 @@ class Activity(MADBase):
     unique = '_id'
     schema = {'_id':         dict(required=0),
               '_creator':    dict(required=0),
+              '_owner':      dict(required=0),
               'objectType':  dict(required=0, default='activity'),
               'actor':       dict(required=1),
               'verb':        dict(required=1),
@@ -29,6 +30,20 @@ class Activity(MADBase):
     def setDates(self):
         super(Activity, self).setDates()
         self['commented'] = datetime.datetime.utcnow()
+
+    def getOwner(self, request):
+        """
+            Overrides the getOwner method to set the
+            actor as owner instead of the creator whenever
+            the actor is a person
+        """
+        isPerson = isinstance(self.data['actor'], User)
+        isContext = isinstance(self.data['actor'], Context)
+
+        if isPerson:
+            return request.actor['username']
+        elif isContext:
+            return request.creator
 
     def buildObject(self):
         """
@@ -164,6 +179,7 @@ class User(MADBase):
     unique = 'username'
     schema = {'_id':          dict(),
               '_creator':     dict(required=0),
+              '_owner':       dict(required=0),
               'objectType':   dict(required=0, default='person'),
               'username':     dict(required=1),
               'displayName':  dict(user_mutable=1),
@@ -262,6 +278,7 @@ class Context(MADBase):
     unique = 'hash'
     schema = {'_id':                dict(),
               '_creator':           dict(required=0),
+              '_owner':             dict(required=0),
               'objectType':         dict(required=0, default='context'),
               'tags':               dict(default=[]),
               'object':             dict(required=1,

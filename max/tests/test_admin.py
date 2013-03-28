@@ -76,7 +76,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         self.create_context(create_context)
         url_hash = sha1(create_context['object']['url']).hexdigest()
-        res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager))
+        res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')

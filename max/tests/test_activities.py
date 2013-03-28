@@ -42,25 +42,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
 
-    def test_create_activity_actor_is_creator(self):
+    def test_create_activity_check_ownership(self):
         """
             Given a plain user
             When I post an activity
             And I am authenticated as myself
-            Then the actor and the creator must be the same
+            Then the actor,the creator and the owner must be the same
         """
         from .mockers import user_status as activity
         username = 'messi'
         self.create_user(username)
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
         self.assertEqual(res.json['actor']['username'], res.json['creator'])
+        self.assertEqual(res.json['owner'], res.json['creator'])
 
-    def test_create_activity_as_admin_actor_is_not_creator(self):
+    def test_create_activity_check_impersonated_ownership(self):
         """
             Given a admin user
             When I post an activity in the name of someone else
-            And I am authenticated as the admin user
-            Then the actor will be that someone else
+            And I am authenticated as an admin user
+            Then the actor and owner will be that someone else
             And the creator will be the admin user
         """
         from .mockers import user_status as activity
@@ -69,6 +70,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=201)
         self.assertEqual(res.json['actor']['username'], username)
         self.assertEqual(res.json['creator'], test_manager)
+        self.assertEqual(res.json['owner'], username)
+
+    def test_create_activity_as_context_check_ownership(self):
+        """
+            Given a admin user
+            When I post an activity in the name of a context
+            And I am authenticated as an admin user
+            Then the actor will be that context
+            And the creator and owner will be the admin user
+        """
+        from .mockers import user_status_context
+        from .mockers import create_context
+        from hashlib import sha1
+        self.create_context(create_context)
+        url_hash = sha1(create_context['object']['url']).hexdigest()
+        res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager), status=201)
+        self.assertEqual(res.json['actor']['hash'], url_hash)
+        self.assertEqual(res.json['creator'], test_manager)
+        self.assertEqual(res.json['owner'], test_manager)
 
     def test_create_activity_default_fields(self):
         """

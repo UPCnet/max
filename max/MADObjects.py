@@ -196,6 +196,9 @@ class MADBase(MADDict):
     def setDates(self):
         self['published'] = datetime.datetime.utcnow()
 
+    def getOwner(self, request):
+        return request.creator
+
     def fromRequest(self, request, rest_params={}):
 
         self.data.update(extractPostData(request))
@@ -209,6 +212,7 @@ class MADBase(MADDict):
         # Who is actually doing this?
         # - The one that is authenticated
         self.data['_creator'] = request.creator
+        self.data['_owner'] = self.getOwner(request)
 
         self.processFields()
 
