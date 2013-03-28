@@ -43,6 +43,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
 
+    def test_create_user_default_fields(self):
+        """
+            Given an admin user
+            When I create a user
+            Then non-required fields with defaults are set
+        """
+        username = 'messi'
+        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+        self.assertIn('objectType', res.json)
+        self.assertIn('following', res.json)
+        self.assertIn('subscribedTo', res.json)
+        self.assertEqual(res.json['objectType'], 'person')
+
     def test_create_user_not_manager(self):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header('imnotallowed'), status=401)

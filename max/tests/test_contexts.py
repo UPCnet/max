@@ -57,6 +57,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/contexts', json.dumps(create_context), oauth2Header(test_manager), status=201)
         self.assertIn('permissions', res.json)
         self.assertIn('tags', res.json)
+        self.assertIn('objectType', res.json)
+        self.assertEqual(res.json['objectType'], 'context')
 
     def test_post_activity_with_public_context(self):
         """ Post an activity to a context which allows everyone to read and write

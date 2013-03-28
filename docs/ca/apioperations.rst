@@ -53,7 +53,8 @@ Usuaris
                     "totalItems": 0,
                     "items": []
                 },
-                "id": "510fd582aceee925d0f1ecd1"
+                "id": "510fd582aceee925d0f1ecd1",
+                "objectType": "person"
             }
 
         .. -> expected
@@ -127,7 +128,8 @@ Contexts
                     "write": "public",
                     "subscribe": "public",
                     "invite": "public"
-                }
+                },
+                "objectType": "context"
             }
 
         .. -> expected
@@ -184,7 +186,8 @@ Contexts
                             "write": "public",
                             "invite": "public",
                             "subscribe": "public"
-                        }
+                        },
+                        "objectType": "context"
                     }
                 ]
             }
@@ -240,7 +243,8 @@ Contexts
                     "write": "public",
                     "subscribe": "public",
                     "invite": "public"
-                }
+                },
+                "objectType": "context"
             }
 
         .. -> expected
@@ -286,7 +290,8 @@ Contexts
                     "write": "public",
                     "subscribe": "public",
                     "invite": "public"
-                }
+                },
+                "objectType": "context"
             }
 
         .. -> expected
@@ -399,7 +404,8 @@ Subscripcions
                 },
                 "verb": "subscribe",
                 "published": "2013-02-05T15:15:02Z",
-                "id": "511121f6aceee949e9da50d6"
+                "id": "511121f6aceee949e9da50d6",
+                "objectType": "activity"
             }
 
         .. -> expected
@@ -495,7 +501,8 @@ s'explica amb profunditat en l'apartat de permisos.
                     "read",
                     "write",
                     "invite"
-                ]
+                ],
+                "objectType": "context"
             }
 
         .. -> expected
@@ -539,7 +546,8 @@ s'explica amb profunditat en l'apartat de permisos.
                     "read",
                     "invite",
                     "unsubscribe"
-                ]
+                ],
+                "objectType": "context"
             }
 
         .. -> expected
@@ -617,7 +625,8 @@ Activitats
                         "permissions": [
                             "read",
                             "write"
-                        ]
+                        ],
+                        "objectType": "context"
                     }
                 ],
                 "object": {
@@ -645,7 +654,8 @@ Activitats
                     ]
                 },
                 "id": "51112436aceee94b85795c15",
-                "published": "2013-02-05T15:24:38Z"
+                "published": "2013-02-05T15:24:38Z",
+                "objectType": "activity"
             }
 
         .. -> expected
@@ -712,7 +722,8 @@ Activitats
                         "permissions": [
                             "read",
                             "write"
-                        ]
+                        ],
+                        "objectType": "context"
                     }
                 ],
                 "object": {
@@ -740,7 +751,8 @@ Activitats
                     ]
                 },
                 "id": "51112436aceee94b85795c15",
-                "published": "2013-02-05T15:24:38Z"
+                "published": "2013-02-05T15:24:38Z",
+                "objectType": "activity"
             }
 
         .. -> expected

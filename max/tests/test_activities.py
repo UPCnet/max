@@ -54,6 +54,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
         self.assertIn('replies', res.json)
         self.assertIn('generator', res.json)
+        self.assertIn('objectType', res.json)
+        self.assertEqual(res.json['objectType'], 'activity')
 
     def test_post_activity_without_context(self):
         from .mockers import user_status

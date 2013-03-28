@@ -123,7 +123,8 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "twitterUsername": "messi10oficial",
-                "id": "510fd582aceee925d0f1ecd1"
+                "id": "510fd582aceee925d0f1ecd1",
+                "objectType": "person"
             }
 
         .. -> expected
@@ -174,7 +175,8 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "twitterUsername": "messi10oficial",
-                "id": "510fd582aceee925d0f1ecd1"
+                "id": "510fd582aceee925d0f1ecd1",
+                "objectType": "person"
             }
 
         .. -> expected
@@ -968,7 +970,8 @@ Subscripcions
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
-                        }
+                        },
+                        "objectType": "context"
                     },
                     {
                         "displayName": "Atenea A",
@@ -984,7 +987,8 @@ Subscripcions
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
-                        }
+                        },
+                        "objectType": "context"
                     }
                 ]
             }
@@ -1046,7 +1050,8 @@ Subscripcions
                 },
                 "verb": "subscribe",
                 "published": "2013-02-05T15:15:02Z",
-                "id": "511121f6aceee949e9da50d6"
+                "id": "511121f6aceee949e9da50d6",
+                "objectType": "activity"
             }
 
         .. -> expected
@@ -1102,7 +1107,8 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                             "read",
                             "write",
                             "invite"
-                        ]
+                        ],
+                        "objectType": "context"
                     }
                 ]
             }
@@ -1215,7 +1221,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                         "permissions": [
                             "read",
                             "write"
-                        ]
+                        ],
+                        "objectType": "context"
                     }
                 ],
                 "object": {
@@ -1243,7 +1250,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     "items": []
                 },
                 "id": "5111667be999fb0d6a01d44c",
-                "published": "2013-02-05T20:07:23Z"
+                "published": "2013-02-05T20:07:23Z",
+                "objectType": "context"
             }
 
         .. -> expected
@@ -1297,7 +1305,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                                 "permissions": [
                                     "read",
                                     "write"
-                                ]
+                                ],
+                                "objectType": "context"
                             }
                         ],
                         "object": {
@@ -1325,7 +1334,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "items": []
                         },
                         "id": "511169b3e999fb0dd75b20d5",
-                        "published": "2013-02-05T20:21:07Z"
+                        "published": "2013-02-05T20:21:07Z",
+                        "objectType": "activity"
                     }
                 ]
             }
@@ -1380,7 +1390,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "write": "subscribed",
                             "subscribe": "restricted",
                             "invite": "restricted"
-                        }
+                        },
+                        "objectType": "context"
                     }
                 ]
             }
@@ -1440,7 +1451,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                         "permissions": [
                             "read",
                             "write"
-                        ]
+                        ],
+                        "objectType": "context"
                     }
                 ],
                 "object": {
@@ -1465,7 +1477,8 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     ]
                 },
                 "id": "51116ce8e999fb0e3f274d6c",
-                "published": "2013-02-05T20:34:48Z"
+                "published": "2013-02-05T20:34:48Z",
+                "objectType": "activity"
             }
 
         .. -> expected
