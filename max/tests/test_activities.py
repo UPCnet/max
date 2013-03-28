@@ -42,6 +42,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
 
+    def test_create_activity_default_fields(self):
+        """
+            Given a plain user
+            When I create an activity
+            Then non-required fields with defaults are set
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        self.assertIn('replies', res.json)
+        self.assertIn('generator', res.json)
+
     def test_post_activity_without_context(self):
         from .mockers import user_status
         username = 'messi'

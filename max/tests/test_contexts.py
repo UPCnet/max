@@ -47,6 +47,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             new_context['permissions'].update(permissions)
         self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=201)
 
+    def test_create_context_default_fields(self):
+        """
+            Given a plain user
+            When I create a context
+            Then non-required fields with defaults are set
+        """
+        from .mockers import create_context
+        res = self.testapp.post('/contexts', json.dumps(create_context), oauth2Header(test_manager), status=201)
+        self.assertIn('permissions', res.json)
+        self.assertIn('tags', res.json)
+
     def test_post_activity_with_public_context(self):
         """ Post an activity to a context which allows everyone to read and write
         """

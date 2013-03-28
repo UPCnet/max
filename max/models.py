@@ -21,7 +21,7 @@ class Activity(MADBase):
               'commented':   dict(required=0),
               'contexts':    dict(required=0),
               'replies':     dict(required=0, default={'items': [], 'totalItems': 0}),
-              'generator':   dict(required=0),
+              'generator':   dict(required=0, default=None),
               }
 
     def setDates(self):
@@ -63,8 +63,6 @@ class Activity(MADBase):
             if isPerson:
                 ob['object']['_keywords'].append(self.data['actor']['username'])
 
-        if 'generator' in self.data:
-            ob['generator'] = self.data['generator']
         if 'contexts' in self.data:
             if isPerson:
                 # When a person posts an activity it can be targeted
@@ -91,7 +89,11 @@ class Activity(MADBase):
         properties = {}
         for key, value in self.schema.items():
             default = value.get('default', None)
-            if key not in self.data and default:
+            # Value is in the request but not set yet, set it please.
+            if key in self.data and key not in self:
+                properties[key] = self.data[key]
+            # Value is not in the request and we have a default, set it please
+            elif 'default' in value.keys():
                 properties[key] = default
         self.update(properties)
 
@@ -176,7 +178,7 @@ class User(MADBase):
             default = value.get('default', None)
             if key in self.data:
                 properties[key] = self.data[key]
-            elif default:
+            elif 'default' in value.keys():
                 properties[key] = default
 
         ob.update(properties)
@@ -246,7 +248,7 @@ class Context(MADBase):
     collection = 'contexts'
     unique = 'hash'
     schema = {'_id':                dict(),
-              'tags':               dict(required=0),
+              'tags':               dict(default=[]),
               'object':             dict(required=1,
                                          operations_mutable=1),
               'hash':               dict(),
@@ -283,7 +285,7 @@ class Context(MADBase):
             default = value.get('default', None)
             if key in self.data:
                 properties[key] = self.data[key]
-            elif default:
+            elif 'default' in value.keys():
                 properties[key] = default
         ob.update(properties)
 
