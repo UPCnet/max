@@ -3,14 +3,14 @@ from pyramid.view import view_config
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max.rest.utils import searchParams
 
 
 @view_config(route_name='timeline', request_method='GET')
 @MaxResponse
-@MaxRequest
+@requirePersonActor
 @oauth2(['widgetcli'])
 def getUserTimeline(context, request):
     """

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
-from max.decorators import MaxResponse, MaxRequest
+from max.decorators import MaxResponse
 
 from max.models import Activity
 
@@ -24,7 +24,6 @@ def getFollowedUser(context, request):
 
 @view_config(route_name='follow', request_method='POST')
 @MaxResponse
-@MaxRequest
 def follow(context, request):
     """
         /people/{username}/follows/{followedDN}'

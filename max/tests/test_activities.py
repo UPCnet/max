@@ -6,7 +6,7 @@ import unittest
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header, basicAuthHeader
+from max.tests.base import MaxTestBase, oauth2Header
 from max.tests import test_manager, test_default_security
 
 
@@ -371,7 +371,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Then the in the activities-sorted timeline, the order equals the activity order
         """
         from .mockers import user_status, user_comment
-        from time import sleep
         username = 'messi'
         self.create_user(username)
         activity_0_id = self.create_activity(username, user_status).json['id']
