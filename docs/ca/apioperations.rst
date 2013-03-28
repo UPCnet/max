@@ -92,6 +92,7 @@ Contexts
     :query permissions: (Opcional) Els permisos i parametrització de seguretat
         relacionada amb el context. Per defecte els contextos són públics a tots
         els efectes.
+    :query tags: (Opcional) Llista de tags per categoritzar un contexte
 
     Cos de la petició
 
@@ -197,7 +198,7 @@ Contexts
 
 .. http:put:: /contexts/{hash}
 
-    Modifica un context al sistema.
+    Modifica un context al sistema. Els camps que es poden modificar queden descrits a continuació
 
     :query hash: (REST) El hash del context en concret. Aquest hash es calcula
         fent una suma de verificació sha1 de la URL del context.
@@ -210,6 +211,7 @@ Contexts
         context té assignat. Qualsevol post fet a Twitter amb aquest usuari
         s'importarà i apareixerà a l'activitat del context com activitat
         (impersonat) del propi context.
+    :query tags: (Opcional) Llista de tags per categoritzar un contexte
 
     Cos de la petició
 
