@@ -92,11 +92,13 @@ class Activity(MADBase):
                         wrapper = self.getObjectWrapper(cobject['objectType'])
                         chash = wrapper(cobject).getHash()
                     subscription = dict(self.data['actor'].getSubscriptionByHash(chash))
-                    # Clean unnecessary fields
-                    del subscription['tags']
-                    del subscription['published']
-                    del subscription['permissions']
-                    del subscription['id']
+
+                    #Clean innecessary fields
+                    non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id']
+                    for fieldname in non_needed_subscription_fields:
+                        if fieldname in subscription:
+                            del subscription[fieldname]
+
                     ob['contexts'].append(subscription)
             if isContext:
                 # When a context posts an activity it can be posted only
