@@ -4,6 +4,22 @@ Permisos
 Es defineixen una serie de permisos i comportaments per defecte en relació als
 permisos del sistema i de les entitats del sistema.
 
+General
+-------
+
+Els permisos de modificació de camps i d'eliminació d'objectes estan subjectes a la propietat dels objectes.
+La propietat
+
+* creator
+* autor
+* owner
+
+- El creator te el mateix comportament a tots els objectes i identifica l'usuari que estava autenticat via oauth en el moment
+de la creació de l'objecte. Aquest camp no es pot modificar
+- L'actor identifica la persona real que està creant un objecte, i que podria ser diferent del creator, en el cas que un administrador
+estés creant activitat en nom d'una altra persona. L'actor tampoc es pot modificar.
+- El owner identifica qui és el propietari, és a dir qui té el poder per poder-lo modificar i eliminar. En el moment de creació de l'objecte l'owner és el mateix que el creador, excepte el el cas de crear activitats, que serà l'actor. L'owner pot canviar en determinades ocasions, com per exemple al marxar l'owner original d'una conversa, l'owner passarà a ser un altre dels components de la conversa.
+
 Contextos
 ---------
 

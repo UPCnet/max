@@ -201,7 +201,11 @@ Paràmetres referents al MAX
   on es publicaran les activitats. El context especificat a * ``readContext``,
   formara sempre part automàticament d'aquesta llista.
 * ``activitySource`` (obligatori)-  Font de l'activitat. Pot ser ``timeline`` o
-  ``activities``. (actualment només suporta ``activities``
+  ``activities``.
+* ``activitySortOrder`` - ``default: activities`` - Ordre que s'aplicarà a les activitats
+  tant en mode timeline com en mode activities. Si és ``activities`` la ultima activitat
+  generada sortirà la primera. SI és ``comments`` la ultima activitat on s'hagi fet
+  un comentari sortirà la primera.
 * ``generatorName`` (obligatori) - Nom que s'adjuntarà a les activitats
   generades des del widget, representant l'orígen de les activitats. Típicament
   serà el nom de l'aplicació on s'ha instal·lat el widget.
