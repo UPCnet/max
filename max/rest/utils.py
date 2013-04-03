@@ -351,7 +351,7 @@ def canWriteInContexts(actor, contexts):
     if contexts == []:
         return True
     else:
-        chashes = [context.getHash() for context in contexts]
+        chashes = [context.hash for context in contexts]
 
     subscribed_contexts = [a['hash'] for a in actor['subscribedTo']['items']]
     unsubscribed_contexts = [chash for chash in chashes if chash not in subscribed_contexts]

@@ -27,7 +27,6 @@ def getUserActivities(context, request):
     query = {}
     query['actor.username'] = request.actor['username']
     query['verb'] = 'post'
-    query['object.objectType'] = {'$ne': 'message'}
     activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, flatten=1)
 
     handler = JSONResourceRoot(activities)
@@ -86,7 +85,7 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed Uri contexts with read permission
-    subscribed_uris = [ctxt['object']['url'] for ctxt in request.actor.subscribedTo.get('items', []) if 'read' in ctxt.get('permissions', []) and ctxt['object']['objectType'] == 'uri']
+    subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo.get('items', []) if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
 
     # get the defined read context
     result_contexts = mmdb.contexts.getItemsByhash(chash)
@@ -94,7 +93,7 @@ def getActivities(context, request):
         rcontext = result_contexts[0]
     else:
         raise ObjectNotFound("Context with hash %s not found inside contexts" % (chash))
-    url = rcontext['object']['url']
+    url = rcontext['url']
 
     # regex query to find all contexts within url
     escaped = re.escape(url)
@@ -106,15 +105,15 @@ def getActivities(context, request):
 
     query = {}                                                     # Search
     query.update({'verb': 'post'})                                 # 'post' activities
-    query.update({'contexts.object.url': url_regex})                      # equal or child of url
+    query.update({'contexts.url': url_regex})                      # equal or child of url
 
     contexts_query = []
     if subscribed_uris:
-        subscribed_query = {'contexts.object.url': {'$in': subscribed_uris}}  # that are subscribed contexts
+        subscribed_query = {'contexts.url': {'$in': subscribed_uris}}  # that are subscribed contexts
         contexts_query.append(subscribed_query)                    # with read permission
 
     if public:                                                     # OR
-        public_query = {'contexts.object.url': {'$in': public}}
+        public_query = {'contexts.url': {'$in': public}}
         contexts_query.append(public_query)                        # pubic contexts
 
     if contexts_query:

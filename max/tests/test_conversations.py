@@ -29,6 +29,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.drop_collection('conversations')
         self.app.registry.max_store.security.insert(test_default_security)
         from webtest import TestApp
         self.testapp = TestApp(self.app)
@@ -60,7 +61,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         chash = str(res.json['contexts'][0]['hash'])
 
-        conversation = self.app.registry.max_store.contexts.find_one()
+        conversation = self.app.registry.max_store.conversations.find_one()
         permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
 
         self.assertEqual(conversation.get("object", None).get("participants", None), sorted([sender, recipient]))

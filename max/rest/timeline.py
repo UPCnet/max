@@ -38,7 +38,7 @@ def getUserTimeline(context, request):
     for subscribed in actor['subscribedTo']['items']:
         # Don't show conversations in timeline
         if subscribed['object']['objectType'] not in ['conversation']:
-            contexts_followings.append({'contexts.object.url': subscribed['object']['url']})
+            contexts_followings.append({'contexts.url': subscribed['object']['url']})
 
     query_items = []
 
@@ -56,8 +56,6 @@ def getUserTimeline(context, request):
     if query_items:
         query = {'$or': query_items}
         query['verb'] = 'post'
-        # Exclude messages from timeline
-        query['object.objectType'] = {'$ne': 'message'}
         # Include only visible activity, this includes activity with visible=True
         # and activity WITHOUT the visible field
         query['visible'] = {'$ne': False}

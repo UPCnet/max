@@ -190,10 +190,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_activities_does_not_show_private_fields(self):
         """
@@ -280,23 +280,23 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
         res = self.testapp.get('/activities', context_query, oauth2Header(username_not_me), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 3)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'xavi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
         self.assertEqual(result.get('items', None)[2].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_post_activity_with_generator(self):
         """ Post an activity to a context which allows everyone to read and write

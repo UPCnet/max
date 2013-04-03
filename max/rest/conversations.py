@@ -4,8 +4,8 @@ from pymongo import ASCENDING
 
 from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import Activity, Context
-from max.ASObjects import Conversation
+from max.models import Activity
+from max.models import Conversation as Conversation
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 
@@ -23,23 +23,23 @@ def getConversations(context, request):
          Return all conversations depending on the actor requester
     """
     mmdb = MADMaxDB(context.db)
-    query = {'object.participants': request.actor['username'],
-             'object.objectType': 'conversation',
+    query = {'participants': request.actor['username'],
+             'objectType': 'conversation',
              }
 
-    conversations = mmdb.contexts.search(query, sort="published", flatten=1, keep_private_fields=False)
+    conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=False)
     for conversation in conversations:
-        query = {'object.objectType': 'message',
+        query = {'objectType': 'message',
                  'contexts.hash': conversation['hash']
                  }
-        messages = mmdb.activity.search(query, flatten=1)
+        messages = mmdb.messages.search(query, flatten=1)
         lastMessage = messages[-1]
-        conversation['object']['lastMessage'] = {'published': lastMessage['published'],
+        conversation['lastMessage'] = {'published': lastMessage['published'],
                                                  'content': lastMessage['object']['content']
                                                  }
-        conversation['object']['messages'] = len(messages)
+        conversation['messages'] = len(messages)
 
-    handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['object']['lastMessage']['published']))
+    handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['lastMessage']['published']))
     return handler.buildResponse()
 
 
@@ -71,28 +71,27 @@ def postMessage2Conversation(context, request):
 
     # If there are only two participants in the conversation, try to get an existing conversation
     # Otherwise, assume is a group conversation and create a new one
-
     current_conversation = None
     if len(ctxts[0]['participants']) == 2:
-        contexts = MADMaxCollection(context.db.contexts)
-        conversations = contexts.search({'object.objectType': 'conversation', 'object.participants': {'$in': ctxts[0]['participants']}})
+        contexts = MADMaxCollection(context.db.conversations)
+        conversations = contexts.search({'objectType': 'conversation', 'participants': {'$in': ctxts[0]['participants']}})
         if conversations:
             current_conversation = conversations[0]
 
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
         conversation_params = dict(actor=request.actor,
-                                   object=ctxts[0],
+                                   participants=ctxts[0]['participants'],
                                    permissions={'read': 'subscribed',
                                                 'write': 'subscribed',
                                                 'subscribe': 'restricted',
                                                 'unsubscribe': 'public',
                                                 'invite': 'restricted'}
                                    )
-        newconversation = Context(request)
+        newconversation = Conversation(request)
         newconversation.fromRequest(request, rest_params=conversation_params)
 
-        if not request.actor.username in newconversation.object['participants']:
+        if not request.actor.username in newconversation['participants']:
             raise ValidationError('Actor must be part of the participants list.')
 
         # New conversation
@@ -100,7 +99,7 @@ def postMessage2Conversation(context, request):
         newconversation['_id'] = contextid
 
         # Subscribe everyone,
-        for user in newconversation['object']['participants']:
+        for user in newconversation['participants']:
             users[user].addSubscription(newconversation)
 
         current_conversation = newconversation

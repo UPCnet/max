@@ -109,16 +109,16 @@ def requireContextActor(exists=True):
                 except:
                     raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
                 else:
-                    #Only Uri contexts are allowed as actors
-                    if actor.object['objectType'].lower() not in ['uri']:
-                        raise ObjectNotSupported('%s objectType not supported as an actor' % actor.object['objectType'])
+                    #Only ontexts are allowed as context actors
+                    if actor['objectType'].lower() not in ['context']:
+                        raise ObjectNotSupported('%s objectType not supported as an actor' % actor['objectType'])
 
             def getActor(request):
                 try:
                     if isinstance(actor, User):
                         actor.setdefault('displayName', actor['username'])
                     if isinstance(actor, Context):
-                        actor.setdefault('displayName', actor['object']['url'])
+                        actor.setdefault('displayName', actor['url'])
                     return actor
                 except:
                     return None
@@ -140,8 +140,8 @@ def MaxResponse(fun):
         # issue proper status code with message
         nkargs = [a for a in args]
         context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
-        #response = fun(*args, **kwargs)
-        #return response
+        # response = fun(*args, **kwargs)
+        # return response
         try:
             response = fun(*args, **kwargs)
         except InvalidId, message:

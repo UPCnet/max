@@ -9,6 +9,7 @@ from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.MADMax import MADMaxDB
+from hashlib import sha1
 
 
 @view_config(route_name='subscriptions', request_method='POST', restricted='Manager')
@@ -32,7 +33,8 @@ def subscribe(context, request):
 
     #Check if user is already subscribed
     subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo['items']]
-    if newactivity.object.getHash() in subscribed_contexts_hashes:
+    chash = sha1(newactivity.object['url']).hexdigest()
+    if chash in subscribed_contexts_hashes:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was susbcribed. This way in th return data we'll have the date of subscription
         code = 200
@@ -48,7 +50,7 @@ def subscribe(context, request):
 
         #Register subscription to the actor
         contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-        scontext = contexts[newactivity['object'].getHash()]
+        scontext = contexts[chash]
         actor.addSubscription(scontext)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
