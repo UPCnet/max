@@ -398,7 +398,7 @@ l'usuari ha estat previament subscrit a aquest context.
 
 .. http:get:: /people/{username}/activities
 
-    Llista totes les activitats generades al sistema per part d'un usuari
+    Llista totes les activitats de tipus post generades al sistema per part d'un usuari
     concret.
 
     :query username: (REST) Identificador d'usuari que crea l'activitat
@@ -412,7 +412,7 @@ l'usuari ha estat previament subscrit a aquest context.
         .. code-block:: python
 
             {
-                "totalItems": 3,
+                "totalItems": 2,
                 "items": [
                     {
                         "generator": null,
@@ -460,27 +460,6 @@ l'usuari ha estat previament subscrit a aquest context.
                         "id": "5154947c71c75c91e7dc5d6d",
                         "published": "2013-03-28T19:05:32Z",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:05:32Z",
-                        "objectType": "activity"
-                    },
-                    {
-                        "generator": null,
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "actor": {
-                            "username": "messi",
-                            "displayName": "messi",
-                            "objectType": "person"
-                        },
-                        "id": "5154947c71c75c91e7dc5d6c",
-                        "published": "2013-03-28T19:05:32Z",
-                        "verb": "subscribe",
                         "replies": {
                             "totalItems": 0,
                             "items": []
