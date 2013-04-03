@@ -59,7 +59,7 @@ Usuaris
 
         .. -> expected
             >>> response = testapp.post('/people/{}'.format(username), "", oauth2Header(test_manager), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -134,7 +134,7 @@ Contexts
 
         .. -> expected
             >>> response = testapp.post('/contexts', payload, oauth2Header(test_manager), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -194,7 +194,7 @@ Contexts
 
         .. -> expected
             >>> response = testapp.get('/contexts', payload, oauth2Header(test_manager), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('totalItems') == 1
             True
@@ -249,7 +249,7 @@ Contexts
 
         .. -> expected
             >>> response = testapp.put('/contexts/{}'.format(context_hash), payload, oauth2Header(test_manager), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -296,7 +296,7 @@ Contexts
 
         .. -> expected
             >>> response = testapp.get('/contexts/{}'.format(context_hash), "", oauth2Header(test_manager), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -332,7 +332,7 @@ Contexts
 
         .. actual test
             >>> response = testapp.delete('/contexts/{}'.format(context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <204 No Content ...
 
     Success
@@ -410,7 +410,7 @@ Subscripcions
 
         .. -> expected
             >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -447,7 +447,7 @@ Subscripcions
     >>> create_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "uri" } }
     >>> resp = utils.create_context(create_context_d)
     >>> context_hash_for_deleting = resp.json.get('hash')
-    >>> utils.admin_subscribe_user_to_context(username, create_context_d) # doctest: +ELLIPSIS
+    >>> utils.admin_subscribe_user_to_context(username, create_context_d)
     <201 Created application/json ...
 
     Resposta esperada
@@ -456,7 +456,7 @@ Subscripcions
 
         .. actual test
             >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <204 No Content ...
 
     Success
@@ -507,7 +507,7 @@ s'explica amb profunditat en l'apartat de permisos.
 
         .. -> expected
             >>> response = testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
 
     Success
@@ -552,7 +552,7 @@ s'explica amb profunditat en l'apartat de permisos.
 
         .. -> expected
             >>> response = testapp.delete('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -561,7 +561,7 @@ s'explica amb profunditat en l'apartat de permisos.
 
 .. put the write permissions of the test user back for further testing :)
 
-    >>> testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201) # doctest: +ELLIPSIS
+    >>> testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201)
     <201 Created application/json ...
 
     Success
@@ -660,7 +660,7 @@ Activitats
 
         .. -> expected
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(test_manager), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -757,7 +757,7 @@ Activitats
 
         .. -> expected
             >>> response = testapp.post('/contexts/{}/activities'.format(context_hash), payload, oauth2Header(test_manager), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True

@@ -39,14 +39,14 @@ resultats, indicant el total d'elements retornats::
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> username = "messi"
     >>> utils = MaxTestBase(testapp)
-    >>> utils.create_user(username) # doctest: +ELLIPSIS
+    >>> utils.create_user(username)
     <201 Created application/json ...
     >>> from max.tests.mockers import create_context, create_contextA, subscribe_context, context_query, user_status
-    >>> utils.create_context(create_context) # doctest: +ELLIPSIS
+    >>> utils.create_context(create_context)
     <201 Created application/json ...
-    >>> utils.create_context(create_contextA) # doctest: +ELLIPSIS
+    >>> utils.create_context(create_contextA)
     <201 Created application/json ...
-    >>> utils.admin_subscribe_user_to_context(username, subscribe_context) # doctest: +ELLIPSIS
+    >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
     <201 Created application/json ...
 
 Usuaris
@@ -77,7 +77,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. -> expected
             >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -130,7 +130,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. -> expected
             >>> response = testapp.put('/people/{}'.format(username), payload, oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -182,7 +182,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. -> expected
             >>> response = testapp.get('/people/{}'.format(username), "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -277,7 +277,7 @@ llistar-les com crear-ne de noves.
 
         .. -> expected
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
             True
@@ -387,7 +387,7 @@ l'usuari ha estat previament subscrit a aquest context.
 
         .. -> expected
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
             True
@@ -473,7 +473,7 @@ l'usuari ha estat previament subscrit a aquest context.
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/people/{}/activities'.format(username), "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
@@ -599,7 +599,7 @@ concret.
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/activities', eval(payload), oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
@@ -698,7 +698,7 @@ indirectament.
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
@@ -784,7 +784,7 @@ Representa el conjunt de comentaris fets a una activitat.
             >>> expected = json.loads(expected)
             >>> activity = utils.create_activity(username, user_status)
             >>> response = testapp.post('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('actor').get('displayName') == expected.get('actor').get('displayName')
             True
@@ -830,7 +830,7 @@ Representa el conjunt de comentaris fets a una activitat.
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
             True
@@ -966,7 +966,7 @@ Subscripcions
 
         .. -> expected
             >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('displayName') == eval(expected).get('displayName')
             True
@@ -1047,7 +1047,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
 
         .. -> expected
             >>> response = testapp.get('/people/{}/subscriptions'.format(username), "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('totalItems') == eval(expected).get('totalItems')
             True
@@ -1070,7 +1070,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
     >>> create_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "uri" } }
     >>> resp = utils.create_context(create_context_d)
     >>> context_hash_for_deleting = resp.json.get('hash')
-    >>> utils.admin_subscribe_user_to_context(username, create_context_d) # doctest: +ELLIPSIS
+    >>> utils.admin_subscribe_user_to_context(username, create_context_d)
     <201 Created application/json ...
 
 
@@ -1080,7 +1080,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
 
         .. actual test
             >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(username), status=204)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <204 No Content ...
 
     Success
@@ -1097,7 +1097,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 .. setup other user for conversations interaction
 
     >>> username2 = 'xavi'
-    >>> utils.create_user(username2) # doctest: +ELLIPSIS
+    >>> utils.create_user(username2)
     <201 Created application/json ...
 
 .. http:post:: /conversations
@@ -1184,7 +1184,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations', payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
@@ -1257,7 +1257,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/conversations/{}/messages'.format(conversation_hash), "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('object').get('objectType') == expected.get('items')[0].get('object').get('objectType')
             True
@@ -1313,7 +1313,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
         .. -> expected
             >>> response = testapp.get('/conversations', "", oauth2Header(username), status=200)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('object').get('objectType') == eval(expected).get('items')[0].get('object').get('objectType')
             True
@@ -1392,7 +1392,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations/{}/messages'.format(conversation_hash), payload, oauth2Header(username), status=201)
-            >>> response # doctest: +ELLIPSIS
+            >>> response
             <201 Created application/json ...
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
