@@ -30,11 +30,14 @@ criteri escollit:
 
 READ
 ~~~~
+Defineix qui pot llegir l'activitat escrita sota el context
+
     - subscribed - Tots els usuaris subscrits al context poden llegir
     - public -  Qualsevol usuari sense esta subscrit al context el pot llegir
 
 WRITE
 ~~~~~
+Defineix qui pot afegir activitat al context
 
     - subscribed - Tots els usuaris subscrits al context poden escriure al context
     - restricted - Només el usuaris subscrits i autoritzats explicitament
@@ -44,9 +47,17 @@ WRITE
 
 SUBSCRIBE
 ~~~~~~~~~
+Defineix qui es pot subscriure al context
 
     - restricted - Només els usuaris administradors poden efectuar subscripcions al context
     - public - Qualsevol usuari pot subscriure's al context (i dessubscriure's)
+
+UNSUBSCRIBE
+~~~~~~~~~~~
+Defineix qui es pot dessubscriure d'un context. Aquest permís es dona automàticament en cas que el permís subscribe sigui public.Només cal especificar-lo si es vol modificar el compartament per defecte.
+    - restricted - Només els usuaris administradors poden dessubscriure usuaris del context
+    - public - Qualsevol usuari pot dessubscriure's del context previament subscrit
+
 
 Si no s'especifiquen en la creació del context, els permisos per defecte són:
 

@@ -86,6 +86,7 @@ def postMessage2Conversation(context, request):
                                    permissions={'read': 'subscribed',
                                                 'write': 'subscribed',
                                                 'subscribe': 'restricted',
+                                                'unsubscribe': 'public',
                                                 'invite': 'restricted'}
                                    )
         newconversation = Context(request)

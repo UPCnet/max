@@ -61,7 +61,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         chash = str(res.json['contexts'][0]['hash'])
 
         conversation = self.app.registry.max_store.contexts.find_one()
-        permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'invite': 'restricted'}
+        permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
 
         self.assertEqual(conversation.get("object", None).get("participants", None), sorted([sender, recipient]))
         self.assertEqual(conversation.get("object", None).get("objectType", None), "conversation")

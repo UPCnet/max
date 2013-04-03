@@ -371,7 +371,8 @@ class Context(MADBase):
             user_permissions.append('write')
         if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
             user_permissions.append('invite')
-        if permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) in ['public']:
+        unsubscribe_permission = permissions.get('unsubscribe', permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']))
+        if unsubscribe_permission in ['public']:
             user_permissions.append('unsubscribe')
 
         #Assign permissions to the subscription object before adding it
