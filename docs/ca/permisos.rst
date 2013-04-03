@@ -11,7 +11,7 @@ Els permisos de modificació de camps i d'eliminació d'objectes estan subjectes
 La propietat
 
 * creator
-* autor
+* actor
 * owner
 
 - El creator te el mateix comportament a tots els objectes i identifica l'usuari que estava autenticat via oauth en el moment
