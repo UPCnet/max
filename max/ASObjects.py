@@ -2,6 +2,8 @@
 from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
 from hashlib import sha1
+from datetime import datetime
+from rfc3339 import rfc3339
 
 
 class ASObject(MADDict):
@@ -113,6 +115,7 @@ class Conversation(ASObject):
     schema = {'_id':          dict(),
               'objectType':   dict(required=1),
               'participants': dict(required=1),
+              '_hash':        dict(required=0)
               }
 
     def __init__(self, data, creating=True):
@@ -121,15 +124,21 @@ class Conversation(ASObject):
         self.data = data
         self.processFields()
         self.update(data)
+        self.getHash()
 
     def getHash(self):
         """
             Calculates the hash based on the participants of the conversation
+            and the creation date. Return the existing hash if already set
         """
-        participants = list(self.participants)  # Make a copy
-        participants.sort()                     # Sort it
-        alltogether = ''.join(participants)     # Join It
-        return sha1(alltogether).hexdigest()    # Hash it
+        if self.get('_hash', None) is None:
+            participants = list(self.participants)  # Make a copy
+            participants.sort()                     # Sort it
+            alltogether = ''.join(participants)     # Join It
+            date = rfc3339(datetime.now(), utc=True, use_system_timezone=False)
+            alltogether += date
+            self._hash = sha1(alltogether).hexdigest()  # Hash it
+        return self._hash
 
     def getDisplayName(self):
         return ', '.join(self.participants)

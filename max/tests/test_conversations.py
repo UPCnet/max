@@ -2,7 +2,6 @@
 import os
 import json
 import unittest
-from hashlib import sha1
 
 from mock import patch
 from paste.deploy import loadapp
@@ -58,33 +57,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
 
         conversation = self.app.registry.max_store.contexts.find_one()
         permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'invite': 'restricted'}
-        participants = list([sender, recipient])
-        participants.sort()
-        alltogether = ''.join(participants)
-        chash = sha1(alltogether).hexdigest()
 
         self.assertEqual(conversation.get("object", None).get("participants", None), sorted([sender, recipient]))
         self.assertEqual(conversation.get("object", None).get("objectType", None), "conversation")
         self.assertEqual(conversation.get("permissions", None), permissions)
         self.assertEqual(conversation.get("hash", None), chash)
 
-    def test_post_messages_to_an_already_existing_conversation_check_not_duplicated_conversation(self):
+    def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
+        res = self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
+        chash2 = str(res.json['contexts'][0]['hash'])
 
-        res = self.testapp.get('/conversations', {}, oauth2Header(sender), status=200)
+        self.assertEqual(chash, chash2)
+
+        res = self.testapp.get('/conversations/%s/messages' % chash, {}, oauth2Header(sender), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get("totalItems", None), 1)
+        self.assertEqual(result.get("totalItems", None), 2)
 
     def test_post_messages_to_an_already_existing_conversation(self):
         from .mockers import message, message2
@@ -93,13 +93,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
-
-        participants = list([sender, recipient])
-        participants.sort()
-        alltogether = ''.join(participants)
-        chash = sha1(alltogether).hexdigest()
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
+        self.testapp.post('/conversations/%s/messages' % chash, json.dumps(message2), oauth2Header(sender), status=201)
 
         res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(sender), status=200)
         result = json.loads(res.text)
@@ -117,12 +113,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        participants = list([sender, recipient])
-        participants.sort()
-        alltogether = ''.join(participants)
-        chash = sha1(alltogether).hexdigest()
-
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
         self.testapp.post('/conversations/%s/messages' % chash, json.dumps(message3), oauth2Header(sender), status=201)
 
         res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(sender), status=200)
@@ -142,13 +134,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
-
-        participants = list([sender, recipient])
-        participants.sort()
-        alltogether = ''.join(participants)
-        chash = sha1(alltogether).hexdigest()
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
+        self.testapp.post('/conversations/%s/messages' % chash, json.dumps(message2), oauth2Header(sender), status=201)
 
         res = self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(recipient), status=200)
         result = json.loads(res.text)
@@ -164,13 +152,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(external)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
-
-        participants = list([sender, recipient])
-        participants.sort()
-        alltogether = ''.join(participants)
-        chash = sha1(alltogether).hexdigest()
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        chash = str(res.json['contexts'][0]['hash'])
+        self.testapp.post('/conversations/%s/messages' % chash, json.dumps(message2), oauth2Header(sender), status=201)
 
         self.testapp.get('/conversations/%s/messages' % chash, "", oauth2Header(external), status=400)
 

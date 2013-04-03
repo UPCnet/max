@@ -69,22 +69,31 @@ def postMessage2Conversation(context, request):
     for participant in ctxts[0]['participants']:
         user = users[participant]
 
-    # Initialize a conversation (context) object from the request, overriding the object using the context
-    conversation_params = dict(actor=request.actor,
-                               object=ctxts[0],
-                               permissions={'read': 'subscribed',
-                                            'write': 'subscribed',
-                                            'subscribe': 'restricted',
-                                            'invite': 'restricted'},
-                               hash=Conversation(ctxts[0]).getHash()
-                               )
-    newconversation = Context(request)
-    newconversation.fromRequest(request, rest_params=conversation_params)
+    # If there are only two participants in the conversation, try to get an existing conversation
+    # Otherwise, assume is a group conversation and create a new one
 
-    if not request.actor.username in newconversation.object['participants']:
-        raise ValidationError('Actor must be part of the participants list.')
+    current_conversation = None
+    if len(ctxts[0]['participants']) == 2:
+        contexts = MADMaxCollection(context.db.contexts)
+        conversations = contexts.search({'object.objectType': 'conversation', 'object.participants': {'$in': ctxts[0]['participants']}})
+        if conversations:
+            current_conversation = conversations[0]
 
-    if not newconversation.get('_id'):
+    if current_conversation is None:
+        # Initialize a conversation (context) object from the request, overriding the object using the context
+        conversation_params = dict(actor=request.actor,
+                                   object=ctxts[0],
+                                   permissions={'read': 'subscribed',
+                                                'write': 'subscribed',
+                                                'subscribe': 'restricted',
+                                                'invite': 'restricted'}
+                                   )
+        newconversation = Context(request)
+        newconversation.fromRequest(request, rest_params=conversation_params)
+
+        if not request.actor.username in newconversation.object['participants']:
+            raise ValidationError('Actor must be part of the participants list.')
+
         # New conversation
         contextid = newconversation.insert()
         newconversation['_id'] = contextid
@@ -92,15 +101,14 @@ def postMessage2Conversation(context, request):
         # Subscribe everyone,
         for user in newconversation['object']['participants']:
             users[user].addSubscription(newconversation)
-    else:
-        # Subscriure users in participants conditionally
-        subs_usernames = [user['username'] for user in newconversation.subscribedUsers()]
-        unsubscribed = set(newconversation['object']['participants']).difference(set(subs_usernames))
-        for user in unsubscribed:
-            users[user].addSubscription(newconversation)
+
+        current_conversation = newconversation
 
     # We have to re-get the actor, in order to have the subscription updated
     message_params = {'actor': users[request.actor['username']],
+                      'contexts': [{'objectType': 'conversation',
+                                    'hash': current_conversation.hash
+                                    }],
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
