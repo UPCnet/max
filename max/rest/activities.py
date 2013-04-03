@@ -86,7 +86,7 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed Uri contexts with read permission
-    subscribed_uris = [context['object']['url'] for context in request.actor.subscribedTo.get('items', []) if 'read' in context.get('permissions', []) and context['object']['objectType'] == 'uri']
+    subscribed_uris = [ctxt['object']['url'] for ctxt in request.actor.subscribedTo.get('items', []) if 'read' in ctxt.get('permissions', []) and ctxt['object']['objectType'] == 'uri']
 
     # get the defined read context
     result_contexts = mmdb.contexts.getItemsByhash(chash)
