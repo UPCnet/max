@@ -73,7 +73,15 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. code-block:: python
 
-            {"totalItems": 1, "items": [{"username": "messi", "id": "510fd582aceee925d0f1ecd1"}]}
+            {
+                "totalItems": 1,
+                "items": [
+                    {
+                        "username": "messi",
+                        "id": "515d7ad9fcfff269213c47a7"
+                    }
+                ]
+            }
 
         .. -> expected
             >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
@@ -113,18 +121,40 @@ Operacions sobre el recurs *usuari* del sistema.
             {
                 "username": "messi",
                 "displayName": "Lionel Messi",
-                "subscribedTo": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "last_login": "2013-02-01T19:33:16Z",
-                "published": "2013-02-01T19:33:16Z",
+                "creator": "test_manager",
                 "following": {
                     "totalItems": 0,
                     "items": []
                 },
+                "subscribedTo": {
+                    "totalItems": 1,
+                    "items": [
+                        {
+                            "displayName": "Atenea",
+                            "tags": [
+                                "Assignatura"
+                            ],
+                            "url": "http://atenea.upc.edu",
+                            "creator": "test_manager",
+                            "published": "2013-04-04T13:06:33Z",
+                            "owner": "test_manager",
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "objectType": "context",
+                            "id": "515d7ad9fcfff269213c47a8",
+                            "permissions": [
+                                "read",
+                                "write",
+                                "invite",
+                                "unsubscribe"
+                            ]
+                        }
+                    ]
+                },
+                "last_login": "2013-04-04T13:06:33Z",
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "510fd582aceee925d0f1ecd1",
+                "id": "515d7ad9fcfff269213c47a7",
                 "objectType": "person"
             }
 
@@ -165,18 +195,40 @@ Operacions sobre el recurs *usuari* del sistema.
             {
                 "username": "messi",
                 "displayName": "Lionel Messi",
-                "subscribedTo": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "last_login": "2013-02-01T19:33:16Z",
-                "published": "2013-02-01T19:33:16Z",
+                "creator": "test_manager",
                 "following": {
                     "totalItems": 0,
                     "items": []
                 },
+                "subscribedTo": {
+                    "totalItems": 1,
+                    "items": [
+                        {
+                            "displayName": "Atenea",
+                            "creator": "test_manager",
+                            "url": "http://atenea.upc.edu",
+                            "tags": [
+                                "Assignatura"
+                            ],
+                            "published": "2013-04-04T13:06:33Z",
+                            "owner": "test_manager",
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "permissions": [
+                                "read",
+                                "write",
+                                "invite",
+                                "unsubscribe"
+                            ],
+                            "id": "515d7ad9fcfff269213c47a8",
+                            "objectType": "context"
+                        }
+                    ]
+                },
+                "last_login": "2013-04-04T13:06:33Z",
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "510fd582aceee925d0f1ecd1",
+                "id": "515d7ad9fcfff269213c47a7",
                 "objectType": "person"
             }
 
@@ -248,17 +300,17 @@ llistar-les com crear-ne de noves.
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "messi",
                 "replies": {
                     "totalItems": 0,
-                    "items": [
-
-                    ]
+                    "items": []
                 },
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus</p>",
-                    "_keywords": [
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                    "keywords": [
                         "testejant",
-                        "creaci\\u00f3",
+                        "creaci\u00f3",
                         "canvi",
                         "messi"
                     ],
@@ -267,21 +319,24 @@ llistar-les com crear-ne de noves.
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
-                    "id": "510ec463e999fb129b5c4104",
                     "objectType": "person"
                 },
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "post",
-                "published": "2013-02-03T20:11:15Z",
-                "id": "510fd582aceee925d0f1ecd1"
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47ab",
+                "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(username), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
+            >>> response.json.get('actor').get('displayName') == expected.get('actor').get('displayName')
             True
-            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
 
     Success
@@ -340,60 +395,56 @@ l'usuari ha estat previament subscrit a aquest context.
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "messi",
                 "contexts": [
                     {
                         "displayName": "Atenea",
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-02-03T20:56:56Z",
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
+                        "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "id": "510ecf18e999fb140d38f48e",
-                        "permissions": [
-                            "read",
-                            "write",
-                            "invite"
-                        ]
+                        "objectType": "context"
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                    "_keywords": [
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "keywords": [
                         "testejant",
-                        "creaci\\u00f3",
+                        "creaci\u00f3",
                         "canvi",
                         "context",
                         "messi"
                     ],
                     "objectType": "note"
                 },
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
-                    "id": "510ecf18e999fb140d38f48d",
                     "objectType": "person"
                 },
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "post",
-                "replies": {
-                    "totalItems": 0,
-                    "items": [
-
-                    ]
-                },
-                "id": "510ecf18e999fb140d38f491",
-                "published": "2013-02-03T20:56:56Z"
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47ac",
+                "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(username), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('actor').get('displayName') == eval(expected).get('actor').get('displayName')
+            >>> response.json.get('actor').get('displayName') == expected.get('actor').get('displayName')
             True
-            >>> response.json.get('object').get('objectType') == eval(expected).get('object').get('objectType')
+            >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
-            >>> response.json.get('contexts')[0].get('object').get('url') == eval(expected).get('contexts')[0].get('object').get('url')
+            >>> response.json.get('contexts')[0].get('url') == expected.get('contexts')[0].get('url')
             True
 
 .. http:get:: /people/{username}/activities
@@ -419,37 +470,40 @@ l'usuari ha estat previament subscrit a aquest context.
                         "contexts": [
                             {
                                 "displayName": "Atenea",
-                                "object": {
-                                    "url": "http://atenea.upc.edu",
-                                    "objectType": "uri"
-                                },
+                                "creator": "test_manager",
+                                "url": "http://atenea.upc.edu",
+                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                                 "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
+                        },
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154947c71c75c91e7dc5d6e",
-                        "published": "2013-03-28T19:05:32Z",
+                        "id": "515d7ad9fcfff269213c47ac",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:05:32Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
                         "objectType": "activity"
                     },
                     {
                         "generator": null,
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
                         "object": {
-                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
                             "objectType": "note"
                         },
                         "actor": {
@@ -457,14 +511,10 @@ l'usuari ha estat previament subscrit a aquest context.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154947c71c75c91e7dc5d6d",
-                        "published": "2013-03-28T19:05:32Z",
+                        "id": "515d7ad9fcfff269213c47ab",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:05:32Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
                         "objectType": "activity"
                     }
                 ]
@@ -546,53 +596,51 @@ concret.
                         "contexts": [
                             {
                                 "displayName": "Atenea",
-                                "object": {
-                                    "url": "http://atenea.upc.edu",
-                                    "objectType": "uri"
-                                },
+                                "creator": "test_manager",
+                                "url": "http://atenea.upc.edu",
+                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                                 "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
+                        },
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154957271c75c92480afde8",
-                        "published": "2013-03-28T19:09:38Z",
+                        "id": "515d7ad9fcfff269213c47ac",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:09:38Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
                         "objectType": "activity"
                     }
                 ],
                 "context": {
                     "displayName": "Atenea",
+                    "creator": "test_manager",
+                    "url": "http://atenea.upc.edu",
                     "tags": [
                         "Assignatura"
                     ],
-                    "object": {
-                        "url": "http://atenea.upc.edu",
-                        "objectType": "uri"
-                    },
-                    "published": "2013-03-28T19:09:38Z",
+                    "published": "2013-04-04T13:06:33Z",
+                    "owner": "test_manager",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                    "objectType": "context",
+                    "id": "515d7ad9fcfff269213c47a8",
                     "permissions": {
                         "write": "public",
                         "subscribe": "public",
                         "read": "public",
                         "invite": "subscribed"
-                    },
-                    "id": "5154957271c75c92480afde4",
-                    "objectType": "context"
+                    }
                 }
             }
 
@@ -644,37 +692,40 @@ indirectament.
                         "contexts": [
                             {
                                 "displayName": "Atenea",
-                                "object": {
-                                    "url": "http://atenea.upc.edu",
-                                    "objectType": "uri"
-                                },
+                                "creator": "test_manager",
+                                "url": "http://atenea.upc.edu",
+                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                                 "objectType": "context"
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
                             "objectType": "note"
+                        },
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
                         },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154961171c75c92a6f0ba38",
-                        "published": "2013-03-28T19:12:17Z",
+                        "id": "515d7ad9fcfff269213c47ac",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:12:17Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
                         "objectType": "activity"
                     },
                     {
                         "generator": null,
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
                         "object": {
-                            "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
                             "objectType": "note"
                         },
                         "actor": {
@@ -682,14 +733,10 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154961171c75c92a6f0ba37",
-                        "published": "2013-03-28T19:12:17Z",
+                        "id": "515d7ad9fcfff269213c47ab",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T19:12:17Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
                         "objectType": "activity"
                     }
                 ]
@@ -746,6 +793,7 @@ Representa el conjunt de comentaris fets a una activitat.
 
             {
                 "generator": null,
+                "creator": "messi",
                 "replies": {
                     "totalItems": 0,
                     "items": []
@@ -754,7 +802,7 @@ Representa el conjunt de comentaris fets a una activitat.
                     "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
                     "inReplyTo": [
                         {
-                            "id": "51549c0371c75c94c025dff5",
+                            "id": "515d7ad9fcfff269213c47ad",
                             "objectType": "note"
                         }
                     ],
@@ -773,10 +821,11 @@ Representa el conjunt de comentaris fets a una activitat.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "id": "51549c0371c75c94c025dff6",
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "comment",
-                "published": "2013-03-28T19:37:39Z",
-                "commented": "2013-03-28T19:37:39Z",
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47ae",
                 "objectType": "activity"
             }
 
@@ -815,14 +864,14 @@ Representa el conjunt de comentaris fets a una activitat.
                 "items": [
                     {
                         "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                        "objectType": "comment",
+                        "id": "515d7ad9fcfff269213c47ae",
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "published": "2013-03-28T19:50:32Z",
-                        "id": "51549f0871c75c969de018aa",
-                        "objectType": "comment"
+                        "published": "2013-04-04T13:06:33Z"
                     }
                 ]
             }
@@ -863,41 +912,39 @@ Subscripcions
                 "items": [
                     {
                         "displayName": "Atenea",
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
                         "tags": [
                             "Assignatura"
                         ],
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-03-28T19:54:27Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "objectType": "context",
+                        "id": "515d7ad9fcfff269213c47a8",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
-                        },
-                        "id": "51549ff371c75c9732101768",
-                        "objectType": "context"
+                        }
                     },
                     {
                         "displayName": "Atenea A",
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu/A",
                         "tags": [],
-                        "object": {
-                            "url": "http://atenea.upc.edu/A",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-03-28T19:54:27Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
+                        "objectType": "context",
+                        "id": "515d7ad9fcfff269213c47a9",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
                             "read": "public",
                             "invite": "subscribed"
-                        },
-                        "id": "51549ff371c75c9732101769",
-                        "objectType": "context"
+                        }
                     }
                 ]
             }
@@ -909,7 +956,7 @@ Subscripcions
             <200 OK application/json ...
             >>> response.json.get('totalItems') == expected.get('totalItems')
             True
-            >>> response.json.get('items')[0]['object']['objectType'] == expected.get('items')[0]['object']['objectType']
+            >>> response.json.get('items')[0]['objectType'] == expected.get('items')[0]['objectType']
             True
 
 
@@ -934,7 +981,7 @@ Subscripcions
 
             {
                 "object": {
-                    "objectType": "uri",
+                    "objectType": "context",
                     "url": "http://atenea.upc.edu/A"
                 }
             }
@@ -946,33 +993,37 @@ Subscripcions
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "messi",
                 "replies": {
                     "totalItems": 0,
                     "items": []
                 },
                 "object": {
                     "url": "http://atenea.upc.edu/A",
-                    "objectType": "uri"
+                    "objectType": "context"
                 },
                 "actor": {
                     "username": "messi",
-                    "displayName": "messi",
-                    "id": "511121f6aceee949e9da50d4",
+                    "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "subscribe",
-                "published": "2013-02-05T15:15:02Z",
-                "id": "511121f6aceee949e9da50d6",
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47af",
                 "objectType": "activity"
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(username), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('verb') == eval(expected).get('verb')
+            >>> response.json.get('verb') == expected.get('verb')
             True
 
     Success
@@ -1008,41 +1059,39 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                 "items": [
                     {
                         "displayName": "Atenea",
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
                         "tags": [
                             "Assignatura"
                         ],
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-03-28T19:57:57Z",
+                        "published": "2013-04-04T13:06:33Z",
+                        "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "permissions": [
+                            "read",
+                            "write",
+                            "invite",
+                            "unsubscribe"
+                        ],
+                        "id": "515d7ad9fcfff269213c47a8",
+                        "objectType": "context"
+                    },
+                    {
+                        "displayName": "Atenea A",
+                        "tags": [],
+                        "url": "http://atenea.upc.edu/A",
+                        "creator": "test_manager",
+                        "published": "2013-04-04T13:06:33Z",
+                        "owner": "test_manager",
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "5154a0c571c75c97a89a81b7",
+                        "id": "515d7ad9fcfff269213c47a9",
                         "permissions": [
                             "read",
                             "write",
                             "invite",
                             "unsubscribe"
                         ]
-                    },
-                    {
-                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "tags": [],
-                        "object": {
-                            "url": "http://atenea.upc.edu/A",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-03-28T19:57:57Z",
-                        "displayName": "Atenea A",
-                        "permissions": [
-                            "read",
-                            "write",
-                            "invite",
-                            "unsubscribe"
-                        ],
-                        "id": "5154a0c571c75c97a89a81b8",
-                        "objectType": "context"
                     }
                 ]
             }
@@ -1069,10 +1118,11 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
 
 .. Create the context unsubscribe and subcribe user to it
 
-    >>> create_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "uri" } }
+    >>> create_context_d = {"url": "http://atenea.upc.edu/C", "objectType": "context" }
+    >>> subscribe_context_d = {"object": {"url": "http://atenea.upc.edu/C", "objectType": "context" } }
     >>> resp = utils.create_context(create_context_d)
     >>> context_hash_for_deleting = resp.json.get('hash')
-    >>> utils.admin_subscribe_user_to_context(username, create_context_d)
+    >>> utils.admin_subscribe_user_to_context(username, subscribe_context_d)
     <201 Created application/json ...
 
 
@@ -1140,18 +1190,18 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
             {
                 "generator": null,
+                "creator": "messi",
                 "contexts": [
                     {
-                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                        "object": {
-                            "participants": [
-                                "messi",
-                                "xavi"
-                            ],
-                            "objectType": "conversation"
-                        },
                         "displayName": "messi, xavi",
-                        "objectType": "context"
+                        "creator": "messi",
+                        "participants": [
+                            "messi",
+                            "xavi"
+                        ],
+                        "owner": "messi",
+                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                        "objectType": "conversation"
                     }
                 ],
                 "object": {
@@ -1167,20 +1217,21 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     ],
                     "objectType": "message"
                 },
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "id": "5154a20d71c75c9887431ba3",
-                "published": "2013-03-28T20:03:25Z",
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "post",
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "commented": "2013-03-28T20:03:25Z",
-                "objectType": "activity"
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47b3",
+                "objectType": "message"
             }
 
         .. -> expected
@@ -1222,36 +1273,35 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                         "generator": null,
                         "contexts": [
                             {
+                                "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                                "creator": "messi",
+                                "participants": [
+                                    "messi",
+                                    "xavi"
+                                ],
+                                "owner": "messi",
                                 "displayName": "messi, xavi",
-                                "object": {
-                                    "participants": [
-                                        "messi",
-                                        "xavi"
-                                    ],
-                                    "objectType": "conversation"
-                                },
-                                "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                                "objectType": "context"
+                                "objectType": "conversation"
                             }
                         ],
                         "object": {
                             "content": "Nos espera una gran temporada, no es cierto?",
                             "objectType": "message"
                         },
+                        "replies": {
+                            "totalItems": 0,
+                            "items": []
+                        },
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5154a2e971c75c993518f51b",
-                        "published": "2013-03-28T20:07:05Z",
+                        "id": "515d7ad9fcfff269213c47b3",
                         "verb": "post",
-                        "replies": {
-                            "totalItems": 0,
-                            "items": []
-                        },
-                        "commented": "2013-03-28T20:07:05Z",
-                        "objectType": "activity"
+                        "published": "2013-04-04T13:06:33Z",
+                        "commented": "2013-04-04T13:06:33Z",
+                        "objectType": "message"
                     }
                 ]
             }
@@ -1286,29 +1336,27 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                 "totalItems": 1,
                 "items": [
                     {
-                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                        "object": {
-                            "participants": [
-                                "messi",
-                                "xavi"
-                            ],
-                            "messages": 1,
-                            "lastMessage": {
-                                "content": "Nos espera una gran temporada, no es cierto?",
-                                "published": "2013-02-05T20:28:24Z"
-                            },
-                            "objectType": "conversation"
+                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                        "messages": 1,
+                        "participants": [
+                            "messi",
+                            "xavi"
+                        ],
+                        "lastMessage": {
+                            "content": "Nos espera una gran temporada, no es cierto?",
+                            "published": "2013-04-04T13:06:33Z"
                         },
-                        "published": "2013-02-05T20:28:24Z",
+                        "published": "2013-04-04T13:06:33Z",
                         "displayName": "messi, xavi",
-                        "id": "51116b68e999fb0e12a9cf9b",
+                        "objectType": "conversation",
+                        "id": "515d7ad9fcfff269213c47b2",
                         "permissions": {
                             "read": "subscribed",
                             "write": "subscribed",
-                            "subscribe": "restricted",
-                            "invite": "restricted"
-                        },
-                        "objectType": "context"
+                            "unsubscribe": "public",
+                            "invite": "restricted",
+                            "subscribe": "restricted"
+                        }
                     }
                 ]
             }
@@ -1317,7 +1365,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
             >>> response = testapp.get('/conversations', "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('object').get('objectType') == eval(expected).get('items')[0].get('object').get('objectType')
+            >>> response.json.get('items')[0].get('objectType') == eval(expected).get('items')[0].get('objectType')
             True
             >>> response.json.get('items')[0].get('displayName') == eval(expected).get('items')[0].get('displayName')
             True
@@ -1353,18 +1401,18 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
             {
                 "generator": null,
+                "creator": "messi",
                 "contexts": [
                     {
-                        "hash": "26a788ea21a872f14039da80a2a98831f2146c85",
-                        "object": {
-                            "participants": [
-                                "messi",
-                                "xavi"
-                            ],
-                            "objectType": "conversation"
-                        },
                         "displayName": "messi, xavi",
-                        "objectType": "context"
+                        "creator": "messi",
+                        "participants": [
+                            "messi",
+                            "xavi"
+                        ],
+                        "owner": "messi",
+                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                        "objectType": "conversation"
                     }
                 ],
                 "object": {
@@ -1375,20 +1423,21 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     ],
                     "objectType": "message"
                 },
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "id": "5154a39971c75c997dcd55c9",
-                "published": "2013-03-28T20:10:01Z",
+                "commented": "2013-04-04T13:06:33Z",
                 "verb": "post",
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "commented": "2013-03-28T20:10:01Z",
-                "objectType": "activity"
+                "published": "2013-04-04T13:06:33Z",
+                "owner": "messi",
+                "id": "515d7ad9fcfff269213c47b4",
+                "objectType": "message"
             }
 
         .. -> expected
