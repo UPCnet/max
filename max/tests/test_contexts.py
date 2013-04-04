@@ -84,7 +84,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_post_activity_with_private_read_write_context(self):
         """ Post an activity to a context which needs the user to be subscribed to read and write
@@ -102,7 +102,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_post_activity_with_private_read_context(self):
         """ Try to post an activity to a context which needs the user to be subscribed to read
@@ -125,7 +125,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         res = self.testapp.post('/contexts', json.dumps(create_context), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
 
     def test_add_invalid_context(self):
@@ -140,14 +140,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_without_displayname
         res = self.create_context(create_context_without_displayname, expect=201)
         result = json.loads(res.text)
-        self.assertEqual(result.get('displayName', None), create_context_without_displayname['object']['url'])
+        self.assertEqual(result.get('displayName', None), create_context_without_displayname['url'])
 
     def test_add_public_context_with_all_params(self):
         from hashlib import sha1
         from .mockers import create_context_full
         res = self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
-        url_hash = sha1(create_context_full['object']['url']).hexdigest()
+        url_hash = sha1(create_context_full['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('displayName', None), create_context_full['displayName'])
         self.assertEqual(result.get('twitterHashtag', None), create_context_full['twitterHashtag'])
@@ -157,7 +157,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ doctest .. http:get:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.create_context(create_context)
         res = self.testapp.get('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
@@ -168,7 +168,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
         self.create_context(create_context)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hash)
@@ -178,7 +178,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
         self.create_context(create_context)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"}), oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hash)
@@ -190,8 +190,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
         self.create_context(create_context)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
-        self.modify_context(create_context['object']['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura4", "twitterUsername": ""}), oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hash)
@@ -203,14 +203,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ doctest .. http:delete:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.create_context(create_context)
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
 
     def test_deleted_context_is_really_deleted(self):
         from hashlib import sha1
         from .mockers import create_context
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.create_context(create_context)
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         res = self.testapp.get('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=404)
@@ -223,8 +223,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         self.create_context(create_contextA)
 
-        url_hash = sha1(create_context['object']['url']).hexdigest()
-        url_hashA = sha1(create_contextA['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
+        url_hashA = sha1(create_contextA['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         res = self.testapp.get('/contexts/%s' % url_hashA, "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
@@ -246,14 +246,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status_context)
         self.create_activity(username, user_status_contextA)
 
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
 
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
         self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items', [None, ])[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('subscribedTo', {}).get('items', [None, ])[0]['url'], subscribe_contextA['object']['url'])
 
     def test_user_cannot_see_activity_from_deleted_context(self):
         """
@@ -269,7 +269,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         self.testapp.get('/activities', context_query, oauth2Header(username), status=404)
 
@@ -286,7 +286,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         res = self.testapp.get('/people/%s/timeline' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
@@ -297,7 +297,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_private_rw
         res = self.testapp.post('/contexts', json.dumps(create_context_private_rw), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
-        url_hash = sha1(create_context_private_rw['object']['url']).hexdigest()
+        url_hash = sha1(create_context_private_rw['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('permissions', None), create_context_private_rw['permissions'])
 
@@ -306,7 +306,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_private_r
         res = self.testapp.post('/contexts', json.dumps(create_context_private_r), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
-        url_hash = sha1(create_context_private_r['object']['url']).hexdigest()
+        url_hash = sha1(create_context_private_r['url']).hexdigest()
         self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('permissions', None), create_context_private_r['permissions'])
 
@@ -319,7 +319,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['object']['url'], subscribe_context['object']['url'])
+        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
         self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
         self.assertEqual('write' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
 
@@ -332,7 +332,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['object']['url'], subscribe_context['object']['url'])
+        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
         self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
         self.assertEqual('write' not in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
 
@@ -356,7 +356,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object']['url'], user_status_context['contexts'][0]['url'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], user_status_context['contexts'][0]['url'])
 
     def test_grant_write_permission_on_write_restricted_context(self):
         """ doctest .. http:put:: /contexts/{hash}/permissions/{username}/{permission} """
@@ -366,7 +366,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
@@ -380,7 +380,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
         res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
@@ -393,7 +393,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context_private_r)
-        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
@@ -405,7 +405,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        chash = sha1(create_context_private_r['object']['url']).hexdigest()
+        chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (chash, username), "", oauth2Header(test_manager), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'InvalidPermission')

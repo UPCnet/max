@@ -4,8 +4,7 @@ from pymongo import ASCENDING
 
 from max.exceptions import ValidationError
 from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import Activity
-from max.models import Conversation as Conversation
+from max.models import Message, Conversation
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 
@@ -35,8 +34,8 @@ def getConversations(context, request):
         messages = mmdb.messages.search(query, flatten=1)
         lastMessage = messages[-1]
         conversation['lastMessage'] = {'published': lastMessage['published'],
-                                                 'content': lastMessage['object']['content']
-                                                 }
+                                       'content': lastMessage['object']['content']
+                                       }
         conversation['messages'] = len(messages)
 
     handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['lastMessage']['published']))
@@ -112,7 +111,7 @@ def postMessage2Conversation(context, request):
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Activity(request)
+    newmessage = Message(request)
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()
@@ -138,7 +137,7 @@ def getMessages(context, request):
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.hash': chash}
-    messages = mmdb.activity.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
+    messages = mmdb.messages.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
 
     handler = JSONResourceRoot(messages)
     return handler.buildResponse()
@@ -162,7 +161,7 @@ def addMessage(context, request):
                       }
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Activity(request)
+    newmessage = Message(request)
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()

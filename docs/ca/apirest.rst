@@ -905,6 +905,8 @@ Subscripcions
         .. -> expected
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/contexts/public', payload, oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json ...
             >>> response.json.get('totalItems') == expected.get('totalItems')
             True
             >>> response.json.get('items')[0]['object']['objectType'] == expected.get('items')[0]['object']['objectType']
@@ -1079,8 +1081,8 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
         .. actual test
-            >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(username), status=204)
-            >>> response
+            >>> resp = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(username), status=204)
+            >>> resp
             <204 No Content ...
 
     Success

@@ -66,7 +66,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_admin_post_activity_with_context_as_actor(self):
         """ doctest .. http:post:: /contexts/{hash}/activities """
@@ -75,12 +75,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         from hashlib import sha1
         self.create_context(create_context)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_security(self):
         res = self.testapp.get('/admin/security', "", status=200)

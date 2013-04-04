@@ -84,7 +84,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         from hashlib import sha1
         self.create_context(create_context)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager), status=201)
         self.assertEqual(res.json['actor']['hash'], url_hash)
         self.assertEqual(res.json['creator'], test_manager)
@@ -116,9 +116,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None), None)
 
     def test_post_activity_with_unauthorized_context(self):
+        from .mockers import create_contextA
         from .mockers import user_status_contextA
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_contextA)
         res = self.create_activity(username, user_status_contextA, expect=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
@@ -312,7 +314,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
         self.assertEqual(result.get('generator', None), user_status_context_generator['generator'])
 
     def test_get_timeline(self):
@@ -334,10 +336,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 3)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_timeline_does_not_show_private_fields(self):
         """

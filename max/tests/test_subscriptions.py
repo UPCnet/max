@@ -38,10 +38,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_subscribe_user_to_context(self):
         from .mockers import create_context
+        from .mockers import subscribe_context
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
-        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(create_context), oauth2Header(test_manager), status=201)
+        self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), oauth2Header(test_manager), status=201)
 
     def test_subscribe_to_context(self):
         """ doctest .. http:post:: /people/{username}/subscriptions """
@@ -56,7 +57,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_subscribe_to_context_already_subscribed(self):
         from .mockers import subscribe_context
@@ -71,7 +72,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('contexts', None)[0]['object'], subscribe_context['object'])
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_subscribe_to_inexistent_context(self):
         from .mockers import subscribe_context
@@ -100,8 +101,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/%s/subscriptions' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems'), 2)
-        self.assertEqual(result.get('items')[0].get('object').get('url'), 'http://atenea.upc.edu/A')
-        self.assertEqual(result.get('items')[1].get('object').get('url'), 'http://atenea.upc.edu/B')
+        self.assertEqual(result.get('items')[0].get('url'), 'http://atenea.upc.edu/A')
+        self.assertEqual(result.get('items')[1].get('url'), 'http://atenea.upc.edu/B')
 
     def test_get_subscriptions_from_another_user(self):
         """
@@ -175,7 +176,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=404)
 
     def test_unsubscribe_from_inexistent_subscription_as_admin(self):
@@ -189,7 +190,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('//people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=404)
 
     def test_unsubscribe_from_restricted_context_as_plain_user(self):
@@ -204,7 +205,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=401)
 
     def test_unsubscribe_from_restricted_context_as_admin(self):
@@ -219,7 +220,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
@@ -238,7 +239,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.user_unsubscribe_user_from_context(username, url_hash, expect=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
@@ -256,7 +257,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
-        url_hash = sha1(create_context['object']['url']).hexdigest()
+        url_hash = sha1(create_context['url']).hexdigest()
         self.admin_unsubscribe_user_from_context(username, url_hash, expect=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)

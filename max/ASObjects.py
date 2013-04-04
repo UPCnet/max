@@ -144,7 +144,7 @@ class Conversation(ASObject):
         return ', '.join(self.participants)
 
 
-class Uri(ASObject):
+class Context(ASObject):
     """
         An Max Context Object
     """

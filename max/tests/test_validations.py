@@ -55,7 +55,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_full
         from hashlib import sha1
         res = self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
-        url_hash = sha1(create_context_full['object']['url']).hexdigest()
+        url_hash = sha1(create_context_full['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet", "twitterHashtag": "#atenea"}), oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')

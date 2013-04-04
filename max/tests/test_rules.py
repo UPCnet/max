@@ -56,7 +56,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
@@ -66,7 +66,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_to_unsubscribed_context(self):
         from maxrules.tasks import processTweet
@@ -76,7 +76,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
 
@@ -94,10 +94,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
 
         self.create_context(create_contextB, permissions=context_permissions)
-        self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
 
         self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
@@ -108,7 +108,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
 
     def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_oldest(self):
         from maxrules.tasks import processTweet
@@ -120,10 +120,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
 
         self.create_context(create_contextB, permissions=context_permissions)
-        self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
 
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
@@ -134,7 +134,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_double_registered_hashtag_subscribed_in_both(self):
         from maxrules.tasks import processTweet
@@ -146,11 +146,11 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
 
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         self.create_context(create_contextB, permissions=context_permissions)
-        self.modify_context(create_contextB['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextB['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #upc #assignatura1')
@@ -160,10 +160,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextB['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
         self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_uppercase_from_twitter(self):
         """
@@ -177,7 +177,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #ASSIGNATURA1')
@@ -187,7 +187,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_twitter_username_uppercase_case_from_twitter(self):
         """
@@ -200,7 +200,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
+        self.modify_context(create_contextA['url'], {"twitterUsername": "MaxUpcnet"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
         processTweet('MAXUPCNET', u'Ehteee, acabo de batir el récor de goles en el Barça.')
 
@@ -210,7 +210,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_twitter_username_different_case_in_max(self):
         """
@@ -223,7 +223,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterUsername": "MaxUpcnet"})
+        self.modify_context(create_contextA['url'], {"twitterUsername": "MaxUpcnet"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('maxUpcnet', u'Ehteee, acabo de batir el récor de goles en el Barça.')
@@ -234,7 +234,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_different_case_in_max(self):
         """
@@ -248,7 +248,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_contextA, permissions=context_permissions)
-        self.modify_context(create_contextA['object']['url'], {"twitterHashtag": "Assignatura1"})
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "Assignatura1"})
         self.admin_subscribe_user_to_context(username, subscribe_contextA)
 
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #assignaTURA1')
@@ -258,4 +258,4 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['object'], subscribe_contextA['object'])
+        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])

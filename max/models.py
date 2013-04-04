@@ -87,8 +87,9 @@ class BaseActivity(MADBase):
                 # of each context and store them in contexts key
                 ob['contexts'] = []
                 for cobject in self.data['contexts']:
-
-                    chash = sha1(cobject.get('url')).hexdigest()
+                    chash = cobject.get('hash', None)
+                    if chash is None:
+                        chash = sha1(cobject.get('url')).hexdigest()
                     subscription = dict(self.data['actor'].getSubscriptionByHash(chash))
 
                     #Clean innecessary fields
@@ -153,7 +154,6 @@ class BaseActivity(MADBase):
             * If the actor is a person, check wether can write in all contexts
             * If the actor is a context, check if the context is the same
         """
-
         collection = getattr(self.mdb_collection.database, self.context_collection)
         contextsdb = MADMaxCollection(collection, query_key='hash')
 
@@ -162,7 +162,11 @@ class BaseActivity(MADBase):
         if isinstance(self.data['actor'], User):
             wrapped_contexts = []
             for context in self.data.get('contexts', []):
-                chash = sha1(context['url']).hexdigest()
+                # Get hash from context or calculate it from the url
+                # XXX Too coupled ...
+                chash = context.get('hash', None)
+                if chash is None:
+                    chash = sha1(context['url']).hexdigest()
                 wrapped = contextsdb[chash]
                 wrapped_contexts.append(wrapped)
 
@@ -188,6 +192,8 @@ class Message(BaseActivity):
     collection = 'messages'
     context_collection = 'conversations'
     unique = '_id'
+    schema = dict(BaseActivity.schema)
+    schema['objectType'] = dict(default='message')
 
 
 class User(MADBase):
@@ -408,7 +414,7 @@ class Context(BaseContext):
     collection = 'contexts'
     unique = 'hash'
     schema = dict(BaseContext.schema)
-    schema['url'] = dict(default='')
+    schema['url'] = dict(required=1)
     schema['tags'] = dict(default=[])
     schema['twitterHashtag'] = dict(operations_mutable=1,
                                     formatters=['stripHash'],
@@ -427,7 +433,6 @@ class Context(BaseContext):
         if self.data.get('twitterUsername', None):
             self['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
 
-        self['url'] = self.data['object']['url']
         self['hash'] = sha1(self.url).hexdigest()
 
         #Set displayName only if it's not specified
@@ -454,8 +459,9 @@ class Conversation(Context):
     """
     collection = 'conversations'
     unique = 'hash'
-    schema = dict(Context.schema)
+    schema = dict(BaseContext.schema)
     schema['participants'] = dict(required=1)
+    schema['objectType'] = dict(default='conversation')
 
     def getHash(self):
         """
@@ -470,7 +476,7 @@ class Conversation(Context):
         return sha1(alltogether).hexdigest()  # Hash it
 
     def buildObject(self):
-        super(Context, self).buildObject(self)
+        super(Context, self).buildObject()
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):

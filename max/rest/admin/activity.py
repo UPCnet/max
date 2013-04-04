@@ -81,16 +81,16 @@ def addAdminContextActivity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='activities', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-def getActivities(context, request):
-    """
-    """
-    mmdb = MADMaxDB(context.db)
-    activities = mmdb.activity.dump(flatten=1)
-    handler = JSONResourceRoot(activities)
-    return handler.buildResponse()
+# @view_config(route_name='activities', request_method='GET', restricted='Manager')
+# @MaxResponse
+# @oauth2(['widgetcli'])
+# def getActivities(context, request):
+#     """
+#     """
+#     mmdb = MADMaxDB(context.db)
+#     activities = mmdb.activity.dump(flatten=1)
+#     handler = JSONResourceRoot(activities)
+#     return handler.buildResponse()
 
 
 @view_config(route_name='activity', request_method='DELETE', restricted='Manager')

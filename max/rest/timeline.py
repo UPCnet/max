@@ -37,8 +37,7 @@ def getUserTimeline(context, request):
     contexts_followings = []
     for subscribed in actor['subscribedTo']['items']:
         # Don't show conversations in timeline
-        if subscribed['object']['objectType'] not in ['conversation']:
-            contexts_followings.append({'contexts.url': subscribed['object']['url']})
+            contexts_followings.append({'contexts.url': subscribed['url']})
 
     query_items = []
 

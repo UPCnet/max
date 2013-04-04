@@ -73,20 +73,14 @@ demostatus_with_context = {
 
 create_context = {
 
-    'object': {
-        'url': 'http://atenea.upc.edu',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'tags': ['Assignatura']
 }
 
 create_context_without_displayname = {
 
-    'object': {
-        'url': 'http://atenea.upc.edu',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu',
 }
 
 create_invalid_context = {
@@ -107,10 +101,7 @@ create_unauthorized_context = {
 }
 
 create_context_full = {
-    'object': {
-        'url': 'http://atenea.upc.edu',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'twitterHashtag': 'atenea',
     'twitterUsername': 'atenaupc',
@@ -118,10 +109,7 @@ create_context_full = {
 
 create_context_private_rw = {
 
-    'object': {
-        'url': 'http://atenea.upc.edu',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'subscribed',
@@ -131,10 +119,7 @@ create_context_private_rw = {
 
 create_context_private_r = {
 
-    'object': {
-        'url': 'http://atenea.upc.edu',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'permissions': {'read': 'subscribed',
                     'write': 'restricted',
@@ -144,43 +129,37 @@ create_context_private_r = {
 }
 
 create_contextA = {
-    'object': {
-        'url': 'http://atenea.upc.edu/A',
-        'objectType': 'uri',
-    },
+    'url': 'http://atenea.upc.edu/A',
     'displayName': 'Atenea A'
 }
 
 create_contextB = {
-    'object': {
-        'url': 'http://atenea.upc.edu/B',
-        'objectType': 'uri',
-    },
-   'displayName': 'Atenea B'
+    'url': 'http://atenea.upc.edu/B',
+    'displayName': 'Atenea B'
 }
 
 
 # Revisat i actualitzat
 subscribe_context = {
     "object": {
-        "objectType": "uri",
-        "url": create_context['object']['url'],
+        "objectType": "context",
+        "url": create_context['url'],
     }
 }
 
 # Revisat i actualitzat
 subscribe_contextA = {
     "object": {
-        "objectType": "uri",
-        "url": create_contextA['object']['url'],
+        "objectType": "context",
+        "url": create_contextA['url'],
     }
 }
 
 # Revisat i actualitzat
 subscribe_contextB = {
     "object": {
-        "objectType": "uri",
-        "url": create_contextB['object']['url'],
+        "objectType": "context",
+        "url": create_contextB['url'],
     }
 }
 
@@ -314,9 +293,9 @@ user_comment_with_hashtag = {
 
 message = {
     "contexts": [
-        {"objectType":"conversation",
+        {"objectType": "conversation",
          "participants": ["messi", "xavi"],
-        }
+         }
     ],
     "object": {
         "objectType": "message",
@@ -328,7 +307,7 @@ message2 = {
     "contexts": [
         {"objectType":"conversation",
          "participants": ["messi", "xavi"],
-        }
+         }
     ],
     "object": {
         "objectType": "message",

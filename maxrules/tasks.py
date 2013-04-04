@@ -24,9 +24,7 @@ def processTweet(twitter_username, content, tweetID='---'):
     """ Process inbound tweet
     """
     # Setup logging
-
     logger.info(u"(INFO) Processing tweet %s from %s with content: %s" % (str(tweetID), twitter_username, content))
-
     conn = pymongo.Connection(mongodb_url)
     db = conn[mongodb_db_name]
     users = MADMaxCollection(db.users)
@@ -43,7 +41,7 @@ def processTweet(twitter_username, content, tweetID='---'):
         # Watch for the case when two or more context share twitterUsername
         for context in maxcontext:
             url_hash = context.get("hash")
-            context_url = context.get('object', {}).get("url")
+            context_url = context.get("url")
 
             # Construct the payload with the activity information
             newactivity = {
@@ -52,7 +50,7 @@ def processTweet(twitter_username, content, tweetID='---'):
                     "content": content
                 },
                 "contexts": [{'url': context_url,
-                              'objectType': 'uri'
+                              'objectType': 'context'
                               }
                              ],
                 "generator": twitter_generator_name
@@ -102,10 +100,10 @@ def processTweet(twitter_username, content, tweetID='---'):
             # Check if MAX username has permission to post to the MAX context
             # if not, discard it
             try:
-                can_write = canWriteInContexts(maxuser, [context.object])
+                can_write = canWriteInContexts(maxuser, [context, ])
             except:
                 can_write = False
-                logger.info(u"(401) %s can't write to %s" % (maxuser.username, context.object['url']))
+                logger.info(u"(401) %s can't write to %s" % (maxuser.username, context['url']))
 
             if can_write:
                 # Construct the payload with the activity information
@@ -114,8 +112,8 @@ def processTweet(twitter_username, content, tweetID='---'):
                         "objectType": "note",
                         "content": content
                     },
-                    "contexts": [{'url': context.object['url'],
-                                  'objectType': 'uri'
+                    "contexts": [{'url': context['url'],
+                                  'objectType': 'context'
                                   }
                                  ],
                     "generator": twitter_generator_name
@@ -125,7 +123,7 @@ def processTweet(twitter_username, content, tweetID='---'):
                 # MAX context in name of the specified MAX username
                 re = requests.post('%s/people/%s/activities' % (max_server_url, maxuser.username), json.dumps(newactivity), auth=('admin', 'admin'), verify=False)
                 if re.status_code == 201:
-                    logger.info(u"(201) Successfully posted tweet %s from @%s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.object.url))
+                    logger.info(u"(201) Successfully posted tweet %s from @%s as %s on context %s" % (str(tweetID), twitter_username, maxuser['username'], context.url))
                     successful_tweets += 1
                     #return u"Success tweet from user %s in context %s" % (maxuser, context.url)
                 else:

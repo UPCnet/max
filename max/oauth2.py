@@ -46,6 +46,13 @@ def oauth2(allowed_scopes=[]):
 
                 return view_function(*args, **kw)
             else:
+
+                def getCreator2(request):
+                    return username
+
+                request.set_property(getCreator2, name='creator', reify=True)
+
+                return view_function(*args, **kw)
                 raise Unauthorized('Invalid token.')
 
         new_function.__doc__ = view_function.__doc__
