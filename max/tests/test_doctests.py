@@ -45,6 +45,8 @@ class DoctestCase(unittest.TestCase):
         app.registry.max_store.drop_collection('users')
         app.registry.max_store.drop_collection('activity')
         app.registry.max_store.drop_collection('contexts')
+        app.registry.max_store.drop_collection('conversations')
+        app.registry.max_store.drop_collection('messages')
         app.registry.max_store.drop_collection('security')
         app.registry.max_store.security.insert(test_default_security)
         from webtest import TestApp
