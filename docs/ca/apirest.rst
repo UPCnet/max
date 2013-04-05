@@ -74,11 +74,11 @@ Operacions sobre el recurs *usuari* del sistema.
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "username": "messi",
-                        "id": "515d7ad9fcfff269213c47a7"
+                        "username": "messi", 
+                        "id": "515d7ca4fcfff26b7c43c198"
                     }
                 ]
             }
@@ -119,42 +119,42 @@ Operacions sobre el recurs *usuari* del sistema.
         .. code-block:: python
 
             {
-                "username": "messi",
-                "displayName": "Lionel Messi",
-                "creator": "test_manager",
+                "username": "messi", 
+                "displayName": "Lionel Messi", 
+                "creator": "test_manager", 
                 "following": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "subscribedTo": {
-                    "totalItems": 1,
+                    "totalItems": 1, 
                     "items": [
                         {
-                            "displayName": "Atenea",
+                            "displayName": "Atenea", 
                             "tags": [
                                 "Assignatura"
-                            ],
-                            "url": "http://atenea.upc.edu",
-                            "creator": "test_manager",
-                            "published": "2013-04-04T13:06:33Z",
-                            "owner": "test_manager",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                            "objectType": "context",
-                            "id": "515d7ad9fcfff269213c47a8",
+                            ], 
+                            "url": "http://atenea.upc.edu", 
+                            "creator": "test_manager", 
+                            "published": "2013-04-04T13:14:12Z", 
+                            "owner": "test_manager", 
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                            "objectType": "context", 
+                            "id": "515d7ca4fcfff26b7c43c199", 
                             "permissions": [
-                                "read",
-                                "write",
-                                "invite",
+                                "read", 
+                                "write", 
+                                "invite", 
                                 "unsubscribe"
                             ]
                         }
                     ]
-                },
-                "last_login": "2013-04-04T13:06:33Z",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "test_manager",
-                "twitterUsername": "messi10oficial",
-                "id": "515d7ad9fcfff269213c47a7",
+                }, 
+                "last_login": "2013-04-04T13:14:12Z", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "test_manager", 
+                "twitterUsername": "messi10oficial", 
+                "id": "515d7ca4fcfff26b7c43c198", 
                 "objectType": "person"
             }
 
@@ -193,42 +193,42 @@ Operacions sobre el recurs *usuari* del sistema.
         .. code-block:: python
 
             {
-                "username": "messi",
-                "displayName": "Lionel Messi",
-                "creator": "test_manager",
+                "username": "messi", 
+                "displayName": "Lionel Messi", 
+                "creator": "test_manager", 
                 "following": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "subscribedTo": {
-                    "totalItems": 1,
+                    "totalItems": 1, 
                     "items": [
                         {
-                            "displayName": "Atenea",
-                            "creator": "test_manager",
-                            "url": "http://atenea.upc.edu",
+                            "displayName": "Atenea", 
+                            "creator": "test_manager", 
+                            "url": "http://atenea.upc.edu", 
                             "tags": [
                                 "Assignatura"
-                            ],
-                            "published": "2013-04-04T13:06:33Z",
-                            "owner": "test_manager",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            ], 
+                            "published": "2013-04-04T13:14:12Z", 
+                            "owner": "test_manager", 
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                             "permissions": [
-                                "read",
-                                "write",
-                                "invite",
+                                "read", 
+                                "write", 
+                                "invite", 
                                 "unsubscribe"
-                            ],
-                            "id": "515d7ad9fcfff269213c47a8",
+                            ], 
+                            "id": "515d7ca4fcfff26b7c43c199", 
                             "objectType": "context"
                         }
                     ]
-                },
-                "last_login": "2013-04-04T13:06:33Z",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "test_manager",
-                "twitterUsername": "messi10oficial",
-                "id": "515d7ad9fcfff269213c47a7",
+                }, 
+                "last_login": "2013-04-04T13:14:12Z", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "test_manager", 
+                "twitterUsername": "messi10oficial", 
+                "id": "515d7ca4fcfff26b7c43c198", 
                 "objectType": "person"
             }
 
@@ -300,32 +300,32 @@ llistar-les com crear-ne de noves.
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>", 
                     "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
+                        "testejant", 
+                        "creaci\u00f3", 
+                        "canvi", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "note"
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "post",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47ab",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "post", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c19c", 
                 "objectType": "activity"
             }
 
@@ -395,43 +395,43 @@ l'usuari ha estat previament subscrit a aquest context.
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "contexts": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "displayName": "Atenea", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
+                        "owner": "test_manager", 
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                         "objectType": "context"
                     }
-                ],
+                ], 
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                     "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
-                        "context",
+                        "testejant", 
+                        "creaci\u00f3", 
+                        "canvi", 
+                        "context", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "note"
-                },
+                }, 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "post",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47ac",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "post", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c19d", 
                 "objectType": "activity"
             }
 
@@ -463,58 +463,58 @@ l'usuari ha estat previament subscrit a aquest context.
         .. code-block:: python
 
             {
-                "totalItems": 2,
+                "totalItems": 2, 
                 "items": [
                     {
-                        "generator": null,
+                        "generator": null, 
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
-                                "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea", 
+                                "creator": "test_manager", 
+                                "url": "http://atenea.upc.edu", 
+                                "owner": "test_manager", 
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                                 "objectType": "context"
                             }
-                        ],
+                        ], 
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                             "objectType": "note"
-                        },
+                        }, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47ac",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c19d", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "activity"
-                    },
+                    }, 
                     {
-                        "generator": null,
+                        "generator": null, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>", 
                             "objectType": "note"
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47ab",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c19c", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "activity"
                     }
                 ]
@@ -589,56 +589,56 @@ concret.
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "generator": null,
+                        "generator": null, 
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
-                                "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea", 
+                                "creator": "test_manager", 
+                                "url": "http://atenea.upc.edu", 
+                                "owner": "test_manager", 
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                                 "objectType": "context"
                             }
-                        ],
+                        ], 
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                             "objectType": "note"
-                        },
+                        }, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47ac",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c19d", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "activity"
                     }
-                ],
+                ], 
                 "context": {
-                    "displayName": "Atenea",
-                    "creator": "test_manager",
-                    "url": "http://atenea.upc.edu",
+                    "displayName": "Atenea", 
+                    "creator": "test_manager", 
+                    "url": "http://atenea.upc.edu", 
                     "tags": [
                         "Assignatura"
-                    ],
-                    "published": "2013-04-04T13:06:33Z",
-                    "owner": "test_manager",
-                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                    "objectType": "context",
-                    "id": "515d7ad9fcfff269213c47a8",
+                    ], 
+                    "published": "2013-04-04T13:14:12Z", 
+                    "owner": "test_manager", 
+                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                    "objectType": "context", 
+                    "id": "515d7ca4fcfff26b7c43c199", 
                     "permissions": {
-                        "write": "public",
-                        "subscribe": "public",
-                        "read": "public",
+                        "write": "public", 
+                        "subscribe": "public", 
+                        "read": "public", 
                         "invite": "subscribed"
                     }
                 }
@@ -685,58 +685,58 @@ indirectament.
         .. code-block:: python
 
             {
-                "totalItems": 2,
+                "totalItems": 2, 
                 "items": [
                     {
-                        "generator": null,
+                        "generator": null, 
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
-                                "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
-                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea", 
+                                "creator": "test_manager", 
+                                "url": "http://atenea.upc.edu", 
+                                "owner": "test_manager", 
+                                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                                 "objectType": "context"
                             }
-                        ],
+                        ], 
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                             "objectType": "note"
-                        },
+                        }, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47ac",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c19d", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "activity"
-                    },
+                    }, 
                     {
-                        "generator": null,
+                        "generator": null, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>", 
                             "objectType": "note"
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47ab",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c19c", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "activity"
                     }
                 ]
@@ -792,40 +792,40 @@ Representa el conjunt de comentaris fets a una activitat.
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "object": {
-                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>", 
                     "inReplyTo": [
                         {
-                            "id": "515d7ad9fcfff269213c47ad",
+                            "id": "515d7ca4fcfff26b7c43c19e", 
                             "objectType": "note"
                         }
-                    ],
+                    ], 
                     "keywords": [
-                        "testejant",
-                        "comentari",
-                        "nou",
-                        "una",
-                        "activitat",
+                        "testejant", 
+                        "comentari", 
+                        "nou", 
+                        "una", 
+                        "activitat", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "comment"
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "comment",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47ae",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "comment", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c19f", 
                 "objectType": "activity"
             }
 
@@ -860,18 +860,18 @@ Representa el conjunt de comentaris fets a una activitat.
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
-                        "objectType": "comment",
-                        "id": "515d7ad9fcfff269213c47ae",
+                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>", 
+                        "objectType": "comment", 
+                        "id": "515d7ca4fcfff26b7c43c19f", 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "published": "2013-04-04T13:06:33Z"
+                        }, 
+                        "published": "2013-04-04T13:14:12Z"
                     }
                 ]
             }
@@ -908,41 +908,41 @@ Subscripcions
         .. code-block:: python
 
             {
-                "totalItems": 2,
+                "totalItems": 2, 
                 "items": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
+                        "displayName": "Atenea", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
                         "tags": [
                             "Assignatura"
-                        ],
-                        "published": "2013-04-04T13:06:33Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
-                        "id": "515d7ad9fcfff269213c47a8",
+                        ], 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "owner": "test_manager", 
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                        "objectType": "context", 
+                        "id": "515d7ca4fcfff26b7c43c199", 
                         "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
+                            "write": "public", 
+                            "subscribe": "public", 
+                            "read": "public", 
                             "invite": "subscribed"
                         }
-                    },
+                    }, 
                     {
-                        "displayName": "Atenea A",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu/A",
-                        "tags": [],
-                        "published": "2013-04-04T13:06:33Z",
-                        "owner": "test_manager",
-                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "objectType": "context",
-                        "id": "515d7ad9fcfff269213c47a9",
+                        "displayName": "Atenea A", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu/A", 
+                        "tags": [], 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "owner": "test_manager", 
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07", 
+                        "objectType": "context", 
+                        "id": "515d7ca4fcfff26b7c43c19a", 
                         "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
+                            "write": "public", 
+                            "subscribe": "public", 
+                            "read": "public", 
                             "invite": "subscribed"
                         }
                     }
@@ -993,26 +993,26 @@ Subscripcions
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "object": {
-                    "url": "http://atenea.upc.edu/A",
+                    "url": "http://atenea.upc.edu/A", 
                     "objectType": "context"
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "subscribe",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47af",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "subscribe", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c1a0", 
                 "objectType": "activity"
             }
 
@@ -1055,41 +1055,41 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
         .. code-block:: python
 
             {
-                "totalItems": 2,
+                "totalItems": 2, 
                 "items": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
+                        "displayName": "Atenea", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
                         "tags": [
                             "Assignatura"
-                        ],
-                        "published": "2013-04-04T13:06:33Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        ], 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "owner": "test_manager", 
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                         "permissions": [
-                            "read",
-                            "write",
-                            "invite",
+                            "read", 
+                            "write", 
+                            "invite", 
                             "unsubscribe"
-                        ],
-                        "id": "515d7ad9fcfff269213c47a8",
+                        ], 
+                        "id": "515d7ca4fcfff26b7c43c199", 
                         "objectType": "context"
-                    },
+                    }, 
                     {
-                        "displayName": "Atenea A",
-                        "tags": [],
-                        "url": "http://atenea.upc.edu/A",
-                        "creator": "test_manager",
-                        "published": "2013-04-04T13:06:33Z",
-                        "owner": "test_manager",
-                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "objectType": "context",
-                        "id": "515d7ad9fcfff269213c47a9",
+                        "displayName": "Atenea A", 
+                        "tags": [], 
+                        "url": "http://atenea.upc.edu/A", 
+                        "creator": "test_manager", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "owner": "test_manager", 
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07", 
+                        "objectType": "context", 
+                        "id": "515d7ca4fcfff26b7c43c19a", 
                         "permissions": [
-                            "read",
-                            "write",
-                            "invite",
+                            "read", 
+                            "write", 
+                            "invite", 
                             "unsubscribe"
                         ]
                     }
@@ -1189,48 +1189,48 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
-                        "creator": "messi",
+                        "displayName": "messi, xavi", 
+                        "creator": "messi", 
                         "participants": [
-                            "messi",
+                            "messi", 
                             "xavi"
-                        ],
-                        "owner": "messi",
-                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                        ], 
+                        "owner": "messi", 
+                        "hash": "2643f5935ccb023e118bce40f43851133abe523e", 
                         "objectType": "conversation"
                     }
-                ],
+                ], 
                 "object": {
-                    "content": "Nos espera una gran temporada, no es cierto?",
+                    "content": "Nos espera una gran temporada, no es cierto?", 
                     "keywords": [
-                        "nos",
-                        "espera",
-                        "una",
-                        "gran",
-                        "temporada",
-                        "cierto",
+                        "nos", 
+                        "espera", 
+                        "una", 
+                        "gran", 
+                        "temporada", 
+                        "cierto", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "message"
-                },
+                }, 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "post",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47b3",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "post", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c1a5", 
                 "objectType": "message"
             }
 
@@ -1267,40 +1267,40 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "generator": null,
+                        "generator": null, 
                         "contexts": [
                             {
-                                "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
-                                "creator": "messi",
+                                "hash": "2643f5935ccb023e118bce40f43851133abe523e", 
+                                "creator": "messi", 
                                 "participants": [
-                                    "messi",
+                                    "messi", 
                                     "xavi"
-                                ],
-                                "owner": "messi",
-                                "displayName": "messi, xavi",
+                                ], 
+                                "owner": "messi", 
+                                "displayName": "messi, xavi", 
                                 "objectType": "conversation"
                             }
-                        ],
+                        ], 
                         "object": {
-                            "content": "Nos espera una gran temporada, no es cierto?",
+                            "content": "Nos espera una gran temporada, no es cierto?", 
                             "objectType": "message"
-                        },
+                        }, 
                         "replies": {
-                            "totalItems": 0,
+                            "totalItems": 0, 
                             "items": []
-                        },
+                        }, 
                         "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
+                            "username": "messi", 
+                            "displayName": "Lionel Messi", 
                             "objectType": "person"
-                        },
-                        "id": "515d7ad9fcfff269213c47b3",
-                        "verb": "post",
-                        "published": "2013-04-04T13:06:33Z",
-                        "commented": "2013-04-04T13:06:33Z",
+                        }, 
+                        "id": "515d7ca4fcfff26b7c43c1a5", 
+                        "verb": "post", 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "commented": "2013-04-04T13:14:12Z", 
                         "objectType": "message"
                     }
                 ]
@@ -1333,28 +1333,28 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
-                        "messages": 1,
+                        "hash": "2643f5935ccb023e118bce40f43851133abe523e", 
+                        "messages": 1, 
                         "participants": [
-                            "messi",
+                            "messi", 
                             "xavi"
-                        ],
+                        ], 
                         "lastMessage": {
-                            "content": "Nos espera una gran temporada, no es cierto?",
-                            "published": "2013-04-04T13:06:33Z"
-                        },
-                        "published": "2013-04-04T13:06:33Z",
-                        "displayName": "messi, xavi",
-                        "objectType": "conversation",
-                        "id": "515d7ad9fcfff269213c47b2",
+                            "content": "Nos espera una gran temporada, no es cierto?", 
+                            "published": "2013-04-04T13:14:12Z"
+                        }, 
+                        "published": "2013-04-04T13:14:12Z", 
+                        "displayName": "messi, xavi", 
+                        "objectType": "conversation", 
+                        "id": "515d7ca4fcfff26b7c43c1a4", 
                         "permissions": {
-                            "read": "subscribed",
-                            "write": "subscribed",
-                            "unsubscribe": "public",
-                            "invite": "restricted",
+                            "read": "subscribed", 
+                            "write": "subscribed", 
+                            "unsubscribe": "public", 
+                            "invite": "restricted", 
                             "subscribe": "restricted"
                         }
                     }
@@ -1400,43 +1400,43 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
+                "generator": null, 
+                "creator": "messi", 
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
-                        "creator": "messi",
+                        "displayName": "messi, xavi", 
+                        "creator": "messi", 
                         "participants": [
-                            "messi",
+                            "messi", 
                             "xavi"
-                        ],
-                        "owner": "messi",
-                        "hash": "b2c1a859b576bd59f4aa2dc1f4c7df7f66e3a07d",
+                        ], 
+                        "owner": "messi", 
+                        "hash": "2643f5935ccb023e118bce40f43851133abe523e", 
                         "objectType": "conversation"
                     }
-                ],
+                ], 
                 "object": {
-                    "content": "M'agrada Taradell!",
+                    "content": "M'agrada Taradell!", 
                     "keywords": [
-                        "taradell",
+                        "taradell", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "message"
-                },
+                }, 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "Lionel Messi",
+                    "username": "messi", 
+                    "displayName": "Lionel Messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-04T13:06:33Z",
-                "verb": "post",
-                "published": "2013-04-04T13:06:33Z",
-                "owner": "messi",
-                "id": "515d7ad9fcfff269213c47b4",
+                }, 
+                "commented": "2013-04-04T13:14:12Z", 
+                "verb": "post", 
+                "published": "2013-04-04T13:14:12Z", 
+                "owner": "messi", 
+                "id": "515d7ca4fcfff26b7c43c1a6", 
                 "objectType": "message"
             }
 

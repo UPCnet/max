@@ -58,12 +58,13 @@ Usuaris
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}'.format(username), "", oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            >>> response.json.get('twitterUsername') == expected.get('twitterUsername')
             True
 
     Success
@@ -133,12 +134,13 @@ Contexts
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/contexts', payload, oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('hash') == eval(expected).get('hash')
+            >>> response.json.get('hash') == expected.get('hash')
             True
             >>> context_hash = response.json.get('hash')
 
@@ -193,6 +195,7 @@ Contexts
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/contexts', payload, oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
@@ -248,12 +251,13 @@ Contexts
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.put('/contexts/{}'.format(context_hash), payload, oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('hash') == eval(expected).get('hash')
+            >>> response.json.get('hash') == expected.get('hash')
             True
 
     Success
@@ -295,12 +299,13 @@ Contexts
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/contexts/{}'.format(context_hash), "", oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('hash') == eval(expected).get('hash')
+            >>> response.json.get('hash') == expected.get('hash')
             True
 
     Success
@@ -331,8 +336,8 @@ Contexts
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
         .. actual test
-            >>> response = testapp.delete('/contexts/{}'.format(context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
-            >>> response
+            >>> resp = testapp.delete('/contexts/{}'.format(context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
+            >>> resp
             <204 No Content ...
 
     Success
@@ -409,12 +414,13 @@ Subscripcions
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}/subscriptions'.format(username), payload, oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('verb') == eval(expected).get('verb')
+            >>> response.json.get('verb') == expected.get('verb')
             True
 
     Success
@@ -455,8 +461,8 @@ Subscripcions
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
         .. actual test
-            >>> response = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
-            >>> response
+            >>> resp = testapp.delete('/people/{}/subscriptions/{}'.format(username, context_hash_for_deleting), "", oauth2Header(test_manager), status=204)
+            >>> resp
             <204 No Content ...
 
     Success
@@ -506,6 +512,7 @@ s'explica amb profunditat en l'apartat de permisos.
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
@@ -551,12 +558,13 @@ s'explica amb profunditat en l'apartat de permisos.
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.delete('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('permissions') == eval(expected).get('permissions')
+            >>> response.json.get('permissions') == expected.get('permissions')
             True
 
 .. put the write permissions of the test user back for further testing :)
@@ -659,12 +667,13 @@ Activitats
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/people/{}/activities'.format(username), payload, oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('verb') == eval(expected).get('verb')
+            >>> response.json.get('verb') == expected.get('verb')
             True
 
 .. http:post:: /contexts/{hash}/activities
@@ -756,12 +765,13 @@ Activitats
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.post('/contexts/{}/activities'.format(context_hash), payload, oauth2Header(test_manager), status=201)
             >>> response
             <201 Created application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json.get('displayName') == expected.get('displayName')
             True
-            >>> response.json.get('verb') == eval(expected).get('verb')
+            >>> response.json.get('verb') == expected.get('verb')
             True
 
 
