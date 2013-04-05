@@ -50,7 +50,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
         self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("object", None).get("objectType", None), "message")
+        self.assertEqual(result.get("objectType", None), "message")
+        self.assertEqual(result.get("object", None).get("objectType", None), "note")
 
     def test_post_message_to_conversation_check_conversation(self):
         from .mockers import message
@@ -172,7 +173,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
         self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("object", None).get("objectType", None), "message")
+        self.assertEqual(result.get("objectType", None), "message")
+        self.assertEqual(result.get("object", None).get("objectType", None), "note")
 
         res = self.testapp.get('/conversations', "", oauth2Header(sender), status=200)
         result = json.loads(res.text)
@@ -186,6 +188,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I post a message to more than one person
             Then a new conversation is created
         """
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
 
     def test_post_messages_to_existing_group_conversation_creates_another_conversation(self):
         """

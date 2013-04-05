@@ -298,27 +298,35 @@ message = {
          }
     ],
     "object": {
-        "objectType": "message",
+        "objectType": "note",
         "content": "Nos espera una gran temporada, no es cierto?",
     }
 }
 
 message2 = {
     "contexts": [
-        {"objectType":"conversation",
+        {"objectType": "conversation",
          "participants": ["messi", "xavi"],
          }
     ],
     "object": {
-        "objectType": "message",
+        "objectType": "note",
         "content": "M'agrada Terrassa!",
     }
 }
 
 message3 = {
     "object": {
-        "objectType": "message",
+        "objectType": "note",
         "content": "M'agrada Taradell!",
+    }
+}
+
+
+group_message = {
+    "object": {
+        "objectType": "note",
+        "content": "Quin grup mes guai!",
     }
 }
 
