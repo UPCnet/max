@@ -39,7 +39,7 @@ for filename in files:
 
     expecteds = [match.start() for match in re.finditer(r'\n[\t ]+\.\.\s+->\s+expected', apirest)]
     if len(expecteds) != len(padded):
-        print "Expected responses count doesn't match printed responses count"
+        print "Expected responses ({}) doesn't match printed responses ({})".format(len(expecteds), len(padded))
         sys.exit(1)
     for pos, expected in enumerate(expecteds):
         current_block = apirest[last:expected]
