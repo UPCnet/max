@@ -179,3 +179,178 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(result.get("totalItems", None), 1)
         self.assertEqual(result.get("items")[0].get("objectType", ""), "conversation")
+
+    def test_post_message_to_inexistent_group_conversation_creates_conversation(self):
+        """
+            Given a plain user
+            When I post a message to more than one person
+            Then a new conversation is created
+        """
+
+    def test_post_messages_to_existing_group_conversation_creates_another_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and two other people
+            When i post a message to the same group of people
+            And I don't specify the existing conversation
+            Then a new conversation is created
+        """
+
+    def test_post_message_to_group_conversation_check_participants_reception(self):
+        """
+            Given a plain user
+            And a conversation between me and two other people
+            When i post a message to the conversation
+            Then all participants can see the message
+        """
+
+    def test_add_participant_to_inexistent_conversation(self):
+        """
+            Given a plain user
+            When i try to add a participant to a conversation
+            And that conversation does not exists
+            Then I get an error
+        """
+
+    def test_add_participant_to_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i try to add a participant to a conversation
+            Then the participant joins the conversation
+        """
+
+    def test_non_owner_add_participant_to_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When i try to add a participant to a conversation
+            Then I get an error
+        """
+
+    def test_conversation_participant_limit(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            When i try to add a participant to a conversation
+            And that conversation is full
+            Then I get an error
+        """
+
+    def test_add_existing_participant_to_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i try to add a participant to a conversation
+            And that participant is already on the conversation
+            Then the participant is not dupicated
+        """
+
+    def test_user_leaves_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When i try to leave the conversation
+            Then I am no longer in the conversation
+        """
+
+    def test_conversation_owner_cannot_leave_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i try to leave the conversation
+            I get an error
+        """
+
+    def test_user_leaves_conversation_other_participants_keep_seeing_messages(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When i leave the conversation
+            Then other participants still see the conversation messages
+        """
+
+    def test_user_leaves_conversation_cannot_see_conversation_messages(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When i leave the conversation
+            I cannot longer see the conversation messages
+        """
+
+    def test_conversation_owner_kicks_user(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i kick a user out of the conversation
+            Then the user is no longer in the conversation
+        """
+
+    def test_non_conversation_owner_kicks_user(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When i try to kick a user out of the conversation
+            Then i get an error
+        """
+
+    def test_conversation_owner_deletes_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i delete the conversation
+            Then all the users will be no longer subcribed in that conversation
+        """
+
+    def test_conversation_users_cannot_see_conversation_after_deleting(self):
+        """
+            Given a plain user
+            And a conversation between me and other people with messages
+            When the owner deletes the conversation
+            Then I cannot see the conversation messages
+        """
+
+    def test_non_conversation_owner_cannot_delete_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When I try to delete the conversation
+            Then I get an error
+        """
+
+    def test_conversation_owner_changes_conversation_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When I change the displayName
+            The conversation displayName changes
+        """
+
+    def test_non_conversation_owner_cannot_change_conversation_name(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When I try to change the displayName
+            I get an error
+        """
+
+    def test_two_people_conversation_displayName_is_partner_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            When I read the conversation details
+            The displayName is the displayName of the other participant
+        """
