@@ -9,6 +9,7 @@ cada servei.
 
 .. test fixtures
     >>> from httpretty import HTTPretty
+    >>> import json
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> from max.tests import test_manager
@@ -43,17 +44,19 @@ Usuaris
             {
                 "username": "messi",
                 "displayName": "messi",
-                "subscribedTo": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "last_login": "2013-02-04T15:36:34Z",
-                "published": "2013-02-04T15:36:34Z",
+                "creator": "test_manager",
                 "following": {
                     "totalItems": 0,
                     "items": []
                 },
-                "id": "510fd582aceee925d0f1ecd1",
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2013-04-05T05:41:09Z",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "id": "515e63f5fcfff2716ac44d01",
                 "objectType": "person"
             }
 
@@ -79,10 +82,10 @@ Contexts
 
     Crea un context al sistema.
 
-    :query url: (Requerit) Una clau de tipus ``object`` que identifica al
-        context indicant com a ``objectType`` el tipus ``uri`` i la URL del
-        context com a l'exemple.
-    :query displayName: (Opcional) El nom per mostrar a la UI.
+    :query objectType: (Obligatori) De moment se suporta el tipus ``context``
+    :query url: La URL amb la qual s'identifica el context.
+    :query displayName: (Opcional) El nom per mostrar a la UI. Si no s'especifica, es
+        mostrarà la url
     :query twitterHashtag: (Opcional) El hashtag (#) que identifica els posts
         a Twitter com a posts del context. Tots els posts d'usuaris del
         sistema i amb permisos al context amb compta de twitter informada
@@ -101,10 +104,8 @@ Contexts
         .. code-block:: python
 
             {
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
+                "url": "http://atenea.upc.edu",
+                "objectType": "context",
                 "displayName": "Atenea",
                 "tags": ["Assignatura"]
             }
@@ -117,19 +118,21 @@ Contexts
 
             {
                 "displayName": "Atenea",
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
-                "published": "2013-02-04T16:28:03Z",
+                "creator": "test_manager",
+                "url": "http://atenea.upc.edu",
+                "tags": [
+                    "Assignatura"
+                ],
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "id": "510fe193aceee92cc82408cb",
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "subscribe": "public",
-                    "invite": "public"
+                    "invite": "public",
+                    "subscribe": "public"
                 },
+                "id": "515e63f5fcfff2716ac44d02",
                 "objectType": "context"
             }
 
@@ -172,24 +175,23 @@ Contexts
                 "totalItems": 1,
                 "items": [
                     {
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "displayName": "Atenea",
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
                         "tags": [
                             "Assignatura"
                         ],
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-03-28T13:08:12Z",
-                        "displayName": "Atenea",
-                        "id": "515440bc71c75c67ea6453d8",
+                        "published": "2013-04-05T05:41:09Z",
+                        "owner": "test_manager",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "objectType": "context",
+                        "id": "515e63f5fcfff2716ac44d02",
                         "permissions": {
                             "read": "public",
                             "write": "public",
                             "invite": "public",
                             "subscribe": "public"
-                        },
-                        "objectType": "context"
+                        }
                     }
                 ]
             }
@@ -233,21 +235,23 @@ Contexts
 
             {
                 "twitterHashtag": "assignatura1",
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
-                "published": "2013-02-05T14:55:23Z",
                 "displayName": "Atenea",
-                "id": "51111d5baceee9464d989908",
+                "creator": "test_manager",
+                "url": "http://atenea.upc.edu",
+                "tags": [
+                    "Assignatura"
+                ],
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "objectType": "context",
+                "id": "515e63f5fcfff2716ac44d02",
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "subscribe": "public",
-                    "invite": "public"
-                },
-                "objectType": "context"
+                    "invite": "public",
+                    "subscribe": "public"
+                }
             }
 
         .. -> expected
@@ -281,20 +285,22 @@ Contexts
 
             {
                 "twitterHashtag": "assignatura1",
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
-                "published": "2013-02-05T14:55:23Z",
                 "displayName": "Atenea",
-                "id": "51111d5baceee9464d989908",
+                "creator": "test_manager",
+                "url": "http://atenea.upc.edu",
+                "tags": [
+                    "Assignatura"
+                ],
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "permissions": {
                     "read": "public",
                     "write": "public",
-                    "subscribe": "public",
-                    "invite": "public"
+                    "invite": "public",
+                    "subscribe": "public"
                 },
+                "id": "515e63f5fcfff2716ac44d02",
                 "objectType": "context"
             }
 
@@ -327,7 +333,7 @@ Contexts
 
 .. Create the context to delete in this test
 
-    >>> create_context = { "object": {"url": "http://atenea.upc.edu", "objectType": "uri" } }
+    >>> create_context = {"url": "http://atenea.upc.edu", "objectType": "context" }
     >>> resp = utils.create_context(create_context)
     >>> context_hash_for_deleting = resp.json.get('hash')
 
@@ -381,7 +387,7 @@ Subscripcions
 
             {
                 "object": {
-                    "objectType": "uri",
+                    "objectType": "context",
                     "url": "http://atenea.upc.edu"
                 }
             }
@@ -393,23 +399,26 @@ Subscripcions
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "test_manager",
                 "replies": {
                     "totalItems": 0,
                     "items": []
                 },
                 "object": {
                     "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
+                    "objectType": "context"
                 },
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
-                    "id": "511121f6aceee949e9da50d4",
                     "objectType": "person"
                 },
+                "commented": "2013-04-05T05:41:09Z",
                 "verb": "subscribe",
-                "published": "2013-02-05T15:15:02Z",
-                "id": "511121f6aceee949e9da50d6",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "messi",
+                "id": "515e63f5fcfff2716ac44d04",
                 "objectType": "activity"
             }
 
@@ -450,10 +459,11 @@ Subscripcions
 
 .. Create the context to delete in this test
 
-    >>> create_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "uri" } }
+    >>> create_context_d = {"url": "http://atenea.upc.edu/C", "objectType": "context" }
+    >>> subscribe_context_d = { "object": {"url": "http://atenea.upc.edu/C", "objectType": "context" } }
     >>> resp = utils.create_context(create_context_d)
     >>> context_hash_for_deleting = resp.json.get('hash')
-    >>> utils.admin_subscribe_user_to_context(username, create_context_d)
+    >>> utils.admin_subscribe_user_to_context(username, subscribe_context_d)
     <201 Created application/json ...
 
     Resposta esperada
@@ -495,19 +505,20 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "displayName": "http://atenea.upc.edu",
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
-                "published": "2013-02-05T19:38:25Z",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "id": "51115fb1e999fb0cabd43ba8",
+                "tags": [],
+                "url": "http://atenea.upc.edu",
+                "creator": "test_manager",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "displayName": "http://atenea.upc.edu",
                 "permissions": [
                     "read",
                     "write",
-                    "invite"
+                    "invite",
+                    "unsubscribe"
                 ],
+                "id": "515e63f5fcfff2716ac44d03",
                 "objectType": "context"
             }
 
@@ -541,19 +552,19 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "displayName": "http://atenea.upc.edu",
-                "object": {
-                    "url": "http://atenea.upc.edu",
-                    "objectType": "uri"
-                },
-                "published": "2013-02-05T19:40:25Z",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "id": "51116029e999fb0cb57338b3",
+                "tags": [],
+                "url": "http://atenea.upc.edu",
+                "creator": "test_manager",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "displayName": "http://atenea.upc.edu",
                 "permissions": [
                     "read",
                     "invite",
                     "unsubscribe"
                 ],
+                "id": "515e63f5fcfff2716ac44d03",
                 "objectType": "context"
             }
 
@@ -590,7 +601,7 @@ Activitats
         context determinat fa falta que enviem una llista d'objectes *context*
         (sota la clau ``contexts``) (ja que teòricament, podem fer que
         l'activitat estigui associada a varis contexts a l'hora), indicant com a
-        ``objectType`` el tipus ``uri`` i les dades del context com a l'exemple
+        ``objectType`` el tipus ``context`` i les dades del context com a l'exemple
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
         *note*. Ha de contindre les claus ``objectType`` i ``content`` que pot
         tractar-se d'un camp codificat amb HTML
@@ -603,7 +614,7 @@ Activitats
                 "contexts": [
                                 {
                                     "url": "http://atenea.upc.edu",
-                                    "objectType": "uri"
+                                    "objectType": "context"
                                  }
                             ],
                 "object": {
@@ -619,50 +630,43 @@ Activitats
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "test_manager",
                 "contexts": [
                     {
-                        "twitterHashtag": "assignatura1",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
-                        },
-                        "published": "2013-02-05T15:24:38Z",
-                        "displayName": "Atenea",
-                        "id": "51112436aceee94b85795c13",
-                        "permissions": [
-                            "read",
-                            "write"
-                        ],
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
+                        "owner": "test_manager",
+                        "displayName": "http://atenea.upc.edu",
                         "objectType": "context"
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                    "_keywords": [
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "keywords": [
                         "testejant",
-                        "creaci\\u00f3",
+                        "creaci\u00f3",
                         "canvi",
                         "context",
                         "messi"
                     ],
                     "objectType": "note"
                 },
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
-                    "id": "51112436aceee94b85795c12",
                     "objectType": "person"
                 },
+                "commented": "2013-04-05T05:41:09Z",
                 "verb": "post",
-                "replies": {
-                    "totalItems": 0,
-                    "items": [
-
-                    ]
-                },
-                "id": "51112436aceee94b85795c15",
-                "published": "2013-02-05T15:24:38Z",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "messi",
+                "id": "515e63f5fcfff2716ac44d07",
                 "objectType": "activity"
             }
 
@@ -686,7 +690,7 @@ Activitats
         context determinat fa falta que enviem una llista d'objectes *context*
         (sota la clau ``contexts``) (ja que teòricament, podem fer que
         l'activitat estigui associada a varis contexts a l'hora), indicant com a
-        ``objectType`` el tipus ``uri`` i les dades del context com a l'exemple.
+        ``objectType`` el tipus ``context`` i les dades del context com a l'exemple.
         En aquest cas d'ús el contexte especificat aquí ha de ser el mateix que
         l'especificat al paràmetre {hash}
     :query object: (Requerit) Per ara només suportat el tipus (``objectType``)
@@ -701,7 +705,7 @@ Activitats
                 "contexts": [
                                 {
                                     "url": "http://atenea.upc.edu",
-                                    "objectType": "uri"
+                                    "objectType": "context"
                                  }
                             ],
                 "object": {
@@ -717,50 +721,52 @@ Activitats
         .. code-block:: python
 
             {
+                "generator": null,
+                "creator": "test_manager",
                 "contexts": [
                     {
-                        "twitterHashtag": "assignatura1",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "object": {
-                            "url": "http://atenea.upc.edu",
-                            "objectType": "uri"
+                        "creator": "test_manager",
+                        "url": "http://atenea.upc.edu",
+                        "tags": [],
+                        "published": "2013-04-05T05:41:09Z",
+                        "owner": "test_manager",
+                        "displayName": "http://atenea.upc.edu",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
                         },
-                        "published": "2013-02-05T15:24:38Z",
-                        "displayName": "Atenea",
-                        "id": "51112436aceee94b85795c13",
-                        "permissions": [
-                            "read",
-                            "write"
-                        ],
+                        "id": "515e63f5fcfff2716ac44d03",
                         "objectType": "context"
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\\u00f3 d\'un canvi d\'estatus a un context</p>",
-                    "_keywords": [
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "keywords": [
                         "testejant",
-                        "creaci\\u00f3",
+                        "creaci\u00f3",
                         "canvi",
-                        "context",
-                        "messi"
+                        "context"
                     ],
                     "objectType": "note"
                 },
-                "actor": {
-                    "username": "messi",
-                    "displayName": "messi",
-                    "id": "51112436aceee94b85795c12",
-                    "objectType": "person"
-                },
-                "verb": "post",
                 "replies": {
                     "totalItems": 0,
-                    "items": [
-
-                    ]
+                    "items": []
                 },
-                "id": "51112436aceee94b85795c15",
-                "published": "2013-02-05T15:24:38Z",
+                "actor": {
+                    "url": "http://atenea.upc.edu",
+                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                    "displayName": "http://atenea.upc.edu",
+                    "objectType": "uri"
+                },
+                "commented": "2013-04-05T05:41:09Z",
+                "verb": "post",
+                "published": "2013-04-05T05:41:09Z",
+                "owner": "test_manager",
+                "id": "515e63f5fcfff2716ac44d08",
                 "objectType": "activity"
             }
 
