@@ -188,7 +188,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I post a message to more than one person
             Then a new conversation is created
         """
-        from .mockers import message
+        from .mockers import group_message as creation_message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -197,6 +197,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
+        self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
 
     def test_post_messages_to_existing_group_conversation_creates_another_conversation(self):
         """
@@ -206,6 +207,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And I don't specify the existing conversation
             Then a new conversation is created
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res1 = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        res2 = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+
+        self.assertNotEqual(res1.json['contexts'][0]['hash'], res2.json['contexts'][0]['hash'])
 
     def test_post_message_to_group_conversation_check_participants_reception(self):
         """
@@ -214,6 +228,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i post a message to the conversation
             Then all participants can see the message
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(recipient), status=201)
+        res.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(res.json['contexts'][0]['hash'], conversation_hash)
+        self.assertEqual(res.json['object']['content'], creation_message['object']['content'])
+
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(recipient2), status=201)
+        res.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(res.json['contexts'][0]['hash'], conversation_hash)
+        self.assertEqual(res.json['object']['content'], creation_message['object']['content'])
 
     def test_add_participant_to_inexistent_conversation(self):
         """
@@ -222,6 +257,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And that conversation does not exists
             Then I get an error
         """
+        from .mockers import new_participant
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        conversation_hash = '0123456789abcdef0123456789abcdef'
+
+        self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(new_participant), oauth2Header(recipient), status=404)
 
     def test_add_participant_to_conversation(self):
         """
@@ -231,6 +276,22 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i try to add a participant to a conversation
             Then the participant joins the conversation
         """
+        from .mockers import group_message as creation_message
+        from .mockers import new_participant
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(new_participant), oauth2Header(sender), status=201)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=201)
+        self.assertEqual(res.json['participants'], 4)
 
     def test_non_owner_add_participant_to_conversation(self):
         """
@@ -240,6 +301,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i try to add a participant to a conversation
             Then I get an error
         """
+        from .mockers import group_message as creation_message
+        from .mockers import new_participant
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(new_participant), oauth2Header(recipient), status=401)
 
     def test_conversation_participant_limit(self):
         """
@@ -249,6 +324,29 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And that conversation is full
             Then I get an error
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+        nonallowed = 'alexis'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+        self.create_user(nonallowed)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        limit = 20
+        for i in range(limit - 3):
+            newusername = 'user{}'.format(i)
+            self.create_user(newusername)
+            participant = {'username': newusername}
+            self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(participant), oauth2Header(sender), status=201)
+
+        participant = {'username': nonallowed}
+        self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(participant), oauth2Header(sender), status=403)
 
     def test_add_existing_participant_to_conversation(self):
         """
@@ -257,8 +355,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And I am the owner of the conversation
             When i try to add a participant to a conversation
             And that participant is already on the conversation
-            Then the participant is not dupicated
+            Then the participant is not duplicated
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+        existing_participant = {'username': recipient2}
+
+        self.testapp.post('/conversations/{}/participants'.format(conversation_hash), json.loads(existing_participant), oauth2Header(recipient), status=200)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=201)
+        self.assertEqual(res.json['participants'], 3)
 
     def test_user_leaves_conversation(self):
         """
@@ -268,6 +382,22 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i try to leave the conversation
             Then I am no longer in the conversation
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, recipient2), '', oauth2Header(recipient2), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=201)
+        self.assertEqual(res.json['participants'], 2)
+        self.assertNotIn(recipient2, res.json['participants'])
 
     def test_conversation_owner_cannot_leave_conversation(self):
         """
@@ -277,6 +407,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i try to leave the conversation
             I get an error
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, sender), '', oauth2Header(sender), status=403)
 
     def test_user_leaves_conversation_other_participants_keep_seeing_messages(self):
         """
@@ -284,8 +427,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And a conversation between me and other people
             And I am not the owner of the conversation
             When i leave the conversation
-            Then other participants still see the conversation messages
+            Then other participants still see the left user conversation messages
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(recipient2), status=201)
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, recipient2), '', oauth2Header(recipient2), status=204)
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(sender), status=200)
+        res.assertEqual(res.json['totalItems'], 2)
 
     def test_user_leaves_conversation_cannot_see_conversation_messages(self):
         """
@@ -295,6 +455,22 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i leave the conversation
             I cannot longer see the conversation messages
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(recipient2), status=201)
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, recipient2), '', oauth2Header(recipient2), status=204)
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_hash), '', oauth2Header(recipient2), status=401)
 
     def test_conversation_owner_kicks_user(self):
         """
@@ -304,6 +480,22 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i kick a user out of the conversation
             Then the user is no longer in the conversation
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, recipient2), '', oauth2Header(sender), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=201)
+        self.assertEqual(res.json['participants'], 2)
+        self.assertNotIn(recipient2, res.json['participants'])
 
     def test_non_conversation_owner_kicks_user(self):
         """
@@ -313,6 +505,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i try to kick a user out of the conversation
             Then i get an error
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_hash, recipient), '', oauth2Header(recipient2), status=401)
 
     def test_conversation_owner_deletes_conversation(self):
         """
@@ -322,6 +527,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i delete the conversation
             Then all the users will be no longer subcribed in that conversation
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=404)
 
     def test_conversation_users_cannot_see_conversation_after_deleting(self):
         """
@@ -330,6 +549,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When the owner deletes the conversation
             Then I cannot see the conversation messages
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}'.format(conversation_hash), '', oauth2Header(sender), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_hash), '', oauth2Header(recipient), status=404)
 
     def test_non_conversation_owner_cannot_delete_conversation(self):
         """
@@ -339,6 +572,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I try to delete the conversation
             Then I get an error
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_hash = res.json['contexts'][0]['hash']
+
+        self.testapp.delete('/conversations/{}'.format(conversation_hash), '', oauth2Header(recipient), status=401)
 
     def test_conversation_owner_changes_conversation_displayName(self):
         """
@@ -348,6 +594,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I change the displayName
             The conversation displayName changes
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
     def test_non_conversation_owner_cannot_change_conversation_name(self):
         """
@@ -357,6 +611,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I try to change the displayName
             I get an error
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
     def test_two_people_conversation_displayName_is_partner_displayName(self):
         """
@@ -365,3 +627,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When I read the conversation details
             The displayName is the displayName of the other participant
         """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
