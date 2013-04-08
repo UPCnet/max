@@ -23,7 +23,11 @@ PUBLIC_RESOURCES = {
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},  # (GET, POST) documented tested
+    'conversation': {'route': '/conversations/{hash}'},  # (GET, DELETE, PUT)
     'messages': {'route': '/conversations/{hash}/messages'},  # (GET, POST) documented tested
+    'message': {'route': '/conversations/{hash}/messages/{activity}'},  # (GET, POST) documented tested
+    'participants': {'route': '/conversations/{hash}/participants'},
+    'participant': {'route': '/conversations/{hash}/participant'},
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},  # not implemented
