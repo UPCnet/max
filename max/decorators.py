@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError
-from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden
+from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden
 from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
@@ -165,6 +165,8 @@ def MaxResponse(fun):
             return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=message.value))
         except ValidationError, message:
             return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=message.value))
+        except Forbidden, message:
+            return JSONHTTPForbidden(error=dict(error=Forbidden.__name__, error_description=message.value))
 
         # JSON decode error????
         except ValueError:

@@ -13,6 +13,9 @@ PUBLIC_RESOURCES = {
     'subscriptions': {'route': '/people/{username}/subscriptions'},  # (GET, POST) documented tested
     'subscription': {'route': '/people/{username}/subscriptions/{hash}'},  # (DELETE) documented tested
 
+    'user_conversations': {'route': '/people/{username}/conversations'},  # (GET, POST) documented tested
+    'user_conversation': {'route': '/people/{username}/conversations/{id}'},  # (DELETE) documented tested
+
     'contexts': {'route': '/contexts'},  # (POST GET) documented tested
     'context': {'route': '/contexts/{hash}'},  # (GET, PUT, DELETE) documented tested
     'context_avatar': {'route': '/contexts/{hash}/avatar'},  # (GET) documented

@@ -13,6 +13,7 @@ from max.resources import Root, loadMAXSettings, loadMAXSecurity
 from max.rest.resources import RESOURCES
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
+CONVERSATION_PARTICIPANTS_LIMIT = 20
 
 
 class RestrictedPredicate(object):

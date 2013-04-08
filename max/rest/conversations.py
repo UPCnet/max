@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPNoContent
 from pymongo import ASCENDING
 
-from max.exceptions import ValidationError
+from max.exceptions import ValidationError, Unauthorized, Forbidden, ObjectNotFound
 from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import Message, Conversation
+from max.models import Message, Conversation, Activity
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
-
+from max import DEFAULT_CONTEXT_PERMISSIONS
+from max import CONVERSATION_PARTICIPANTS_LIMIT
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import extractPostData
 
@@ -98,7 +100,21 @@ def postMessage2Conversation(context, request):
 
         # Subscribe everyone,
         for user in newconversation['participants']:
-            users[user].addSubscription(newconversation)
+            db_user = users[user]
+            db_user.addSubscription(newconversation)
+            # Initialize a Subscription Activity
+            rest_params = {'actor': db_user,
+                           'verb': 'subscribe',
+                           'object': {'objectType': 'conversation',
+                                      'id': newconversation['_id'],
+                                      'participants': newconversation.participants},
+                           'contexts': []  # Override contexts from request
+
+                           }
+            newactivity = Activity()
+            newactivity.fromRequest(request, rest_params=rest_params)
+            newactivity_oid = newactivity.insert()  # Insert a subscribe activity
+            newactivity['_id'] = newactivity_oid
 
         current_conversation = newconversation
 
@@ -130,15 +146,34 @@ def getMessages(context, request):
          Return all messages from a conversation
     """
     cid = request.matchdict['id']
-
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
-        raise ValidationError('Actor must be either subscribed to the conversation or a participant of it.')
+        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.id': cid}
     messages = mmdb.messages.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
 
     handler = JSONResourceRoot(messages)
+    return handler.buildResponse()
+
+
+@view_config(route_name='conversation', request_method='GET')
+@MaxResponse
+@requirePersonActor
+@oauth2(['widgetcli'])
+def getConversation(context, request):
+    """
+         /conversations/{id}
+         Return Conversation¥
+    """
+    cid = request.matchdict['id']
+
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
+        raise ValidationError('Actor must be either subscribed to the conversation or a participant of it.')
+
+    conversations = MADMaxCollection(context.db.conversations)
+
+    handler = JSONResourceEntity(conversations[cid].flatten())
     return handler.buildResponse()
 
 
@@ -170,35 +205,95 @@ def addMessage(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='participants', request_method='POST')
+@view_config(route_name='user_conversation', request_method='POST')
 @MaxResponse
-@requirePersonActor
+@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
-def addParticipant(context, request):
+def joinConversation(context, request):
     """
-         /conversations/{id}/participants
+         /people/{username}/conversations/{id}/participants
          Adds a participant to a conversation
     """
-    import ipdb;ipdb.set_trace()
+    actor = request.actor
     cid = request.matchdict['id']
 
-    mmdb = MADMaxCollection(context.db.conversations)
-    aa = mmdb[ObjectId(cid)]
+    #Check if user is already subscribed
+    current_conversations = [a['id'] for a in actor.talkingIn['items']]
+    if cid in current_conversations:
+        # If user already subscribed, send a 200 code and retrieve the original subscribe activity
+        # post when user was susbcribed. This way in th return data we'll have the date of subscription
+        code = 200
+        activities = MADMaxCollection(context.db.activity)
+        query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
+        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
+    else:
+        #Register subscription to the actor
+        conversations = MADMaxCollection(context.db.conversations)
+        conversation = conversations[cid]
 
-    message_params = {'actor': request.actor,
-                      'verb': 'post',
-                      'contexts': [{'objectType': 'conversation',
-                                    'id': cid
-                                    }]
-                      }
+        if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
+            raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
-    # Initialize a Message (Activity) object from the request
-    newmessage = Message()
-    newmessage.fromRequest(request, rest_params=message_params)
+        # The owner of the conversation must be the same as the request creator to subscribe people to restricted conversations
+        if conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted' and \
+                conversation._owner != request.creator:
 
-    message_oid = newmessage.insert()
-    newmessage['_id'] = message_oid
+            raise Unauthorized('User {0} cannot subscribe himself to to this context'.format(actor['username']))
 
-    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+        actor.addSubscription(conversation)
+        conversation.participants.append(actor.username)
+        conversation.save()
+
+        # If user wasn't created, 201 will show that the subscription has just been added
+        code = 201
+
+        # Initialize a Activity object from the request
+        rest_params = {'actor': actor,
+                       'verb': 'subscribe',
+                       'object': {'objectType': 'conversation',
+                                  'id': cid,
+                                  'participants': conversation.participants}
+                       }
+
+        newactivity = Activity()
+        newactivity.fromRequest(request, rest_params=rest_params)
+        newactivity_oid = newactivity.insert()  # Insert a subscribe activity
+        newactivity['_id'] = newactivity_oid
+    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()
+
+
+@view_config(route_name='user_conversation', request_method='DELETE')
+@MaxResponse
+@requirePersonActor(force_own=False)
+@oauth2(['widgetcli'])
+def leaveConversation(context, request):
+    """
+    """
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
+    cid = request.matchdict.get('id', None)
+    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+
+    if subscription is None:
+        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
+
+    if 'unsubscribe' not in subscription.get('permissions', []):
+        raise Forbidden('User {0} cannot leave this conversation'.format(actor.username))
+
+    found_context = mmdb.conversations[cid]
+
+    auth_user_is_conversation_owner = found_context._owner == request.creator
+    auth_user_is_leaving = request.creator == actor.username
+
+    if auth_user_is_conversation_owner and auth_user_is_leaving:
+        raise Forbidden('User {0} is the owner of the conversation, leaving is not allowed, only deleting'.format(actor.username))
+
+    if not auth_user_is_leaving and not auth_user_is_conversation_owner:
+        raise Unauthorized('Only conversation owner can force participants out')
+
+    actor.removeSubscription(found_context)
+    found_context.participants.remove(actor.username)
+    found_context.save()
+    return HTTPNoContent()

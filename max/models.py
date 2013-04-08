@@ -326,7 +326,7 @@ class User(MADBase):
         """
             Adds a comment to an existing activity
         """
-        self.deleteFromList(context.user_subscription_storage, {context.unique: context.getIdentifier()})
+        self.deleteFromList(context.user_subscription_storage, {context.unique.lstrip('_'): context.getIdentifier()})
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
@@ -465,7 +465,7 @@ class BaseContext(MADBase):
             user if userd_to_delete is provided
         """
         usersdb = MADMaxCollection(self.mdb_collection.database.users)
-        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique): self[self.unique]}
+        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
         users = usersdb.search(criteria)
 
         for user in users:
