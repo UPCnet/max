@@ -28,19 +28,10 @@ def addAdminUserActivity(context, request):
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
-    # If we have the _id setted, then the object already existed in the DB,
-    # otherwise, proceed to insert it into the DB
-    # In both cases, respond with the JSON of the object and the appropiate
-    # HTTP Status Code
-
-    if newactivity.get('_id'):
-        # Already Exists
-        code = 200
-    else:
-        # New User
-        code = 201
-        activity_oid = newactivity.insert()
-        newactivity['_id'] = activity_oid
+    # New User
+    code = 201
+    activity_oid = newactivity.insert()
+    newactivity['_id'] = activity_oid
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()
