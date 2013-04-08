@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError, ValidationError
+from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, ValidationError
 import datetime
-from pyramid.request import Request
+from pyramid.threadlocal import get_current_request
 import sys
 
 
@@ -188,9 +188,14 @@ class MADBase(MADDict):
     mdb_collection = None
     data = {}
 
-    def __init__(self, request):
-        if request:
-            self.mdb_collection = request.context.db[self.collection]
+    def __init__(self):
+        self.request = get_current_request()
+        # When called from outside a pyramyd app, we have no request
+        try:
+            self.db = self.request.context.db
+            self.mdb_collection = self.db[self.collection]
+        except:
+            pass
         self.data = RUDict({})
 
     def setDates(self):
@@ -228,9 +233,14 @@ class MADBase(MADDict):
             # if it's already on the DB, just populate with the object data
             self.update(existing_object)
 
-    def fromObject(self, source, collection):
-        self.mdb_collection = collection
+    def _post_init_from_object(self, source):
+        return True
+
+    def fromObject(self, source, collection=None):
         self.update(source)
+        if 'id' in source:
+            self['_id'] = source['id']
+        self._post_init_from_object(source)
 
     def fromDatabase(self, key):
         self.data[self.unique] = key
@@ -290,6 +300,7 @@ class MADBase(MADDict):
                                         }
                                        )
             #Self-update to reflect the addition
+            self.setdefault(field, {'items': [], 'totalItems': 0})  # Make sure the field exists
             self[field]['items'].append(obj)
             self[field]['totalItems'] += 1
         else:

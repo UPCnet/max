@@ -141,7 +141,7 @@ class MADMaxCollection(object):
                          security='Security')
 
         model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
-        wrapped = model(None)
+        wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
 
         #Also wrap subobjects, only if we are not flattening
