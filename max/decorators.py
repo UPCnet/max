@@ -6,7 +6,7 @@ from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
 from max.resources import Root
 from max.rest.resources import RESOURCES
-from max.rest.utils import isOauth, isBasic, getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
+from max.rest.utils import getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
 from max.models import User, Context
 from beaker.cache import cache_region, Cache
 
