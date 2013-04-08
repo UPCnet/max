@@ -327,7 +327,14 @@ group_message = {
     "object": {
         "objectType": "note",
         "content": "Quin grup mes guai!",
-    }
+        "displayName": "Pelotudos"
+    },
+
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi", "shakira"],
+         "displayName": "Pelotudos"
+         }]
 }
 
 # For revision, not implemented yet
