@@ -90,13 +90,6 @@ class Conversation(ASObject):
               'participants': dict(required=1),
               }
 
-    def __init__(self, data, creating=True):
-        """
-        """
-        self.data = data
-        self.processFields()
-        self.update(data)
-
 
 class Context(ASObject):
     """
@@ -109,21 +102,11 @@ class Context(ASObject):
               'objectType':  dict(required=1),
               }
 
-    def __init__(self, data, creating=True):
-        """
-        """
-        self.data = data
-        self.processFields()
-        self.update(data)
-
     def getHash(self):
         """
             Calculates the hash based on the url
         """
         return sha1(self.url).hexdigest()
-
-    def getDisplayName(self):
-        return self.url
 
 
 class Person(ASObject):
@@ -137,10 +120,3 @@ class Person(ASObject):
               'displayName': dict(required=0),
               'objectType':  dict(required=1),
               }
-
-    def __init__(self, data, creating=True):
-        """
-        """
-        self.data = data
-        self.processFields()
-        self.update(data)
