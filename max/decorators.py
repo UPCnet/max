@@ -13,12 +13,13 @@ from beaker.cache import cache_region, Cache
 
 def getUserActor(db, username):
     mmdb = MADMaxDB(db)
-    return mmdb.users.getItemsByusername(username)
+    actor = mmdb.users.getItemsByusername(username)[0]
+    return actor
 
 
 def getContextActor(db, hash):
     mmdb = MADMaxDB(db)
-    context = mmdb.contexts.getItemsByhash(hash)
+    context = mmdb.contexts.getItemsByhash(hash)[0]
     return context
 
 
@@ -57,8 +58,8 @@ def requirePersonActor(exists=True, force_own=True):
             # Check a valid actor exists in the tdatabase
             if exists:
                 try:
-                    actor = getUserActor(context.db, username)[0]
-                except:
+                    actor = getUserActor(context.db, username)
+                except IndexError:
                     raise UnknownUserError('Unknown actor identified by username: %s' % username)
 
             if force_own:
@@ -105,8 +106,8 @@ def requireContextActor(exists=True):
             # Check a valid context exists in the tdatabase
             if exists:
                 try:
-                    actor = getContextActor(context.db, contexthash)[0]
-                except:
+                    actor = getContextActor(context.db, contexthash)
+                except IndexError:
                     raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
                 else:
                     #Only ontexts are allowed as context actors
