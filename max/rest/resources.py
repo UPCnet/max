@@ -23,11 +23,11 @@ PUBLIC_RESOURCES = {
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},  # (GET, POST) documented tested
-    'conversation': {'route': '/conversations/{hash}'},  # (GET, DELETE, PUT)
-    'messages': {'route': '/conversations/{hash}/messages'},  # (GET, POST) documented tested
-    'message': {'route': '/conversations/{hash}/messages/{activity}'},  # (GET, POST) documented tested
-    'participants': {'route': '/conversations/{hash}/participants'},
-    'participant': {'route': '/conversations/{hash}/participant'},
+    'conversation': {'route': '/conversations/{id}'},  # (GET, DELETE, PUT)
+    'messages': {'route': '/conversations/{id}/messages'},  # (GET, POST) documented tested
+    'message': {'route': '/conversations/{id}/messages/{activity}'},  # (GET, POST) documented tested
+    'participants': {'route': '/conversations/{id}/participants'},
+    'participant': {'route': '/conversations/{id}/participant'},
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},  # not implemented
@@ -45,7 +45,6 @@ PUBLIC_RESOURCES = {
     'comment': {'route': '/activities/{activity}/comments/{commentId}'},  # not implemented
     'context_permissions': {'route': '/contexts/{hash}/permissions'},  # not implemented
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},  # not implemented
-    'conversation': {'route': '/conversations/{hash}'},  # not implemented
 
 }
 

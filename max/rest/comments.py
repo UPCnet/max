@@ -76,7 +76,7 @@ def addActivityComment(context, request):
     }
 
     # Initialize a Activity object from the request
-    newactivity = Activity(request)
+    newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
     code = 201

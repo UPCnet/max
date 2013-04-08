@@ -3,7 +3,7 @@ from max.MADObjects import MADBase
 from max.rest.utils import canWriteInContexts
 import datetime
 from MADMax import MADMaxCollection
-from max.rest.utils import getUserIdFromTwitter
+from max.rest.utils import getUserIdFromTwitter, getMaxModelByObjectType
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from hashlib import sha1
 from rfc3339 import rfc3339
@@ -87,10 +87,7 @@ class BaseActivity(MADBase):
                 # of each context and store them in contexts key
                 ob['contexts'] = []
                 for cobject in self.data['contexts']:
-                    chash = cobject.get('hash', None)
-                    if chash is None:
-                        chash = sha1(cobject.get('url')).hexdigest()
-                    subscription = dict(self.data['actor'].getSubscriptionByHash(chash))
+                    subscription = dict(self.data['actor'].getSubscription(cobject))
 
                     #Clean innecessary fields
                     non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id']
@@ -147,6 +144,15 @@ class BaseActivity(MADBase):
 
         self.save()
 
+
+class Activity(BaseActivity):
+    """
+        An activity
+    """
+    collection = 'activity'
+    context_collection = 'contexts'
+    unique = '_id'
+
     def _on_create_custom_validations(self):
         """
             Perform custom validations on the Activity Object
@@ -176,15 +182,6 @@ class BaseActivity(MADBase):
         return result
 
 
-class Activity(BaseActivity):
-    """
-        An activity
-    """
-    collection = 'activity'
-    context_collection = 'contexts'
-    unique = '_id'
-
-
 class Message(BaseActivity):
     """
         An activity
@@ -194,6 +191,78 @@ class Message(BaseActivity):
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['objectType'] = dict(default='message')
+
+    def buildObject(self):
+        """
+            Updates the dict content with the activity structure,
+            with data parsed from the request
+        """
+        ob = {'actor': {'objectType': 'person',
+                        'displayName': self.data['actor']['displayName'],
+                        'username': self.data['actor']['username']
+                        },
+              'verb': self.data['verb'],
+              'object': None,
+              }
+
+        wrapper = self.getObjectWrapper(self.data['object']['objectType'])
+        subobject = wrapper(self.data['object'])
+        ob['object'] = subobject
+
+        #Append actor as username if object has keywords and actor is a Person
+        if ob['object'].get('_keywords', None):
+            ob['object']['_keywords'].append(self.data['actor']['username'])
+
+        if 'contexts' in self.data:
+            # When a person posts an activity it can be targeted
+            # to multiple contexts. here we construct the basic info
+            # of each context and store them in contexts key
+            ob['contexts'] = []
+            for cobject in self.data['contexts']:
+                subscription = dict(self.data['actor'].getSubscription(cobject))
+
+                #Clean innecessary fields
+                non_needed_subscription_fields = ['tags', 'published', 'permissions']
+                for fieldname in non_needed_subscription_fields:
+                    if fieldname in subscription:
+                        del subscription[fieldname]
+
+                ob['contexts'].append(subscription)
+        self.update(ob)
+
+        # Set defaults
+        properties = {}
+        for key, value in self.schema.items():
+            default = value.get('default', None)
+            # Value is in the request but not set yet, set it please.
+            if key in self.data and key not in self:
+                properties[key] = self.data[key]
+            # Value is not in the request and we have a default, set it please
+            elif 'default' in value.keys():
+                properties[key] = default
+        self.update(properties)
+
+    def _on_create_custom_validations(self):
+        """
+            Perform custom validations on the Activity Object
+
+            * If the actor is a person, check wether can write in all contexts
+            * If the actor is a context, check if the context is the same
+        """
+        collection = getattr(self.mdb_collection.database, self.context_collection)
+        contextsdb = MADMaxCollection(collection, query_key='_id')
+
+        # If we are updating, we already have all data on the object, so we read self directly
+        result = True
+        wrapped_contexts = []
+        for context in self.data.get('contexts', []):
+            # Get hash from context or calculate it from the url
+            # XXX Too coupled ...
+            wrapped = contextsdb[context['id']]
+            wrapped_contexts.append(wrapped)
+
+        result = result and canWriteInContexts(self.data['actor'], wrapped_contexts)
+        return result
 
 
 class User(MADBase):
@@ -211,6 +280,7 @@ class User(MADBase):
               'last_login':   dict(),
               'following':    dict(default={'items': [], 'totalItems': 0}),
               'subscribedTo': dict(default={'items': [], 'totalItems': 0}),
+              'talkingIn':    dict(default={'items': [], 'totalItems': 0}),
               'published':    dict(),
               'twitterUsername':    dict(user_mutable=1,
                                          formatters=['stripTwitterUsername'],
@@ -250,13 +320,13 @@ class User(MADBase):
             Adds a comment to an existing activity
         """
         subscription = context.prepareUserSubscription()
-        self.addToList('subscribedTo', subscription, safe=False)
+        self.addToList(context.user_subscription_storage, subscription, safe=False)
 
-    def removeSubscription(self, chash):
+    def removeSubscription(self, context):
         """
             Adds a comment to an existing activity
         """
-        self.deleteFromList('subscribedTo', {'hash': chash})
+        self.deleteFromList(context.user_subscription_storage, {context.unique: context.getIdentifier()})
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
@@ -288,23 +358,27 @@ class User(MADBase):
 
         self.mdb_collection.update(criteria, what)
 
-    def getSubscriptionByHash(self, chash):
+    def getSubscription(self, context):
         """
         """
-        context_map = {context['hash']: context for context in self.subscribedTo['items']}
-        return context_map.get(chash)
+        ContextClass = getMaxModelByObjectType(context['objectType'])
+        temp_context = ContextClass()
+        temp_context.fromObject(context)
+        for subscription in self[temp_context.user_subscription_storage]['items']:
+            if subscription[temp_context.unique.lstrip('_')] == temp_context[temp_context.unique]:
+                return subscription
 
 
 class BaseContext(MADBase):
     """
         A max Context object representation
     """
-    unique = 'hash'
+    unique = '_id'
+    uniqueMethod = None
     schema = {'_id':                dict(),
               '_creator':           dict(required=0),
               '_owner':             dict(required=0),
               'objectType':         dict(required=0, default='context'),
-              'hash':               dict(),
               'displayName':        dict(operations_mutable=1),
               'published':          dict(),
               'permissions':        dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
@@ -314,6 +388,9 @@ class BaseContext(MADBase):
                                                   }
                                          ),
               }
+
+    def getIdentifier(self):
+        return str(self[self.unique])
 
     def buildObject(self):
         """
@@ -388,11 +465,12 @@ class BaseContext(MADBase):
             user if userd_to_delete is provided
         """
         usersdb = MADMaxCollection(self.mdb_collection.database.users)
-        criteria = {'subscribedTo.items.hash': self.hash}
+        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique): self[self.unique]}
         users = usersdb.search(criteria)
+
         for user in users:
             if users_to_delete == [] or user.username in users_to_delete:
-                user.removeSubscription(self.hash)
+                user.removeSubscription(self)
 
     def removeActivities(self, logical=False):
         """
@@ -413,7 +491,9 @@ class Context(BaseContext):
 
     collection = 'contexts'
     unique = 'hash'
+    user_subscription_storage = 'subscribedTo'
     schema = dict(BaseContext.schema)
+    schema['hash'] = dict()
     schema['url'] = dict(required=1)
     schema['tags'] = dict(default=[])
     schema['twitterHashtag'] = dict(operations_mutable=1,
@@ -426,6 +506,13 @@ class Context(BaseContext):
                                      )
     schema['twitterUsernameId'] = dict(operations_mutable=1)
 
+    def _post_init_from_object(self, source):
+        if self.get(self.unique, None) is None:
+            self[self.unique] = self.getIdentifier()
+
+    def getIdentifier(self):
+        return sha1(self['url']).hexdigest()
+
     def buildObject(self):
         super(Context, self).buildObject()
 
@@ -433,7 +520,7 @@ class Context(BaseContext):
         if self.data.get('twitterUsername', None):
             self['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
 
-        self['hash'] = sha1(self.url).hexdigest()
+        self['hash'] = self.getIdentifier()
 
         #Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', self.url)
@@ -452,37 +539,26 @@ class Context(BaseContext):
         self.save()
 
 
-class Conversation(Context):
+class Conversation(BaseContext):
     """
         A conversation between people. This are normal contexts but stored in
         another collection
     """
     collection = 'conversations'
-    unique = 'hash'
+    unique = '_id'
+    user_subscription_storage = 'talkingIn'
     schema = dict(BaseContext.schema)
     schema['participants'] = dict(required=1)
     schema['objectType'] = dict(default='conversation')
 
-    def getHash(self):
-        """
-            Calculates the hash based on the participants of the conversation
-            and the creation date. Return the existing hash if already set
-        """
-        participants = list(self.participants)  # Make a copy
-        participants.sort()                     # Sort it
-        alltogether = ''.join(participants)     # Join It
-        date = rfc3339(datetime.datetime.now(), utc=True, use_system_timezone=False)
-        alltogether += date
-        return sha1(alltogether).hexdigest()  # Hash it
-
     def buildObject(self):
-        super(Context, self).buildObject()
+        super(Conversation, self).buildObject()
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
             self['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
 
-        self['hash'] = self.getHash()
+        #self['hash'] = self.getHash()
 
         #Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', ', '.join(self.participants))

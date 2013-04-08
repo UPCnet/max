@@ -12,12 +12,17 @@ import requests
 import logging
 import urllib2
 import re
+import sys
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
 FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\w\-\_\.%s]+)' % UNICODE_ACCEPTED_CHARS
 FIND_KEYWORDS_REGEX = r'(\s|^)[#\'\"]?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
+
+
+def getMaxModelByObjectType(objectType):
+    return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 
 
 def downloadTwitterUserImage(twitterUsername, filename):
@@ -350,23 +355,26 @@ def canWriteInContexts(actor, contexts):
     # If no context filter defined, write/read is always allowed
     if contexts == []:
         return True
-    else:
-        chashes = [context.hash for context in contexts]
 
-    subscribed_contexts = [a['hash'] for a in actor['subscribedTo']['items']]
-    unsubscribed_contexts = [chash for chash in chashes if chash not in subscribed_contexts]
+    subscriptions = {}
 
-    # If user is trying to post on a context/s where he's not subscribed
-    if unsubscribed_contexts:
-        raise Unauthorized("You are not subscribed to one or more of this contexts ,: %s" % ', '.join(unsubscribed_contexts))
+    for context in contexts:
+        subscription = subscriptions.get(context.getIdentifier(), None)
+        if subscription is None:
+            #update subscriptions dict
+            u_field = context.unique.lstrip('_')
+            subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {}).get('items', [])])
+            subscriptions.update(subsc)
+            subscription = subscriptions.get(context.getIdentifier(), None)
+            if subscription is None:
+                raise Unauthorized("You are not subscribed to this context : %s" % context.getIdentifier())
 
-    # If user is trying to post on a subscribed context/s
-    # Check that has write permission in all the contexts
-    context_map = {context['hash']: context for context in actor.subscribedTo['items']}
-    unauthorized_contexts = [chash for chash in subscribed_contexts if 'write' not in context_map[chash].get('permissions', [])]
+        # If user is trying to post on a subscribed context/s
+        # Check that has write permission in all the contexts
 
-    if unauthorized_contexts:
-        raise Unauthorized("You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts))
+        allowed_to_write = 'write' in subscription.get('permissions', [])
+        if not allowed_to_write:
+            raise Unauthorized("You are not allowed to post to this context : %s" % context.getIdentifier())
 
     # If we reached here, we have permission to post on all contexts
     return True

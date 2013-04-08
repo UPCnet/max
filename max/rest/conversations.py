@@ -29,7 +29,7 @@ def getConversations(context, request):
     conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=False)
     for conversation in conversations:
         query = {'objectType': 'message',
-                 'contexts.hash': conversation['hash']
+                 'contexts.id': conversation['id']
                  }
         messages = mmdb.messages.search(query, flatten=1)
         lastMessage = messages[-1]
@@ -51,7 +51,6 @@ def postMessage2Conversation(context, request):
          /conversations
          Post message to a conversation
     """
-
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
     data = extractPostData(request)
@@ -87,7 +86,7 @@ def postMessage2Conversation(context, request):
                                                 'unsubscribe': 'public',
                                                 'invite': 'restricted'}
                                    )
-        newconversation = Conversation(request)
+        newconversation = Conversation()
         newconversation.fromRequest(request, rest_params=conversation_params)
 
         if not request.actor.username in newconversation['participants']:
@@ -106,12 +105,12 @@ def postMessage2Conversation(context, request):
     # We have to re-get the actor, in order to have the subscription updated
     message_params = {'actor': users[request.actor['username']],
                       'contexts': [{'objectType': 'conversation',
-                                    'hash': current_conversation.hash
+                                    'id': current_conversation.getIdentifier()
                                     }],
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Message(request)
+    newmessage = Message()
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()
@@ -127,16 +126,16 @@ def postMessage2Conversation(context, request):
 @oauth2(['widgetcli'])
 def getMessages(context, request):
     """
-         /conversations/{hash}/messages
+         /conversations/{id}/messages
          Return all messages from a conversation
     """
-    chash = request.matchdict['hash']
+    cid = request.matchdict['id']
 
-    if chash not in [ctxt.get("hash", '') for ctxt in request.actor.subscribedTo.get("items", [])]:
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
         raise ValidationError('Actor must be either subscribed to the conversation or a participant of it.')
 
     mmdb = MADMaxDB(context.db)
-    query = {'contexts.hash': chash}
+    query = {'contexts.id': cid}
     messages = mmdb.messages.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
 
     handler = JSONResourceRoot(messages)
@@ -149,19 +148,19 @@ def getMessages(context, request):
 @oauth2(['widgetcli'])
 def addMessage(context, request):
     """
-         /conversations/{hash}/messages
+         /conversations/{id}/messages
          Post a message to 1 (one) existing conversation
     """
-    chash = request.matchdict['hash']
+    cid = request.matchdict['id']
     message_params = {'actor': request.actor,
                       'verb': 'post',
                       'contexts': [{'objectType': 'conversation',
-                                    'hash': chash
+                                    'id': cid
                                     }]
                       }
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Message(request)
+    newmessage = Message()
     newmessage.fromRequest(request, rest_params=message_params)
 
     message_oid = newmessage.insert()

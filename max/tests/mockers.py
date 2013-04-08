@@ -175,7 +175,7 @@ user_status = {
 user_status_context_with_hashtag = {
     "contexts": [
         {'url': subscribe_context['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {
@@ -188,7 +188,7 @@ user_status_context_with_hashtag = {
 user_status_context = {
     "contexts": [
         {'url': subscribe_context['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {
@@ -201,7 +201,7 @@ user_status_context = {
 user_status_context_generator = {
     "contexts": [
         {'url': subscribe_context['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {
@@ -215,7 +215,7 @@ user_status_context_generator = {
 user_status_contextA = {
     "contexts": [
         {'url': subscribe_contextA['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {
@@ -227,7 +227,7 @@ user_status_contextA = {
 user_status_contextB = {
     "contexts": [
         {'url': subscribe_contextB['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {
@@ -239,10 +239,10 @@ user_status_contextB = {
 user_status_contextAB = {
     "contexts": [
         {'url': subscribe_contextA['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          },
         {'url': subscribe_contextB['object']['url'],
-         'objectType': 'uri'
+         'objectType': 'context'
          }
     ],
     "object": {

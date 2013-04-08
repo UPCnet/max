@@ -50,7 +50,7 @@ def subscribe(context, request):
                    'verb': 'subscribe'}
 
     # Initialize a Activity object from the request
-    newactivity = Activity(request)
+    newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
     #Check if user is already subscribed
@@ -91,7 +91,7 @@ def unsubscribe(context, request):
     actor = request.actor
     mmdb = MADMaxDB(context.db)
     chash = request.matchdict.get('hash', None)
-    subscription = actor.getSubscriptionByHash(chash)
+    subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
 
     if subscription is None:
         raise ObjectNotFound("User {0} is not subscribed to context with hash: {1}".format(actor.username, chash))
