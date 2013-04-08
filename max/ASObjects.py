@@ -85,10 +85,9 @@ class Conversation(ASObject):
     """
     data = {}
     objectType = 'Conversation'
-    schema = {'_id':          dict(),
+    schema = {'id':          dict(),
               'objectType':   dict(required=1),
               'participants': dict(required=1),
-              '_hash':        dict(required=0)
               }
 
     def __init__(self, data, creating=True):
@@ -97,24 +96,6 @@ class Conversation(ASObject):
         self.data = data
         self.processFields()
         self.update(data)
-        self.getHash()
-
-    def getHash(self):
-        """
-            Calculates the hash based on the participants of the conversation
-            and the creation date. Return the existing hash if already set
-        """
-        if self.get('_hash', None) is None:
-            participants = list(self.participants)  # Make a copy
-            participants.sort()                     # Sort it
-            alltogether = ''.join(participants)     # Join It
-            date = rfc3339(datetime.now(), utc=True, use_system_timezone=False)
-            alltogether += date
-            self._hash = sha1(alltogether).hexdigest()  # Hash it
-        return self._hash
-
-    def getDisplayName(self):
-        return ', '.join(self.participants)
 
 
 class Context(ASObject):
@@ -122,7 +103,7 @@ class Context(ASObject):
         An Max Context Object
     """
     data = {}
-    objectType = 'Uri'
+    objectType = 'Context'
     schema = {'_id':         dict(),
               'url':         dict(required=1),
               'objectType':  dict(required=1),
