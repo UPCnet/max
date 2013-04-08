@@ -242,15 +242,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient), status=201)
-        res.assertEqual(res.json['totalItems'], 1)
-        self.assertEqual(res.json['contexts'][0]['id'], conversation_id)
-        self.assertEqual(res.json['object']['content'], creation_message['object']['content'])
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient), status=200)
+        self.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(res.json['items'][0]['contexts'][0]['id'], conversation_id)
+        self.assertEqual(res.json['items'][0]['object']['content'], creation_message['object']['content'])
 
-        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient2), status=201)
-        res.assertEqual(res.json['totalItems'], 1)
-        self.assertEqual(res.json['contexts'][0]['id'], conversation_id)
-        self.assertEqual(res.json['object']['content'], creation_message['object']['content'])
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient2), status=200)
+        self.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(res.json['items'][0]['contexts'][0]['id'], conversation_id)
+        self.assertEqual(res.json['items'][0]['object']['content'], creation_message['object']['content'])
 
     def test_add_participant_to_inexistent_conversation(self):
         """
@@ -259,9 +259,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And that conversation does not exists
             Then I get an error
         """
-        from .mockers import new_participant
         sender = 'messi'
         recipient = 'xavi'
+        new_participant = {"username": "shakira"}
 
         self.create_user(sender)
         self.create_user(recipient)
@@ -279,10 +279,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Then the participant joins the conversation
         """
         from .mockers import group_message as creation_message
-        from .mockers import new_participant
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+
+        new_participant = {"username": "melendi"}
 
         self.create_user(sender)
         self.create_user(recipient)
@@ -304,10 +305,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Then I get an error
         """
         from .mockers import group_message as creation_message
-        from .mockers import new_participant
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+
+        new_participant = {"username": "melendi"}
 
         self.create_user(sender)
         self.create_user(recipient)
@@ -447,7 +449,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.delete('/conversations/{}/participants/{}'.format(conversation_id, recipient2), '', oauth2Header(recipient2), status=204)
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(sender), status=200)
-        res.assertEqual(res.json['totalItems'], 2)
+        self.assertEqual(res.json['totalItems'], 2)
 
     def test_user_leaves_conversation_cannot_see_conversation_messages(self):
         """
