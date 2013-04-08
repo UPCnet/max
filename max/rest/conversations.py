@@ -168,3 +168,37 @@ def addMessage(context, request):
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
+
+
+@view_config(route_name='participants', request_method='POST')
+@MaxResponse
+@requirePersonActor
+@oauth2(['widgetcli'])
+def addParticipant(context, request):
+    """
+         /conversations/{id}/participants
+         Adds a participant to a conversation
+    """
+    import ipdb;ipdb.set_trace()
+    cid = request.matchdict['id']
+
+    mmdb = MADMaxCollection(context.db.conversations)
+    aa = mmdb[ObjectId(cid)]
+
+
+    message_params = {'actor': request.actor,
+                      'verb': 'post',
+                      'contexts': [{'objectType': 'conversation',
+                                    'id': cid
+                                    }]
+                      }
+
+    # Initialize a Message (Activity) object from the request
+    newmessage = Message()
+    newmessage.fromRequest(request, rest_params=message_params)
+
+    message_oid = newmessage.insert()
+    newmessage['_id'] = message_oid
+
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+    return handler.buildResponse()

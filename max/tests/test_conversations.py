@@ -267,8 +267,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
 
         conversation_id = '0123456789abcdef0123456789abcdef'
-
-        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(new_participant), oauth2Header(recipient), status=404)
+        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(new_participant), oauth2Header(recipient), status=404)
 
     def test_add_participant_to_conversation(self):
         """
@@ -292,7 +291,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(new_participant), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(new_participant), oauth2Header(sender), status=201)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=201)
         self.assertEqual(res.json['participants'], 4)
 
@@ -318,7 +317,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(new_participant), oauth2Header(recipient), status=401)
+        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(new_participant), oauth2Header(recipient), status=401)
 
     def test_conversation_participant_limit(self):
         """
@@ -347,10 +346,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             newusername = 'user{}'.format(i)
             self.create_user(newusername)
             participant = {'username': newusername}
-            self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(participant), oauth2Header(sender), status=201)
+            self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(participant), oauth2Header(sender), status=201)
 
         participant = {'username': nonallowed}
-        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(participant), oauth2Header(sender), status=403)
+        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(participant), oauth2Header(sender), status=403)
 
     def test_add_existing_participant_to_conversation(self):
         """
@@ -374,7 +373,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         conversation_id = res.json['contexts'][0]['id']
         existing_participant = {'username': recipient2}
 
-        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.loads(existing_participant), oauth2Header(recipient), status=200)
+        self.testapp.post('/conversations/{}/participants'.format(conversation_id), json.dumps(existing_participant), oauth2Header(recipient), status=200)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=201)
         self.assertEqual(res.json['participants'], 3)
 
