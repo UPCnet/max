@@ -420,7 +420,7 @@ class BaseContext(MADBase):
     def subscribedUsers(self):
         """
         """
-        criteria = {'subscribedTo.items.hash': self.hash}
+        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
         subscribed_users = self.mdb_collection.database.users.find(criteria)
         return [user for user in subscribed_users]
 
@@ -451,6 +451,8 @@ class BaseContext(MADBase):
         """
         # XXX TODO For now only updates displayName
         ids = [user['_id'] for user in self.subscribedUsers()]
+        if ids:
+            import ipdb;ipdb.set_trace()
 
         for obid in ids:
             criteria = {'_id': obid, 'subscribedTo.items.hash': self.hash}
