@@ -13,7 +13,6 @@ class BaseActivity(MADBase):
     """
         An activitystrea.ms Activity object representation
     """
-    collection = 'activity'
     unique = '_id'
     schema = {'_id':         dict(required=0),
               '_creator':    dict(required=0),
@@ -570,3 +569,7 @@ class Security(MADBase):
     unique = '_id'
     schema = {'_id':         dict(required=0),
               'roles':        dict(required=0)}
+
+
+import inspect
+CLASS_COLLECTION_MAPPING = dict([(klass.collection, name) for name, klass in locals().items() if inspect.isclass(klass) and getattr(klass, 'collection', None)])

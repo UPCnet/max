@@ -133,14 +133,8 @@ class MADMaxCollection(object):
             the appropiate class, mapped by the origin collection of the item.
             Flattened or not by demand
         """
-        class_map = dict(activity='Activity',
-                         users='User',
-                         contexts='Context',
-                         conversations='Conversation',
-                         messages='Message',
-                         security='Security')
-
-        model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
+        CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
+        model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[self.collection.name], None)
         wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
 
