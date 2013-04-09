@@ -18,8 +18,11 @@ class MaxTestBase(object):
     def __init__(self, testapp):
         self.testapp = testapp
 
-    def create_user(self, username):
-        res = self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+    def create_user(self, username, **kwargs):
+        payload = {}
+        for key, value in kwargs.items():
+            payload[key] = value
+        res = self.testapp.post('/people/%s' % username, json.dumps(payload), oauth2Header(test_manager), status=201)
         return res
 
     def modify_user(self, username, properties):
