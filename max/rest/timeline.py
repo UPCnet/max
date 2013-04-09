@@ -10,8 +10,8 @@ from max.rest.utils import searchParams
 
 @view_config(route_name='timeline', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getUserTimeline(context, request):
     """
          /people/{username}/timeline

@@ -14,8 +14,8 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 @view_config(route_name='users', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getUsers(context, request):
     """
          /people
@@ -33,8 +33,8 @@ def getUsers(context, request):
 
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getUser(context, request):
     """
         /people/{username}
@@ -70,8 +70,8 @@ def getUserAvatar(context, request):
 
 @view_config(route_name='user', request_method='PUT')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def ModifyUser(context, request):
     """
         /people/{username}

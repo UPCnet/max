@@ -14,8 +14,8 @@ from hashlib import sha1
 
 @view_config(route_name='subscriptions', request_method='POST', restricted='Manager')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
@@ -59,8 +59,8 @@ def subscribe(context, request):
 
 @view_config(route_name='subscription', request_method='DELETE', restricted='Manager')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def unsubscribe(context, request):
     """
     """

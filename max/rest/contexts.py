@@ -15,8 +15,8 @@ import time
 
 @view_config(route_name='public_contexts', request_method='GET')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def getPublicContexts(context, request):
     """
         /contexts/public

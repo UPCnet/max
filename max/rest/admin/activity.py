@@ -13,8 +13,8 @@ from max.exceptions import ObjectNotFound
 
 @view_config(route_name='user_activities', request_method='POST', restricted='Manager')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def addAdminUserActivity(context, request):
     """
          /people|contexts/{username|hash}/activities
@@ -39,8 +39,8 @@ def addAdminUserActivity(context, request):
 
 @view_config(route_name='context_activities', request_method='POST', restricted='Manager')
 @MaxResponse
-@requireContextActor
 @oauth2(['widgetcli'])
+@requireContextActor
 def addAdminContextActivity(context, request):
     """
          /people|contexts/{username|hash}/activities

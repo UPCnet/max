@@ -41,8 +41,8 @@ def deleteUser(context, request):
 
 @view_config(route_name='user', request_method='POST', restricted='Manager')
 @MaxResponse
-@requirePersonActor(exists=False, force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(exists=False, force_own=False)
 def addUser(context, request):
     """
         /people/{username}

@@ -122,8 +122,8 @@ def ModifyContext(context, request):
 
 @view_config(route_name='context_user_permission', request_method='PUT', restricted='Manager')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
@@ -160,8 +160,8 @@ def grantPermissionOnContext(context, request):
 
 @view_config(route_name='context_user_permission', request_method='DELETE', restricted='Manager')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def revokePermissionOnContext(context, request):
     """ [RESTRICTED]
     """

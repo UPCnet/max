@@ -15,8 +15,8 @@ import re
 
 @view_config(route_name='user_activities', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getUserActivities(context, request):
     """
          /people/{username}/activities
@@ -35,8 +35,8 @@ def getUserActivities(context, request):
 
 @view_config(route_name='user_activities', request_method='POST')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def addUserActivity(context, request):
     """
          /users/{username}/activities
@@ -61,8 +61,8 @@ def addUserActivity(context, request):
 
 @view_config(route_name='activities', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getActivities(context, request):
     """
          /activities
@@ -128,6 +128,7 @@ def getActivities(context, request):
 
 @view_config(route_name='activity', request_method='GET')
 @MaxResponse
+@oauth2(['widgetcli'])
 @requirePersonActor
 def getActivity(context, request):
     """

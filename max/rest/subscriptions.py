@@ -16,8 +16,8 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 
 @view_config(route_name='subscriptions', request_method='GET')
 @MaxResponse
-@requirePersonActor(force_own=True)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=True)
 def getUserSubscriptions(context, request):
     """
         /people/{username}/subscriptions
@@ -36,8 +36,8 @@ def getUserSubscriptions(context, request):
 
 @view_config(route_name='subscriptions', request_method='POST')
 @MaxResponse
-@requirePersonActor(force_own=True)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=True)
 def subscribe(context, request):
     """
         /people/{username}/subscriptions
@@ -83,8 +83,8 @@ def subscribe(context, request):
 
 @view_config(route_name='subscription', request_method='DELETE')
 @MaxResponse
-@requirePersonActor(force_own=True)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=True)
 def unsubscribe(context, request):
     """
     """

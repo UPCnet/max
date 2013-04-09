@@ -14,6 +14,7 @@ from bson.objectid import ObjectId
 
 @view_config(route_name='user_comments', request_method='GET')
 @MaxResponse
+@oauth2(['widgetcli'])
 def getUserComments(context, request):
     """
     """
@@ -22,8 +23,8 @@ def getUserComments(context, request):
 
 @view_config(route_name='comments', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getActivityComments(context, request):
     """
         /activities/{activity}/comments
@@ -49,8 +50,8 @@ def getActivityComments(context, request):
 
 @view_config(route_name='comments', request_method='POST')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def addActivityComment(context, request):
     """
         /activities/{activity}/comments

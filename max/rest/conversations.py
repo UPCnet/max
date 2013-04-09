@@ -16,8 +16,8 @@ from max.rest.utils import extractPostData
 
 @view_config(route_name='conversations', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getConversations(context, request):
     """
          /conversations
@@ -46,8 +46,8 @@ def getConversations(context, request):
 
 @view_config(route_name='conversations', request_method='POST')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def postMessage2Conversation(context, request):
     """
          /conversations
@@ -138,8 +138,8 @@ def postMessage2Conversation(context, request):
 
 @view_config(route_name='messages', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getMessages(context, request):
     """
          /conversations/{id}/messages
@@ -159,8 +159,8 @@ def getMessages(context, request):
 
 @view_config(route_name='conversation', request_method='GET')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getConversation(context, request):
     """
          /conversations/{id}
@@ -211,8 +211,8 @@ def ModifyContext(context, request):
 
 @view_config(route_name='messages', request_method='POST')
 @MaxResponse
-@requirePersonActor
 @oauth2(['widgetcli'])
+@requirePersonActor
 def addMessage(context, request):
     """
          /conversations/{id}/messages
@@ -239,8 +239,8 @@ def addMessage(context, request):
 
 @view_config(route_name='user_conversation', request_method='POST')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def joinConversation(context, request):
     """
          /people/{username}/conversations/{id}/participants
@@ -298,8 +298,8 @@ def joinConversation(context, request):
 
 @view_config(route_name='user_conversation', request_method='DELETE')
 @MaxResponse
-@requirePersonActor(force_own=False)
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
 def leaveConversation(context, request):
     """
     """
