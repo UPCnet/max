@@ -451,14 +451,10 @@ class BaseContext(MADBase):
         """
         # XXX TODO For now only updates displayName
         ids = [user['_id'] for user in self.subscribedUsers()]
-        if ids:
-            import ipdb;ipdb.set_trace()
 
         for obid in ids:
-            criteria = {'_id': obid, 'subscribedTo.items.hash': self.hash}
-
-                 # deletes context from subcription list
-            what = {'$set': {'subscribedTo.items.$.displayName': self.displayName}}
+            criteria = {'_id': obid, '{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+            what = {'$set': {'{}.items.$.displayName'.format(self.user_subscription_storage): self.displayName}}
             self.mdb_collection.database.users.update(criteria, what)
 
     def removeUserSubscriptions(self, users_to_delete=[]):
@@ -479,9 +475,9 @@ class BaseContext(MADBase):
             Removes all activity posted to a context. If logical is set to True
             Activities are not actually deleted, only marked as not visible
         """
-        activitydb = MADMaxCollection(self.mdb_collection.database.activity)
+        activitydb = MADMaxCollection(getattr(self.mdb_collection.database, self.activity_storage))
         which_to_delete = {
-            'contexts.hash': self.hash
+            'contexts.{}'.format(self.unique.lstrip('_')): self.getIdentifier()
         }
         activitydb.remove(which_to_delete, logical=logical)
 
@@ -494,6 +490,7 @@ class Context(BaseContext):
     collection = 'contexts'
     unique = 'hash'
     user_subscription_storage = 'subscribedTo'
+    activity_storage = 'activity'
     schema = dict(BaseContext.schema)
     schema['hash'] = dict()
     schema['url'] = dict(required=1)
@@ -549,6 +546,7 @@ class Conversation(BaseContext):
     collection = 'conversations'
     unique = '_id'
     user_subscription_storage = 'talkingIn'
+    activity_storage = 'messages'
     schema = dict(BaseContext.schema)
     schema['participants'] = dict(required=1)
     schema['objectType'] = dict(default='conversation')
@@ -559,8 +557,6 @@ class Conversation(BaseContext):
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
             self['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
-
-        #self['hash'] = self.getHash()
 
         #Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', ', '.join(self.participants))

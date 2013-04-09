@@ -540,161 +540,188 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient2), status=401)
 
-    # def test_conversation_owner_deletes_conversation(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and other people
-    #         And I am the owner of the conversation
-    #         When i delete the conversation
-    #         Then all the users will be no longer subcribed in that conversation
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+    def test_conversation_owner_deletes_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i delete the conversation
+            Then the conversation disappears for all users
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
 
-    #     self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
-    #     res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=404)
+        self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
+        self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=404)
+        self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=404)
 
-    # def test_conversation_users_cannot_see_conversation_after_deleting(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and other people with messages
-    #         When the owner deletes the conversation
-    #         Then I cannot see the conversation messages
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+    def test_conversation_messages_deleted_after_deleting_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people with messages
+            When the owner deletes the conversation
+            Then I cannot see the conversation messages
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
 
-    #     self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
-    #     res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=404)
+        self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
+        self.assertEqual(self.app.registry.max_store.messages.count(), 0)
 
-    # def test_non_conversation_owner_cannot_delete_conversation(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and other people
-    #         And I am not the owner of the conversation
-    #         When I try to delete the conversation
-    #         Then I get an error
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+    def test_conversation_messages_deleted_only(self):
+        """
+            Given a plain user
+            And a conversation between me and other people with messages
+            When the owner deletes the conversation
+            Then the messages of other conversations still exists
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
 
-    #     self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=401)
+        self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
 
-    # def test_conversation_owner_changes_conversation_displayName(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and other people
-    #         And I am the owner of the conversation
-    #         When I change the displayName
-    #         The conversation displayName changes
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+        self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
+        self.assertEqual(self.app.registry.max_store.messages.count(), 1)
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+    def test_non_conversation_owner_cannot_delete_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When I try to delete the conversation
+            Then I get an error
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
-    #     self.testapp.put('/conversations{}'.format(conversation_id), {'displayName': 'Nou nom'}, oauth2Header(sender), status=200)
-    #     res = self.testapp.get('/conversations{}'.format(conversation_id), oauth2Header(sender), status=200)
-    #     self.assertEqual(res['displayName'], 'Nou nom')
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    # def test_non_conversation_owner_cannot_change_conversation_name(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and other people
-    #         And I am not the owner of the conversation
-    #         When I try to change the displayName
-    #         I get an error
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+        self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=401)
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
-    #     self.testapp.put('/conversations{}'.format(conversation_id), {'displayName': 'Nou nom'}, oauth2Header(recipient), status=401)
+    def test_conversation_owner_changes_conversation_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When I change the displayName
+            The conversation displayName changes
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    # def test_two_people_conversation_displayName_is_partner_displayName(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and another user
-    #         When I read the conversation details
-    #         The displayName is the displayName of the other participant
-    #     """
-    #     from .mockers import message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(sender), status=200)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(res.json['displayName'], 'Nou nom')
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
+    def test_non_conversation_owner_cannot_change_conversation_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When I try to change the displayName
+            I get an error
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
 
-    #     res = self.testapp.get('/conversations{}'.format(conversation_id), '', oauth2Header(sender), status=200)
-    #     self.assertEqual(res['displayName'], recipient)
-    #     res = self.testapp.get('/conversations{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
-    #     self.assertEqual(res['displayName'], sender)
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
 
-    # def test_two_people_conversation_formerly_group_displayName_is_partner_displayName(self):
-    #     """
-    #         Given a plain user
-    #         And a conversation between me and another user
-    #         And that conversation previously was a three user conversation with a displayName
-    #         When I read the conversation details
-    #         The displayName is the displayName of the remaining participant
-    #     """
-    #     from .mockers import group_message as creation_message
-    #     sender = 'messi'
-    #     recipient = 'xavi'
-    #     recipient2 = 'shakira'
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(sender), status=200)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
+        self.assertEqual(res.json['displayName'], 'Nou nom')
 
-    #     self.create_user(sender)
-    #     self.create_user(recipient)
-    #     self.create_user(recipient2)
+    def test_two_people_conversation_displayName_is_partner_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            When I read the conversation details
+            The displayName is the displayName of the other participant
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
 
-    #     res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
-    #     conversation_id = res.json['contexts'][0]['id']
-    #     self.testapp.delete('/people/{}/conversations/{}'.format(conversation_id, recipient), '', oauth2Header(recipient2), status=204)
+        self.create_user(sender, displayName='Leo Messi')
+        self.create_user(recipient, displayName='Xavi Hernandez')
 
-    #     res = self.testapp.get('/conversations{}'.format(conversation_id), '', oauth2Header(sender), status=200)
-    #     self.assertEqual(res['displayName'], recipient2)
-    #     res = self.testapp.get('/conversations{}'.format(conversation_id), '', oauth2Header(recipient2), status=200)
-    #     self.assertEqual(res['displayName'], sender)
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(res.json['displayName'], 'Xavi Hernandez')
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
+        self.assertEqual(res.json['displayName'], 'Leo Messi')
+
+    def test_two_people_conversation_formerly_group_displayName_is_partner_displayName(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And that conversation previously was a three user conversation with a displayName
+            When I read the conversation details
+            The displayName is the displayName of the remaining participant
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender, displayName='Leo Messi')
+        self.create_user(recipient, displayName='Xavi Hernandez')
+        self.create_user(recipient2, displayName='La Shakira')
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(sender), status=204)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(res.json['displayName'], 'La Shakira')
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient2), status=200)
+        self.assertEqual(res.json['displayName'], 'Leo Messi')

@@ -164,16 +164,48 @@ def getMessages(context, request):
 def getConversation(context, request):
     """
          /conversations/{id}
-         Return Conversation¥
+         Return Conversation
     """
     cid = request.matchdict['id']
+    conversations = MADMaxCollection(context.db.conversations)
+    conversation = conversations[cid]
+
+    if len(conversation.participants) == 2:
+        participants = list(conversation.participants)
+        participants.remove(request.actor.username)
+        users = MADMaxCollection(context.db.users, query_key='username')
+        partner = users[participants[0]]
+        conversation.displayName = partner.displayName
 
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
-        raise ValidationError('Actor must be either subscribed to the conversation or a participant of it.')
+        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
+    handler = JSONResourceEntity(conversation.flatten())
+    return handler.buildResponse()
+
+
+@view_config(route_name='conversation', request_method='PUT')
+@MaxResponse
+@oauth2(['widgetcli'])
+def ModifyContext(context, request):
+    """
+        /conversation/{id}
+
+        Modify the given context.
+    """
+    cid = request.matchdict['id']
     conversations = MADMaxCollection(context.db.conversations)
+    conversation = conversations[cid]
 
-    handler = JSONResourceEntity(conversations[cid].flatten())
+    auth_user_is_conversation_owner = conversation._owner == request.creator
+
+    if not auth_user_is_conversation_owner:
+        raise Unauthorized('Only the owner modify conversation properties')
+
+    properties = conversation.getMutablePropertiesFromRequest(request)
+    conversation.modifyContext(properties)
+    conversation.updateUsersSubscriptions()
+    handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()
 
 
@@ -296,4 +328,25 @@ def leaveConversation(context, request):
     actor.removeSubscription(found_context)
     found_context.participants.remove(actor.username)
     found_context.save()
+    return HTTPNoContent()
+
+
+@view_config(route_name='conversation', request_method='DELETE')
+@MaxResponse
+@oauth2(['widgetcli'])
+def DeleteConversation(context, request):
+    """
+    """
+    mmdb = MADMaxDB(context.db)
+    cid = request.matchdict.get('id', None)
+    ctx = mmdb.conversations[cid]
+
+    auth_user_is_conversation_owner = ctx._owner == request.creator
+
+    if not auth_user_is_conversation_owner:
+        raise Unauthorized('Only the owner can delete the conversation')
+
+    ctx.removeUserSubscriptions()
+    ctx.removeActivities(logical=False)
+    ctx.delete()
     return HTTPNoContent()
