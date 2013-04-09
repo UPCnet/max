@@ -21,6 +21,11 @@ def oauth2(allowed_scopes=[]):
             scope = request.headers.get('X-Oauth-Scope', '')
 
             if not oauth_token or not username:
+
+                # This is for mental sanity in case we miss the body part when writing tests
+                if 'X-Oauth-Username' in request.params.keys():
+                    raise Unauthorized("Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...")
+
                 raise Unauthorized('No auth headers found.')
 
             if allowed_scopes:

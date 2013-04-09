@@ -39,11 +39,6 @@ def requirePersonActor(exists=True, force_own=True):
             oauth_username = getUsernameFromXOAuth(request)
             username = str(oauth_username)  # To avoid variable reference
 
-            if not oauth_username:
-                # Something went really, really wrong, because when we get here, we shoud
-                # have succesfully passed OAuth authentication
-                raise Unauthorized("Invalid Authentication")
-
             # If we have a username in the URI, take it
             uri_username = getUsernameFromURI(request)
             if uri_username:
