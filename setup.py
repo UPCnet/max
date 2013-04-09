@@ -55,5 +55,6 @@ setup(name='max',
       initialize_max_db = max.scripts.security:main
       max.devel = max.scripts.devel:main
       maxui.setup = max.scripts.maxui:main
+      max.report = max.scripts.report:main
       """,
       )

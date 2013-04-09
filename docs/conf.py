@@ -93,7 +93,11 @@ exclude_patterns = ['_build', 'README.rst', '_themes/README.rst']
 sys.path.append(os.path.abspath('_themes'))
 html_theme_path = ['_themes']
 html_theme = 'pylons'
-html_theme_options = dict(github_url='https://github.com/UPCnet/max')
+html_theme_options = {
+    'github_url': 'https://github.com/UPCnet/max',
+    'globaltoc_depth': 2,
+    'navbar_fixed_top': 'true'
+}
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

@@ -1,4 +1,8 @@
 {% extends "bootstrap/layout.html" %}
+
+{# Include our new CSS file into existing ones. #}
+{% set script_files = script_files + ['_static/reports.js']%}
+
 {% macro navBar2() %}
   <div id="navbar" class="{{ theme_navbar_class }} {% if theme_navbar_fixed_top == 'true' -%} navbar-fixed-top{%- endif -%}">
     <div class="navbar-inner">

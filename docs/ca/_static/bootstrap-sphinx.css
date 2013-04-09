@@ -76,3 +76,55 @@ font-style: italic;
 }
 
 body { font-family: "ProximaNova", serif; font-size: 16px}
+
+
+.alert-code {
+color: #468847;
+background-color: #dff0d8;
+border-color: #d6e9c6;
+padding:4px;
+width:30px;
+margin:0px !important;
+float:left;
+font-size:12px;
+padding: 1px 6px 0px 4px !important;
+}
+
+.alert-docs {
+color: #3a87ad;
+background-color: #d9edf7;
+border-color: #bce8f1;
+padding:4px;
+width:30px;
+margin:0px !important;
+margin-left: 4px !important;
+float:left;
+font-size:12px;
+padding: 1px 6px 0px 4px !important;
+}
+
+.alert-test {
+color: #c09853;
+background-color: #fcf8e3;
+border: 1px solid #fbeed5;
+padding:4px;
+width:30px;
+margin:0px !important;
+margin-left: 4px !important;
+float:left;
+font-size:12px;
+padding: 1px 6px 0px 4px !important;
+}
+
+div.alert-code, div.alert-test, div.alert-docs, {
+  margin-bottom:0px;
+
+}
+
+div.alert-code p.admonition-title, div.alert-test p.admonition-title, div.alert-docs p.admonition-title {
+  display:none;
+
+}
+
+div.alert-code p.last, div.alert-test p.last, div.alert-docs p.last {
+  margin:0px;
