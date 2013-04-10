@@ -59,7 +59,7 @@ def requirePersonActor(exists=True, force_own=True):
 
             if force_own:
                 if username != oauth_username:
-                    raise Unauthorized("You don't have permission to access %s resources" % (oauth_username))
+                    raise Unauthorized("You don't have permission to access %s resources" % (username))
 
             def getActor(request):
                 try:
