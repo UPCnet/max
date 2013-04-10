@@ -191,7 +191,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         url_hash = sha1(create_context['url']).hexdigest()
-        self.testapp.delete('//people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=404)
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=404)
 
     def test_unsubscribe_from_restricted_context_as_plain_user(self):
         """

@@ -367,7 +367,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
+        permission = 'write'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
         self.assertEqual('write' in result['permissions'], True)
@@ -381,8 +382,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=201)
-        res = self.testapp.delete('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=200)
+        permission = 'write'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
+        res = self.testapp.delete('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
         self.assertEqual('write' not in result['permissions'], True)
@@ -394,7 +396,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         chash = sha1(create_context_private_r['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/write' % (chash, username), "", oauth2Header(test_manager), status=401)
+        permission = 'write'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=401)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'Unauthorized')
 
@@ -406,6 +409,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s/permissions/%s/badpermission' % (chash, username), "", oauth2Header(test_manager), status=400)
+        permission = 'badpermission'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'InvalidPermission')
