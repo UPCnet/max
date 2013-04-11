@@ -23,6 +23,7 @@ requires = [
     ]
 
 test_requires = ['WebTest', 'mock', ]
+script_requires = ['prettytable', 'sh']
 
 setup(name='max',
       version='3.0',
@@ -41,7 +42,7 @@ setup(name='max',
       packages=['max', 'maxrules'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires,
+      install_requires=requires + script_requires,
       tests_require=requires + test_requires,
       test_suite="max.tests",
       extras_require={

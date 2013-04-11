@@ -580,8 +580,8 @@ concret.
 
     :query context: (Requerit) El hash (sha1) de la URL del context
     :query sortBy: (Opcional) Tipus d'ordenació que s'aplicarà als resultats. Per defecte és
-    ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
-    possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
+        ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
+        possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
 
 
     Cos de la petició
@@ -1330,7 +1330,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
     Success
 
-        Retorna una llista d'objectes ``Message`
+        Retorna una llista d'objectes ``Message``
 
 .. http:get:: /conversations
 
