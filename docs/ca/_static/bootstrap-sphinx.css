@@ -90,6 +90,10 @@ font-size:12px;
 padding: 1px 6px 0px 4px !important;
 }
 
+.alert-code a {
+  color: #468847;
+}
+
 .alert-docs {
 color: #3a87ad;
 background-color: #d9edf7;
@@ -103,6 +107,10 @@ font-size:12px;
 padding: 1px 6px 0px 4px !important;
 }
 
+.alert-docs a{
+  color: #3a87ad;
+}
+
 .alert-test {
 color: #c09853;
 background-color: #fcf8e3;
@@ -114,6 +122,10 @@ margin-left: 4px !important;
 float:left;
 font-size:12px;
 padding: 1px 6px 0px 4px !important;
+}
+
+.alert-test a{
+  color: #c09853;
 }
 
 div.alert-code, div.alert-test, div.alert-docs, {

@@ -351,24 +351,6 @@ Contexts
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
 
-.. http:get:: /contexts/{hash}/avatar
-
-    Retorna la imatge que li correspon al context depenent del usuari de
-    Twitter que te assignat. Si no en te cap, retorna una imatge estàndar. Per
-    ara només està implementada la integració amb Twitter i dissenyat per quan
-    un context vol *parlar* impersonat a l'activitat del seu propi context.
-    Per exemple, una assignatura.
-
-    Aquest és un servei públic.
-
-    :query hash: (REST) El hash del context en concret. Aquest hash es calcula
-        fent una suma de verificació sha1 de la URL del context.
-
-    Success
-
-        Retorna la imatge del context.
-
-
 Subscripcions
 -------------
 
