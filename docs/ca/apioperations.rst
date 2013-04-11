@@ -42,21 +42,25 @@ Usuaris
         .. code-block:: python
 
             {
-                "username": "messi",
-                "displayName": "messi",
-                "creator": "test_manager",
+                "username": "messi", 
+                "displayName": "messi", 
+                "talkingIn": {
+                    "totalItems": 0, 
+                    "items": []
+                }, 
+                "creator": "test_manager", 
                 "following": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "subscribedTo": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
-                "last_login": "2013-04-05T05:41:09Z",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "id": "515e63f5fcfff2716ac44d01",
+                }, 
+                "last_login": "2013-04-11T10:41:17Z", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "id": "5166934dfcfff25086305533", 
                 "objectType": "person"
             }
 
@@ -117,22 +121,22 @@ Contexts
         .. code-block:: python
 
             {
-                "displayName": "Atenea",
-                "creator": "test_manager",
-                "url": "http://atenea.upc.edu",
+                "displayName": "Atenea", 
+                "creator": "test_manager", 
+                "url": "http://atenea.upc.edu", 
                 "tags": [
                     "Assignatura"
-                ],
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                ], 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                 "permissions": {
-                    "read": "public",
-                    "write": "public",
-                    "invite": "public",
+                    "read": "public", 
+                    "write": "public", 
+                    "invite": "public", 
                     "subscribe": "public"
-                },
-                "id": "515e63f5fcfff2716ac44d02",
+                }, 
+                "id": "5166934dfcfff25086305534", 
                 "objectType": "context"
             }
 
@@ -172,24 +176,24 @@ Contexts
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 1, 
                 "items": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
+                        "displayName": "Atenea", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
                         "tags": [
                             "Assignatura"
-                        ],
-                        "published": "2013-04-05T05:41:09Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
-                        "id": "515e63f5fcfff2716ac44d02",
+                        ], 
+                        "published": "2013-04-11T10:41:17Z", 
+                        "owner": "test_manager", 
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                        "objectType": "context", 
+                        "id": "5166934dfcfff25086305534", 
                         "permissions": {
-                            "read": "public",
-                            "write": "public",
-                            "invite": "public",
+                            "read": "public", 
+                            "write": "public", 
+                            "invite": "public", 
                             "subscribe": "public"
                         }
                     }
@@ -234,22 +238,22 @@ Contexts
         .. code-block:: python
 
             {
-                "twitterHashtag": "assignatura1",
-                "displayName": "Atenea",
-                "creator": "test_manager",
-                "url": "http://atenea.upc.edu",
+                "twitterHashtag": "assignatura1", 
+                "displayName": "Atenea", 
+                "creator": "test_manager", 
+                "url": "http://atenea.upc.edu", 
                 "tags": [
                     "Assignatura"
-                ],
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "objectType": "context",
-                "id": "515e63f5fcfff2716ac44d02",
+                ], 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                "objectType": "context", 
+                "id": "5166934dfcfff25086305534", 
                 "permissions": {
-                    "read": "public",
-                    "write": "public",
-                    "invite": "public",
+                    "read": "public", 
+                    "write": "public", 
+                    "invite": "public", 
                     "subscribe": "public"
                 }
             }
@@ -284,23 +288,23 @@ Contexts
         .. code-block:: python
 
             {
-                "twitterHashtag": "assignatura1",
-                "displayName": "Atenea",
-                "creator": "test_manager",
-                "url": "http://atenea.upc.edu",
+                "twitterHashtag": "assignatura1", 
+                "displayName": "Atenea", 
+                "creator": "test_manager", 
+                "url": "http://atenea.upc.edu", 
                 "tags": [
                     "Assignatura"
-                ],
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                ], 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
                 "permissions": {
-                    "read": "public",
-                    "write": "public",
-                    "invite": "public",
+                    "read": "public", 
+                    "write": "public", 
+                    "invite": "public", 
                     "subscribe": "public"
-                },
-                "id": "515e63f5fcfff2716ac44d02",
+                }, 
+                "id": "5166934dfcfff25086305534", 
                 "objectType": "context"
             }
 
@@ -381,26 +385,26 @@ Subscripcions
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "test_manager",
+                "generator": null, 
+                "creator": "test_manager", 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "object": {
-                    "url": "http://atenea.upc.edu",
+                    "url": "http://atenea.upc.edu", 
                     "objectType": "context"
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "messi",
+                    "username": "messi", 
+                    "displayName": "messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-05T05:41:09Z",
-                "verb": "subscribe",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "messi",
-                "id": "515e63f5fcfff2716ac44d04",
+                }, 
+                "commented": "2013-04-11T10:41:17Z", 
+                "verb": "subscribe", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "messi", 
+                "id": "5166934dfcfff25086305536", 
                 "objectType": "activity"
             }
 
@@ -487,20 +491,20 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "tags": [],
-                "url": "http://atenea.upc.edu",
-                "creator": "test_manager",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "displayName": "http://atenea.upc.edu",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                "tags": [], 
+                "url": "http://atenea.upc.edu", 
+                "creator": "test_manager", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "displayName": "http://atenea.upc.edu", 
                 "permissions": [
-                    "read",
-                    "write",
-                    "invite",
+                    "read", 
+                    "write", 
+                    "invite", 
                     "unsubscribe"
-                ],
-                "id": "515e63f5fcfff2716ac44d03",
+                ], 
+                "id": "5166934dfcfff25086305535", 
                 "objectType": "context"
             }
 
@@ -534,19 +538,19 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "tags": [],
-                "url": "http://atenea.upc.edu",
-                "creator": "test_manager",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "displayName": "http://atenea.upc.edu",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                "tags": [], 
+                "url": "http://atenea.upc.edu", 
+                "creator": "test_manager", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "displayName": "http://atenea.upc.edu", 
                 "permissions": [
-                    "read",
-                    "invite",
+                    "read", 
+                    "invite", 
                     "unsubscribe"
-                ],
-                "id": "515e63f5fcfff2716ac44d03",
+                ], 
+                "id": "5166934dfcfff25086305535", 
                 "objectType": "context"
             }
 
@@ -612,43 +616,43 @@ Activitats
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "test_manager",
+                "generator": null, 
+                "creator": "test_manager", 
                 "contexts": [
                     {
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "owner": "test_manager",
-                        "displayName": "http://atenea.upc.edu",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
+                        "owner": "test_manager", 
+                        "displayName": "http://atenea.upc.edu", 
                         "objectType": "context"
                     }
-                ],
+                ], 
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                     "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
-                        "context",
+                        "testejant", 
+                        "creaci\u00f3", 
+                        "canvi", 
+                        "context", 
                         "messi"
-                    ],
+                    ], 
                     "objectType": "note"
-                },
+                }, 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "actor": {
-                    "username": "messi",
-                    "displayName": "messi",
+                    "username": "messi", 
+                    "displayName": "messi", 
                     "objectType": "person"
-                },
-                "commented": "2013-04-05T05:41:09Z",
-                "verb": "post",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "messi",
-                "id": "515e63f5fcfff2716ac44d07",
+                }, 
+                "commented": "2013-04-11T10:41:17Z", 
+                "verb": "post", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "messi", 
+                "id": "5166934dfcfff25086305539", 
                 "objectType": "activity"
             }
 
@@ -703,52 +707,52 @@ Activitats
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "test_manager",
+                "generator": null, 
+                "creator": "test_manager", 
                 "contexts": [
                     {
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "tags": [],
-                        "published": "2013-04-05T05:41:09Z",
-                        "owner": "test_manager",
-                        "displayName": "http://atenea.upc.edu",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                        "creator": "test_manager", 
+                        "url": "http://atenea.upc.edu", 
+                        "tags": [], 
+                        "published": "2013-04-11T10:41:17Z", 
+                        "owner": "test_manager", 
+                        "displayName": "http://atenea.upc.edu", 
                         "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
+                            "write": "public", 
+                            "subscribe": "public", 
+                            "read": "public", 
                             "invite": "subscribed"
-                        },
-                        "id": "515e63f5fcfff2716ac44d03",
+                        }, 
+                        "id": "5166934dfcfff25086305535", 
                         "objectType": "context"
                     }
-                ],
+                ], 
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>", 
                     "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
+                        "testejant", 
+                        "creaci\u00f3", 
+                        "canvi", 
                         "context"
-                    ],
+                    ], 
                     "objectType": "note"
-                },
+                }, 
                 "replies": {
-                    "totalItems": 0,
+                    "totalItems": 0, 
                     "items": []
-                },
+                }, 
                 "actor": {
-                    "url": "http://atenea.upc.edu",
-                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                    "displayName": "http://atenea.upc.edu",
+                    "url": "http://atenea.upc.edu", 
+                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997", 
+                    "displayName": "http://atenea.upc.edu", 
                     "objectType": "uri"
-                },
-                "commented": "2013-04-05T05:41:09Z",
-                "verb": "post",
-                "published": "2013-04-05T05:41:09Z",
-                "owner": "test_manager",
-                "id": "515e63f5fcfff2716ac44d08",
+                }, 
+                "commented": "2013-04-11T10:41:17Z", 
+                "verb": "post", 
+                "published": "2013-04-11T10:41:17Z", 
+                "owner": "test_manager", 
+                "id": "5166934dfcfff2508630553a", 
                 "objectType": "activity"
             }
 

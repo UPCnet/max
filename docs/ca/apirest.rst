@@ -34,6 +34,7 @@ resultats, indicant el total d'elements retornats::
 .. this is some setup, it is hidden in a reST comment
 
     >>> from httpretty import HTTPretty
+    >>> from max.tests import test_manager
     >>> import json
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
@@ -78,7 +79,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "items": [
                     {
                         "username": "messi",
-                        "id": "516335a771c75c52a6dd7f9d"
+                        "id": "5166934cfcfff2507e79a4ab"
                     }
                 ]
             }
@@ -140,11 +141,11 @@ Operacions sobre el recurs *usuari* del sistema.
                             ],
                             "url": "http://atenea.upc.edu",
                             "creator": "test_manager",
-                            "published": "2013-04-08T21:24:55Z",
+                            "published": "2013-04-11T10:41:16Z",
                             "owner": "test_manager",
                             "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "objectType": "context",
-                            "id": "516335a771c75c52a6dd7f9e",
+                            "id": "5166934cfcfff2507e79a4ac",
                             "permissions": [
                                 "read",
                                 "write",
@@ -154,11 +155,11 @@ Operacions sobre el recurs *usuari* del sistema.
                         }
                     ]
                 },
-                "last_login": "2013-04-08T21:24:55Z",
-                "published": "2013-04-08T21:24:55Z",
+                "last_login": "2013-04-11T10:41:16Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "516335a771c75c52a6dd7f9d",
+                "id": "5166934cfcfff2507e79a4ab",
                 "objectType": "person"
             }
 
@@ -218,7 +219,7 @@ Operacions sobre el recurs *usuari* del sistema.
                             "tags": [
                                 "Assignatura"
                             ],
-                            "published": "2013-04-08T21:24:55Z",
+                            "published": "2013-04-11T10:41:16Z",
                             "owner": "test_manager",
                             "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "permissions": [
@@ -227,16 +228,16 @@ Operacions sobre el recurs *usuari* del sistema.
                                 "invite",
                                 "unsubscribe"
                             ],
-                            "id": "516335a771c75c52a6dd7f9e",
+                            "id": "5166934cfcfff2507e79a4ac",
                             "objectType": "context"
                         }
                     ]
                 },
-                "last_login": "2013-04-08T21:24:55Z",
-                "published": "2013-04-08T21:24:55Z",
+                "last_login": "2013-04-11T10:41:16Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "516335a771c75c52a6dd7f9d",
+                "id": "5166934cfcfff2507e79a4ab",
                 "objectType": "person"
             }
 
@@ -329,11 +330,11 @@ llistar-les com crear-ne de noves.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "post",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fa1",
+                "id": "5166934cfcfff2507e79a4af",
                 "objectType": "activity"
             }
 
@@ -435,11 +436,11 @@ l'usuari ha estat previament subscrit a aquest context.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "post",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fa2",
+                "id": "5166934cfcfff2507e79a4b0",
                 "objectType": "activity"
             }
 
@@ -498,10 +499,10 @@ l'usuari ha estat previament subscrit a aquest context.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fa2",
+                        "id": "5166934cfcfff2507e79a4b0",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "activity"
                     },
                     {
@@ -519,10 +520,10 @@ l'usuari ha estat previament subscrit a aquest context.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fa1",
+                        "id": "5166934cfcfff2507e79a4af",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "activity"
                     }
                 ]
@@ -624,10 +625,10 @@ concret.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fa2",
+                        "id": "5166934cfcfff2507e79a4b0",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "activity"
                     }
                 ],
@@ -638,11 +639,11 @@ concret.
                     "tags": [
                         "Assignatura"
                     ],
-                    "published": "2013-04-08T21:24:55Z",
+                    "published": "2013-04-11T10:41:16Z",
                     "owner": "test_manager",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "objectType": "context",
-                    "id": "516335a771c75c52a6dd7f9e",
+                    "id": "5166934cfcfff2507e79a4ac",
                     "permissions": {
                         "write": "public",
                         "subscribe": "public",
@@ -720,10 +721,10 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fa2",
+                        "id": "5166934cfcfff2507e79a4b0",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "activity"
                     },
                     {
@@ -741,10 +742,10 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fa1",
+                        "id": "5166934cfcfff2507e79a4af",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "activity"
                     }
                 ]
@@ -810,7 +811,7 @@ Representa el conjunt de comentaris fets a una activitat.
                     "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
                     "inReplyTo": [
                         {
-                            "id": "516335a771c75c52a6dd7fa3",
+                            "id": "5166934cfcfff2507e79a4b1",
                             "objectType": "note"
                         }
                     ],
@@ -829,11 +830,11 @@ Representa el conjunt de comentaris fets a una activitat.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "comment",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fa4",
+                "id": "5166934cfcfff2507e79a4b2",
                 "objectType": "activity"
             }
 
@@ -873,7 +874,7 @@ Representa el conjunt de comentaris fets a una activitat.
                     {
                         "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
                         "objectType": "comment",
-                        "id": "516335a771c75c52a6dd7fa4",
+                        "id": "5166934cfcfff2507e79a4b2",
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
@@ -883,7 +884,7 @@ Representa el conjunt de comentaris fets a una activitat.
                             },
                             "objectType": "person"
                         },
-                        "published": "2013-04-08T21:24:55Z"
+                        "published": "2013-04-11T10:41:16Z"
                     }
                 ]
             }
@@ -929,11 +930,11 @@ Subscripcions
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
-                        "id": "516335a771c75c52a6dd7f9e",
+                        "id": "5166934cfcfff2507e79a4ac",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -946,11 +947,11 @@ Subscripcions
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu/A",
                         "tags": [],
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "516335a771c75c52a6dd7f9f",
+                        "id": "5166934cfcfff2507e79a4ad",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -1020,11 +1021,11 @@ Subscripcions
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "subscribe",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fa5",
+                "id": "5166934cfcfff2507e79a4b3",
                 "objectType": "activity"
             }
 
@@ -1076,7 +1077,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "permissions": [
@@ -1085,7 +1086,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                             "invite",
                             "unsubscribe"
                         ],
-                        "id": "516335a771c75c52a6dd7f9e",
+                        "id": "5166934cfcfff2507e79a4ac",
                         "objectType": "context"
                     },
                     {
@@ -1093,11 +1094,11 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         "tags": [],
                         "url": "http://atenea.upc.edu/A",
                         "creator": "test_manager",
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "516335a771c75c52a6dd7f9f",
+                        "id": "5166934cfcfff2507e79a4ad",
                         "permissions": [
                             "read",
                             "write",
@@ -1156,7 +1157,16 @@ Missatges i converses
 ---------------------
 
 El MAX implementa des de la seva versió 3.0 la funcionalitat de missatgeria
-instantània asíncrona entre els seus usuaris. Aquests són els serveis associats.
+instantània asíncrona entre els seus usuaris.
+
+* Les converses tenen un limit de 20 participants.
+* Les converses tenen un propietari, que és l'usuari que va crear la conversa.
+* El propietari de la conversa pot afegir més gent a la conversa.
+* El propietari de la conversa pot fer fora usuaris de la conversa.
+* El propietari de la conversa *NO* pot marxar d'una conversa
+* Els participants d'una conversa poden marxar sempre que vulguin de la conversa, els seus missatges no s'esborren
+
+Aquests són els serveis associats.
 
 .. setup other user for conversations interaction
 
@@ -1166,14 +1176,15 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
 .. http:post:: /conversations
 
-    Retorna totes les converses depenent de l'actor que faci la petició.
+    Crea una conversa nova, hi subscriu tots els participants especificats, i afegeix el
+    missatge a la conversa.
 
     :query contexts: (Requerit) Tipus d'objecte al qual ens volem subscriure (en
         aquest cas ``conversation``). Hem de proporcionar un objecte amb les claus
         ``objectType`` i el valor ``conversation``, i la llista de
         ``participants`` com a l'exemple
     :query object: (Requerit) Tipus d'objecte de la conversa. Hem de
-        proporcionar un objecte (per ara només es permet el tipus `message`) i
+        proporcionar un objecte (per ara només es permet el tipus `note`) i
         el contingut amb les dades ``content`` amb el cos del missatge
         propiament dit
 
@@ -1212,7 +1223,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "xavi"
                         ],
                         "owner": "messi",
-                        "id": "516335a771c75c52a6dd7fa9",
+                        "id": "5166934cfcfff2507e79a4b7",
                         "objectType": "conversation"
                     }
                 ],
@@ -1238,11 +1249,11 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "post",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fac",
+                "id": "5166934cfcfff2507e79a4ba",
                 "objectType": "message"
             }
 
@@ -1292,7 +1303,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                                     "xavi"
                                 ],
                                 "owner": "messi",
-                                "id": "516335a771c75c52a6dd7fa9",
+                                "id": "5166934cfcfff2507e79a4b7",
                                 "objectType": "conversation"
                             }
                         ],
@@ -1309,10 +1320,10 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "516335a771c75c52a6dd7fac",
+                        "id": "5166934cfcfff2507e79a4ba",
                         "verb": "post",
-                        "published": "2013-04-08T21:24:55Z",
-                        "commented": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
+                        "commented": "2013-04-11T10:41:16Z",
                         "objectType": "message"
                     }
                 ]
@@ -1334,7 +1345,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
 .. http:get:: /conversations
 
-    Retorna totes les converses depenent de l'actor que faci la petició
+    Retorna totes les converses de l'actor que faci la petició
 
     Cos de la petició
 
@@ -1356,9 +1367,9 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                         ],
                         "lastMessage": {
                             "content": "Nos espera una gran temporada, no es cierto?",
-                            "published": "2013-04-08T21:24:55Z"
+                            "published": "2013-04-11T10:41:16Z"
                         },
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "permissions": {
                             "read": "subscribed",
                             "write": "subscribed",
@@ -1366,7 +1377,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "invite": "restricted",
                             "subscribe": "restricted"
                         },
-                        "id": "516335a771c75c52a6dd7fa9",
+                        "id": "5166934cfcfff2507e79a4b7",
                         "objectType": "conversation"
                     }
                 ]
@@ -1384,6 +1395,110 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
     Success
 
         Retorna una llista d'objectes del tipus ``Conversation``.
+
+.. http:get:: /conversations/{id}
+
+    Retorna una conversa
+
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
+        o en la llista de converses d'un usuari.
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "displayName": "xavi",
+                "creator": "messi",
+                "participants": [
+                    "messi",
+                    "xavi"
+                ],
+                "published": "2013-04-11T10:41:16Z",
+                "owner": "messi",
+                "permissions": {
+                    "read": "subscribed",
+                    "write": "subscribed",
+                    "unsubscribe": "public",
+                    "invite": "restricted",
+                    "subscribe": "restricted"
+                },
+                "id": "5166934cfcfff2507e79a4b7",
+                "objectType": "conversation"
+            }
+
+        .. -> expected
+            >>> response = testapp.get('/conversations/{}'.format(conversation_id), "", oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json ...
+            >>> response.json['objectType'] == 'conversation'
+            True
+
+    Success
+
+        Retorna un objecte del tipus ``Conversation``.
+
+
+.. http:put:: /conversations/{id}
+
+    Modifica una conversa
+
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
+        o en la llista de converses d'un usuari.
+    :query displayName: El nom visible de la conversa, només visible en converses de més de 2 participants.
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {
+                displayName: 'Nou nom'
+            }
+
+        .. -> payload
+
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "displayName": "xavi",
+                "creator": "messi",
+                "participants": [
+                    "messi",
+                    "xavi"
+                ],
+                "published": "2013-04-11T10:41:16Z",
+                "owner": "messi",
+                "permissions": {
+                    "read": "subscribed",
+                    "write": "subscribed",
+                    "unsubscribe": "public",
+                    "invite": "restricted",
+                    "subscribe": "restricted"
+                },
+                "id": "5166934cfcfff2507e79a4b7",
+                "objectType": "conversation"
+            }
+
+        .. -> expected
+
+
+            >>> response = testapp.get('/conversations/{}'.format(conversation_id), json.dumps(payload), oauth2Header(username), status=200)
+            >>> response
+            <200 OK application/json ...
+            >>> response.json['objectType'] == 'conversation'
+            True
+
+    Success
+
+        Retorna un objecte del tipus ``Conversation``.
+
 
 .. http:post:: /conversations/{hash}/messages
 
@@ -1422,7 +1537,7 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                             "xavi"
                         ],
                         "owner": "messi",
-                        "id": "516335a771c75c52a6dd7fa9",
+                        "id": "5166934cfcfff2507e79a4b7",
                         "objectType": "conversation"
                     }
                 ],
@@ -1443,11 +1558,11 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-08T21:24:55Z",
+                "commented": "2013-04-11T10:41:16Z",
                 "verb": "post",
-                "published": "2013-04-08T21:24:55Z",
+                "published": "2013-04-11T10:41:16Z",
                 "owner": "messi",
-                "id": "516335a771c75c52a6dd7fad",
+                "id": "5166934cfcfff2507e79a4bb",
                 "objectType": "message"
             }
 
@@ -1465,10 +1580,110 @@ instantània asíncrona entre els seus usuaris. Aquests són els serveis associa
 
         Retorna l'objecte ``Message`` (activitat).
 
-.. doctests teardown (absolutelly needed)
 
-    >>> HTTPretty.disable()
+.. http:post:: /people/{username}/conversations/{id}
 
+    Afegeix un usuari a una conversa. L'usuari propietari de la conversa és l'únic que ho pot fer.
+    Hi ha un limit de 20 participants per conversa.
+
+    :query username: (REST) L'usuari que es vol afegir a la conversa
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
+        o en la llista de converses d'un usuari.
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "generator": null,
+                "creator": "messi",
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "object": {
+                    "participants": [
+                        "messi",
+                        "xavi",
+                        "nouusuari"
+                    ],
+                    "id": "5166934cfcfff2507e79a4b7",
+                    "objectType": "conversation"
+                },
+                "actor": {
+                    "username": "nouusuari",
+                    "displayName": "nouusuari",
+                    "objectType": "person"
+                },
+                "commented": "2013-04-11T10:41:16Z",
+                "verb": "subscribe",
+                "published": "2013-04-11T10:41:16Z",
+                "owner": "nouusuari",
+                "id": "5166934cfcfff2507e79a4bd",
+                "objectType": "activity"
+            }
+
+        .. -> expected
+
+            >>> expected = json.loads(expected)
+            >>> utils.create_user('nouusuari')
+            <201 Created application/json ...
+            >>> response = testapp.post('/people/{}/conversations/{}'.format('nouusuari', conversation_id), payload, oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json ...
+            >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
+            True
+
+        Retorna un codi HTTP 201 (created) amb la subscripció, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari.
+        Si sobrepassem el límit obtindrem un HTTP 403 (Forbidden)
+
+.. http:delete:: /people/{username}/conversations/{id}
+
+    Treu un usuari d'una conversa. Ho pot fer qualsevol participant de la conversa excepte el propietari.
+
+    :query username: (REST) L'usuari que es vol afegir a la conversa
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
+        o en la llista de converses d'un usuari.
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari
+
+        .. actual test
+            >>> resp = testapp.delete('/people/{}/conversations/{}'.format('nouusuari', conversation_id), "", oauth2Header(username), status=204)
+            >>> resp
+            <204 No Content ...
+
+.. http:delete:: /conversations/{id}
+
+    Elimina una conversa
+
+    Elimina una conversa i tots els seus missatges de forma permanent. L'usuari propietari de la conversa és
+    ĺ'únic que pot eliminarla.
+
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
+        o en la llista de converses d'un usuari.
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari
+
+        .. actual test
+            >>> resp = testapp.delete('/conversations/{}'.format(conversation_id), "", oauth2Header(username), status=204)
+            >>> resp
+            <204 No Content ...
 
 
 Contextos
@@ -1499,11 +1714,11 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
-                        "id": "516335a771c75c52a6dd7f9e",
+                        "id": "5166934cfcfff2507e79a4ac",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -1516,11 +1731,11 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu/A",
                         "tags": [],
-                        "published": "2013-04-08T21:24:55Z",
+                        "published": "2013-04-11T10:41:16Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "516335a771c75c52a6dd7f9f",
+                        "id": "5166934cfcfff2507e79a4ad",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -1532,8 +1747,8 @@ que són accessibles per usuaris normals estàn documentats aquí
             }
 
         .. -> expected
-            >>> create_context = {"url": "http://atenea.upc.edu", "objectType": "context" }
-            >>> resp = utils.create_context(create_context)
+            >>> testapp.delete('/contexts/{}'.format(context_hash_for_deleting), '', oauth2Header(test_manager), status=204)
+            <204 No Content ...
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/contexts/public', '', oauth2Header(username), status=200)
             >>> response
@@ -1565,3 +1780,7 @@ que són accessibles per usuaris normals estàn documentats aquí
     Success
 
         Retorna la imatge del context.
+
+.. doctests teardown (absolutelly needed)
+
+    >>> HTTPretty.disable()
