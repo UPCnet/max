@@ -7,7 +7,7 @@ from paste.deploy import loadapp
 from mock import patch
 from maxrules import config
 
-from max.tests.base import MaxTestBase, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
 from max.tests import test_manager, test_default_security
 
 config.mongodb_db_name = 'tests'
@@ -30,8 +30,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
-        from webtest import TestApp
-        self.testapp = TestApp(self.app)
+        self.testapp = MaxTestApp(self)
         self.patched = patch('requests.post', new=self.mock_post)
         self.patched.start()
 

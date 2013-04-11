@@ -7,7 +7,7 @@ from hashlib import sha1
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
 from max.tests import test_manager, test_default_security
 
 
@@ -31,8 +31,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
-        from webtest import TestApp
-        self.testapp = TestApp(self.app)
+        self.testapp = MaxTestApp(self)
 
     # BEGIN TESTS
 

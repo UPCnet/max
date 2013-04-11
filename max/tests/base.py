@@ -13,10 +13,46 @@ def oauth2Header(username):
     return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}
 
 
-class MaxTestBase(object):
+class MaxTestApp(object):
 
-    def __init__(self, testapp):
-        self.testapp = testapp
+    def __init__(self, testcase):
+        from webtest import TestApp
+        self.testcase = testcase
+        self.testapp = TestApp(testcase.app)
+
+    def __getattr__(self, value):
+        if value.lower() in ['post', 'get', 'put', 'delete', 'head', 'options', 'fetch']:
+            return object.__getattribute__(self, value.lower())
+        else:
+            return object.__getattribute__(self.testapp, value)
+
+    def get(self, *args, **kwargs):
+        return self.call_testapp('get', *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        return self.call_testapp('post', *args, **kwargs)
+
+    def put(self, *args, **kwargs):
+        return self.call_testapp('put', *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self.call_testapp('delete', *args, **kwargs)
+
+    def call_testapp(self, method, *args, **kwargs):
+
+        status = kwargs.get('status', None)
+        testapp_method = getattr(self.testapp, method)
+        kwargs['expect_errors'] = True
+        res = testapp_method(*args, **kwargs)
+        if status is not None:
+            message = 'STATUS = {} not {}. '.format(status, res.status_int)
+            if 'error' in getattr(res, 'json', []):
+                message += '\nRaised {error}: "{error_description}"'.format(**res.json)
+            self.testcase.assertEqual(status, res.status_int, message)
+        return res
+
+
+class MaxTestBase(object):
 
     def create_user(self, username, **kwargs):
         payload = {}

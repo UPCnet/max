@@ -4,7 +4,7 @@ import doctest
 
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
 from max.tests import test_manager, test_default_security
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
@@ -49,7 +49,6 @@ class DoctestCase(unittest.TestCase):
         app.registry.max_store.drop_collection('messages')
         app.registry.max_store.drop_collection('security')
         app.registry.max_store.security.insert(test_default_security)
-        from webtest import TestApp
         testapp = TestApp(app)
 
         test.globs['testapp'] = testapp
