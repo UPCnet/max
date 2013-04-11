@@ -175,12 +175,12 @@ pot prendre:
 
     var settings = {
            'language': 'ca',
-           'username' : nom.cognom,
-           'oAuthToken' : 01234567890abcdef01234567890abcd,
+           'username' : 'nom.cognom',
+           'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : http://rocalcom.upc.edu,
-           'readContext': http://foo.com/bar,
-           'writeContexts': ['http://foo.com/bar/cel', http://foo.com/bar/cel/ona]
+           'maxServerURL' : 'http://rocalcom.upc.edu',
+           'readContext': 'http://foo.com/bar',
+           'writeContexts': ['http://foo.com/bar/cel', 'http://foo.com/bar/cel/ona]''
            'activitySource': 'activities'
            }
 
@@ -263,7 +263,7 @@ Paràmetres de la UI
 Altres Paràmetres
 
 * ``maxRequestsAPI`` - ``default: jquery`` - Api a utilitzar per les peticions
-  al servidor MAX. Actualment només suporta jquery.
+  al servidor MAX. Actualment només suporta jquery en aquesta versió.
 * ``enableAlerts`` - ``default: false`` - Booleà per activar finestres emergents
   d'alerta quan succeeixi algun error. Útil per a depurar errors.
 
@@ -297,8 +297,8 @@ CORS - Cross Origin Resource Sharing
 Les crides al MAX que es fan des del widget es van via peticions XHR des del
 navegador. Degut a restriccions de seguretat, per defecte els navegadors no
 permeten que una crida XHR interactuï amb dominis diferents del qual s'ha
-accedit. Per exemple, si hem carregat l'aplicació a http://www.foo.com, no
-podrem fer crides XHR a http://www.bar.com.
+accedit. Per exemple, si hem carregat l'aplicació a ``http://www.foo.com``, no
+podrem fer crides XHR a ``http://www.bar.com``.
 
 Per superar aquest obstacle, s'ha implementat l'estàndar CORS que permet fer
 aquestes accions, però no tots els navegadors ho suporten. De moment el sistema

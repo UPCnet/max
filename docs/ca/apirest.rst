@@ -60,9 +60,10 @@ Operacions sobre el recurs *usuari* del sistema.
     Retorna el resultat d'una cerca d'usuaris del sistema en forma de llista
     de noms d'usuaris per l'ús de la UI.
 
-    :query username: El filtre de cerca d'usuaris.
+    **Paràmetres JSON**
+        - ``username``: El filtre de cerca d'usuaris.
 
-    Cos de la petició
+    **Exemple de petició**:
 
         .. code-block:: python
 
@@ -70,7 +71,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -93,8 +94,12 @@ Operacions sobre el recurs *usuari* del sistema.
             >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
             True
 
+    **Codis d'error**:
+        * 200 petició executada correctament
+
     Success
         Retorna la llista d'usuaris que compleix la query especificada.
+
 
 .. http:put:: /people/{username}
 
@@ -107,7 +112,7 @@ Operacions sobre el recurs *usuari* del sistema.
     :query displayName: (Opcional) El nom real de l'usuari al sistema
     :query twitterUsername: (Opcional) El nom d'usuari de Twitter de l'usuari
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -115,7 +120,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -189,11 +194,11 @@ Operacions sobre el recurs *usuari* del sistema.
 
     :query username: (REST) L'identificador de l'usuari
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -291,7 +296,7 @@ llistar-les com crear-ne de noves.
         *note*. Ha de contindre les claus ``objectType`` i ``content`` el qual
         pot tractar-se d'un camp codificat amb HTML.
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -304,7 +309,7 @@ llistar-les com crear-ne de noves.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -380,7 +385,7 @@ llistar-les com crear-ne de noves.
 En el cas que volguem lligar l'activitat a un context en concret, suposant que
 l'usuari ha estat previament subscrit a aquest context.
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -399,7 +404,7 @@ l'usuari ha estat previament subscrit a aquest context.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -463,11 +468,11 @@ l'usuari ha estat previament subscrit a aquest context.
 
     :query username: (REST) Identificador d'usuari que crea l'activitat
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -585,7 +590,7 @@ concret.
         possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
 
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -593,7 +598,7 @@ concret.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -685,11 +690,11 @@ indirectament.
         ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
         possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -783,7 +788,7 @@ Representa el conjunt de comentaris fets a una activitat.
         comentari ha de ser *comment*. Ha de contindre les claus ``objectType``
         i ``content``.
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -796,7 +801,7 @@ Representa el conjunt de comentaris fets a una activitat.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -860,11 +865,11 @@ Representa el conjunt de comentaris fets a una activitat.
     :query activity: (REST) ha de ser un identificador vàlid d'una activitat
         existent, per exemple: 4e6eefc5aceee9210d000004
 
-    Cos de la petició
+    **Exemple de petició**
 
          Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -912,11 +917,11 @@ Subscripcions
 
     Dona una llista de tots els contextes als qual un usuari es pot subscriure lliurement
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -988,7 +993,7 @@ Subscripcions
         aquest cas del tipus `context`. Hem de proporcionar un objecte amb les
         claus ``objectType`` i el valor *context*, i la dada ``url`` del context.
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -1001,7 +1006,7 @@ Subscripcions
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1059,11 +1064,11 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
 
     :query username: (REST) L'identificador de l'usuari al sistema
 
-    Cos de la petició
+    **Exemple de petició**
 
          Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1125,7 +1130,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
     :query hash: (REST) El hash del context la subscripció al qual es vol esborrar. Aquest hash es calcula
         fent una suma de verificació sha1 dels paràmetres del context
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
@@ -1139,7 +1144,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
     <201 Created application/json ...
 
 
-    Resposta esperada
+    **Resposta esperada**:
 
         Retorna un codi HTTP 204 (deleted) amb el cos buit
 
@@ -1188,7 +1193,7 @@ Aquests són els serveis associats.
         el contingut amb les dades ``content`` amb el cos del missatge
         propiament dit
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -1207,7 +1212,7 @@ Aquests són els serveis associats.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1281,11 +1286,11 @@ Aquests són els serveis associats.
         calcula fent una suma de verificació sha1 de la llista de participants
         (ordenada alfabèticament i sense espais) de la conversa
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1347,11 +1352,11 @@ Aquests són els serveis associats.
 
     Retorna totes les converses de l'actor que faci la petició
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1403,11 +1408,11 @@ Aquests són els serveis associats.
     :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
         o en la llista de converses d'un usuari.
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1451,7 +1456,7 @@ Aquests són els serveis associats.
         o en la llista de converses d'un usuari.
     :query displayName: El nom visible de la conversa, només visible en converses de més de 2 participants.
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -1462,7 +1467,7 @@ Aquests són els serveis associats.
         .. -> payload
 
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1508,7 +1513,7 @@ Aquests són els serveis associats.
         calcula fent una suma de verificació sha1 de la llista de participants
         (ordenada alfabèticament i sense espais) de la conversa
 
-    Cos de la petició
+    **Exemple de petició**
 
         .. code-block:: python
 
@@ -1521,7 +1526,7 @@ Aquests són els serveis associats.
 
         .. -> payload
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1590,11 +1595,11 @@ Aquests són els serveis associats.
     :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
         o en la llista de converses d'un usuari.
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
@@ -1649,11 +1654,11 @@ Aquests són els serveis associats.
     :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
         o en la llista de converses d'un usuari.
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari
 
@@ -1672,11 +1677,11 @@ Aquests són els serveis associats.
     :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
         o en la llista de converses d'un usuari.
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no te cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari
 
@@ -1696,11 +1701,11 @@ que són accessibles per usuaris normals estàn documentats aquí
 
     Dona una llista de tots els contextes als qual un usuari es pot subscriure lliurement
 
-    Cos de la petició
+    **Exemple de petició**
 
         Aquesta petició no necessita cos.
 
-    Resposta esperada
+    **Resposta esperada**:
 
         .. code-block:: python
 
