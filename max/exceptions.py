@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPBadRequest, HTTPNotImplemented, HTTPNotFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPUnauthorized, HTTPBadRequest, HTTPNotImplemented, HTTPNotFound, HTTPForbidden, HTTPInternalServerError
 from pyramid.response import Response
 
 import json
@@ -34,6 +34,13 @@ class JSONHTTPNotFound(HTTPNotFound):
 
 
 class JSONHTTPNotImplemented(HTTPNotImplemented):
+
+    def __init__(self, error):
+        Response.__init__(self, json.dumps(error), status=self.code)
+        self.content_type = 'application/json'
+
+
+class JSONHTTPInternalServerError(HTTPInternalServerError):
 
     def __init__(self, error):
         Response.__init__(self, json.dumps(error), status=self.code)

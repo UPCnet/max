@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden
-from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden
+from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden, JSONHTTPInternalServerError
 from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
@@ -9,6 +9,15 @@ from max.rest.resources import RESOURCES
 from max.rest.utils import getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
 from max.models import User, Context
 from beaker.cache import cache_region, Cache
+
+import traceback
+from datetime import datetime
+import json
+import base64
+import zlib
+from hashlib import sha1
+import logging
+logger = logging.getLogger('exceptions')
 
 
 def getUserActor(db, username):
@@ -125,6 +134,37 @@ def requireContextActor(exists=True):
         return wrap(exists)
     return wrap
 
+ERROR_TEMPLATE = """
+------------------------------------------------
+BEGIN EXCEPTION REPORT: {hash}
+DATE: {time}
+REQUEST:
+
+{raw_request}
+
+TRACEBACK:
+
+{traceback}
+
+END EXCEPTION REPORT
+------------------------------------------------
+"""
+
+
+def saveException(request, error):
+    time = datetime.now().isoformat()
+    entry = dict(
+        traceback=error,
+        time=time,
+        raw_request=request.as_string(),
+        matched_route=request.matched_route.name,
+        matchdict=request.matchdict,
+    )
+    dump = json.dumps(entry)
+    entry['hash'] = sha1(dump).hexdigest()
+    logger.debug(ERROR_TEMPLATE.format(**entry))
+    return entry['hash']
+
 
 def MaxResponse(fun):
     def replacement(*args, **kwargs):
@@ -163,7 +203,9 @@ def MaxResponse(fun):
         except ValueError:
             return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
         except:
-            return HTTPInternalServerError()
+            error = traceback.format_exc()
+            sha1_hash = saveException(request, error)
+            return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged as {}. Please contact the system admin.'.format(sha1_hash)))
         else:
             try:
                 # Don't cache by default, get configuration from resource if any
