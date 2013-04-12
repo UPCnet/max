@@ -205,7 +205,8 @@ def MaxResponse(fun):
         except:
             error = traceback.format_exc()
             sha1_hash = saveException(request, error)
-            return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged as {}. Please contact the system admin.'.format(sha1_hash)))
+            max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
+            return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
         else:
             try:
                 # Don't cache by default, get configuration from resource if any
