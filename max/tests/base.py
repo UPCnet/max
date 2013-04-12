@@ -54,6 +54,9 @@ class MaxTestApp(object):
 
 class MaxTestBase(object):
 
+    def __init__(self, testapp):
+        self.testapp = testapp
+
     def create_user(self, username, **kwargs):
         payload = {}
         for key, value in kwargs.items():
