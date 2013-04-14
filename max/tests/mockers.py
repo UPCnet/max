@@ -303,6 +303,18 @@ message = {
     }
 }
 
+wrong_message = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "UnknownType",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
 message2 = {
     "contexts": [
         {"objectType": "conversation",

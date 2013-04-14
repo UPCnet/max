@@ -45,7 +45,7 @@ class MaxTestApp(object):
         kwargs['expect_errors'] = True
         res = testapp_method(*args, **kwargs)
         if status is not None:
-            message = 'STATUS = {} not {}. '.format(status, res.status_int)
+            message = "Response status is {},  we're expecting {}. ".format(res.status_int, status)
             if 'error' in getattr(res, 'json', []):
                 message += '\nRaised {error}: "{error_description}"'.format(**res.json)
             self.testcase.assertEqual(status, res.status_int, message)

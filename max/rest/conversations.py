@@ -127,7 +127,13 @@ def postMessage2Conversation(context, request):
 
     # Initialize a Message (Activity) object from the request
     newmessage = Message()
-    newmessage.fromRequest(request, rest_params=message_params)
+    try:
+        newmessage.fromRequest(request, rest_params=message_params)
+    except Exception as Catched:
+        # In case we coulnd't post the message, rollback conversation and subscriptions
+        current_conversation.removeUserSubscriptions()
+        current_conversation.delete()
+        raise Catched
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid

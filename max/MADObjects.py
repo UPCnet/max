@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.rest.utils import extractPostData, flatten, RUDict
 from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, ValidationError
+from bson import ObjectId
 import datetime
 from pyramid.threadlocal import get_current_request
 import sys
@@ -273,7 +274,7 @@ class MADBase(MADDict):
         """
             Removes the object from the DB
         """
-        self.mdb_collection.remove({'_id': self._id})
+        self.mdb_collection.remove({'_id': ObjectId(self._id)})
 
     def addToList(self, field, obj, allow_duplicates=False, safe=True):
         """

@@ -41,7 +41,8 @@ def oauth2(allowed_scopes=[]):
 
             req = requests.post(settings['max_oauth_check_endpoint'], data=payload, verify=False)
 
-            if req.status_code == 200:
+            if req:
+            #if req.status_code == 200:
                 # Valid token, proceed.
 
                 def getCreator(request):
