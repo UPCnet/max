@@ -1,3 +1,31 @@
+CHANGELOG
+=========
+
+3.0 (2013-04-15)
+----------------
+
+ * Conversations with socket.io
+ * Improved tests and documentation
+ * Cleanup
+ * Unsubscribe from contexts
+ * Creation and ownership fields
+ * Route unification of /admin and /* endpoints
+ * New security implementation fully based on oauth2 and roles on db
+ * Public contexts
+
+
+2.0 (2012-03-01)
+----------------
+
+ Added this new features:
+
+ * oAuth based user authentication against a oAuth 2.0 server compliant using *Resource owner password credentials* flow
+ * oAuth user - activity actor validation
+ * App hooks dirven apps
+ * Restricted-API access for app driven hooks
+ * Support for restricted-API users and its management UI
+
+
 1.0 (2011-12-1)
 ---------------
 
@@ -14,13 +42,3 @@ Initial version, featuring:
  * No support for user profiles
  * User photos resources hardcoded and stored in fs
 
- 2.0 (2012-03-01)
- ----------------
-
- Added this new features:
-
- * oAuth based user authentication against a oAuth 2.0 server compliant using *Resource owner password credentials* flow
- * oAuth user - activity actor validation
- * App hooks dirven apps
- * Restricted-API access for app driven hooks
- * Support for restricted-API users and its management UI
