@@ -79,7 +79,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         conversation = self.app.registry.max_store.conversations.find_one()
         permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
-
         self.assertEqual(conversation.get("participants", None), sorted([sender, recipient]))
         self.assertEqual(conversation.get("objectType", None), "conversation")
         self.assertEqual(conversation.get("permissions", None), permissions)
@@ -91,7 +90,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         recipient = 'xavi'
         self.create_user(sender)
         self.create_user(recipient)
-
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
         res = self.testapp.post('/conversations', json.dumps(message2), oauth2Header(sender), status=201)
@@ -102,6 +100,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/%s/messages' % cid, {}, oauth2Header(sender), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get("totalItems", None), 2)
+
+    def test_post_message_to_new_conversation_check_message_not_in_another_conversation(self):
+        from .mockers import message, message_s
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid1 = str(res.json['contexts'][0]['id'])
+        res = self.testapp.post('/conversations', json.dumps(message_s), oauth2Header(sender), status=201)
+        cid2 = str(res.json['contexts'][0]['id'])
+
+        self.assertNotEqual(cid1, cid2)
+
+        res = self.testapp.get('/conversations/%s/messages' % cid1, {}, oauth2Header(sender), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get("totalItems", None), 1)
 
     def test_post_messages_to_an_already_existing_conversation(self):
         from .mockers import message, message2

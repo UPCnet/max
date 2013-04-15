@@ -303,6 +303,17 @@ message = {
     }
 }
 
+message_s = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "shakira"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
 wrong_message = {
     "contexts": [
         {"objectType": "conversation",

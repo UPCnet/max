@@ -68,13 +68,17 @@ def postMessage2Conversation(context, request):
     users = MADMaxCollection(context.db.users, query_key='username')
     for participant in ctxts[0]['participants']:
         user = users[participant]
-
     # If there are only two participants in the conversation, try to get an existing conversation
     # Otherwise, assume is a group conversation and create a new one
     current_conversation = None
     if len(ctxts[0]['participants']) == 2:
         contexts = MADMaxCollection(context.db.conversations)
-        conversations = contexts.search({'objectType': 'conversation', 'participants': {'$in': ctxts[0]['participants']}})
+        participants_query = [
+            {'participants': {'$in': [ctxts[0]['participants'][0], ]}},
+            {'participants': {'$in': [ctxts[0]['participants'][1], ]}},
+        ]
+        conversations = contexts.search({'objectType': 'conversation', '$and': participants_query})
+        conversations = [a for a in conversations if len(a.participants) == 2]
         if conversations:
             current_conversation = conversations[0]
 
