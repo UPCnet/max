@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden
 from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden, JSONHTTPInternalServerError
-from pyramid.httpexceptions import HTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
 from max.resources import Root
 from max.rest.resources import RESOURCES
 from max.rest.utils import getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
 from max.models import User, Context
-from beaker.cache import cache_region, Cache
 
 import traceback
 from datetime import datetime
 import json
-import base64
-import zlib
 from hashlib import sha1
 import logging
 logger = logging.getLogger('exceptions')

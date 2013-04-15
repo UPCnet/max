@@ -12,6 +12,8 @@ maxlogger = logging.getLogger('max')
 from max.resources import Root, loadMAXSettings, loadMAXSecurity
 from max.rest.resources import RESOURCES
 
+from pyramid_beaker import set_cache_regions_from_settings
+
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 
@@ -59,6 +61,9 @@ def main(global_config, **settings):
 
     # Set security
     config.registry.max_security = loadMAXSecurity(config.registry)
+
+    # Load cache settings
+    set_cache_regions_from_settings(settings)
 
     # REST Resources
     # Configure routes based on resources defined in RESOURCES

@@ -3,6 +3,16 @@ from max.resources import getMAXSettings
 from max.resources import Root
 
 import requests
+from beaker.cache import cache_region
+
+
+@cache_region('oauth_token')
+def checkToken(url, username, token, scope):
+    payload = {"oauth_token": token,
+               "user_id": username}
+    if scope:
+        payload['scope'] = scope
+    return requests.post(url, data=payload, verify=False).status_code == 200
 
 
 def oauth2(allowed_scopes=[]):
@@ -32,19 +42,11 @@ def oauth2(allowed_scopes=[]):
                 if scope not in allowed_scopes:
                     raise Unauthorized('The specified scope is not allowed for this resource.')
 
-            # Validate access token
-            payload = {"oauth_token": oauth_token,
-                       "user_id": username,
-                       }
-            if scope:
-                payload['scope'] = scope
-
-            req = requests.post(settings['max_oauth_check_endpoint'], data=payload, verify=False)
+            valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope)
 
             # FOR DEBUGGING, oauth passtrough
-            # if req:
-            if req.status_code == 200:
-                Valid token, proceed.
+            # valid = True
+            if valid:
 
                 def getCreator(request):
                     return username
