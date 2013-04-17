@@ -22,7 +22,7 @@ requires = [
     'Paste'
     ]
 
-test_requires = ['WebTest', 'mock', ]
+test_requires = ['WebTest', 'mock', 'beaker']
 script_requires = ['prettytable', 'sh']
 
 setup(name='max',
