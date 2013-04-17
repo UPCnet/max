@@ -504,6 +504,27 @@ class Context(BaseContext):
                                      )
     schema['twitterUsernameId'] = dict(operations_mutable=1)
 
+    def alreadyExists(self):
+        """
+            Checks if there's an object with the value specified in the unique field.
+            If present, return the object, otherwise returns None
+        """
+        unique = self.unique
+        if self.unique not in self.data.keys():
+            value = self.data.get('url', '')
+            value = sha1(value).hexdigest()
+        else:
+            value = self.data.get(unique)
+
+        if value:
+            query = {unique: value}
+            return self.mdb_collection.find_one(query)
+        else:
+            # in the case that we don't have the unique value in the request data
+            # Assume that the object doesn't exist
+            # XXX TODO - Test it!!
+            return None
+
     def _post_init_from_object(self, source):
         if self.get(self.unique, None) is None:
             self[self.unique] = self.getIdentifier()
