@@ -337,7 +337,7 @@ Contexts
 
 .. Create the context to delete in this test
 
-    >>> create_context = {"url": "http://atenea.upc.edu", "objectType": "context" }
+    >>> create_context = {"url": "http://atenea.upc.edu/delete", "objectType": "context" }
     >>> resp = utils.create_context(create_context)
     >>> context_hash_for_deleting = resp.json.get('hash')
 
@@ -544,10 +544,9 @@ s'explica amb profunditat en l'apartat de permisos.
                 "creator": "test_manager",
                 "published": "2013-04-11T10:41:17Z",
                 "owner": "test_manager",
-                "displayName": "http://atenea.upc.edu",
+                "displayName": "Atenea",
                 "permissions": [
                     "read",
-                    "invite",
                     "unsubscribe"
                 ],
                 "id": "5166934dfcfff25086305535",
