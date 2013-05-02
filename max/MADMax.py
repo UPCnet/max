@@ -41,7 +41,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, show_fields=None, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
+    def search(self, query, show_fields=None, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, count=False, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -104,6 +104,10 @@ class MADMaxCollection(object):
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)
         cursor = self.collection.find(query, self.show_fields)
+
+        # If it's a count search, return the cursor's count before sorting and limiting
+        if count:
+            return cursor.count()
 
         # Sort and limit the results if specified
         if sort:

@@ -38,6 +38,9 @@ class MaxTestApp(object):
     def delete(self, *args, **kwargs):
         return self.call_testapp('delete', *args, **kwargs)
 
+    def head(self, *args, **kwargs):
+        return self.call_testapp('head', *args, **kwargs)
+
     def call_testapp(self, method, *args, **kwargs):
 
         status = kwargs.get('status', None)
@@ -46,8 +49,9 @@ class MaxTestApp(object):
         res = testapp_method(*args, **kwargs)
         if status is not None:
             message = "Response status is {},  we're expecting {}. ".format(res.status_int, status)
-            if 'error' in getattr(res, 'json', []):
-                message += '\nRaised {error}: "{error_description}"'.format(**res.json)
+            if hasattr(res, 'json'):
+                if 'error' in getattr(res, 'json', []):
+                    message += '\nRaised {error}: "{error_description}"'.format(**res.json)
             self.testcase.assertEqual(status, res.status_int, message)
         return res
 
