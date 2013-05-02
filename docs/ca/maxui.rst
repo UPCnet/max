@@ -98,10 +98,19 @@ asíncrona el widget en la nostra aplicació:
     // 1 - Inicialitzar variable global
     window._MAXUI = window._MAXUI || {}
 
-    // 2 -  Inicialitzar widget
+    // 2 -  Inicialitzar widget, quan estigui disponible
     window._MAXUI.onReady = function() {
         var settings = {  }
+
         $('#activityStream').maxUI(settings)
+
+        intervalID = setInterval(function(event) {
+        if ($().maxUI) {
+                  clearInterval(intervalID)
+                  $('#activityStream').maxUI(settings)
+          }, 30)
+        }
+
     }
 
     // 3 - Descarregar codi del widget
@@ -169,7 +178,7 @@ Configuració del widget
 Per configurar el widget, prepararem una variable javascript, on especificarem
 els paràmetres amb els quals volem inicialitzar el widget. Aquí tenim una
 mostra, a tall d'exemple per veure una representació dels diversos valors que
-pot prendre:
+pot prendre, en mode timeline:
 
 .. code-block:: js
 
@@ -178,11 +187,25 @@ pot prendre:
            'username' : 'nom.cognom',
            'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : 'http://rocalcom.upc.edu',
+           'maxServerURL' : 'https://rocalcom.upc.edu',
+           'activitySource': 'timeline'
+           }
+
+i un altra exemple en mode context:
+
+.. code-block:: js
+
+    var settings = {
+           'language': 'ca',
+           'username' : 'nom.cognom',
+           'oAuthToken' : '01234567890abcdef01234567890abcd',
+           'oAuthGrantType' : 'password',
+           'maxServerURL' : 'https://rocalcom.upc.edu',
            'readContext': 'http://foo.com/bar',
            'writeContexts': ['http://foo.com/bar/cel', 'http://foo.com/bar/cel/ona]''
            'activitySource': 'activities'
            }
+
 
 A continuació detallarem els diferents paràmetres que es poden utilitzar, quins
 són obligatoris, i el tipus de valor que s'espera en cada un d'ells:
