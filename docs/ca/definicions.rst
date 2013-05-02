@@ -9,6 +9,7 @@ Conceptes previs
 La api REST està organitzada en recursos, identificats per una URI concreta. Cada recurs és capaç de subministrar diferents respostes en funció amb el mètode que utilitzem per accedir a ell. En termes generals, cada recurs exposa 4 mètodes que implementen el que es coneix com a UI (Uniform interface): GET, POST, PUT i DELETE. Aquests mètodes és poden interpretar sota l'acrònim que s'usa normalment de CRUD (Create, Read, Update, Delete), sent la correspondència la següent:
 
 :GET: Llegir element(s) d'un recurs
+:HEAD: Informació sobre un recurs.
 :POST: Crear un element dins un recurs
 :PUT: Modificar un element existent d'un recurs
 :DELETE: Eliminar un element d'un recurs
@@ -50,6 +51,12 @@ Ens llista totes les dades de l'entitat mindundi. En aquest cas a la URI podem l
 Les URI's dels serveis REST les podem interpretar quasibé sempre llegint de dreta a esquerra, agrupant els diferents identificadors d'entitats concretes amb el seu recurs. D'aquesta manera, l'ultim exemple el podem interpretar com a::
 
     "Activitats de la persona amb nom mindundi"
+
+En les col.leccions, els elements poden venir limitats per una cerca (per defecte 10 elements), i s'han de consultar de manera iterativa. Per saber quants elements tenim en total en una col·lecció, podem fer::
+
+GET /people/mindundi/activities
+
+i consultar la capçalera ``X-totalItems`` de la resposta.
 
 Creació d'elements nous
 --------------------------
