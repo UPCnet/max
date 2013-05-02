@@ -28,7 +28,7 @@ def getUserActivities(context, request):
     query['actor.username'] = request.actor['username']
     query['verb'] = 'post'
     is_head = request.method == 'HEAD'
-    activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, flatten=1, count=is_head)
+    activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, flatten=1, count=is_head, **searchParams(request))
 
     handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()

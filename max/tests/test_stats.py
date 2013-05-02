@@ -39,8 +39,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
 
-        self.create_activity(username, user_status)
-        self.create_activity(username, user_status)
-        self.create_activity(username, user_status)
+        for i in range(11):
+            self.create_activity(username, user_status)
+        res = self.testapp.get('/people/%s/activities' % username, '', oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems'), 10)
         res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
-        self.assertEqual(res.headers.get('X-totalItems'), '3')
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
