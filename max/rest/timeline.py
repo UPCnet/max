@@ -8,22 +8,8 @@ from max.oauth2 import oauth2
 from max.rest.utils import searchParams
 
 
-@view_config(route_name='timeline', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
-def getUserTimeline(context, request):
-    """
-         /people/{username}/timeline
-
-         Retorna totes les activitats d'un usuari
-    """
-    actor = request.actor
-    is_context_resource = 'timeline/contexts' in request.path
-    is_follows_resource = 'timeline/follows' in request.path
-
-    mmdb = MADMaxDB(context.db)
-
+def timelineQuery(mmdb, actor):
+    # Add the activity of the requesting user
     actor_query = {'actor.username': actor['username']}
 
     # Add the activity of the people that the user follows
@@ -40,25 +26,34 @@ def getUserTimeline(context, request):
             contexts_followings.append({'contexts.url': subscribed['url']})
 
     query_items = []
+    query_items.append(actor_query)
+    query_items += actors_followings
+    query_items += contexts_followings
 
-    if not is_follows_resource and not is_context_resource:
-        query_items.append(actor_query)
-        query_items += actors_followings
-        query_items += contexts_followings
+    query = {'$or': query_items}
+    query['verb'] = 'post'
+    # Include only visible activity, this includes activity with visible=True
+    # and activity WITHOUT the visible field
+    query['visible'] = {'$ne': False}
+    return query
 
-    if is_context_resource:
-        query_items += contexts_followings
 
-    if is_follows_resource:
-        query_items += contexts_followings
+@view_config(route_name='timeline', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def getUserTimeline(context, request):
+    """
+         /people/{username}/timeline
 
-    if query_items:
-        query = {'$or': query_items}
-        query['verb'] = 'post'
-        # Include only visible activity, this includes activity with visible=True
-        # and activity WITHOUT the visible field
-        query['visible'] = {'$ne': False}
+         Retorna totes les activitats d'un usuari
+    """
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
 
+    query = timelineQuery(mmdb, actor)
+
+    if query:
         sortBy_fields = {
             'activities': '_id',
             'comments': 'commented',
