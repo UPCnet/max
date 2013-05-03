@@ -16,6 +16,8 @@ from pyramid_beaker import set_cache_regions_from_settings
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
+LAST_AUTHORS_LIMIT = 8
+AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
 
 
 class RestrictedPredicate(object):

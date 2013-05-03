@@ -6,6 +6,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max.rest.utils import searchParams
+from max import LAST_AUTHORS_LIMIT, AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 
 
 def timelineQuery(mmdb, actor):
@@ -64,4 +65,52 @@ def getUserTimeline(context, request):
         activities = []
 
     handler = JSONResourceRoot(activities)
+    return handler.buildResponse()
+
+
+@view_config(route_name='timeline_authors', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def getUserTimelineAuthors(context, request):
+    """
+         /people/{username}/timeline/authors
+
+         Retorna totes els 8 ultims autors d'un timeline
+    """
+    # Get the author limit from the request or set a default
+    author_limit = request.params.get('limit', LAST_AUTHORS_LIMIT)
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
+
+    query = timelineQuery(mmdb, actor)
+
+    sortBy_fields = {
+        'activities': '_id',
+        'comments': 'commented',
+    }
+    sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
+
+    still_has_activities = True
+    distinct_authors = []
+    activities = []
+    before = None
+    queries = 0
+
+    search_params = searchParams(request)
+    while len(distinct_authors) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
+        if not activities:
+            if before is not None:
+                search_params['before'] = before
+            activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
+            queries += 1
+            print len(activities)
+            still_has_activities = len(activities) > 0
+        if still_has_activities:
+            activity = activities.pop(0)
+            before = activity._id
+            if activity.actor not in distinct_authors and activity.actor['username'] != actor.username:
+                distinct_authors.append(activity.actor)
+
+    handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()
