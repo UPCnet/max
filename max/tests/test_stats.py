@@ -46,6 +46,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_user_activities_stats_context_only(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+
+        for i in range(11):
+            self.create_activity(username, user_status)
+
+        from .mockers import user_status_context
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        from hashlib import sha1
+
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+
+        res = self.testapp.head('/people/%s/activities?context=%s' % (username, url_hash), oauth2Header(username), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '1')
+
     def test_timeline_authors(self):
         """
             As a plain user
@@ -70,7 +92,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             for count in range(2):
                 self.create_activity('user-{}'.format(usern), user_status_context)
 
-        res = self.testapp.get('/people/user-0/timeline/authors', '', oauth2Header('user-0'), status=200)
+        res = self.testapp.get('/people/{}/timeline/authors'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(res.json['totalItems'], 8)
         self.assertEqual(res.json['items'][0]['username'], 'user-1')
         self.assertEqual(res.json['items'][7]['username'], 'user-8')

@@ -27,6 +27,10 @@ def getUserActivities(context, request):
     query = {}
     query['actor.username'] = request.actor['username']
     query['verb'] = 'post'
+    chash = request.params.get('context', None)
+    if chash:
+        query['contexts.hash'] = chash
+
     is_head = request.method == 'HEAD'
     activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, flatten=1, count=is_head, **searchParams(request))
 
