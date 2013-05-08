@@ -46,6 +46,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_user_activities_stats_without_activity(self):
+        username = 'messi'
+        self.create_user(username)
+
+        res = self.testapp.get('/people/%s/activities' % username, '', oauth2Header(username), status=200)
+        self.assertEqual(res.json.get('totalItems'), 0)
+        res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '0')
+
     def test_user_activities_stats_context_only(self):
         from .mockers import user_status
         username = 'messi'

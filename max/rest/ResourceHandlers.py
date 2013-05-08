@@ -48,15 +48,16 @@ class JSONResourceRoot(ResourceRoot):
             Translate to JSON object if any data. If data is not a list
             something went wrong
         """
-        if self.data:
-            if isinstance(self.data, list):
-                response_payload = json.dumps(self.wrap())
-            elif self.stats and isinstance(self.data, int):
+
+        if self.stats:
+            if isinstance(self.data, int):
                 response_payload = ''
                 self.headers['X-totalItems'] = str(self.data)
             else:
-                return HTTPInternalServerError('Invalid JSON output')
+                return HTTPInternalServerError('Invalid integer value')
         else:
+            if not isinstance(self.data, list):
+                return HTTPInternalServerError('Invalid JSON output')
             response_payload = json.dumps(self.wrap())
 
         return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
