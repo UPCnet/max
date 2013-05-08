@@ -102,7 +102,6 @@ def main(argv=sys.argv):
     undocumented = []
 
     total_functions = 0
-    import ipdb;ipdb.set_trace()
     # Walk trough code looking for view declarations
     # and collect which methods are implemented for each route
     gitdir = git.bake('--git-dir', '{}/.git'.format(re.sub(r'(.*?)/max$', r'\1', max.__path__[0])))
