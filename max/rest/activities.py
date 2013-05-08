@@ -112,6 +112,8 @@ def getActivities(context, request):
         public_query = {'contexts.url': {'$in': public}}
         contexts_query.append(public_query)                        # pubic contexts
 
+    is_head = request.method == 'HEAD'
+
     if contexts_query:
         query.update({'$or': contexts_query})
 
@@ -120,14 +122,15 @@ def getActivities(context, request):
             'comments': 'commented',
         }
         sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
+
+        activities = mmdb.activity.search(query, count=is_head, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
     else:
         # we have no public contexts and we are not subscribed to any context, so we
         # won't get anything
         activities = []
 
     # pass the read context as a extension to the resource
-    handler = JSONResourceRoot(activities, extension=dict(context=rcontext.flatten()))
+    handler = JSONResourceRoot(activities, extension=dict(context=rcontext.flatten()), stats=is_head)
     return handler.buildResponse()
 
 
