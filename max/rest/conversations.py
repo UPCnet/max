@@ -28,7 +28,7 @@ def getConversations(context, request):
              'objectType': 'conversation',
              }
 
-    conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=False)
+    conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=True)
     for conversation in conversations:
         query = {'objectType': 'message',
                  'contexts.id': conversation['id']

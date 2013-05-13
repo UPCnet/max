@@ -140,9 +140,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context, create_contextA, create_contextB
         from .mockers import context_search_by_tags
 
-        self.create_context(create_context)
-        self.create_context(create_contextA)
-        self.create_context(create_contextB)
+        self.create_context(create_context)   # Tagged "Assignatura"
+        self.create_context(create_contextA)  # Tagged "Assignatura"
+        self.create_context(create_contextB)  # Not tagged
         res = self.testapp.get('/contexts?tags', context_search_by_tags, oauth2Header(test_manager), status=200)
-        self.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(res.json['totalItems'], 2)
 
+    def test_public_contexts_search_with_tags(self):
+        """
+            Given a plain user
+            When I search for public contexts with a tag
+            Then I get the ones with that tag
+        """
+        from .mockers import create_context, create_contextA, create_contextB
+        from .mockers import context_search_by_tags
+
+        username = 'messi'
+        self.create_user(username)
+
+        self.create_context(create_context)
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='subscribed'))
+        self.create_context(create_contextB)
+        res = self.testapp.get('/contexts/public?tags', context_search_by_tags, oauth2Header(username), status=200)
+        self.assertEqual(res.json['totalItems'], 1)

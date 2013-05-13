@@ -22,7 +22,7 @@ requires = [
     'Paste'
     ]
 
-test_requires = ['WebTest', 'mock', 'beaker']
+test_requires = ['WebTest', 'mock']
 script_requires = ['prettytable', 'sh']
 
 setup(name='max',
@@ -46,7 +46,7 @@ setup(name='max',
       tests_require=requires + test_requires,
       test_suite="max.tests",
       extras_require={
-        'test': ['WebTest', 'mock', 'HTTPretty', 'manuel']
+        'test': ['WebTest', 'mock', 'HTTPretty', 'manuel', 'pyramid-beaker']
       },
       entry_points="""\
       [paste.app_factory]

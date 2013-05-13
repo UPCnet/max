@@ -26,7 +26,7 @@ def getPublicContexts(context, request):
         Return a list of public-subscribable contexts
     """
     mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, flatten=1)
+    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, flatten=1, **searchParams(request))
 
     handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
@@ -74,7 +74,6 @@ def getContextAuthors(context, request):
             if before is not None:
                 search_params['before'] = before
             activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
-            print len(activities)
             still_has_activities = len(activities) > 0
         if still_has_activities:
             activity = activities.pop(0)

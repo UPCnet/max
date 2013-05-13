@@ -104,7 +104,6 @@ def getUserTimelineAuthors(context, request):
                 search_params['before'] = before
             activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
             queries += 1
-            print len(activities)
             still_has_activities = len(activities) > 0
         if still_has_activities:
             activity = activities.pop(0)

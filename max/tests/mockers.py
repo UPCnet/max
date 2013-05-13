@@ -130,7 +130,8 @@ create_context_private_r = {
 
 create_contextA = {
     'url': 'http://atenea.upc.edu/A',
-    'displayName': 'Atenea A'
+    'displayName': 'Atenea A',
+    'tags': ['Assignatura']
 }
 
 create_contextB = {
