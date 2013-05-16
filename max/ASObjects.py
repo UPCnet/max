@@ -58,7 +58,7 @@ class Comment(ASObject):
     data = {}
     objectType = 'Comment'
     schema = {'_id':         dict(),
-              'content':     dict(required=1),
+              'content':     dict(required=1, formatters=['stripHTMLTags']),
               'objectType':  dict(required=1),
               'inReplyTo':   dict(required=1),
               '_hashtags':     dict(),
