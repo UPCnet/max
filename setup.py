@@ -19,7 +19,8 @@ requires = [
     'celery',
     'beaker',
     'waitress',
-    'Paste'
+    'Paste',
+    'bleach'
     ]
 
 test_requires = ['WebTest', 'mock']

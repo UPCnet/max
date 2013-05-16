@@ -31,7 +31,7 @@ class Note(ASObject):
     data = {}
     objectType = 'Note'
     schema = {'_id':           dict(),
-              'content':       dict(required=1),
+              'content':       dict(required=1, formatters=['stripHTMLTags']),
               'objectType':    dict(required=1),
               '_hashtags':     dict(),
               '_keywords':     dict(),
