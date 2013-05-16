@@ -294,7 +294,7 @@ llistar-les com crear-ne de noves.
         ``objectType`` el tipus ``uri`` i les dades del context com a l'exemple.
     :query object: (Requerit) Per ara només suportat el tipus ``objectType``
         *note*. Ha de contindre les claus ``objectType`` i ``content`` el qual
-        pot tractar-se d'un camp codificat amb HTML.
+        pot tractar-se d'un camp codificat amb HTML, amb tags restringits.
 
     **Exemple de petició**
 
@@ -303,7 +303,7 @@ llistar-les com crear-ne de noves.
             {
                 "object": {
                     "objectType": "note",
-                    "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+                    "content": "<p[A] Testejant la creació d'un canvi d'estatus</p>"
                 }
             }
 
