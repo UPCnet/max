@@ -108,7 +108,7 @@ def getUserTimelineAuthors(context, request):
         if still_has_activities:
             activity = activities.pop(0)
             before = activity._id
-            if activity.actor not in distinct_authors and activity.actor['username'] != actor.username:
+            if activity.actor not in distinct_authors:
                 distinct_authors.append(activity.actor)
 
     handler = JSONResourceRoot(distinct_authors)

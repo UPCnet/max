@@ -125,8 +125,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/{}/timeline/authors'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(res.json['totalItems'], 8)
-        self.assertEqual(res.json['items'][0]['username'], 'user-1')
-        self.assertEqual(res.json['items'][7]['username'], 'user-8')
+        self.assertEqual(res.json['items'][0]['username'], 'user-0')
+        self.assertEqual(res.json['items'][7]['username'], 'user-7')
 
     def test_context_authors(self):
         """
