@@ -45,7 +45,7 @@ def oauth2(allowed_scopes=[]):
             valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope)
 
             # FOR DEBUGGING, oauth passtrough
-            valid = True
+            #valid = True
             if valid:
 
                 def getCreator(request):
