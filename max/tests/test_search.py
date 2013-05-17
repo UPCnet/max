@@ -47,14 +47,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        res = self.create_activity(username, user_status_context)
-        activity = json.loads(res.text)
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        res = self.testapp.get('/activities/%s' % str(activity.get('id')), json.dumps({}), oauth2Header(username), status=200)
-        result = json.loads(res.text)
-
-        expected_keywords = [u'comentari', u'messi', u'creaci\xf3', u'testejant', u'canvi', u'una', u'nou', u'activitat']
-        self.assertListEqual(result['object']['keywords'], expected_keywords)
+        activity = self.create_activity(username, user_status_context).json
+        res = self.testapp.post('/activities/%s/comments' % str(activity['id']), json.dumps(user_comment), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/%s' % str(activity['id']), json.dumps({}), oauth2Header(username), status=200)
+        expected_keywords = [u'comentari', u'estatus', u'messi', u'creaci\xf3', u'testejant', u'canvi', u'una', u'nou', u'activitat']
+        self.assertListEqual(res.json['object']['keywords'], expected_keywords)
 
     def test_activities_hashtag_generation(self):
         """

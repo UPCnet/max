@@ -304,6 +304,19 @@ message = {
     }
 }
 
+
+message_with_tags = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>A <strong>text</strong> A</p>",
+    }
+}
+
 message_s = {
     "contexts": [
         {"objectType": "conversation",

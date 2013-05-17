@@ -41,32 +41,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ doctest .. http:post:: /people/{username}/activities """
         from .mockers import user_status
         username = 'messi'
-        activity = dict(user_status)  # Make a copy
-        activity['object']['content'] = '<p>A <strong>text</strong> A</p>'
         self.create_user(username)
-        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
-        self.assertEqual(res.json['object']['content'], 'A <strong>text</strong> A')
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(user_status), oauth2Header(username), status=201)
+        self.assertEqual(res.json['object']['content'], "[A] Testejant la creació d'un canvi d'estatus")
 
     def test_post_comment_strip_tags(self):
         """ doctest .. http:post:: /activities/{activity}/comments """
         from .mockers import user_status, user_comment
         from .mockers import subscribe_context, create_context
         username = 'messi'
-        comment = dict(user_comment)  # Make a copy
-        comment['object']['content'] = '<p>A <strong>text</strong> A</p>'
         self.create_user(username)
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         activity = self.create_activity(username, user_status)
         activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(comment), oauth2Header(username), status=201)
-        self.assertEqual(res.json['object']['content'], 'A <strong>text</strong> A')
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+        self.assertEqual(res.json['object']['content'], "[C] Testejant un comentari nou a una activitat")
 
     def test_post_message_to_conversation_strip_tags(self):
         """ doctest .. http:post:: /conversations """
-        from .mockers import message
-        message_with_tags = dict(message)
-        message_with_tags['object']['content'] = '<p>A <strong>text</strong> A</p>'
+        from .mockers import message_with_tags
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
