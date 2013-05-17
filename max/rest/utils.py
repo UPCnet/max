@@ -17,7 +17,7 @@ UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
 FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\w\-\_\.%s]+)' % UNICODE_ACCEPTED_CHARS
-FIND_KEYWORDS_REGEX = r'(\s|^)[#\'\"]?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
+FIND_KEYWORDS_REGEX = r'(\s|^)(?:#|\'|\"|\w\')?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
 
 
 def getMaxModelByObjectType(objectType):
