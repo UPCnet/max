@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+3.1 (unreleased)
+---------------
+
+ * Delete activities
+ * DELETE and PUT requests tunneling
+ * Timeline and contexts authors list
+ * HEAD requests include totalItems count
+ * Strip tags from content
+ * Public contexts search with tags
+ * Add beaker cache to oauth requests
+ * BUGFIX: Rollback on failed conversation creation
+ * Catch exceptions in a log with a bigmax permalink
+ * Documentation report system an rebuilder
+ * Group conversations
+ * Automatically map model classes to collections
+
 3.0 (2013-04-15)
 ----------------
 
