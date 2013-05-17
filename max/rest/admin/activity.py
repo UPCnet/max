@@ -91,7 +91,7 @@ def deleteActivity(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    activityid = request.matchdict.get('id', None)
+    activityid = request.matchdict.get('activity', None)
     try:
         found_activity = mmdb.activity[activityid]
     except:

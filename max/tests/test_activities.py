@@ -55,6 +55,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['actor']['username'], res.json['creator'])
         self.assertEqual(res.json['owner'], res.json['creator'])
 
+    def test_delete_own_activity(self):
+        """
+            Given a plain user
+            When I post an activity
+            Then I can delete my activity
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=204)
+
+    def test_delete_other_activity(self):
+        """
+            Given a plain user
+            When someone else posts an activity
+            Then I can't delete his activity
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.create_user(username2)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username2), status=401)
+
     def test_create_activity_check_impersonated_ownership(self):
         """
             Given a admin user

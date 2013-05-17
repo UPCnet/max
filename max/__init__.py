@@ -49,7 +49,7 @@ def main(global_config, **settings):
     # App config
     config = Configurator(settings=settings,
                           root_factory=Root)
-
+    config.add_tween('max.tweens.post_tunneling_factory')
     config.add_route('wadl', '/WADL')
 
     # Store in registry

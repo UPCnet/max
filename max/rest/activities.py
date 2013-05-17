@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
 
 from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
-from max.exceptions import MissingField, ObjectNotFound
+from max.exceptions import MissingField, ObjectNotFound, Unauthorized
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
@@ -154,10 +154,26 @@ def getActivity(context, request):
 
 
 @view_config(route_name='activity', request_method='DELETE')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
 def deleteActivity(context, request):
     """
     """
-    return HTTPNotImplemented()
+    mmdb = MADMaxDB(context.db)
+    activityid = request.matchdict.get('activity', None)
+    try:
+        found_activity = mmdb.activity[activityid]
+    except:
+        raise ObjectNotFound("There's no activity with id: %s" % activityid)
+
+    # Only the owner can delete the activity
+    if request.actor.username == found_activity._owner:
+        found_activity.delete()
+    else:
+        raise Unauthorized("You're not the owner of this activity, so tou can't delete it")
+
+    return HTTPNoContent()
 
 
 @view_config(route_name='activity', request_method='PUT')
