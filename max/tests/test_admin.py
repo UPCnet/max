@@ -87,6 +87,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('totalItems', None), 1)
         self.assertEqual(result.get('items', None)[0].get('roles', None).get('Manager')[0], 'test_manager')
 
+    def test_get_other_activities(self):
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_user(test_manager)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.testapp.get('/people/%s/activities' % (username), '', oauth2Header(test_manager), status=200)
+
+
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
     #     from hashlib import sha1
