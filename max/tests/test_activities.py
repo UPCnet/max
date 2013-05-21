@@ -211,7 +211,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username_not_me, user_status_context)
-        res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertIn('context', result)
         self.assertEqual(result.get('totalItems', None), 2)
@@ -236,7 +236,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
-        res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         self.assertEqual(res.json.get('totalItems', None), 1)
         self.assertNotIn('_keywords', res.json['items'][0]['object'])
 
@@ -270,7 +270,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         sleep(1)
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
-        res = self.testapp.get('/activities?sortBy=activities', context_query, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
         self.assertEqual(res.json.get('totalItems', None), 3)
         self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_2_id)
         self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_1_id)
@@ -302,7 +302,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username_not_me, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextB)
 
-        res = self.testapp.get('/activities', context_query, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
@@ -312,7 +312,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
-        res = self.testapp.get('/activities', context_query, oauth2Header(username_not_me), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username_not_me), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 3)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')

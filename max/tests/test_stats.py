@@ -93,10 +93,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         for i in range(11):
             self.create_activity(username, user_status_context)
 
-        res = self.testapp.get('/activities?context=%s' % (url_hash), '', oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (url_hash), '', oauth2Header(username), status=200)
         self.assertEqual(res.json.get('totalItems'), 10)
 
-        res = self.testapp.head('/activities?context=%s' % (url_hash), oauth2Header(username), status=200)
+        res = self.testapp.head('/contexts/%s/activities' % (url_hash), oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
     def test_timeline_authors(self):

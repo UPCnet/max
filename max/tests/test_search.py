@@ -76,6 +76,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_context_activities_keyword_search(self):
         """
         """
+        from .mockers import context_query
         from .mockers import context_query_kw_search
         from .mockers import create_context
         from .mockers import subscribe_context, user_status_context
@@ -86,14 +87,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
-        res = self.testapp.get('/activities', context_query_kw_search, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), context_query_kw_search, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 1)
 
     def test_context_activities_actor_search(self):
         """
         """
-        from .mockers import context_query_actor_search
+        from .mockers import context_query
         from .mockers import create_context
         from .mockers import subscribe_context, user_status_context
 
@@ -108,7 +109,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status_context)
         self.create_activity(username2, user_status_context)
 
-        res = self.testapp.get('/activities', context_query_actor_search, oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities?actor=%s' % (context_query['context'], username), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('totalItems', None), 2)
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')

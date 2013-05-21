@@ -64,20 +64,17 @@ def addUserActivity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='activities', request_method='GET')
+@view_config(route_name='context_activities', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
 def getActivities(context, request):
     """
-         /activities
+         /context/{hash}/activities
 
          Return all activities, filtered by context.
     """
-    chash = request.params.get('context', None)
-    if not chash:
-        raise MissingField('You have to specify one context')
-
+    chash = request.matchdict.get('hash', None)
     mmdb = MADMaxDB(context.db)
 
     # subscribed Uri contexts with read permission
