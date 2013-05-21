@@ -111,6 +111,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.head('/activities', oauth2Header(test_manager), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_global_comments_stats(self):
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        self.create_user(test_manager)
+        self.create_user(username)
+
+        for i in range(11):
+            res = self.create_activity(username, user_status)
+            self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities', '', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json.get('totalItems'), 10)
+        res = self.testapp.head('/activities/comments', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
+
     def test_timeline_authors(self):
         """
             As a plain user

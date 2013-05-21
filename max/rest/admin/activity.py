@@ -81,7 +81,7 @@ def getActivities(context, request):
     """
     mmdb = MADMaxDB(context.db)
     is_head = request.method == 'HEAD'
-    activities = mmdb.activity.dump(flatten=1, count=is_head, **searchParams(request))
+    activities = mmdb.activity.search({'verb': 'post'}, flatten=1, count=is_head, **searchParams(request))
     handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()
 

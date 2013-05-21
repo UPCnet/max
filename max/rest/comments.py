@@ -21,7 +21,7 @@ def getUserComments(context, request):
     return HTTPNotImplemented()
 
 
-@view_config(route_name='comments', request_method='GET')
+@view_config(route_name='activity_comments', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
@@ -48,7 +48,7 @@ def getActivityComments(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='comments', request_method='POST')
+@view_config(route_name='activity_comments', request_method='POST')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
