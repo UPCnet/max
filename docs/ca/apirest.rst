@@ -571,7 +571,7 @@ l'usuari ha estat previament subscrit a aquest context.
                 {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
 
-Activitats globals
+Activitats d'un contexte
 ------------------
 
 Torna el conjunt d'activitats generades pels usuaris del sistema a un context.
@@ -580,17 +580,14 @@ context requerit, de lo contrari se li denegarà l'accés. Típicament s'utilitz
 per recuperar totes les activitats que els usuaris han associat a un context
 concret.
 
-.. http:get:: /activities
+.. http:get:: /contexts/{hash}/activities
 
     Llistat de totes les activitats del sistema, filtrada sota algun criteri
 
-    :query context: (Requerit) El hash (sha1) de la URL del context
+    :query hash: (REST) El hash (sha1) de la URL del context
     :query sortBy: (Opcional) Tipus d'ordenació que s'aplicarà als resultats. Per defecte és
         ``activities``, i te en compte la data de publicació de l'activitat. L'altre valor
         possible és ``comments`` i ordena per la data de l'últim comentari a l'activitat.
-
-
-    **Exemple de petició**
 
         .. code-block:: python
 
@@ -660,7 +657,7 @@ concret.
 
         .. -> expected
             >>> expected = json.loads(expected)
-            >>> response = testapp.get('/activities', eval(payload), oauth2Header(username), status=200)
+            >>> response = testapp.get('/contexts/%s/activities'% (eval(payload)['context']), '', oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
             >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
