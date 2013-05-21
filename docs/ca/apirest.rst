@@ -80,7 +80,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "items": [
                     {
                         "username": "messi",
-                        "id": "5166934cfcfff2507e79a4ab"
+                        "id": "519b00000000000000000000"
                     }
                 ]
             }
@@ -146,11 +146,11 @@ Operacions sobre el recurs *usuari* del sistema.
                             ],
                             "url": "http://atenea.upc.edu",
                             "creator": "test_manager",
-                            "published": "2013-04-11T10:41:16Z",
+                            "published": "2000-01-01T00:01:00Z",
                             "owner": "test_manager",
                             "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "objectType": "context",
-                            "id": "5166934cfcfff2507e79a4ac",
+                            "id": "519b00000000000000000000",
                             "permissions": [
                                 "read",
                                 "write",
@@ -160,11 +160,11 @@ Operacions sobre el recurs *usuari* del sistema.
                         }
                     ]
                 },
-                "last_login": "2013-04-11T10:41:16Z",
-                "published": "2013-04-11T10:41:16Z",
+                "last_login": "2000-01-01T00:01:00Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "5166934cfcfff2507e79a4ab",
+                "id": "519b00000000000000000000",
                 "objectType": "person"
             }
 
@@ -224,7 +224,7 @@ Operacions sobre el recurs *usuari* del sistema.
                             "tags": [
                                 "Assignatura"
                             ],
-                            "published": "2013-04-11T10:41:16Z",
+                            "published": "2000-01-01T00:01:00Z",
                             "owner": "test_manager",
                             "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "permissions": [
@@ -233,16 +233,16 @@ Operacions sobre el recurs *usuari* del sistema.
                                 "invite",
                                 "unsubscribe"
                             ],
-                            "id": "5166934cfcfff2507e79a4ac",
+                            "id": "519b00000000000000000000",
                             "objectType": "context"
                         }
                     ]
                 },
-                "last_login": "2013-04-11T10:41:16Z",
-                "published": "2013-04-11T10:41:16Z",
+                "last_login": "2000-01-01T00:01:00Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "twitterUsername": "messi10oficial",
-                "id": "5166934cfcfff2507e79a4ab",
+                "id": "519b00000000000000000000",
                 "objectType": "person"
             }
 
@@ -321,13 +321,8 @@ llistar-les com crear-ne de noves.
                     "items": []
                 },
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
-                    "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
-                        "messi"
-                    ],
+                    "content": "",
+                    "keywords": [],
                     "objectType": "note"
                 },
                 "actor": {
@@ -335,11 +330,11 @@ llistar-les com crear-ne de noves.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4af",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -422,11 +417,12 @@ l'usuari ha estat previament subscrit a aquest context.
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "keywords": [
                         "testejant",
                         "creaci\u00f3",
                         "canvi",
+                        "estatus",
                         "context",
                         "messi"
                     ],
@@ -441,11 +437,11 @@ l'usuari ha estat previament subscrit a aquest context.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4b0",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -492,7 +488,7 @@ l'usuari ha estat previament subscrit a aquest context.
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                             "objectType": "note"
                         },
                         "replies": {
@@ -504,10 +500,10 @@ l'usuari ha estat previament subscrit a aquest context.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4b0",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     },
                     {
@@ -517,7 +513,7 @@ l'usuari ha estat previament subscrit a aquest context.
                             "items": []
                         },
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                            "content": "",
                             "objectType": "note"
                         },
                         "actor": {
@@ -525,10 +521,10 @@ l'usuari ha estat previament subscrit a aquest context.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4af",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     }
                 ]
@@ -615,7 +611,7 @@ concret.
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                             "objectType": "note"
                         },
                         "replies": {
@@ -627,10 +623,10 @@ concret.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4b0",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     }
                 ],
@@ -641,11 +637,11 @@ concret.
                     "tags": [
                         "Assignatura"
                     ],
-                    "published": "2013-04-11T10:41:16Z",
+                    "published": "2000-01-01T00:01:00Z",
                     "owner": "test_manager",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "objectType": "context",
-                    "id": "5166934cfcfff2507e79a4ac",
+                    "id": "519b00000000000000000000",
                     "permissions": {
                         "write": "public",
                         "subscribe": "public",
@@ -700,6 +696,7 @@ indirectament.
                 "items": [
                     {
                         "generator": null,
+                        "creator": "messi",
                         "contexts": [
                             {
                                 "displayName": "Atenea",
@@ -711,7 +708,15 @@ indirectament.
                             }
                         ],
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                            "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
+                            "keywords": [
+                                "testejant",
+                                "creaci\u00f3",
+                                "canvi",
+                                "estatus",
+                                "context",
+                                "messi"
+                            ],
                             "objectType": "note"
                         },
                         "replies": {
@@ -723,20 +728,23 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4b0",
+                        "commented": "2000-01-01T00:01:00Z",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "owner": "messi",
+                        "id": "519b00000000000000000000",
                         "objectType": "activity"
                     },
                     {
                         "generator": null,
+                        "creator": "messi",
                         "replies": {
                             "totalItems": 0,
                             "items": []
                         },
                         "object": {
-                            "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus</p>",
+                            "content": "",
+                            "keywords": [],
                             "objectType": "note"
                         },
                         "actor": {
@@ -744,10 +752,11 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4af",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "owner": "messi",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     }
                 ]
@@ -810,10 +819,10 @@ Representa el conjunt de comentaris fets a una activitat.
                     "items": []
                 },
                 "object": {
-                    "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                    "content": "[C] Testejant un comentari nou a una activitat",
                     "inReplyTo": [
                         {
-                            "id": "5166934cfcfff2507e79a4b1",
+                            "id": "519b00000000000000000000",
                             "objectType": "note"
                         }
                     ],
@@ -832,11 +841,11 @@ Representa el conjunt de comentaris fets a una activitat.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "comment",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4b2",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -874,9 +883,9 @@ Representa el conjunt de comentaris fets a una activitat.
                 "totalItems": 1,
                 "items": [
                     {
-                        "content": "<p>[C] Testejant un comentari nou a una activitat</p>",
+                        "content": "[C] Testejant un comentari nou a una activitat",
                         "objectType": "comment",
-                        "id": "5166934cfcfff2507e79a4b2",
+                        "id": "519b00000000000000000000",
                         "actor": {
                             "username": "messi",
                             "displayName": "Lionel Messi",
@@ -886,7 +895,7 @@ Representa el conjunt de comentaris fets a una activitat.
                             },
                             "objectType": "person"
                         },
-                        "published": "2013-04-11T10:41:16Z"
+                        "published": "2000-01-01T00:01:00Z"
                     }
                 ]
             }
@@ -932,11 +941,11 @@ Subscripcions
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
-                        "id": "5166934cfcfff2507e79a4ac",
+                        "id": "519b00000000000000000000",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -948,12 +957,14 @@ Subscripcions
                         "displayName": "Atenea A",
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu/A",
-                        "tags": [],
-                        "published": "2013-04-11T10:41:16Z",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "5166934cfcfff2507e79a4ad",
+                        "id": "519b00000000000000000000",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -1023,11 +1034,11 @@ Subscripcions
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "subscribe",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4b3",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -1079,7 +1090,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "permissions": [
@@ -1088,19 +1099,21 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                             "invite",
                             "unsubscribe"
                         ],
-                        "id": "5166934cfcfff2507e79a4ac",
+                        "id": "519b00000000000000000000",
                         "objectType": "context"
                     },
                     {
                         "displayName": "Atenea A",
-                        "tags": [],
+                        "tags": [
+                            "Assignatura"
+                        ],
                         "url": "http://atenea.upc.edu/A",
                         "creator": "test_manager",
-                        "published": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "5166934cfcfff2507e79a4ad",
+                        "id": "519b00000000000000000000",
                         "permissions": [
                             "read",
                             "write",
@@ -1225,7 +1238,7 @@ Aquests són els serveis associats.
                             "xavi"
                         ],
                         "owner": "messi",
-                        "id": "5166934cfcfff2507e79a4b7",
+                        "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
                 ],
@@ -1251,11 +1264,11 @@ Aquests són els serveis associats.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4ba",
+                "id": "519b00000000000000000000",
                 "objectType": "message"
             }
 
@@ -1305,7 +1318,7 @@ Aquests són els serveis associats.
                                     "xavi"
                                 ],
                                 "owner": "messi",
-                                "id": "5166934cfcfff2507e79a4b7",
+                                "id": "519b00000000000000000000",
                                 "objectType": "conversation"
                             }
                         ],
@@ -1322,10 +1335,10 @@ Aquests són els serveis associats.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "id": "5166934cfcfff2507e79a4ba",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
-                        "published": "2013-04-11T10:41:16Z",
-                        "commented": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "message"
                     }
                 ]
@@ -1362,6 +1375,7 @@ Aquests són els serveis associats.
                 "items": [
                     {
                         "displayName": "messi, xavi",
+                        "creator": "messi",
                         "messages": 1,
                         "participants": [
                             "messi",
@@ -1369,9 +1383,10 @@ Aquests són els serveis associats.
                         ],
                         "lastMessage": {
                             "content": "Nos espera una gran temporada, no es cierto?",
-                            "published": "2013-04-11T10:41:16Z"
+                            "published": "2000-01-01T00:01:00Z"
                         },
-                        "published": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
+                        "owner": "messi",
                         "permissions": {
                             "read": "subscribed",
                             "write": "subscribed",
@@ -1379,7 +1394,7 @@ Aquests són els serveis associats.
                             "invite": "restricted",
                             "subscribe": "restricted"
                         },
-                        "id": "5166934cfcfff2507e79a4b7",
+                        "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
                 ]
@@ -1420,7 +1435,7 @@ Aquests són els serveis associats.
                     "messi",
                     "xavi"
                 ],
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
                 "permissions": {
                     "read": "subscribed",
@@ -1429,7 +1444,7 @@ Aquests són els serveis associats.
                     "invite": "restricted",
                     "subscribe": "restricted"
                 },
-                "id": "5166934cfcfff2507e79a4b7",
+                "id": "519b00000000000000000000",
                 "objectType": "conversation"
             }
 
@@ -1475,7 +1490,7 @@ Aquests són els serveis associats.
                     "messi",
                     "xavi"
                 ],
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
                 "permissions": {
                     "read": "subscribed",
@@ -1484,7 +1499,7 @@ Aquests són els serveis associats.
                     "invite": "restricted",
                     "subscribe": "restricted"
                 },
-                "id": "5166934cfcfff2507e79a4b7",
+                "id": "519b00000000000000000000",
                 "objectType": "conversation"
             }
 
@@ -1539,13 +1554,14 @@ Aquests són els serveis associats.
                             "xavi"
                         ],
                         "owner": "messi",
-                        "id": "5166934cfcfff2507e79a4b7",
+                        "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
                 ],
                 "object": {
                     "content": "M'agrada Taradell!",
                     "keywords": [
+                        "agrada",
                         "taradell",
                         "messi"
                     ],
@@ -1560,11 +1576,11 @@ Aquests són els serveis associats.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934cfcfff2507e79a4bb",
+                "id": "519b00000000000000000000",
                 "objectType": "message"
             }
 
@@ -1613,7 +1629,7 @@ Aquests són els serveis associats.
                         "xavi",
                         "nouusuari"
                     ],
-                    "id": "5166934cfcfff2507e79a4b7",
+                    "id": "519b00000000000000000000",
                     "objectType": "conversation"
                 },
                 "actor": {
@@ -1621,11 +1637,11 @@ Aquests són els serveis associats.
                     "displayName": "nouusuari",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:16Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "subscribe",
-                "published": "2013-04-11T10:41:16Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "nouusuari",
-                "id": "5166934cfcfff2507e79a4bd",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -1716,11 +1732,11 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-11T10:41:16Z",
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
-                        "id": "5166934cfcfff2507e79a4ac",
+                        "id": "519b00000000000000000000",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",
@@ -1732,12 +1748,14 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "displayName": "Atenea A",
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu/A",
-                        "tags": [],
-                        "published": "2013-04-11T10:41:16Z",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "5166934cfcfff2507e79a4ad",
+                        "id": "519b00000000000000000000",
                         "permissions": {
                             "write": "public",
                             "subscribe": "public",

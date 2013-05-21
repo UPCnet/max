@@ -47,7 +47,21 @@ for filename in files:
         newapirest += current_block[:last_codeblock]
 
         # Insert new json from previously parsed items
-        newapirest += '\n{}\n'.format(padded[pos])
+        newjson = padded[pos]
+
+        # Replace all the key:value pairs with id's and dates with defaults to make diffs cleaner
+        def replace(matchobj):
+            replacements = {
+                'id': '519b00000000000000000000',
+                'commented': '2000-01-01T00:01:00Z',
+                'published': '2000-01-01T00:01:00Z',
+                'last_login': '2000-01-01T00:01:00Z',
+            }
+            return '"{}": "{}"'.format(matchobj.groups()[0], replacements[matchobj.groups()[0]])
+
+        cleaned = re.sub(r'[\"\'](id|commented|published|last_login)[\"\']\s*:\s*[\"\'](.*?)[\"\']', replace, newjson)
+        cleaned = re.sub(r'(.*?) *\n', r'\1\n', cleaned)  # Remove trailing spaces
+        newapirest += '\n{}\n'.format(cleaned)
         last = int(expected)
 
     newapirest += apirest[last:]

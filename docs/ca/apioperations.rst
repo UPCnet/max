@@ -57,10 +57,10 @@ Usuaris
                     "totalItems": 0,
                     "items": []
                 },
-                "last_login": "2013-04-11T10:41:17Z",
-                "published": "2013-04-11T10:41:17Z",
+                "last_login": "2000-01-01T00:01:00Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
-                "id": "5166934dfcfff25086305533",
+                "id": "519b00000000000000000000",
                 "objectType": "person"
             }
 
@@ -127,7 +127,7 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "permissions": {
@@ -136,7 +136,7 @@ Contexts
                     "invite": "public",
                     "subscribe": "public"
                 },
-                "id": "5166934dfcfff25086305534",
+                "id": "519b00000000000000000000",
                 "objectType": "context"
             }
 
@@ -185,11 +185,11 @@ Contexts
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2013-04-11T10:41:17Z",
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
-                        "id": "5166934dfcfff25086305534",
+                        "id": "519b00000000000000000000",
                         "permissions": {
                             "read": "public",
                             "write": "public",
@@ -245,11 +245,11 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "objectType": "context",
-                "id": "5166934dfcfff25086305534",
+                "id": "519b00000000000000000000",
                 "permissions": {
                     "read": "public",
                     "write": "public",
@@ -295,7 +295,7 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "permissions": {
@@ -304,7 +304,7 @@ Contexts
                     "invite": "public",
                     "subscribe": "public"
                 },
-                "id": "5166934dfcfff25086305534",
+                "id": "519b00000000000000000000",
                 "objectType": "context"
             }
 
@@ -400,11 +400,11 @@ Subscripcions
                     "displayName": "messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:17Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "subscribe",
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934dfcfff25086305536",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -491,21 +491,23 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "tags": [],
+                "twitterHashtag": "assignatura1",
+                "displayName": "Atenea",
+                "tags": [
+                    "Assignatura"
+                ],
                 "url": "http://atenea.upc.edu",
                 "creator": "test_manager",
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
-                "displayName": "http://atenea.upc.edu",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "objectType": "context",
+                "id": "519b00000000000000000000",
                 "permissions": [
                     "read",
                     "write",
-                    "invite",
                     "unsubscribe"
-                ],
-                "id": "5166934dfcfff25086305535",
-                "objectType": "context"
+                ]
             }
 
         .. -> expected
@@ -538,19 +540,22 @@ s'explica amb profunditat en l'apartat de permisos.
         .. code-block:: python
 
             {
-                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "tags": [],
+                "twitterHashtag": "assignatura1",
+                "displayName": "Atenea",
+                "tags": [
+                    "Assignatura"
+                ],
                 "url": "http://atenea.upc.edu",
                 "creator": "test_manager",
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
-                "displayName": "Atenea",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "objectType": "context",
+                "id": "519b00000000000000000000",
                 "permissions": [
                     "read",
                     "unsubscribe"
-                ],
-                "id": "5166934dfcfff25086305535",
-                "objectType": "context"
+                ]
             }
 
         .. -> expected
@@ -619,20 +624,22 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
+                        "twitterHashtag": "assignatura1",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu",
                         "owner": "test_manager",
-                        "displayName": "http://atenea.upc.edu",
+                        "displayName": "Atenea",
                         "objectType": "context"
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "keywords": [
                         "testejant",
                         "creaci\u00f3",
                         "canvi",
+                        "estatus",
                         "context",
                         "messi"
                     ],
@@ -647,11 +654,11 @@ Activitats
                     "displayName": "messi",
                     "objectType": "person"
                 },
-                "commented": "2013-04-11T10:41:17Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
-                "id": "5166934dfcfff25086305539",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
@@ -710,29 +717,33 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "twitterHashtag": "assignatura1",
+                        "displayName": "Atenea",
                         "creator": "test_manager",
                         "url": "http://atenea.upc.edu",
-                        "tags": [],
-                        "published": "2013-04-11T10:41:17Z",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "published": "2000-01-01T00:01:00Z",
                         "owner": "test_manager",
-                        "displayName": "http://atenea.upc.edu",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "objectType": "context",
+                        "id": "519b00000000000000000000",
                         "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
                             "read": "public",
-                            "invite": "subscribed"
-                        },
-                        "id": "5166934dfcfff25086305535",
-                        "objectType": "context"
+                            "write": "public",
+                            "invite": "public",
+                            "subscribe": "public"
+                        }
                     }
                 ],
                 "object": {
-                    "content": "<p>[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context</p>",
+                    "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "keywords": [
                         "testejant",
                         "creaci\u00f3",
                         "canvi",
+                        "estatus",
                         "context"
                     ],
                     "objectType": "note"
@@ -744,14 +755,14 @@ Activitats
                 "actor": {
                     "url": "http://atenea.upc.edu",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                    "displayName": "http://atenea.upc.edu",
+                    "displayName": "Atenea",
                     "objectType": "uri"
                 },
-                "commented": "2013-04-11T10:41:17Z",
+                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
-                "published": "2013-04-11T10:41:17Z",
+                "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
-                "id": "5166934dfcfff2508630553a",
+                "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
 
