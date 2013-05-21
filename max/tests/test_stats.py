@@ -99,6 +99,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.head('/contexts/%s/activities' % (url_hash), oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_global_activities_stats(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+
+        for i in range(11):
+            self.create_activity(username, user_status)
+        res = self.testapp.get('/activities', '', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json.get('totalItems'), 10)
+        res = self.testapp.head('/activities', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
+
     def test_timeline_authors(self):
         """
             As a plain user

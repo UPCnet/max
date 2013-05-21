@@ -184,12 +184,12 @@ class MADMaxCollection(object):
         else:
             getattr(self, name)
 
-    def dump(self, flatten=0):
+    def dump(self, flatten=0, **kwargs):
         """
             Returns all records of a collection
         """
 
-        return self.search({}, flatten=flatten)
+        return self.search({}, flatten=flatten, **kwargs)
 
     def remove(self, query, logical=False):
         """
