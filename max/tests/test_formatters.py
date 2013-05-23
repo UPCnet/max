@@ -43,7 +43,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(user_status), oauth2Header(username), status=201)
-        self.assertEqual(res.json['object']['content'], "[A] Testejant la creació d'un canvi d'estatus")
+        self.assertEqual(res.json['object']['content'], u"[A] Testejant la creació d'un canvi d'estatus")
 
     def test_post_comment_strip_tags(self):
         """ doctest .. http:post:: /activities/{activity}/comments """
@@ -56,7 +56,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = self.create_activity(username, user_status)
         activity = activity.json
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        self.assertEqual(res.json['object']['content'], "[C] Testejant un comentari nou a una activitat")
+        self.assertEqual(res.json['object']['content'], u"[C] Testejant un comentari nou a una activitat")
 
     def test_post_message_to_conversation_strip_tags(self):
         """ doctest .. http:post:: /conversations """
@@ -67,4 +67,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
 
         res = self.testapp.post('/conversations', json.dumps(message_with_tags), oauth2Header(sender), status=201)
-        self.assertEqual(res.json['object']['content'], 'A <strong>text</strong> A')
+        self.assertEqual(res.json['object']['content'], u'A <strong>text</strong> A')
