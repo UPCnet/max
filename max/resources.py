@@ -32,4 +32,4 @@ def loadMAXSecurity(registry):
     if security_settings:
         return security_settings[0]
     else:
-        maxlogger.info("No security info found. Please run initialization database script.")
+        maxlogger.info("No security info found. Please run initialization database script.")  #pragma: no cover
