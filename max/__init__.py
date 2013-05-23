@@ -13,6 +13,7 @@ from max.resources import Root, loadMAXSettings, loadMAXSecurity
 from max.rest.resources import RESOURCES
 
 from pyramid_beaker import set_cache_regions_from_settings
+from max import debug
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
@@ -49,7 +50,11 @@ def main(global_config, **settings):
     # App config
     config = Configurator(settings=settings,
                           root_factory=Root)
+
     config.add_tween('max.tweens.post_tunneling_factory')
+
+    debug.setup(config, settings)
+
     config.add_route('wadl', '/WADL')
 
     # Store in registry
