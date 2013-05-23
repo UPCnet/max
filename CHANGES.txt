@@ -4,6 +4,7 @@ CHANGELOG
 3.1 (unreleased)
 ---------------
 
+ * Add debug tools
  * Delete activities
  * DELETE and PUT requests tunneling
  * Timeline and contexts authors list
