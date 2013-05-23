@@ -1,3 +1,4 @@
+import os
 from celery.task import task
 from maxrules.twitter import twitter_generator_name, debug_hashtag, max_server_url
 import requests
@@ -11,6 +12,8 @@ import logging
 
 
 logging_file = '/var/pyramid/maxserver/var/log/twitter-processor.log'
+if not os.path.exists(logging_file):
+    logging_file = '/tmp/twitter-processor.log'
 logger = logging.getLogger("tweetprocessor")
 fh = logging.FileHandler(logging_file, encoding="utf-8")
 formatter = logging.Formatter('%(asctime)s %(message)s')

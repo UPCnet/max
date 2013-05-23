@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import os
 import sys
 import optparse
 #from getpass import getpass
@@ -15,7 +15,8 @@ max_server_url = 'https://max.upc.edu'
 twitter_generator_name = 'Twitter'
 debug_hashtag = '#debugmaxupcnet'
 logging_file = '/var/pyramid/maxserver/var/log/twitter-listener.log'
-
+if not os.path.exists(logging_file):
+    logging_file = '/tmp/twitter-listener.log'
 logger = logging.getLogger("tweeterlistener")
 fh = logging.FileHandler(logging_file, encoding="utf-8")
 formatter = logging.Formatter('%(asctime)s %(message)s')
