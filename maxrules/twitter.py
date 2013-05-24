@@ -15,7 +15,7 @@ max_server_url = 'https://max.upc.edu'
 twitter_generator_name = 'Twitter'
 debug_hashtag = 'debugmaxupcnet'
 logging_file = '/var/pyramid/maxserver/var/log/twitter-listener.log'
-if not os.path.exists(logging_file):
+if not os.path.exists(logging_file):  # pragma: no cover
     logging_file = '/tmp/twitter-listener.log'
 logger = logging.getLogger("tweeterlistener")
 fh = logging.FileHandler(logging_file, encoding="utf-8")
@@ -25,13 +25,13 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 
-def main(argv=sys.argv, quiet=False):
+def main(argv=sys.argv, quiet=False):  # pragma: no cover
     # command = MaxTwitterRulesRunnerTest(argv, quiet)
     command = MaxTwitterRulesRunner(argv, quiet)
     return command.run()
 
 
-class StreamWatcherListener(tweepy.StreamListener):
+class StreamWatcherListener(tweepy.StreamListener):  # pragma: no cover
 
     status_wrapper = TextWrapper(width=60, initial_indent='    ', subsequent_indent='    ')
 
@@ -54,7 +54,7 @@ class StreamWatcherListener(tweepy.StreamListener):
         logging.warning('Snoozing Zzzzzz')
 
 
-class MaxTwitterRulesRunner(object):
+class MaxTwitterRulesRunner(object):  # pragma: no cover
     verbosity = 1  # required
     description = "Max rules runner."
     usage = "usage: %prog [options]"
@@ -116,7 +116,7 @@ class MaxTwitterRulesRunner(object):
 
 
 # For testing purposes only
-class MaxTwitterRulesRunnerTest(object):
+class MaxTwitterRulesRunnerTest(object):  # pragma: no cover
     verbosity = 1  # required
     description = "Max rules runner."
     usage = "usage: %prog [options]"
@@ -156,7 +156,7 @@ class MaxTwitterRulesRunnerTest(object):
             time.sleep(2)
             processTweet('maxupcnet', u'Twitejant amb el hashtag #upc #gsxf')
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         main()
     except KeyboardInterrupt:
