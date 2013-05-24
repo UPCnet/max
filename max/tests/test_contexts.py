@@ -13,7 +13,7 @@ from max.tests import test_manager, test_default_security
 class mock_post(object):
 
     def __init__(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     text = ""
     status_code = 200
@@ -40,10 +40,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         permissions = dict(read='public', write='restricted', subscribe='restricted', invite='restricted')
         default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(create_context)
-        if 'permissions' not in new_context:
-            new_context['permissions'] = default_permissions
-        if permissions:
-            new_context['permissions'].update(permissions)
         self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=201)
 
     def test_create_context_creator_is_admin(self):

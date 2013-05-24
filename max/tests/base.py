@@ -4,11 +4,6 @@ import base64
 from max.tests import test_manager
 
 
-def basicAuthHeader(username, password):
-    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
-    return dict(Authorization="Basic %s" % base64string)
-
-
 def oauth2Header(username):
     return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}
 
@@ -19,12 +14,6 @@ class MaxTestApp(object):
         from webtest import TestApp
         self.testcase = testcase
         self.testapp = TestApp(testcase.app)
-
-    def __getattr__(self, value):
-        if value.lower() in ['post', 'get', 'put', 'delete', 'head', 'options', 'fetch']:
-            return object.__getattribute__(self, value.lower())
-        else:
-            return object.__getattribute__(self.testapp, value)
 
     def get(self, *args, **kwargs):
         return self.call_testapp('get', *args, **kwargs)

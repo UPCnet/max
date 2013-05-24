@@ -13,7 +13,7 @@ from max.tests import test_manager, test_default_security
 class mock_post(object):
 
     def __init__(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     text = ""
     status_code = 200

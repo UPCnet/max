@@ -34,7 +34,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.patched = patch('requests.post', new=self.mock_post)
         self.patched.start()
 
-    def mock_post(self, *args, **kwargs):
+    def mock_post(self, *args, **kwargs):  # pragma: no cover
         if '/people/messi/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
             res = self.testapp.post('/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
@@ -43,7 +43,6 @@ class RulesTests(unittest.TestCase, MaxTestBase):
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
             res = self.testapp.post('/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
             return mock_post_obj(text=res.text, status_code=201)
-        return mock_post_obj(text='', status_code=200)
 
     # BEGIN TESTS
 
