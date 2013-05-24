@@ -177,4 +177,4 @@ def deleteActivity(context, request):
 def modifyActivity(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
