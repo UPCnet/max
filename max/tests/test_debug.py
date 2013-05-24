@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import json
 import unittest
 import urllib
 
-from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp
 from max.tests import test_manager, test_default_security
 
 
@@ -32,6 +30,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.security.insert(test_default_security)
         self.testapp = MaxTestApp(self)
 
+    def test_debugging_mode_does_not_break_normal_app(self):
+        """
+            Make a simple get in debug mode to test app's normal behaviour
+        """
+        self.testapp.get('/people', '', status=401)
+
     def test_make_get_without_oauth(self):
         """
             With oauth2 passtrough and debug api option activated
@@ -43,6 +47,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         )
         qs = urllib.urlencode(debug_params)
         self.testapp.get('/people?{}'.format(qs), '', {}, status=200)
+
+    def test_make_debug_post_without_user(self):
+        """
+            With oauth2 passtrough and debug api option activated
+            Check that debug mode without a user does not activate
+            the method override
+        """
+        username = 'messi'
+        debug_params = dict(
+            d='',
+            m='post'
+        )
+        qs = urllib.urlencode(debug_params)
+        self.testapp.get('/people/{}?{}'.format(username, qs), '', {}, status=401)
 
     def test_make_post_as_get(self):
         """

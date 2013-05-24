@@ -315,4 +315,4 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #%s #Assignatura1' % (debug_hashtag))
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(result.get('totalItems', None), 0)

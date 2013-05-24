@@ -13,7 +13,7 @@ import logging
 max_server_url = 'https://max.upc.edu'
 # max_server_url = 'https://sneridagh.upc.es'
 twitter_generator_name = 'Twitter'
-debug_hashtag = '#debugmaxupcnet'
+debug_hashtag = 'debugmaxupcnet'
 logging_file = '/var/pyramid/maxserver/var/log/twitter-listener.log'
 if not os.path.exists(logging_file):
     logging_file = '/tmp/twitter-listener.log'
@@ -107,7 +107,7 @@ class MaxTwitterRulesRunner(object):
         stream = tweepy.Stream(auth, StreamWatcherListener(), timeout=None)
 
         # Hardcoded global hashtag(s)
-        track_list = ['#upc', debug_hashtag]
+        track_list = ['#upc', '#%s' % debug_hashtag]
 
         logging.warning("Listening to this Twitter hashtags: %s" % str(track_list))
         logging.warning("Listening to this Twitter userIds: %s" % str(readable_follow_list))
