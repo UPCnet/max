@@ -13,7 +13,7 @@ from max.tests import test_manager, test_default_security
 class mock_post(object):
 
     def __init__(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     text = ""
     status_code = 200
@@ -161,3 +161,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextB)
         res = self.testapp.get('/contexts/public?tags', context_search_by_tags, oauth2Header(username), status=200)
         self.assertEqual(res.json['totalItems'], 1)
+
+    def test_search_with_invalid_parameters(self):
+        """
+            Given a plain user
+            When I do a search with invalid parameters
+            Then I get a Bad Request Error
+        """
+        username = 'messi'
+        self.create_user(username)
+        fake_id = '519200000000000000000000'
+        self.testapp.get('/people?limit=a', '', oauth2Header(username), status=400)
+        self.testapp.get('/people?after=0', '', oauth2Header(username), status=400)
+        self.testapp.get('/people?before=0', '', oauth2Header(username), status=400)
+        self.testapp.get('/people?before={0}&after={0}'.format(fake_id), '', oauth2Header(username), status=400)
