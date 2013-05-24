@@ -13,7 +13,7 @@ from max.tests import test_manager, test_default_security
 config.mongodb_db_name = 'tests'
 
 
-class mock_post_obj(object):
+class mock_requests_obj(object):
 
     def __init__(self, *args, **kwargs):
         self.text = kwargs['text']
@@ -31,18 +31,28 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
         self.testapp = MaxTestApp(self)
-        self.patched = patch('requests.post', new=self.mock_post)
-        self.patched.start()
+        self.patched_get = patch('requests.get', new=self.mock_get)
+        self.patched_get.start()
+        self.patched_post = patch('requests.post', new=self.mock_post)
+        self.patched_post.start()
+
+    def mock_get(self, *args, **kwargs):  # pragma: no cover
+        if args[0] == 'http://api.twitter.com/1/users/show.json?screen_name=MaxUpcnet':
+            return mock_requests_obj(text='{"id_str":"526326641"}', status_code=200)
+        else:
+            return mock_requests_obj(text='', status_code=404)
 
     def mock_post(self, *args, **kwargs):  # pragma: no cover
         if '/people/messi/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
             res = self.testapp.post('/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
-            return mock_post_obj(text=res.text, status_code=201)
+            return mock_requests_obj(text=res.text, status_code=201)
         elif '/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
             # Fake the requests.post thorough the self.testapp instance, and test result later in test
             res = self.testapp.post('/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
-            return mock_post_obj(text=res.text, status_code=201)
+            return mock_requests_obj(text=res.text, status_code=201)
+        else:
+            return mock_requests_obj(text='', status_code=200)
 
     # BEGIN TESTS
 
