@@ -145,7 +145,13 @@ END EXCEPTION REPORT
 """
 
 
-def saveException(request, error):
+def saveException(request, error):  # pragma: no cover
+    """
+        Logs the exception
+
+        This code will only raise if a non-tested thing appear
+         So, as the tests will not ever see this, we exlcude it from coverage
+    """
     time = datetime.now().isoformat()
     entry = dict(
         traceback=error,
@@ -196,17 +202,16 @@ def MaxResponse(fun):
         # JSON decode error????
         except ValueError:
             return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
-        except:
+        # This code will only raise if a non-tested thing appear
+        # So, as the tests will not ever see this, we exlcude it from coverage
+        except:  # pragma: no cover
             error = traceback.format_exc()
             sha1_hash = saveException(request, error)
             max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
             return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
         else:
-            try:
-                # Don't cache by default, get configuration from resource if any
-                route_cache_settings = RESOURCES.get(request.matched_route.name).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
-                response.headers.update({'Cache-Control': route_cache_settings})
-            except:
-                pass
+            # Don't cache by default, get configuration from resource if any
+            route_cache_settings = RESOURCES.get(request.matched_route.name, {}).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
+            response.headers.update({'Cache-Control': route_cache_settings})
             return response
     return replacement

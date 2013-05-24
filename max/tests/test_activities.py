@@ -41,6 +41,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
 
+    def test_create_activity_with_invalid_json(self):
+        """ doctest .. http:post:: /people/{username}/activities """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.post('/people/%s/activities' % username, json.dumps(activity)[:-10], oauth2Header(username), status=400)
+
     def test_create_activity_check_ownership(self):
         """
             Given a plain user
