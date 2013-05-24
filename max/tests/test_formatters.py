@@ -68,3 +68,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/conversations', json.dumps(message_with_tags), oauth2Header(sender), status=201)
         self.assertEqual(res.json['object']['content'], u'A <strong>text</strong> A')
+
+    def test_post_activity_shortens_url(self):
+        """  """
+        from .mockers import user_status_with_url
+        username = 'messi'
+        self.create_user(username)
+        res = self.create_activity(username, user_status_with_url)
+        self.assertIn('bit.ly', res.json['object']['content'],)

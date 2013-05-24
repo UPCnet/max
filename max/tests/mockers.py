@@ -173,6 +173,13 @@ user_status = {
     },
 }
 
+user_status_with_url = {
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb url http://example.com </p>"
+    },
+}
+
 user_status_context_with_hashtag = {
     "contexts": [
         {'url': subscribe_context['object']['url'],
