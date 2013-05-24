@@ -76,3 +76,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers['X-HTTP-Method-Override'] = 'PUT'
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
+
+    def test_invalid_scope(self):
+        username = 'messi'
+        headers = oauth2Header(test_manager)
+        headers['X-Oauth-Scope'] = 'Invalid scope'
+        res = self.testapp.post('/people/%s' % username, "", headers, status=401)
+        self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')

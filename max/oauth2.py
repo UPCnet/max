@@ -10,8 +10,7 @@ from beaker.cache import cache_region
 def checkToken(url, username, token, scope):
     payload = {"oauth_token": token,
                "user_id": username}
-    if scope:
-        payload['scope'] = scope
+    payload['scope'] = scope if scope else 'widgetcli'
     return requests.post(url, data=payload, verify=False).status_code == 200
 
 
@@ -44,10 +43,7 @@ def oauth2(allowed_scopes=[]):
 
             valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope)
 
-            # FOR DEBUGGING, oauth passtrough
-            #valid = True
             if valid:
-
                 def getCreator(request):
                     return username
 

@@ -74,6 +74,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
         self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=204)
 
+    def test_delete_inexistent_activity(self):
+        """
+            Given a plain user
+            When I try to delete an inexistent activity
+            Then I get a notfound error
+        """
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.delete('/activities/%s' % 'fakeid', '', oauth2Header(username), status=404)
+
     def test_delete_other_activity(self):
         """
             Given a plain user
