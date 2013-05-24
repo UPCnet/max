@@ -27,7 +27,7 @@ class MADDict(dict):
         else:
             pass
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         dictrepr = dict.__repr__(self)
         return '%s(%s)' % (type(self).__name__, dictrepr)
 

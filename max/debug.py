@@ -10,7 +10,7 @@ def setup(config, settings):
         sort_order = dict(under='pyramid_debugtoolbar.toolbar_tween_factory')
 
         # Don't apply tween order when running from tests
-        if asbool(settings.get('testing', False)):
+        if asbool(settings.get('testing', False)):  # pragma: no cover
             sort_order = {}
         config.add_tween('max.tweens.browser_debug_factory', **sort_order)
 

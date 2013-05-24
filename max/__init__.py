@@ -36,8 +36,6 @@ class RestrictedPredicate(object):
         allowed_roles = copy(self.val)
         if not isinstance(self.val, list):
             allowed_roles = [self.val, ]
-        else:
-            import ipdb;ipdb.set_trace()
         security = request.registry.max_security
         user_has_roles = [username in security.get("roles").get(role) for role in allowed_roles]
         user_is_allowed = reduce(operator.and_, user_has_roles, True)
