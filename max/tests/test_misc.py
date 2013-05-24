@@ -34,6 +34,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     # BEGIN TESTS
 
+    def test_root(self):
+        """
+            Test site root is accessible and returns html
+        """
+        res = self.testapp.get('/', status=200)
+        self.assertEqual(res.content_type, 'text/html')
+
     def test_bad_test_call_warning(self):
         """
             Test calling a service with missing body parameter, and the authorization as body.

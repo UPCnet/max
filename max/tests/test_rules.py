@@ -258,3 +258,61 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+
+    def test_process_new_tweet_from_unassociated_user(self):
+        """
+        Test the case where we receive a valid tweet, but there's no user associated with the hashtag
+        """
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "Assignatura1"})
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+
+        processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #Assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 0)
+
+    def test_process_new_tweet_from_unassociated_context(self):
+        """
+        Test the case where we receive a valid tweet, but there's no user associated with the hashtag
+        """
+        from maxrules.tasks import processTweet
+        from .mockers import create_contextA, subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+
+        processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #UPC #Assignatura1')
+
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 0)
+
+    def test_process_tweet_from_debug_hashtag(self):
+        """
+        Test the case when we reiceive a valid tweet with a debug hashtag
+        """
+        from maxrules.tasks import processTweet
+        from maxrules.twitter import debug_hashtag
+        from .mockers import create_contextA, subscribe_contextA
+        username = 'messi'
+        self.create_user(username)
+        self.modify_user(username, {"displayName": "Lionel Messi", "twitterUsername": "leomessi"})
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.modify_context(create_contextA['url'], {"twitterHashtag": "Assignatura1"})
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+
+        processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #%s #Assignatura1' % (debug_hashtag))
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
