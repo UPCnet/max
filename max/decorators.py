@@ -68,8 +68,7 @@ def requirePersonActor(exists=True, force_own=True):
 
             def getActor(request):
                 try:
-                    if isinstance(actor, User):
-                        actor.setdefault('displayName', actor['username'])
+                    actor.setdefault('displayName', actor['username'])
                     return actor
                 except:
                     return None
@@ -114,8 +113,7 @@ def requireContextActor(exists=True):
 
             def getActor(request):
                 try:
-                    if isinstance(actor, Context):
-                        actor.setdefault('displayName', actor['url'])
+                    actor.setdefault('displayName', actor['url'])
                     return actor
                 except:
                     return None
