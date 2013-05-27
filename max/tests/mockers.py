@@ -310,6 +310,29 @@ message = {
     }
 }
 
+invalid_message_without_sender = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+invalid_message_sender_repeated = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "messi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
 invalid_message_no_context = {
     "object": {
         "objectType": "note",
