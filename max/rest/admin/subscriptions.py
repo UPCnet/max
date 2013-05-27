@@ -74,8 +74,5 @@ def unsubscribe(context, request):
 
     found_context = mmdb.contexts.getItemsByhash(chash)
 
-    if not found_context:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
-
     found_context[0].removeUserSubscriptions(users_to_delete=[actor.username])
     return HTTPNoContent()
