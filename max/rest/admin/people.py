@@ -29,13 +29,12 @@ def deleteUser(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    userid = request.matchdict.get('id', None)
-    try:
-        found_user = mmdb.users[userid]
-    except:
-        raise ObjectNotFound("There's no user with id: %s" % userid)
+    username = request.matchdict.get('username')
+    found_user = mmdb.users.getItemsByusername(username)
+    if not found_user:
+        raise ObjectNotFound("There's no user with username: %s" % username)
 
-    found_user.delete()
+    found_user[0].delete()
     return HTTPNoContent()
 
 

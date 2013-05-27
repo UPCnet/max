@@ -91,6 +91,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status_context)
         self.testapp.get('/people/%s/activities' % (username), '', oauth2Header(test_manager), status=200)
 
+    def test_delete_user(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.delete('/people/%s' % username, '', oauth2Header(test_manager), status=204)
+
+    def test_delete_inexistent_user(self):
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.testapp.delete('/people/%s' % username2, '', oauth2Header(test_manager), status=404)
+
 
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
