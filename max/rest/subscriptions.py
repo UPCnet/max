@@ -28,8 +28,6 @@ def getUserSubscriptions(context, request):
     query = {'username': request.actor['username']}
     users = mmdb.users.search(query, show_fields=["username", "subscribedTo"], flatten=1, **searchParams(request))
 
-    if len(users) == 0:
-        raise ObjectNotFound('User {0} is not subscribed to any context').format(request.actor['username'])
     handler = JSONResourceRoot(users[0]['subscribedTo']['items'])
     return handler.buildResponse()
 
