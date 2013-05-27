@@ -21,21 +21,20 @@ requires = [
     'waitress',
     'Paste',
     'bleach'
-    ]
+]
 
 test_requires = ['WebTest', 'mock']
-script_requires = ['prettytable', 'sh']
 
 setup(name='max',
       version='3.0',
       description='Activity Stream and Subscription Enhanced Engine (Motor d\'activitat i subscripcions extes)',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
-        "Programming Language :: Python",
-        "Framework :: Pylons",
-        "Topic :: Internet :: WWW/HTTP",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
-        ],
+          "Programming Language :: Python",
+          "Framework :: Pylons",
+          "Topic :: Internet :: WWW/HTTP",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+      ],
       author='UPCnet Content Management Team',
       author_email='victor.fernandez@upcnet.es',
       url='http://github.com/upcnet/max',
@@ -43,20 +42,14 @@ setup(name='max',
       packages=['max', 'maxrules'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires + script_requires,
+      install_requires=requires,
       tests_require=requires + test_requires,
       test_suite="max.tests",
       extras_require={
-        'test': ['WebTest', 'mock', 'HTTPretty', 'manuel', 'pyramid-beaker']
+          'test': ['WebTest', 'mock', 'HTTPretty', 'manuel', 'pyramid-beaker']
       },
-      entry_points="""\
+      entry_points="""
       [paste.app_factory]
       main = max:main
-      [console_scripts]
-      maxrules.twitter = maxrules.twitter:main
-      initialize_max_db = max.scripts.security:main
-      max.devel = max.scripts.devel:main
-      maxui.setup = max.scripts.maxui:main
-      max.report = max.scripts.report:main
       """,
       )
