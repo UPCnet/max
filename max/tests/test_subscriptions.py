@@ -142,6 +142,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertIn('unsubscribe', result['items'][0]['permissions'])
 
+    def test_subscribe_to_public_context_as_plain_user_already_subscribed(self):
+        """
+            Given a plain user
+            When I subscribe to a public subscription context
+            And I am already subscribed
+            Then the subscription is returned
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=200)
+
     def test_list_all_public_subcribable_contexts(self):
         """
             Given a plain user
