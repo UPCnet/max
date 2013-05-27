@@ -102,6 +102,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.delete('/people/%s' % username2, '', oauth2Header(test_manager), status=404)
 
+    def test_admin_delete_inexistent_activity(self):
+        fake_id = '519200000000000000000000'
+        self.testapp.delete('/activities/%s' % (fake_id), '', oauth2Header(test_manager), status=404)
+
     def test_admin_activities_search_by_context(self):
         """
         """
