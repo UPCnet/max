@@ -45,6 +45,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get("objectType", None), "message")
         self.assertEqual(result.get("object", None).get("objectType", None), "note")
 
+    def test_post_message_to_conversation_without_context(self):
+        """
+        """
+        from .mockers import invalid_message_no_context
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(invalid_message_no_context), oauth2Header(sender), status=400)
+
+    def test_post_message_to_conversation_without_participants(self):
+        """
+        """
+        from .mockers import invalid_message_no_participants
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(invalid_message_no_participants), oauth2Header(sender), status=400)
+
     def test_post_message_to_conversation_does_not_exists_yet_with_wrong_message_type(self):
         """ doctest .. http:post:: /conversations
             TO check that a failed 2-people conversation creation succeds after a failed first attempt

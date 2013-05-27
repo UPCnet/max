@@ -310,6 +310,24 @@ message = {
     }
 }
 
+invalid_message_no_context = {
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+invalid_message_no_participants = {
+    "contexts": [
+        {"objectType": "conversation",
+         }
+    ],
+
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
 
 message_with_tags = {
     "contexts": [

@@ -59,7 +59,7 @@ def postMessage2Conversation(context, request):
     ctxts = data.get('contexts', [])
     if len(ctxts) == 0:
         raise ValidationError('Empty contexts parameter')
-    if len(ctxts[0]['participants']) == 0:
+    if len(ctxts[0].get('participants', [])) == 0:
         raise ValidationError('Empty participants parameter')
 
     #Loop trough all participants, if there's one that doesn't exists, an exception will raise
