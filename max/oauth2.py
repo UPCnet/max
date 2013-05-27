@@ -37,9 +37,8 @@ def oauth2(allowed_scopes=[]):
 
                 raise Unauthorized('No auth headers found.')
 
-            if allowed_scopes:
-                if scope not in allowed_scopes:
-                    raise Unauthorized('The specified scope is not allowed for this resource.')
+            if scope not in allowed_scopes:
+                raise Unauthorized('The specified scope is not allowed for this resource.')
 
             valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope)
 
@@ -55,6 +54,4 @@ def oauth2(allowed_scopes=[]):
 
         new_function.__doc__ = view_function.__doc__
         return new_function
-    if type(allowed_scopes) == type(wrap):
-        return wrap(allowed_scopes)
     return wrap
