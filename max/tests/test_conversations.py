@@ -243,7 +243,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
 
         res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(external), status=401)
-        import ipdb;ipdb.set_trace()
 
     def test_get_conversations_for_an_user(self):
         """ doctest .. http:get:: /conversations """
@@ -759,9 +758,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
-        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(sender), status=200)
-        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
-        self.assertEqual(res.json['displayName'], 'Nou nom')
+        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(recipient), status=401)
 
     def test_two_people_conversation_displayName_is_partner_displayName(self):
         """
