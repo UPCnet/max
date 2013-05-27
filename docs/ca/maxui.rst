@@ -102,16 +102,14 @@ asíncrona el widget en la nostra aplicació:
     window._MAXUI.onReady = function() {
         var settings = {  }
 
-        $('#activityStream').maxUI(settings)
-
         intervalID = setInterval(function(event) {
-        if ($().maxUI) {
-                  clearInterval(intervalID)
-                  $('#activityStream').maxUI(settings)
-          }, 30)
-        }
-
+            if ($().maxUI) {
+                clearInterval(intervalID)
+                $('#activityStream').maxUI(settings)
+            }
+        }, 30)
     }
+
 
     // 3 - Descarregar codi del widget
     (function(d){
