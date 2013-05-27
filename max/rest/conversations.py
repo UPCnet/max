@@ -180,15 +180,15 @@ def getConversation(context, request):
     conversations = MADMaxCollection(context.db.conversations)
     conversation = conversations[cid]
 
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
+        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
+
     if len(conversation.participants) == 2:
         participants = list(conversation.participants)
         participants.remove(request.actor.username)
         users = MADMaxCollection(context.db.users, query_key='username')
         partner = users[participants[0]]
         conversation.displayName = partner.displayName
-
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
-        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
     handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()

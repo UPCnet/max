@@ -87,8 +87,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.post('/conversations', json.dumps(invalid_message_sender_repeated), oauth2Header(sender), status=400)
-        import ipdb;ipdb.set_trace()
+        self.testapp.post('/conversations', json.dumps(invalid_message_sender_repeated), oauth2Header(sender), status=400)
 
     def test_post_message_to_conversation_does_not_exists_yet_with_wrong_message_type(self):
         """ doctest .. http:post:: /conversations
@@ -216,6 +215,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(result.get("totalItems", None), 2)
 
+    def test_get_conversation_for_user_not_in_participants(self):
+        from .mockers import message, message2
+        sender = 'messi'
+        recipient = 'xavi'
+        external = 'casillas'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(external)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.get('/conversations/%s' % cid, "", oauth2Header(external), status=401)
+
     def test_get_messages_from_a_conversation_for_user_not_in_participants(self):
         from .mockers import message, message2
         sender = 'messi'
@@ -229,7 +242,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         cid = str(res.json['contexts'][0]['id'])
         self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
 
-        self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(external), status=401)
+        res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(external), status=401)
+        import ipdb;ipdb.set_trace()
 
     def test_get_conversations_for_an_user(self):
         """ doctest .. http:get:: /conversations """
