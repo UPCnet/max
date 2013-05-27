@@ -241,3 +241,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['totalItems'], 3)
         self.assertEqual(res.json['items'][0]['username'], 'user-0')
         self.assertEqual(res.json['items'][2]['username'], 'user-2')
+
+    def test_context_authors_not_subscribed(self):
+        """
+            As a plain user
+            When i query the last eight authors that published in a context
+            And i'm not subscribed to that context
+            Then I get an error
+        """
+        from .mockers import create_context
+        from hashlib import sha1
+
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        username = 'messi'
+        self.create_user(username)
+
+        self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header(username), status=401)
