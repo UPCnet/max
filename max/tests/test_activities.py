@@ -352,6 +352,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
         self.assertEqual(result.get('generator', None), user_status_context_generator['generator'])
 
+    def test_get_timeline_no_activities(self):
+        """ doctest .. http:get:: /people/{username}/timeline """
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 0)
+
     def test_get_timeline(self):
         """ doctest .. http:get:: /people/{username}/timeline """
         from .mockers import user_status, user_status_context, user_status_contextA
