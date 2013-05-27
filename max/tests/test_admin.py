@@ -102,6 +102,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.delete('/people/%s' % username2, '', oauth2Header(test_manager), status=404)
 
+    def test_admin_activities_search_by_context(self):
+        """
+        """
+        from .mockers import user_status
+        from .mockers import context_query
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status)
+
+        res = self.testapp.get('/people/%s/activities' % username, context_query, oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 1)
 
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
