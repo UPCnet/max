@@ -11,7 +11,6 @@ from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
 from max.tests import test_manager, test_default_security
 
 
-@patch('requests.post', new=mock_post)
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
@@ -212,6 +211,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=404)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'ObjectNotFound')
+
+    def test_delete_inexistent_context(self):
+        """ doctest .. http:delete:: /contexts/{hash} """
+        from hashlib import sha1
+        from .mockers import create_context
+        url_hash = '00000000000000'
+        self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=404)
 
     def test_delete_only_deleted_specified_context(self):
         from hashlib import sha1
