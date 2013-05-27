@@ -50,14 +50,9 @@ class JSONResourceRoot(ResourceRoot):
         """
 
         if self.stats:
-            if isinstance(self.data, int):
-                response_payload = ''
-                self.headers['X-totalItems'] = str(self.data)
-            else:
-                return HTTPInternalServerError('Invalid integer value')
+            response_payload = ''
+            self.headers['X-totalItems'] = str(self.data)
         else:
-            if not isinstance(self.data, list):
-                return HTTPInternalServerError('Invalid JSON output')
             response_payload = json.dumps(self.wrap())
 
         return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
@@ -79,11 +74,8 @@ class ResourceEntity(object):
         """
         """
         data = payload is None and self.data or payload
-        if data:
-            response = Response(data, status_int=self.status_code)
-            response.content_type = self.response_content_type
-        else:
-            response = HTTPNotFound()
+        response = Response(data, status_int=self.status_code)
+        response.content_type = self.response_content_type
 
         return response
 
@@ -98,12 +90,6 @@ class JSONResourceEntity(ResourceEntity):
             Translate to JSON object if any data. If data is not a dict,
             something went wrong
         """
-        if self.data:
-            if isinstance(self.data, dict):
-                response_payload = json.dumps(self.data)
-            else:
-                return HTTPInternalServerError('Invalid JSON output')
-        else:
-            response_payload = None
+        response_payload = json.dumps(self.data)
 
         return super(JSONResourceEntity, self).buildResponse(payload=response_payload)
