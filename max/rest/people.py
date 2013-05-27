@@ -90,4 +90,4 @@ def ModifyUser(context, request):
 def DeleteUser(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover

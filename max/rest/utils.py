@@ -12,6 +12,8 @@ import logging
 import urllib2
 import re
 import sys
+import os
+
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
@@ -27,21 +29,22 @@ def getMaxModelByObjectType(objectType):
 def downloadTwitterUserImage(twitterUsername, filename):
     """
     """
-    try:
-        req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
+    exit_status = False
+    req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
+
+    if req.status_code == 200:
         data = json.loads(req.text)
         image_url = data.get('profile_image_url_https', None)
         if image_url:
             req = requests.get(image_url)
-            open(filename, 'w').write(req.content)
-            return True
-        else:
-            logger = logging.getLogger('max')
-            logger.error("An error occurred while downloading twitter user image!")
-    except:
+            if req.status_code == 200:
+                open(filename, 'w').write(req.content)
+                exit_status = True
+
+    if not exit_status:
         logger = logging.getLogger('max')
         logger.error("An error occurred while downloading twitter user image!")
-        return False
+    return exit_status
 
 
 def getUserIdFromTwitter(twitterUsername):

@@ -104,7 +104,7 @@ create_context_full = {
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'twitterHashtag': 'atenea',
-    'twitterUsername': 'atenaupc',
+    'twitterUsername': 'maxupcnet',
 }
 
 create_context_private_rw = {

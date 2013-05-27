@@ -5,7 +5,7 @@ from pyramid.response import Response
 
 from max import LAST_AUTHORS_LIMIT, AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 from max.MADMax import MADMaxDB
-from max.exceptions import Unauthorized
+from max.exceptions import Unauthorized, ObjectNotFound
 from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot
@@ -86,6 +86,7 @@ def getContextAuthors(context, request):
 
 
 @view_config(route_name='context_avatar', request_method='GET')
+@MaxResponse
 def getContextAvatar(context, request):
     """
         /contexts/{hash}/avatar
@@ -103,6 +104,8 @@ def getContextAvatar(context, request):
         if len(found_context) > 0:
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
+        else:
+            raise ObjectNotFound("There's no context with hash %s" % chash)
 
     if os.path.exists(context_image_filename):
         # Calculate time since last download and set if we have to redownload or not
@@ -128,4 +131,4 @@ def getContextAvatar(context, request):
 def DeleteContext(context, request):
     """
     """
-    return HTTPNotImplemented
+    return HTTPNotImplemented  # pragma: no cover

@@ -1,6 +1,10 @@
 import json
 
+from pyramid.threadlocal import get_current_request
+
 from max.tests import test_manager
+from max.tests.mock_image import image
+
 
 MOCK_TOKEN = "jfa1sDF2SDF234"
 
@@ -8,7 +12,10 @@ MOCK_TOKEN = "jfa1sDF2SDF234"
 class mock_requests_obj(object):
 
     def __init__(self, *args, **kwargs):
-        self.text = kwargs['text']
+        if kwargs.get('text', None) is not None:
+            self.text = kwargs['text']
+        if kwargs.get('content', None) is not None:
+            self.content = kwargs['content']
         self.status_code = kwargs['status_code']
 
 
@@ -31,8 +38,15 @@ def mock_post(self, *args, **kwargs):  # pragma: no cover
 
 
 def mock_get(self, *args, **kwargs):  # pragma: no cover
-    if args[0] == 'http://api.twitter.com/1/users/show.json?screen_name=MaxUpcnet':
-        return mock_requests_obj(text='{"id_str":"526326641"}', status_code=200)
+    if args[0].lower() == 'http://api.twitter.com/1/users/show.json?screen_name=maxupcnet':
+        result = '{"id_str":"526326641", "profile_image_url_https": "https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png"}'
+        return mock_requests_obj(text=result, status_code=200)
+    elif args[0] == 'https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png':
+        request = get_current_request()
+        if request.headers.get('SIMULATE_TWITTER_FAIL', False):
+            return mock_requests_obj(text='', status_code=500)
+        else:
+            return mock_requests_obj(content=image, status_code=200)
     else:
         return mock_requests_obj(text='', status_code=404)
 
