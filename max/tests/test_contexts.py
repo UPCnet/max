@@ -169,6 +169,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
 
+    def test_modify_inexistent_context(self):
+        """ doctest .. http:put:: /contexts/{hash} """
+        url_hash = '0000000000000'
+        self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=404)
+
     def test_modify_context_with_twitter_username(self):
         from hashlib import sha1
         from .mockers import create_context
@@ -214,8 +219,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_delete_inexistent_context(self):
         """ doctest .. http:delete:: /contexts/{hash} """
-        from hashlib import sha1
-        from .mockers import create_context
         url_hash = '00000000000000'
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=404)
 
