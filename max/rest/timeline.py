@@ -52,15 +52,12 @@ def getUserTimeline(context, request):
 
     query = timelineQuery(mmdb, actor)
 
-    if query:
-        sortBy_fields = {
-            'activities': '_id',
-            'comments': 'commented',
-        }
-        sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-        activities = mmdb.activity.search(query, sort=sort_order, flatten=1, **searchParams(request))
-    else:
-        activities = []
+    sortBy_fields = {
+        'activities': '_id',
+        'comments': 'commented',
+    }
+    sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
+    activities = mmdb.activity.search(query, sort=sort_order, flatten=1, **searchParams(request))
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
