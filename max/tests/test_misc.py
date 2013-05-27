@@ -2,24 +2,15 @@
 import os
 import json
 import unittest
+from functools import partial
 
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
 from max.tests import test_manager, test_default_security
 
 
-class mock_post(object):
-
-    def __init__(self, *args, **kwargs):
-        pass  # pragma: no cover
-
-    text = ""
-    status_code = 200
-
-
-@patch('requests.post', new=mock_post)
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
@@ -30,6 +21,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
+        self.patched_post = patch('requests.post', new=partial(mock_post, self))
+        self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
     # BEGIN TESTS
@@ -76,10 +69,3 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers['X-HTTP-Method-Override'] = 'PUT'
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
-
-    def test_invalid_scope(self):
-        username = 'messi'
-        headers = oauth2Header(test_manager)
-        headers['X-Oauth-Scope'] = 'Invalid scope'
-        res = self.testapp.post('/people/%s' % username, "", headers, status=401)
-        self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')

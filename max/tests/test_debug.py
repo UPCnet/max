@@ -2,20 +2,13 @@
 import os
 import unittest
 import urllib
+from functools import partial
 
+from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp
+from max.tests.base import MaxTestBase, MaxTestApp, mock_post
 from max.tests import test_manager, test_default_security
-
-
-class mock_post(object):
-
-    def __init__(self, *args, **kwargs):
-        pass  # pragma: no cover
-
-    text = ""
-    status_code = 200
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -28,6 +21,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
+        self.patched_post = patch('requests.post', new=partial(mock_post, self))
+        self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
     def test_debugging_mode_does_not_break_normal_app(self):

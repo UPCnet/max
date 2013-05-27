@@ -2,25 +2,17 @@
 """
     Authentication tests
 
-    This tests doesn't have the requests.post patched,
-    so real request to oauth are done
-
 """
 import os
+import json
 import unittest
+from functools import partial
 
 from paste.deploy import loadapp
 from mock import patch
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
-from max.tests import test_default_security
-
-
-class mock_requests_obj(object):
-
-    def __init__(self, *args, **kwargs):
-        self.text = kwargs['text']
-        self.status_code = kwargs['status_code']
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
+from max.tests import test_default_security, test_manager
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -33,19 +25,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
-        self.testapp = MaxTestApp(self)
-        self.patched_post = patch('requests.post', new=self.mock_post)
+        self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
-
-    def mock_post(self, *args, **kwargs):  # pragma: no cover
-        if args[0].endswith('checktoken'):
-            return mock_requests_obj(text='', status_code=403)
-        else:
-            return mock_requests_obj(text='', status_code=200)
+        self.testapp = MaxTestApp(self)
 
     # BEGIN TESTS
 
     def test_invalid_token(self):
         username = 'messi'
-        self.create_user(username, expect=201)
-        #self.assertEqual(res.json['error_description'], 'Invalid token.')
+        res = self.testapp.post('/people/%s' % username, json.dumps({}), oauth2Header(test_manager, token='bad token'), status=401)
+        self.assertEqual(res.json['error_description'], 'Invalid token.')
+
+    def test_invalid_scope(self):
+        username = 'messi'
+        headers = oauth2Header(test_manager)
+        headers['X-Oauth-Scope'] = 'Invalid scope'
+        res = self.testapp.post('/people/%s' % username, "", headers, status=401)
+        self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')

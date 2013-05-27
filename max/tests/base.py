@@ -1,11 +1,47 @@
 import json
-import base64
 
 from max.tests import test_manager
 
+MOCK_TOKEN = "jfa1sDF2SDF234"
 
-def oauth2Header(username):
-    return {"X-Oauth-Token": "jfa1sDF2SDF234", "X-Oauth-Username": username, "X-Oauth-Scope": "widgetcli"}
+
+class mock_requests_obj(object):
+
+    def __init__(self, *args, **kwargs):
+        self.text = kwargs['text']
+        self.status_code = kwargs['status_code']
+
+
+def mock_post(self, *args, **kwargs):  # pragma: no cover
+    #Return OK to any post request targeted to 'checktoken', with the mock token
+    if args[0].endswith('checktoken'):
+        token = kwargs.get('data', {}).get('oauth_token')
+        status_code = 200 if token == MOCK_TOKEN else 401
+        return mock_requests_obj(text='', status_code=status_code)
+    if '/people/messi/activities' in args[0]:
+        # Fake the requests.post thorough the self.testapp instance, and test result later in test
+        res = self.testapp.post('/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
+        return mock_requests_obj(text=res.text, status_code=201)
+    elif '/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
+        # Fake the requests.post thorough the self.testapp instance, and test result later in test
+        res = self.testapp.post('/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
+        return mock_requests_obj(text=res.text, status_code=201)
+    else:
+        return mock_requests_obj(text='', status_code=200)
+
+
+def mock_get(self, *args, **kwargs):  # pragma: no cover
+    if args[0] == 'http://api.twitter.com/1/users/show.json?screen_name=MaxUpcnet':
+        return mock_requests_obj(text='{"id_str":"526326641"}', status_code=200)
+    else:
+        return mock_requests_obj(text='', status_code=404)
+
+
+def oauth2Header(username, token=MOCK_TOKEN, scope="widgetcli"):
+    return {
+        "X-Oauth-Token": token,
+        "X-Oauth-Username": username,
+        "X-Oauth-Scope": scope}
 
 
 class MaxTestApp(object):

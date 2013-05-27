@@ -2,24 +2,15 @@
 import os
 import json
 import unittest
+from functools import partial
 
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header
+from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
 from max.tests import test_default_security
 
 
-class mock_post(object):
-
-    def __init__(self, *args, **kwargs):
-        pass  # pragma: no cover
-
-    text = ""
-    status_code = 200
-
-
-@patch('requests.post', new=mock_post)
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
@@ -32,6 +23,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('conversations')
         self.app.registry.max_store.drop_collection('messages')
         self.app.registry.max_store.security.insert(test_default_security)
+        self.patched_post = patch('requests.post', new=partial(mock_post, self))
+        self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
     # BEGIN TESTS
