@@ -16,9 +16,7 @@ def timelineQuery(mmdb, actor):
     # Add the activity of the people that the user follows
     actors_followings = []
     for following in actor['following']['items']:
-        followed_person = mmdb.users.getItemsByusername(following['username'])[0]
-        if followed_person:
-            actors_followings.append({'actor._id': followed_person['_id']})
+        actors_followings.append({'actor.username': following['username']})
 
     # Add the activity of the people that posts to a particular context
     contexts_followings = []

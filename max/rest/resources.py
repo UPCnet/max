@@ -38,7 +38,7 @@ PUBLIC_RESOURCES = {
     'user_shares': {'route': '/people/{username}/shares'},
     'user_likes': {'route': '/people/{username}/likes'},
     'follows': {'route': '/people/{username}/follows'},
-    'follow': {'route': '/people/{username}/follows/{followedDN}'},
+    'follow': {'route': '/people/{username}/follows/{followedUsername}'},
     'likes': {'route': '/activities/{activity}/likes'},
     'like': {'route': '/activities/{activity}/likes/{likeId}'},
     'shares': {'route': '/activities/{activity}/shares'},
