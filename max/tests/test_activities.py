@@ -335,6 +335,46 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('items', None)[2].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
+    def test_get_activities_from_recursive_public_contexts(self):
+        from .mockers import context_query
+        from .mockers import create_context
+        from .mockers import subscribe_contextA, create_contextA, user_status_contextA
+        from .mockers import subscribe_contextB, create_contextB, user_status_contextB
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextB)
+        self.create_activity(username_not_me, user_status_contextA)
+        self.create_activity(username_not_me, user_status_contextB)
+
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('totalItems', None), 2)
+
+    def test_get_activities_from_recursive_subscribed_contexts(self):
+        from .mockers import context_query
+        from .mockers import create_context
+        from .mockers import subscribe_contextA, create_contextA, user_status_contextA
+        from .mockers import subscribe_contextB, create_contextB, user_status_contextB
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_contextB)
+        self.create_activity(username_not_me, user_status_contextA)
+        self.create_activity(username_not_me, user_status_contextB)
+
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=403)
+
     def test_post_activity_with_generator(self):
         """ Post an activity to a context which allows everyone to read and write
         """

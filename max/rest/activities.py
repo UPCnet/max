@@ -6,7 +6,7 @@ from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
-from max.exceptions import MissingField, ObjectNotFound, Unauthorized
+from max.exceptions import ObjectNotFound, Unauthorized, Forbidden
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
@@ -124,7 +124,7 @@ def getActivities(context, request):
     else:
         # we have no public contexts and we are not subscribed to any context, so we
         # won't get anything
-        activities = []
+        raise Forbidden("You don't have permission to see anyting in this context and it's child")
 
     # pass the read context as a extension to the resource
     handler = JSONResourceRoot(activities, extension=dict(context=rcontext.flatten()), stats=is_head)
