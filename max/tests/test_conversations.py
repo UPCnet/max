@@ -521,7 +521,30 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.delete('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=403)
+        res = self.testapp.delete('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=403)
+
+    def test_non_conversation_participant_cannot_leave_conversation(self):
+        """
+            Given a plain user
+            And a conversation between other people
+            When i try to leave the conversation
+            I get an error because i'm no in that conversation
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+        external = 'casillas'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+        self.create_user(external)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        res = self.testapp.delete('/people/{}/conversations/{}'.format(external, conversation_id), '', oauth2Header(sender), status=404)
 
     def test_user_leaves_conversation_other_participants_keep_seeing_messages(self):
         """
@@ -714,7 +737,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=401)
+        res = self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=401)
 
     def test_conversation_owner_changes_conversation_displayName(self):
         """

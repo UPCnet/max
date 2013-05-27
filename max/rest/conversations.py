@@ -321,9 +321,6 @@ def leaveConversation(context, request):
     if subscription is None:
         raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
 
-    if 'unsubscribe' not in subscription.get('permissions', []):
-        raise Forbidden('User {0} cannot leave this conversation'.format(actor.username))
-
     found_context = mmdb.conversations[cid]
 
     auth_user_is_conversation_owner = found_context._owner == request.creator
