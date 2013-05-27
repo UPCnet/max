@@ -18,7 +18,7 @@ from bson.objectid import ObjectId
 def getUserComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='activity_comments', request_method='GET')
@@ -99,18 +99,18 @@ def addActivityComment(context, request):
 def getActivityComment(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='comments', request_method='PUT')
 def modifyActivityComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='comments', request_method='DELETE')
 def deleteActivityComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover

@@ -123,7 +123,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             As a plain user
             When i query the last eight authors that appear in my timeline
             Then I get a list of persons
-            And I'm not in that list
+            And I'm in that list
         """
         from .mockers import user_status_context
         from .mockers import create_context
@@ -153,7 +153,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             When i query the last eight authors that appear in my timeline
             Then I get a list of persons
             And that list is smaller than the minimum expected
-            And I'm not in that list
+            And I'm in that list
         """
         from .mockers import user_status_context
         from .mockers import create_context
@@ -180,7 +180,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_context_authors(self):
         """
             As a plain user
-            When i query the last eight authors that appear in my timeline
+            When i query the last eight authors that published in a context
             Then I get a list of persons
             And I am in that list
         """
@@ -208,3 +208,36 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['totalItems'], 8)
         self.assertEqual(res.json['items'][0]['username'], 'user-0')
         self.assertEqual(res.json['items'][7]['username'], 'user-7')
+
+    def test_context_authors_not_enough(self):
+        """
+            As a plain user
+            When i query the last eight authors that published in a context
+            Then I get a list of persons
+            And that list is smaller than the minimum expected
+            And I am in that list
+        """
+
+        from .mockers import user_status_context
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        from hashlib import sha1
+
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        # Create 20 users and subscribe to context
+        # The last user to post will be the first-created user
+        for i in range(3):
+            self.create_user('user-{}'.format(i))
+            self.admin_subscribe_user_to_context('user-{}'.format(i), subscribe_context)
+
+        # Create 2 consecutive activities for each user
+        for usern in range(3)[::-1]:
+            for count in range(2):
+                self.create_activity('user-{}'.format(usern), user_status_context)
+
+        res = self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header('user-0'), status=200)
+        self.assertEqual(res.json['totalItems'], 3)
+        self.assertEqual(res.json['items'][0]['username'], 'user-0')
+        self.assertEqual(res.json['items'][2]['username'], 'user-2')
