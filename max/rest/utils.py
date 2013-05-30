@@ -204,8 +204,11 @@ def deUnderescore(di, key):
         Renames a dict key, removing underscores from the begginning of the key
     """
     if key.startswith('_'):
-        di[key.lstrip('_')] = di[key]
+        newkey = key.lstrip('_')
+        di[newkey] = di[key]
         del di[key]
+        return newkey
+    return key
 
 
 def clearPrivateFields(di):
@@ -225,13 +228,26 @@ def flattendict(di, **kwargs):
     if not kwargs.get('keep_private_fields', True):
         clearPrivateFields(di)
 
+    # Default is squashing anything or the specified fields in squash
+    squash = kwargs.get('squash', [])
+    preserve = kwargs.get('preserve', None)
+
+    # If both parameters indicated, don't squash anything
+    if 'preserve' in kwargs and 'squash' in kwargs:
+        squash = []
+    # If only preserved was indicated, squash
+    elif preserve is not None:
+        squash = set(di.keys()) - set(preserve)
+
     for key in di.keys():
         value = di[key]
         if isinstance(value, dict) or isinstance(value, list):
             di[key] = flatten(value, **kwargs)
         else:
             decodeBSONEntity(di, key)
-        deUnderescore(di, key)
+        newkey = deUnderescore(di, key)
+        if key in squash or newkey in squash:
+            del di[newkey]
     return di
 
 

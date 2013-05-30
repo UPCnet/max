@@ -93,7 +93,6 @@ class BaseActivity(MADBase):
                     for fieldname in non_needed_subscription_fields:
                         if fieldname in subscription:
                             del subscription[fieldname]
-
                     ob['contexts'].append(subscription)
             if isContext:
                 # When a context posts an activity it can be posted only

@@ -64,18 +64,18 @@ class BaseContext(MADBase):
     def prepareUserSubscription(self):
         """
         """
-        subscription = self.flatten()
-        permissions = subscription['permissions']
-
+        fields_to_preserve = ['displayName', 'url', 'hash', 'objectType']
+        fields_to_preserve.append(self.unique)
+        subscription = self.flatten(preserve=fields_to_preserve)
         #If we are subscribing the user, read permission is granted
         user_permissions = ['read']
 
         #Set other permissions based on context defaults
-        if permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
+        if self.permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
             user_permissions.append('write')
-        if permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
+        if self.permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
             user_permissions.append('invite')
-        unsubscribe_permission = permissions.get('unsubscribe', permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']))
+        unsubscribe_permission = self.permissions.get('unsubscribe', self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']))
         if unsubscribe_permission in ['public']:
             user_permissions.append('unsubscribe')
 

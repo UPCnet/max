@@ -68,7 +68,6 @@ def subscribe(context, request):
         scontext = contexts[newactivity['object'].getHash()]
         if scontext.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted':
             raise Unauthorized('User {0} cannot subscribe himself to to this context'.format(actor['username']))
-
         actor.addSubscription(scontext)
 
         # If user wasn't created, 201 will show that the subscription has just been added
