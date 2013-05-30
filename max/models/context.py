@@ -64,9 +64,10 @@ class BaseContext(MADBase):
     def prepareUserSubscription(self):
         """
         """
-        fields_to_preserve = ['displayName', 'url', 'hash', 'objectType']
-        fields_to_preserve.append(self.unique)
-        subscription = self.flatten(preserve=fields_to_preserve)
+        fields_to_squash = ['published', 'owner', 'creator']
+        if '_id' != self.unique:
+            fields_to_squash.append('_id')
+        subscription = self.flatten(squash=fields_to_squash)
         #If we are subscribing the user, read permission is granted
         user_permissions = ['read']
 
