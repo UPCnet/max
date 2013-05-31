@@ -253,7 +253,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_get_activities_from_inexistent_context(self):
         username = 'messi'
         self.create_user(username)
-        self.testapp.get('/contexts/%s/activities'.format('01234567890abcdef01234567890abcdef012345'), oauth2Header(username), status=404)
+        self.testapp.get('/contexts/%s/activities'.format('01234567890abcdef01234567890abcdef012345'), '', oauth2Header(username), status=404)
 
     def test_get_activities_order_sorted_by_last_comment_publish_date(self):
         """

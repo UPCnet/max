@@ -11,7 +11,7 @@ from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot
 import os
 
-from max.rest.utils import downloadTwitterUserImage, searchParams
+from max.rest.utils import downloadTwitterUserImage, searchParams, flatten
 import time
 
 
@@ -28,7 +28,7 @@ def getPublicContexts(context, request):
     mmdb = MADMaxDB(context.db)
     found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
-    handler = JSONResourceRoot(found_contexts.flatten(squash=['owner', 'creator', 'pubished']))
+    handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'pubished']))
     return handler.buildResponse()
 
 
