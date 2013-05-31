@@ -47,8 +47,6 @@ resultats, indicant el total d'elements retornats::
     <201 Created application/json ...
     >>> utils.create_context(create_contextA)
     <201 Created application/json ...
-    >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
-    <201 Created application/json ...
 
 Usuaris
 --------
@@ -371,6 +369,11 @@ llistar-les com crear-ne de noves.
 
 En el cas que volguem lligar l'activitat a un context en concret, suposant que
 l'usuari ha estat previament subscrit a aquest context.
+
+.. Subscribe the user to the context
+    >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
+    <201 Created application/json ...
+
 
     **Exemple de petició**
 
