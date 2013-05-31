@@ -137,8 +137,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
-        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
-        res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
+        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), oauth2Header(username), status=201)
+        res = self.testapp.get('/people/%s/subscriptions' % username, '', oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertIn('unsubscribe', result['items'][0]['permissions'])
 

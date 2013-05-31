@@ -119,7 +119,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         self.create_context(create_contextA)
         self.create_context(create_contextB)
-        res = self.testapp.get('/contexts', {}, oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/contexts', '', oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['totalItems'], 3)
 
     def test_contexts_search_with_tags(self):

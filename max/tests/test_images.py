@@ -75,7 +75,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(image), len(res.body))
         self.assertEqual(len(os.listdir(self.app.registry.settings['avatar_folder'])), 1)
 
-
     def test_get_context_twitter_avatar_inexistent_context(self):
         """
         """
@@ -117,6 +116,3 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # Assert that the file is rencently downloaded
         new_modification_time = os.path.getmtime(image_filename)
         self.assertNotEqual(modification_time, new_modification_time)
-
-
-
