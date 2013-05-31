@@ -497,12 +497,8 @@ s'explica amb profunditat en l'apartat de permisos.
                     "Assignatura"
                 ],
                 "url": "http://atenea.upc.edu",
-                "creator": "test_manager",
-                "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "objectType": "context",
-                "id": "519b00000000000000000000",
                 "permissions": [
                     "read",
                     "write",
@@ -546,12 +542,8 @@ s'explica amb profunditat en l'apartat de permisos.
                     "Assignatura"
                 ],
                 "url": "http://atenea.upc.edu",
-                "creator": "test_manager",
-                "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "objectType": "context",
-                "id": "519b00000000000000000000",
                 "permissions": [
                     "read",
                     "unsubscribe"
@@ -624,11 +616,9 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
+                        "url": "http://atenea.upc.edu",
                         "twitterHashtag": "assignatura1",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "owner": "test_manager",
                         "displayName": "Atenea",
                         "objectType": "context"
                     }

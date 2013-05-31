@@ -65,4 +65,5 @@ for filename in files:
         last = int(expected)
 
     newapirest += apirest[last:]
+    newtext = re.sub('>>> print response\n', r'>>> response\n', apirest)
     open(filename, 'w').write(newapirest)

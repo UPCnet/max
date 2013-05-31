@@ -145,12 +145,8 @@ Operacions sobre el recurs *usuari* del sistema.
                                 "Assignatura"
                             ],
                             "url": "http://atenea.upc.edu",
-                            "creator": "test_manager",
-                            "published": "2000-01-01T00:01:00Z",
-                            "owner": "test_manager",
                             "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "objectType": "context",
-                            "id": "519b00000000000000000000",
                             "permissions": [
                                 "read",
                                 "write",
@@ -218,23 +214,19 @@ Operacions sobre el recurs *usuari* del sistema.
                     "totalItems": 1,
                     "items": [
                         {
-                            "displayName": "Atenea",
-                            "creator": "test_manager",
-                            "url": "http://atenea.upc.edu",
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "tags": [
                                 "Assignatura"
                             ],
-                            "published": "2000-01-01T00:01:00Z",
-                            "owner": "test_manager",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "url": "http://atenea.upc.edu",
+                            "displayName": "Atenea",
+                            "objectType": "context",
                             "permissions": [
                                 "read",
                                 "write",
                                 "invite",
                                 "unsubscribe"
-                            ],
-                            "id": "519b00000000000000000000",
-                            "objectType": "context"
+                            ]
                         }
                     ]
                 },
@@ -408,10 +400,8 @@ l'usuari ha estat previament subscrit a aquest context.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
                         "url": "http://atenea.upc.edu",
-                        "owner": "test_manager",
+                        "displayName": "Atenea",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }
@@ -479,11 +469,9 @@ l'usuari ha estat previament subscrit a aquest context.
                         "generator": null,
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
                                 "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "objectType": "context"
                             }
                         ],
@@ -602,11 +590,9 @@ concret.
                         "generator": null,
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
                                 "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "objectType": "context"
                             }
                         ],
@@ -699,11 +685,9 @@ indirectament.
                         "creator": "messi",
                         "contexts": [
                             {
-                                "displayName": "Atenea",
-                                "creator": "test_manager",
                                 "url": "http://atenea.upc.edu",
-                                "owner": "test_manager",
                                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                                "displayName": "Atenea",
                                 "objectType": "context"
                             }
                         ],
@@ -1084,23 +1068,19 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                 "totalItems": 2,
                 "items": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "url": "http://atenea.upc.edu",
+                        "displayName": "Atenea",
+                        "objectType": "context",
                         "permissions": [
                             "read",
                             "write",
                             "invite",
                             "unsubscribe"
-                        ],
-                        "id": "519b00000000000000000000",
-                        "objectType": "context"
+                        ]
                     },
                     {
                         "displayName": "Atenea A",
@@ -1108,12 +1088,8 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                             "Assignatura"
                         ],
                         "url": "http://atenea.upc.edu/A",
-                        "creator": "test_manager",
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
-                        "id": "519b00000000000000000000",
                         "permissions": [
                             "read",
                             "write",
@@ -1231,13 +1207,11 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
-                        "creator": "messi",
                         "participants": [
                             "messi",
                             "xavi"
                         ],
-                        "owner": "messi",
+                        "displayName": "messi, xavi",
                         "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
@@ -1311,13 +1285,11 @@ Aquests són els serveis associats.
                         "generator": null,
                         "contexts": [
                             {
-                                "displayName": "messi, xavi",
-                                "creator": "messi",
                                 "participants": [
                                     "messi",
                                     "xavi"
                                 ],
-                                "owner": "messi",
+                                "displayName": "messi, xavi",
                                 "id": "519b00000000000000000000",
                                 "objectType": "conversation"
                             }
@@ -1547,13 +1519,11 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
-                        "creator": "messi",
                         "participants": [
                             "messi",
                             "xavi"
                         ],
-                        "owner": "messi",
+                        "displayName": "messi, xavi",
                         "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
