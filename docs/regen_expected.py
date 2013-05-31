@@ -6,7 +6,7 @@ import subprocess
 import json
 
 PADDING = 12
-
+BUILDOUT_FOLDER = os.path.realpath('../../../')
 files = ['ca/apirest.rst', 'ca/apioperations.rst']
 
 for filename in files:
@@ -20,7 +20,7 @@ for filename in files:
     open(filename, 'w').write(newtext)
 
     # Execute doctests to capture new outputs and restore backup
-    output = subprocess.Popen(["/var/pyramid/maxdevel/bin/test", "-t", filename], stdout=subprocess.PIPE).communicate()[0]
+    output = subprocess.Popen(["{}/bin/test".format(BUILDOUT_FOLDER), "-t", filename], stdout=subprocess.PIPE).communicate()[0]
     shutil.copy(filename + '.backup', filename)
     os.remove(filename + '.backup')
     # Parse printed blocks with expected results
