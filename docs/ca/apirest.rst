@@ -135,24 +135,8 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "subscribedTo": {
-                    "totalItems": 1,
-                    "items": [
-                        {
-                            "displayName": "Atenea",
-                            "tags": [
-                                "Assignatura"
-                            ],
-                            "url": "http://atenea.upc.edu",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                            "objectType": "context",
-                            "permissions": [
-                                "read",
-                                "write",
-                                "invite",
-                                "unsubscribe"
-                            ]
-                        }
-                    ]
+                    "totalItems": 0,
+                    "items": []
                 },
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
@@ -209,24 +193,8 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "subscribedTo": {
-                    "totalItems": 1,
-                    "items": [
-                        {
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                            "tags": [
-                                "Assignatura"
-                            ],
-                            "url": "http://atenea.upc.edu",
-                            "displayName": "Atenea",
-                            "objectType": "context",
-                            "permissions": [
-                                "read",
-                                "write",
-                                "invite",
-                                "unsubscribe"
-                            ]
-                        }
-                    ]
+                    "totalItems": 0,
+                    "items": []
                 },
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
@@ -312,7 +280,6 @@ llistar-les com crear-ne de noves.
                 },
                 "object": {
                     "content": "",
-                    "keywords": [],
                     "objectType": "note"
                 },
                 "actor": {
@@ -370,9 +337,9 @@ llistar-les com crear-ne de noves.
 En el cas que volguem lligar l'activitat a un context en concret, suposant que
 l'usuari ha estat previament subscrit a aquest context.
 
-.. Subscribe the user to the context
-    >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
-    <201 Created application/json ...
+    .. Subscribe the user to the context
+        >>> utils.admin_subscribe_user_to_context(username, subscribe_context)
+        <201 Created application/json ...
 
 
     **Exemple de petició**
@@ -411,14 +378,6 @@ l'usuari ha estat previament subscrit a aquest context.
                 ],
                 "object": {
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
-                    "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
-                        "estatus",
-                        "context",
-                        "messi"
-                    ],
                     "objectType": "note"
                 },
                 "replies": {
@@ -559,7 +518,7 @@ l'usuari ha estat previament subscrit a aquest context.
 
 
 Activitats d'un contexte
-------------------
+-------------------------
 
 Torna el conjunt d'activitats generades pels usuaris del sistema a un context.
 L'usuari que fa la petició ha de tindre permisos de lectura com a mínim en el
@@ -685,7 +644,6 @@ indirectament.
                 "items": [
                     {
                         "generator": null,
-                        "creator": "messi",
                         "contexts": [
                             {
                                 "url": "http://atenea.upc.edu",
@@ -696,14 +654,6 @@ indirectament.
                         ],
                         "object": {
                             "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
-                            "keywords": [
-                                "testejant",
-                                "creaci\u00f3",
-                                "canvi",
-                                "estatus",
-                                "context",
-                                "messi"
-                            ],
                             "objectType": "note"
                         },
                         "replies": {
@@ -715,23 +665,20 @@ indirectament.
                             "displayName": "Lionel Messi",
                             "objectType": "person"
                         },
-                        "commented": "2000-01-01T00:01:00Z",
+                        "id": "519b00000000000000000000",
                         "verb": "post",
                         "published": "2000-01-01T00:01:00Z",
-                        "owner": "messi",
-                        "id": "519b00000000000000000000",
+                        "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     },
                     {
                         "generator": null,
-                        "creator": "messi",
                         "replies": {
                             "totalItems": 0,
                             "items": []
                         },
                         "object": {
                             "content": "",
-                            "keywords": [],
                             "objectType": "note"
                         },
                         "actor": {
@@ -742,7 +689,6 @@ indirectament.
                         "id": "519b00000000000000000000",
                         "verb": "post",
                         "published": "2000-01-01T00:01:00Z",
-                        "owner": "messi",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
                     }
@@ -919,45 +865,22 @@ Subscripcions
         .. code-block:: python
 
             {
-                "totalItems": 2,
+                "totalItems": 1,
                 "items": [
                     {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "tags": [
-                            "Assignatura"
-                        ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
+                        "content": "[C] Testejant un comentari nou a una activitat",
+                        "objectType": "comment",
                         "id": "519b00000000000000000000",
-                        "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
-                            "invite": "subscribed"
-                        }
-                    },
-                    {
-                        "displayName": "Atenea A",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu/A",
-                        "tags": [
-                            "Assignatura"
-                        ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "objectType": "context",
-                        "id": "519b00000000000000000000",
-                        "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
-                            "invite": "subscribed"
-                        }
+                        "actor": {
+                            "username": "messi",
+                            "displayName": "Lionel Messi",
+                            "talkingIn": {
+                                "totalItems": 0,
+                                "items": []
+                            },
+                            "objectType": "person"
+                        },
+                        "published": "2000-01-01T00:01:00Z"
                     }
                 ]
             }
@@ -1071,13 +994,10 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                 "totalItems": 2,
                 "items": [
                     {
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "tags": [
-                            "Assignatura"
-                        ],
                         "url": "http://atenea.upc.edu",
-                        "displayName": "Atenea",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context",
+                        "displayName": "Atenea",
                         "permissions": [
                             "read",
                             "write",
@@ -1086,13 +1006,10 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         ]
                     },
                     {
-                        "displayName": "Atenea A",
-                        "tags": [
-                            "Assignatura"
-                        ],
                         "url": "http://atenea.upc.edu/A",
                         "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                         "objectType": "context",
+                        "displayName": "Atenea A",
                         "permissions": [
                             "read",
                             "write",
@@ -1696,47 +1613,32 @@ que són accessibles per usuaris normals estàn documentats aquí
         .. code-block:: python
 
             {
-                "totalItems": 2,
-                "items": [
-                    {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "tags": [
-                            "Assignatura"
-                        ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
-                        "id": "519b00000000000000000000",
-                        "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
-                            "invite": "subscribed"
-                        }
-                    },
-                    {
-                        "displayName": "Atenea A",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu/A",
-                        "tags": [
-                            "Assignatura"
-                        ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
-                        "objectType": "context",
-                        "id": "519b00000000000000000000",
-                        "permissions": {
-                            "write": "public",
-                            "subscribe": "public",
-                            "read": "public",
-                            "invite": "subscribed"
-                        }
-                    }
-                ]
+                "generator": null,
+                "creator": "messi",
+                "replies": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "object": {
+                    "participants": [
+                        "messi",
+                        "xavi",
+                        "nouusuari"
+                    ],
+                    "id": "519b00000000000000000000",
+                    "objectType": "conversation"
+                },
+                "actor": {
+                    "username": "nouusuari",
+                    "displayName": "nouusuari",
+                    "objectType": "person"
+                },
+                "commented": "2000-01-01T00:01:00Z",
+                "verb": "subscribe",
+                "published": "2000-01-01T00:01:00Z",
+                "owner": "nouusuari",
+                "id": "519b00000000000000000000",
+                "objectType": "activity"
             }
 
         .. -> expected

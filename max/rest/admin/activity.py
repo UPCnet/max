@@ -59,7 +59,7 @@ def addAdminUserActivity(context, request):
     activity_oid = newactivity.insert()
     newactivity['_id'] = activity_oid
 
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()
 
 

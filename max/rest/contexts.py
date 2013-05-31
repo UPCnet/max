@@ -26,9 +26,9 @@ def getPublicContexts(context, request):
         Return a list of public-subscribable contexts
     """
     mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, flatten=1, **searchParams(request))
+    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
-    handler = JSONResourceRoot(found_contexts)
+    handler = JSONResourceRoot(found_contexts.flatten(squash=['owner', 'creator', 'pubished']))
     return handler.buildResponse()
 
 

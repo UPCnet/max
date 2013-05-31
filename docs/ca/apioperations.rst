@@ -493,9 +493,6 @@ s'explica amb profunditat en l'apartat de permisos.
             {
                 "twitterHashtag": "assignatura1",
                 "displayName": "Atenea",
-                "tags": [
-                    "Assignatura"
-                ],
                 "url": "http://atenea.upc.edu",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "objectType": "context",
@@ -538,9 +535,6 @@ s'explica amb profunditat en l'apartat de permisos.
             {
                 "twitterHashtag": "assignatura1",
                 "displayName": "Atenea",
-                "tags": [
-                    "Assignatura"
-                ],
                 "url": "http://atenea.upc.edu",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "objectType": "context",
@@ -625,14 +619,6 @@ Activitats
                 ],
                 "object": {
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
-                    "keywords": [
-                        "testejant",
-                        "creaci\u00f3",
-                        "canvi",
-                        "estatus",
-                        "context",
-                        "messi"
-                    ],
                     "objectType": "note"
                 },
                 "replies": {
