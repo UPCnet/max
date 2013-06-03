@@ -25,7 +25,7 @@ def getUsers(context, request):
     """
     mmdb = MADMaxDB(context.db)
     query = {}
-    users = mmdb.users.search(query, show_fields=["username"], sort="username", flatten=1, **searchParams(request))
+    users = mmdb.users.search(query, show_fields=["username", "objectType"], sort="username", flatten=1, **searchParams(request))
 
     handler = JSONResourceRoot(users)
     return handler.buildResponse()

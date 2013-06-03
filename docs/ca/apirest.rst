@@ -78,7 +78,8 @@ Operacions sobre el recurs *usuari* del sistema.
                 "items": [
                     {
                         "username": "messi",
-                        "id": "519b00000000000000000000"
+                        "id": "519b00000000000000000000",
+                        "objectType": "person"
                     }
                 ]
             }
@@ -865,22 +866,41 @@ Subscripcions
         .. code-block:: python
 
             {
-                "totalItems": 1,
+                "totalItems": 2,
                 "items": [
                     {
-                        "content": "[C] Testejant un comentari nou a una activitat",
-                        "objectType": "comment",
-                        "id": "519b00000000000000000000",
-                        "actor": {
-                            "username": "messi",
-                            "displayName": "Lionel Messi",
-                            "talkingIn": {
-                                "totalItems": 0,
-                                "items": []
-                            },
-                            "objectType": "person"
+                        "displayName": "Atenea",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "url": "http://atenea.upc.edu",
+                        "published": "2000-01-01T00:01:00Z",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
                         },
-                        "published": "2000-01-01T00:01:00Z"
+                        "id": "519b00000000000000000000",
+                        "objectType": "context"
+                    },
+                    {
+                        "displayName": "Atenea A",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "url": "http://atenea.upc.edu/A",
+                        "published": "2000-01-01T00:01:00Z",
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
+                        },
+                        "id": "519b00000000000000000000",
+                        "objectType": "context"
                     }
                 ]
             }
@@ -1613,32 +1633,43 @@ que són accessibles per usuaris normals estàn documentats aquí
         .. code-block:: python
 
             {
-                "generator": null,
-                "creator": "messi",
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "object": {
-                    "participants": [
-                        "messi",
-                        "xavi",
-                        "nouusuari"
-                    ],
-                    "id": "519b00000000000000000000",
-                    "objectType": "conversation"
-                },
-                "actor": {
-                    "username": "nouusuari",
-                    "displayName": "nouusuari",
-                    "objectType": "person"
-                },
-                "commented": "2000-01-01T00:01:00Z",
-                "verb": "subscribe",
-                "published": "2000-01-01T00:01:00Z",
-                "owner": "nouusuari",
-                "id": "519b00000000000000000000",
-                "objectType": "activity"
+                "totalItems": 2,
+                "items": [
+                    {
+                        "displayName": "Atenea",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "url": "http://atenea.upc.edu",
+                        "published": "2000-01-01T00:01:00Z",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
+                        },
+                        "id": "519b00000000000000000000",
+                        "objectType": "context"
+                    },
+                    {
+                        "displayName": "Atenea A",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "url": "http://atenea.upc.edu/A",
+                        "published": "2000-01-01T00:01:00Z",
+                        "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
+                        "permissions": {
+                            "write": "public",
+                            "subscribe": "public",
+                            "read": "public",
+                            "invite": "subscribed"
+                        },
+                        "id": "519b00000000000000000000",
+                        "objectType": "context"
+                    }
+                ]
             }
 
         .. -> expected
