@@ -7,6 +7,7 @@ from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.utils import searchParams
 from max.exceptions import ObjectNotFound
 
 
@@ -17,7 +18,7 @@ def getUsers(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
-    users = mmdb.users.dump(flatten=1)
+    users = mmdb.users.search({}, flatten=1, **searchParams(request))
     handler = JSONResourceRoot(users)
     return handler.buildResponse()
 
