@@ -7,10 +7,13 @@ from beaker.cache import cache_region
 
 
 @cache_region('oauth_token')
-def checkToken(url, username, token, scope):
-    payload = {"oauth_token": token,
-               "user_id": username}
-    payload['scope'] = scope if scope else 'widgetcli'
+def checkToken(url, username, token, scope, oauth_standard):
+    if oauth_standard:
+        payload = {"access_token": token, "username": username}
+        payload['scope'] = scope if scope else 'widgetcli'
+    else:
+        payload = {"oauth_token": token, "user_id": username}
+        payload['scope'] = scope if scope else 'widgetcli'
     return requests.post(url, data=payload, verify=False).status_code == 200
 
 
@@ -40,7 +43,7 @@ def oauth2(allowed_scopes=[]):
             if scope not in allowed_scopes:
                 raise Unauthorized('The specified scope is not allowed for this resource.')
 
-            valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope)
+            valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope, settings.get('max_oauth_standard', False))
 
             if valid:
                 def getCreator(request):
