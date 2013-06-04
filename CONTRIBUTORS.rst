@@ -1,3 +1,6 @@
+Contributors
+============
+
 Idea and concept:
 
  * Javier Otero [javier_otero]
