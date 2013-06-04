@@ -1,7 +1,7 @@
 from pyramid.settings import asbool
 
 
-def patched_checkToken(url, username, token, scope):
+def patched_checkToken(url, username, token, scope, False):
     return True
 
 
