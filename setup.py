@@ -1,11 +1,11 @@
 import os
-import sys
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
+README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
+CONTRIBUTORS = open(os.path.join(here, 'CONTRIBUTORS.rst')).read()
 
 requires = [
     'pyramid',
@@ -26,9 +26,9 @@ requires = [
 test_requires = ['WebTest', 'mock']
 
 setup(name='max',
-      version='3.0',
-      description='Activity Stream and Subscription Enhanced Engine (Motor d\'activitat i subscripcions extes)',
-      long_description=README + '\n\n' + CHANGES,
+      version='3.3',
+      description='Activity Stream and Subscription Enhanced Engine (Motor d\'Activitat i subscripcions eXtes)',
+      long_description=README + '\n\n' + CHANGES + '\n\n' + CONTRIBUTORS,
       classifiers=[
           "Programming Language :: Python",
           "Framework :: Pylons",
@@ -37,7 +37,7 @@ setup(name='max',
       ],
       author='UPCnet Content Management Team',
       author_email='victor.fernandez@upcnet.es',
-      url='http://github.com/upcnet/max',
+      url='https://github.com/upcnet/max',
       keywords='web pylons pyramid mongodb',
       packages=['max', 'maxrules'],
       include_package_data=True,

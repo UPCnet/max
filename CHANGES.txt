@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-3.1 (unreleased)
----------------
+3.3 (2013-06-04)
+------------------
 
  * Add debug tools
  * Delete activities
@@ -17,6 +17,7 @@ CHANGELOG
  * Documentation report system an rebuilder
  * Group conversations
  * Automatically map model classes to collections
+ * Match the package version to the MAXUI version
 
 3.0 (2013-04-15)
 ----------------
