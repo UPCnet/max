@@ -162,3 +162,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people', query, oauth2Header(username2), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result.get('items', '')), 1)
+
+    def test_create_own_user(self):
+        username = 'messi'
+        self.testapp.post('/people/%s' % username, "", oauth2Header(username), status=201)

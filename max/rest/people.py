@@ -7,6 +7,7 @@ from pyramid.response import Response
 from max.exceptions import Unauthorized
 from max.oauth2 import oauth2
 from max.MADMax import MADMaxDB
+from max.models import User
 from max.rest.utils import searchParams
 from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
@@ -48,8 +49,35 @@ def getUser(context, request):
 @view_config(route_name='user', request_method='POST')
 @MaxResponse
 @oauth2(['widgetcli'])
-def ForbiddenaddUser(context, request):
-    raise Unauthorized('The provided credentials are not allowed to perform this operation.')
+@requirePersonActor(exists=False)
+def addOwnUser(context, request):
+    """
+        /people/{username}
+
+        Creates a the own system user.
+    """
+    username = request.matchdict['username']
+    rest_params = {'username': username}
+
+    # Initialize a User object from the request
+    newuser = User()
+    newuser.fromRequest(request, rest_params=rest_params)
+
+    # If we have the _id setted, then the object already existed in the DB,
+    # otherwise, proceed to insert it into the DB
+    # In both cases, respond with the JSON of the object and the appropiate
+    # HTTP Status Code
+
+    if newuser.get('_id'):
+        # Already Exists
+        code = 200
+    else:
+        # New User
+        code = 201
+        userid = newuser.insert()
+        newuser['_id'] = userid
+    handler = JSONResourceEntity(newuser.flatten(), status_code=code)
+    return handler.buildResponse()
 
 
 @view_config(route_name='avatar', request_method='GET')
