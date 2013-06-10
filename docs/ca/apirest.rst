@@ -39,6 +39,7 @@ resultats, indicant el total d'elements retornats::
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> username = "messi"
+    >>> username2 = "neymar"
     >>> utils = MaxTestBase(testapp)
     >>> utils.create_user(username)
     <201 Created application/json ...
@@ -165,6 +166,64 @@ Operacions sobre el recurs *usuari* del sistema.
         .. code-block:: python
 
             {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
+
+.. http:post:: /people/{username}
+
+    Crea el perfil propi (el de l'usuari que executa) d'usuari remotament al
+    sistema pel seu posterior ús si no existeix. En cas de que l'usuari ja
+    existis, el retorna canviant el codi d'estat HTTP en funció de l'acció
+    realitzada.
+
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query displayName: (Opcional) El nom real (de pantalla) de l'usuari al
+        sistema
+
+    Cos de la petició
+
+        .. code-block:: python
+
+            {"username": "neymar", "displayName": "Neymar JR"}
+
+        .. -> payload
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "neymar",
+                "displayName": "Neymar JR",
+                "talkingIn": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "creator": "neymar",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2000-01-01T00:01:00Z",
+                "published": "2000-01-01T00:01:00Z",
+                "owner": "neymar",
+                "id": "519b00000000000000000000",
+                "objectType": "person"
+            }
+
+        .. -> expected
+            >>> expected = json.loads(expected)
+            >>> response = testapp.post('/people/{}'.format(username2), payload, oauth2Header(username2), status=201)
+            >>> response
+            <201 Created application/json ...
+            >>> response.json.get('displayName') == expected.get('displayName')
+            True
+
+    Success
+
+        Retorna un objecte ``Person``.
 
 .. http:get:: /people/{username}
 
