@@ -11,7 +11,7 @@ requires = [
     'pyramid',
     'pyramid_tm',
     'pyramid_debugtoolbar',
-    'pyramid_who',
+    'osiris',
     'pymongo',
     'rfc3339',
     'requests',
