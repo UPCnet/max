@@ -3,7 +3,7 @@ from celery.task import task
 from maxrules.twitter import twitter_generator_name, debug_hashtag, max_server_url
 import requests
 import pymongo
-from maxrules.config import mongodb_url, mongodb_db_name
+from maxrules.config import mongodb_url, mongodb_db_name, mongodb_cluster, mongodb_hosts, mongodb_replica_set
 from max.MADMax import MADMaxCollection
 from max.rest.utils import canWriteInContexts
 from max.rest.utils import findHashtags
@@ -30,7 +30,13 @@ def processTweet(twitter_username, content, tweetID='---'):
     """
     # Setup logging
     logger.info(u"(INFO) Processing tweet %s from %s with content: %s" % (str(tweetID), twitter_username, content))
-    conn = pymongo.Connection(mongodb_url)
+
+    # DB connection
+    if not mongodb_cluster:
+        conn = pymongo.MongoClient(mongodb_url)
+    else:
+        conn = pymongo.MongoReplicaSetClient(mongodb_hosts, mongodb_replica_set)
+
     db = conn[mongodb_db_name]
     users = MADMaxCollection(db.users)
     contexts = MADMaxCollection(db.contexts)

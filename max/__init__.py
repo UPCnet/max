@@ -58,8 +58,14 @@ def main(global_config, **settings):
     config.add_route('wadl', '/WADL')
 
     # Store in registry
-    db_uri = settings['mongodb.url']
-    conn = pymongo.Connection(db_uri)
+    if not settings.get('mongodb.cluster', False):
+        db_uri = settings['mongodb.url']
+        conn = pymongo.MongoClient(db_uri)
+    else:
+        hosts = settings.get('mongodb.hosts', '')
+        replica_set = settings.get('mongodb.replica_set', '')
+        conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set)
+
     db = conn[settings['mongodb.db_name']]
     config.registry.max_store = db
 

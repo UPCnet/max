@@ -73,12 +73,27 @@ class MaxTwitterRulesRunner(object):  # pragma: no cover
                       dest='mongodb_url',
                       type='string',
                       action='append',
-                      help=('Twitter password'))
+                      help=('MongoDB url'))
     parser.add_option('-n', '--mongodb-name',
                       dest='mongodb_db_name',
                       type='string',
                       action='append',
-                      help=('Twitter password'))
+                      help=('MongoDB database name'))
+    parser.add_option('-c', '--mongodb-cluster',
+                      dest='mongodb_cluster',
+                      action="store_true",
+                      default=False,
+                      help=('Enable MongoDB cluster'))
+    parser.add_option('-h', '--mongodb-hosts',
+                      dest='mongodb_hosts',
+                      type='string',
+                      action='append',
+                      help=('MongoDB Cluster hosts'))
+    parser.add_option('-r', '--mongodb-replica_set',
+                      dest='mongodb_replica_set',
+                      type='string',
+                      action='append',
+                      help=('MongoDB Cluster replica set'))
 
     def __init__(self, argv, quiet=False):
         self.quiet = quiet
@@ -95,6 +110,14 @@ class MaxTwitterRulesRunner(object):  # pragma: no cover
         #track_list = raw_input('Keywords to track (comma seperated):').strip()
 
         # Querying the BBDD for users to follow.
+        if self.options.mongodb_cluster[0] != '':
+            db_uri = settings['mongodb.url']
+            conn = pymongo.MongoClient(db_uri)
+        else:
+            hosts = settings.get('mongodb.hosts', '')
+            replica_set = settings.get('mongodb.replica_set', '')
+            conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set)
+
         conn = pymongo.Connection(self.options.mongodb_url[0])
         db = conn[self.options.mongodb_db_name[0]]
         contexts_with_twitter_username = db.contexts.find({"twitterUsernameId": {"$exists": True}})

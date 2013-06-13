@@ -10,3 +10,8 @@ CELERY_IMPORTS = ("maxrules.tasks", "max.models")
 # MongoDB config
 mongodb_url = "mongodb://localhost"
 mongodb_db_name = "max"
+
+# Cluster config
+mongodb_cluster = False
+mongodb_hosts = "faiada.upcnet.es:27017,fajolpetit.upcnet.es:27017,finestrelles.upcnet.es:27017"
+mongodb_replica_set = "maxcluster"
