@@ -58,6 +58,13 @@ RESTRICTED_RESOURCES = {
     'admin_security': {'route': '/admin/security'},
 }
 
+AUTHENTICATION_RESOURCES = {
+    'auth_user': {'route': '/auth/user'},
+    'auth_vhost': {'route': '/auth/vhost'},
+    'auth_resource': {'route': '/auth/resource'},
+}
+
 RESOURCES = {}
 RESOURCES.update(PUBLIC_RESOURCES)
 RESOURCES.update(RESTRICTED_RESOURCES)
+RESOURCES.update(AUTHENTICATION_RESOURCES)
