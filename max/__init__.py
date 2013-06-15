@@ -13,6 +13,7 @@ from max.resources import Root, loadMAXSettings, loadMAXSecurity
 from max.rest.resources import RESOURCES
 
 from pyramid_beaker import set_cache_regions_from_settings
+from pyramid.settings import asbool
 from max import debug
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
@@ -58,7 +59,7 @@ def main(global_config, **settings):
     config.add_route('wadl', '/WADL')
 
     # Store in registry
-    if not settings.get('mongodb.cluster', False):
+    if not asbool(settings.get('mongodb.cluster', False)):
         db_uri = settings['mongodb.url']
         conn = pymongo.MongoClient(db_uri)
     else:
