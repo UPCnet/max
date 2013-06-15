@@ -12,6 +12,8 @@ from max import DEFAULT_CONTEXT_PERMISSIONS
 from max import CONVERSATION_PARTICIPANTS_LIMIT
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import extractPostData
+from max.rabbitmq.notifications import messageNotification
+from max.rabbitmq.notifications import addConversationExchange
 
 
 @view_config(route_name='conversations', request_method='GET')
@@ -142,6 +144,9 @@ def postMessage2Conversation(context, request):
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
 
+    addConversationExchange(current_conversation)
+    messageNotification(newmessage)
+
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
 
@@ -242,6 +247,8 @@ def addMessage(context, request):
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
+
+    messageNotification(newmessage)
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
