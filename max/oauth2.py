@@ -2,6 +2,8 @@ from max.exceptions import Unauthorized
 from max.resources import getMAXSettings
 from max.resources import Root
 
+from pyramid.settings import asbool
+
 import requests
 from beaker.cache import cache_region
 
@@ -43,7 +45,7 @@ def oauth2(allowed_scopes=[]):
             if scope not in allowed_scopes:
                 raise Unauthorized('The specified scope is not allowed for this resource.')
 
-            valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope, settings.get('max_oauth_standard', False))
+            valid = checkToken(settings['max_oauth_check_endpoint'], username, oauth_token, scope, asbool(settings.get('max_oauth_standard', False)))
 
             if valid:
                 def getCreator(request):
