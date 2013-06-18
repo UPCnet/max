@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4 (2013-06-18)
+------------------
+
+ * STOMP enabled
+ * Merge long run newpermissionmodel/conversations/stomp branch into develop/master
+
 3.3.2 (2013-06-13)
 ------------------
 
