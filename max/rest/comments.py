@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotImplemented
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.decorators import MaxRequest, MaxResponse
+from max.decorators import MaxResponse, requirePersonActor
 from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.utils import flatten
@@ -14,19 +14,22 @@ from bson.objectid import ObjectId
 
 @view_config(route_name='user_comments', request_method='GET')
 @MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
 def getUserComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
-@view_config(route_name='comments', request_method='GET')
+@view_config(route_name='activity_comments', request_method='GET')
 @MaxResponse
-@MaxRequest
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getActivityComments(context, request):
     """
+        /activities/{activity}/comments
+
+        Return the comments for an activity.
     """
     activityid = request.matchdict['activity']
 
@@ -40,18 +43,20 @@ def getActivityComments(context, request):
     #handler = JSONResourceRoot(activities)
     replies = refering_activity.get('replies', {})
     items = replies.get('items', [])
-    flatten(items)
-    handler = JSONResourceRoot(items)
+    result = flatten(items, keep_private_fields=False)
+    handler = JSONResourceRoot(result)
     return handler.buildResponse()
 
 
-@view_config(route_name='comments', request_method='POST')
+@view_config(route_name='activity_comments', request_method='POST')
 @MaxResponse
-@MaxRequest
 @oauth2(['widgetcli'])
+@requirePersonActor
 def addActivityComment(context, request):
     """
-    POST /activities/{activity}/comments
+        /activities/{activity}/comments
+
+        Post a comment to an activity.
     """
     #XXX TODO ara només es tracta la primera activitat,
     # s'ha de iterar si es vol que el comentari sigui de N activitats
@@ -61,9 +66,15 @@ def addActivityComment(context, request):
     refering_activity = mmdb.activity[activityid]
 
     # Prepare rest parameters to be merged with post data
-    rest_params = {'verb': 'comment',
-                   'object': {'inReplyTo': [{'_id':ObjectId(activityid),
-                                              'objectType':refering_activity.object['objectType']}]}}
+    rest_params = {
+        'verb': 'comment',
+        'object': {
+            'inReplyTo': [{
+                '_id': ObjectId(activityid),
+                'objectType': refering_activity.object['objectType']
+            }]
+        }
+    }
 
     # Initialize a Activity object from the request
     newactivity = Activity()
@@ -75,10 +86,9 @@ def addActivityComment(context, request):
 
     comment = dict(newactivity.object)
     comment['published'] = newactivity.published
-    comment['author'] = request.actor
+    comment['actor'] = request.actor
     comment['id'] = newactivity._id
     del comment['inReplyTo']
-
     refering_activity.addComment(comment)
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
@@ -89,18 +99,18 @@ def addActivityComment(context, request):
 def getActivityComment(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='comments', request_method='PUT')
 def modifyActivityComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='comments', request_method='DELETE')
 def deleteActivityComments(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover

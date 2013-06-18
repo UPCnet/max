@@ -5,3 +5,5 @@ _build
 *.egg-info
 *.DS_Store
 *.egg
+avatars
+dist

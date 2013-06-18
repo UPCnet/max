@@ -1,33 +1,60 @@
+# -*- coding: utf-8 -*-
+import os
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
-from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import User
-from max.decorators import MaxRequest, MaxResponse
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-import os
-
+from max.exceptions import Unauthorized
 from max.oauth2 import oauth2
-from max.rest.utils import extractPostData
+from max.MADMax import MADMaxDB
+from max.models import User
+from max.rest.utils import searchParams
+from max.decorators import MaxResponse, requirePersonActor
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+
+
+@view_config(route_name='users', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def getUsers(context, request):
+    """
+         /people
+
+         Return the result of a query specified by the username param as
+         a list of usernames. For UI use only.
+    """
+    mmdb = MADMaxDB(context.db)
+    query = {}
+    users = mmdb.users.search(query, show_fields=["username", "objectType"], sort="username", flatten=1, **searchParams(request))
+
+    handler = JSONResourceRoot(users)
+    return handler.buildResponse()
 
 
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
-@MaxRequest
 @oauth2(['widgetcli'])
+@requirePersonActor
 def getUser(context, request):
     """
+        /people/{username}
+
+        Return the required user object.
     """
     handler = JSONResourceEntity(request.actor.flatten())
     return handler.buildResponse()
 
 
-@view_config(route_name='user', request_method='POST', permission='operations')
+@view_config(route_name='user', request_method='POST')
 @MaxResponse
-@MaxRequest
-def addUser(context, request):
+@oauth2(['widgetcli'])
+@requirePersonActor(exists=False)
+def addOwnUser(context, request):
     """
+        /people/{username}
+
+        Creates a the own system user.
     """
     username = request.matchdict['username']
     rest_params = {'username': username}
@@ -49,7 +76,6 @@ def addUser(context, request):
         code = 201
         userid = newuser.insert()
         newuser['_id'] = userid
-
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()
 
@@ -57,6 +83,9 @@ def addUser(context, request):
 @view_config(route_name='avatar', request_method='GET')
 def getUserAvatar(context, request):
     """
+        /people/{username}/avatar
+
+        Returns user avatar. Public endpoint.
     """
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
@@ -69,10 +98,14 @@ def getUserAvatar(context, request):
 
 @view_config(route_name='user', request_method='PUT')
 @MaxResponse
-@MaxRequest
 @oauth2(['widgetcli'])
+@requirePersonActor
 def ModifyUser(context, request):
     """
+        /people/{username}
+
+        Modifies a system user via oauth, so only the user can modify its own
+        properties.
     """
     actor = request.actor
     properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
@@ -85,4 +118,4 @@ def ModifyUser(context, request):
 def DeleteUser(context, request):
     """
     """
-    return HTTPNotImplemented()
+    return HTTPNotImplemented()  # pragma: no cover

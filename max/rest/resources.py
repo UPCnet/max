@@ -1,46 +1,70 @@
-OAUTH_RESOURCES = {
-'users': {'route': '/people'},
-'user': {'route': '/people/{username}'},
-'avatar': {'route': '/people/{username}/avatar'},
-'user_activities': {'route': '/people/{username}/activities'},
-'timeline': {'route': '/people/{username}/timeline'},
-'user_comments': {'route': '/people/{username}/comments'},
-'user_shares': {'route': '/people/{username}/shares'},
-'user_likes': {'route': '/people/{username}/likes'},
-'follows': {'route': '/people/{username}/follows'},
-'follow': {'route': '/people/{username}/follows/{followedDN}'},
-'subscriptions': {'route': '/people/{username}/subscriptions'},
-'subscription': {'route': '/people/{username}/subscriptions/{urlHash}'},
+PUBLIC_RESOURCES = {
+    'users': {'route': '/people'},
+    'user': {'route': '/people/{username}'},
+    'avatar': {'route': '/people/{username}/avatar'},
+    'user_activities': {'route': '/people/{username}/activities'},
 
-'activities': {'route': '/activities'},
-'activity': {'route': '/activities/{activity}'},
-'comments': {'route': '/activities/{activity}/comments'},
-'comment': {'route': '/activities/{activity}/comments/{commentId}'},
-'likes': {'route': '/activities/{activity}/likes'},
-'like': {'route': '/activities/{activity}/likes/{likeId}'},
-'shares': {'route': '/activities/{activity}/shares'},
-'share': {'route': '/activities/{activity}/shares/{shareId}'},
+    'activities': {'route': '/activities'},
+    'comments': {'route': '/activities/comments'},
+    'activity': {'route': '/activities/{activity}'},
+    'timeline': {'route': '/people/{username}/timeline'},
+    'timeline_authors': {'route': '/people/{username}/timeline/authors'},
 
-'contexts': {'route': '/contexts'},
-'context': {'route': '/contexts/{urlHash}'},
-'context_avatar': {'route': '/contexts/{urlHash}/avatar'},
-'context_permissions': {'route': '/contexts/{urlHash}/permissions'},
-'context_user_permissions': {'route': '/contexts/{urlHash}/permissions/{username}'},
-'context_user_permission': {'route': '/contexts/{urlHash}/permissions/{username}/{permission}'},
+    'activity_comments': {'route': '/activities/{activity}/comments'},
+
+    'subscriptions': {'route': '/people/{username}/subscriptions'},
+    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},
+
+    'user_conversations': {'route': '/people/{username}/conversations'},
+    'user_conversation': {'route': '/people/{username}/conversations/{id}'},
+
+    'contexts': {'route': '/contexts'},
+    'context': {'route': '/contexts/{hash}'},
+    'context_avatar': {'route': '/contexts/{hash}/avatar'},
+    'public_contexts': {'route': '/contexts/public'},
+    'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
+    'context_activities': {'route': '/contexts/{hash}/activities'},
+    'context_activities_authors': {'route': '/contexts/{hash}/activities/authors'},
+
+    # MAX 3.0
+    'conversations': {'route': '/conversations'},
+    'conversation': {'route': '/conversations/{id}'},
+    'messages': {'route': '/conversations/{id}/messages'},
+    'message': {'route': '/conversations/{id}/messages/{activity}'},
+    'participants': {'route': '/conversations/{id}/participants'},
+    'participant': {'route': '/conversations/{id}/participant'},
+
+    # MAX 4.0
+    'user_shares': {'route': '/people/{username}/shares'},
+    'user_likes': {'route': '/people/{username}/likes'},
+    'follows': {'route': '/people/{username}/follows'},
+    'follow': {'route': '/people/{username}/follows/{followedUsername}'},
+    'likes': {'route': '/activities/{activity}/likes'},
+    'like': {'route': '/activities/{activity}/likes/{likeId}'},
+    'shares': {'route': '/activities/{activity}/shares'},
+    'share': {'route': '/activities/{activity}/shares/{shareId}'},
+
+    # Not implemented / Not in roadmap
+    'user_comments': {'route': '/people/{username}/comments'},
+    'user_conversations': {'route': '/people/{username}/conversations'},
+    'comment': {'route': '/activities/{activity}/comments/{commentId}'},
+    'context_permissions': {'route': '/contexts/{hash}/permissions'},
+    'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
+
 }
 
-ADMIN_RESOURCES = {
-'admin_user_activities': {'route': '/admin/people/{username}/activities'},
-'admin_context_activities': {'route': '/admin/contexts/{urlHash}/activities'},
-'admin_users': {'route': '/admin/people'},
-'admin_activities': {'route': '/admin/activities'},
-'admin_contexts': {'route': '/admin/contexts'},
+RESTRICTED_RESOURCES = {
 
-'admin_user': {'route': '/admin/people/{id}'},
-'admin_activity': {'route': '/admin/activities/{id}'},
-'admin_context': {'route': '/admin/contexts/{id}'},
+    'admin_security': {'route': '/admin/security'},
+}
+
+AUTHENTICATION_RESOURCES = {
+    'auth_user': {'route': '/auth/user'},
+    'auth_vhost': {'route': '/auth/vhost'},
+    'auth_resource': {'route': '/auth/resource'},
 }
 
 RESOURCES = {}
-RESOURCES.update(OAUTH_RESOURCES)
-RESOURCES.update(ADMIN_RESOURCES)
+RESOURCES.update(PUBLIC_RESOURCES)
+RESOURCES.update(RESTRICTED_RESOURCES)
+RESOURCES.update(AUTHENTICATION_RESOURCES)

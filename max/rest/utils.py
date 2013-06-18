@@ -6,38 +6,45 @@ from rfc3339 import rfc3339
 from max.exceptions import InvalidSearchParams, Unauthorized
 
 from bson.objectid import ObjectId
-from max.MADMax import MADMaxCollection
 
 import requests
 import logging
 import urllib2
 import re
+import sys
+import os
+
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
 FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\w\-\_\.%s]+)' % UNICODE_ACCEPTED_CHARS
-FIND_KEYWORDS_REGEX = r'(\s|^)[#\'\"]?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
+FIND_KEYWORDS_REGEX = r'(\s|^)(?:#|\'|\"|\w\')?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
+
+
+def getMaxModelByObjectType(objectType):
+    return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 
 
 def downloadTwitterUserImage(twitterUsername, filename):
     """
     """
-    try:
-        req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
+    exit_status = False
+    req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
+
+    if req.status_code == 200:
         data = json.loads(req.text)
         image_url = data.get('profile_image_url_https', None)
         if image_url:
             req = requests.get(image_url)
-            open(filename, 'w').write(req.content)
-            return True
-        else:
-            logger = logging.getLogger('max')
-            logger.error("An error occurred while downloading twitter user image!")
-    except:
+            if req.status_code == 200:
+                open(filename, 'w').write(req.content)
+                exit_status = True
+
+    if not exit_status:
         logger = logging.getLogger('max')
         logger.error("An error occurred while downloading twitter user image!")
-        return False
+    return exit_status
 
 
 def getUserIdFromTwitter(twitterUsername):
@@ -64,29 +71,13 @@ def getUsernameFromURI(request):
 def getUrlHashFromURI(request):
     """
     """
-    return request.matchdict.get('urlHash', None)
+    return request.matchdict.get('hash', None)
 
 
 def getUsernameFromPOSTBody(request):
     """
     """
     return extractPostData(request).get('actor', {}).get('username', None)
-
-
-def isOauth(request):
-    """
-    """
-    keys = request.headers.keys()
-    return 'X-Oauth-Username' in keys and 'X-Oauth-Token' in keys and 'X-Oauth-Scope' in keys
-
-
-def isBasic(request):
-    """
-    """
-    if request.authorization:
-        return request.authorization[0] == 'Basic'
-    else:
-        return False
 
 
 def searchParams(request):
@@ -100,37 +91,50 @@ def searchParams(request):
     try:
         params['limit'] = int(limit)
     except:
-        raise InvalidSearchParams, 'limit must be a positive integer'
+        raise InvalidSearchParams('limit must be a positive integer')
 
     after = request.params.get('after')
     if after:
         try:
             params['after'] = ObjectId(after)
         except:
-            raise InvalidSearchParams, 'after must be a valid ObjectId BSON identifier'
+            raise InvalidSearchParams('after must be a valid ObjectId BSON identifier')
 
     before = request.params.get('before')
     if before:
         try:
             params['before'] = ObjectId(before)
         except:
-            raise InvalidSearchParams, 'before must be a valid ObjectId BSON identifier'
+            raise InvalidSearchParams('before must be a valid ObjectId BSON identifier')
 
     if 'before' in params and 'after' in params:
-        raise InvalidSearchParams, 'only one offset filter is allowe, after or before'
+        raise InvalidSearchParams('only one offset filter is allowed, after or before')
 
     hashtags = request.params.getall('hashtag')
     if hashtags:
         params['hashtag'] = [hasht.lower() for hasht in hashtags]
 
-    author = request.params.get('author')
-    if author:
-        params['author'] = author.lower()
+    actor = request.params.get('actor')
+    if actor:
+        params['actor'] = actor.lower()
 
     keywords = request.params.getall('keyword')
     if keywords:
         ### XXX Split or regex?
         params['keywords'] = [keyw.lower() for keyw in keywords]
+
+    username = request.params.get('username')
+    if username:
+        params['username'] = username.lower()
+
+    tags = request.params.getall('tags')
+    if tags:
+        retags = []
+        for tag in tags:
+            retag = re.sub(r'\s*(\w+)\s*', r'\1', tag, re.UNICODE)
+            if retag:
+                retags.append(retag)
+        params['tags'] = retags
 
     return params
 
@@ -200,32 +204,65 @@ def deUnderescore(di, key):
         Renames a dict key, removing underscores from the begginning of the key
     """
     if key.startswith('_'):
-        di[key.lstrip('_')] = di[key]
+        newkey = key.lstrip('_')
+        di[newkey] = di[key]
         del di[key]
+        return newkey
+    return key
 
 
-def flattendict(di):
+def clearPrivateFields(di):
+    """
+        Clears all fields starting with _ except _id
+    """
+    for key in di.keys():
+        if key.startswith('_') and key not in ['_id']:
+            del di[key]
+
+
+def flattendict(di, **kwargs):
     """
         Flattens key/values of a dict and continues the recursion
     """
+    di = dict(di)
+    if not kwargs.get('keep_private_fields', True):
+        clearPrivateFields(di)
+
+    # Default is squashing anything or the specified fields in squash
+    squash = kwargs.get('squash', [])
+    preserve = kwargs.get('preserve', None)
+
+    # If both parameters indicated, don't squash anything
+    if 'preserve' in kwargs and 'squash' in kwargs:
+        squash = []
+    # If only preserved was indicated, squash
+    elif preserve is not None:
+        squash = set(di.keys()) - set(preserve)
+
     for key in di.keys():
         value = di[key]
         if isinstance(value, dict) or isinstance(value, list):
-            flatten(value)
+            di[key] = flatten(value, **kwargs)
         else:
             decodeBSONEntity(di, key)
-            deUnderescore(di, key)
+        newkey = deUnderescore(di, key)
+        if key in squash or newkey in squash:
+            del di[newkey]
+    return di
 
 
-def flatten(data):
+def flatten(data, **kwargs):
     """
         Recursively flatten a dict or list
     """
     if isinstance(data, list):
+        newitems = []
         for item in data:
-            flatten(item)
+            newitems.append(flatten(item, **kwargs))
+        data = newitems
     if isinstance(data, dict):
-        flattendict(data)
+        data = flattendict(data, **kwargs)
+    return data
 
 
 def formatMessageEntities(text):
@@ -262,7 +299,7 @@ def findKeywords(text):
         excluding urls and words shorter than the defined in KEYWORD_MIN_LENGTH.
         Keywords are stored in lowercase.
     """
-    _text = text.lower().decode('utf-8')
+    _text = text.lower()
     stripped_urls = re.sub(FIND_URL_REGEX, '', _text)
     keywords = [kw.groups()[1] for kw in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
     return keywords
@@ -287,7 +324,7 @@ def shortenURL(url):
               'version': 'v3',
               'endpoint': 'shorten',
               'endpoint_params': 'longUrl=%s' % (urllib2.quote(url))
-             }
+              }
 
     queryurl = '%(api_url)s/%(version)s/%(endpoint)s?%(login)s&%(endpoint_params)s' % params
 
@@ -313,27 +350,32 @@ def extractPostData(request):
     # TODO: Do more syntax and format checks of sent data
 
 
-def canWriteInContexts(actor, urls):
+def canWriteInContexts(actor, contexts):
     """
     """
     # If no context filter defined, write/read is always allowed
-    if urls == []:
+    if contexts == []:
         return True
 
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items']]
-    unsubscribed_contexts = [url for url in urls if url not in subscribed_contexts_urls]
+    subscriptions = {}
 
-    # If user is trying to post on a context/s where he's not subscribed
-    if unsubscribed_contexts:
-        raise Unauthorized, "You are not subscribed to one or more of this contexts ,: %s" % ', '.join(unsubscribed_contexts)
+    for context in contexts:
+        subscription = subscriptions.get(context.getIdentifier(), None)
+        if subscription is None:
+            #update subscriptions dict
+            u_field = context.unique.lstrip('_')
+            subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {}).get('items', [])])
+            subscriptions.update(subsc)
+            subscription = subscriptions.get(context.getIdentifier(), None)
+            if subscription is None:
+                raise Unauthorized("You are not subscribed to this context : %s" % context.getIdentifier())
 
-    # If user is trying to post on a subscribed context/s
-    # Check that has write permission in all the contexts
-    context_map = {context['url']: context for context in actor.subscribedTo['items']}
-    unauthorized_contexts = [url for url in subscribed_contexts_urls if 'write' not in context_map[url].get('permissions', [])]
+        # If user is trying to post on a subscribed context/s
+        # Check that has write permission in all the contexts
 
-    if unauthorized_contexts:
-        raise Unauthorized, "You are not allowed to post to one or more of this contexts ,: %s" % ', '.join(unauthorized_contexts)
+        allowed_to_write = 'write' in subscription.get('permissions', [])
+        if not allowed_to_write:
+            raise Unauthorized("You are not allowed to post to this context : %s" % context.getIdentifier())
 
     # If we reached here, we have permission to post on all contexts
     return True
@@ -346,7 +388,7 @@ def canReadContext(actor, url):
     if url == []:
         return True
 
-    subscribed_contexts_urls = [a['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
+    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
 
     if url not in subscribed_contexts_urls:
 
@@ -354,213 +396,7 @@ def canReadContext(actor, url):
         # unsubscribed context if is subscribed to at least one child context
         containments = [usc.startswith(url) for usc in subscribed_contexts_urls]
         if True not in containments:
-            raise Unauthorized, "You are not subscribed to this context: %s" % url
+            raise Unauthorized("You are not subscribed to this context: %s" % url)
 
     #If we reached here, we have permission to read on all contexts
     return True
-
-# Old methods
-
-
-def checkRequestConsistency(request):
-    if request.content_type != 'application/json':
-        raise
-
-    # TODO: Do more consistency checks
-
-
-def checkQuery(data):
-    if not 'username' in data and not 'context' in data:
-        raise
-
-
-def checkIsValidQueryUser(context, data):
-    username = data['username']
-
-    result = context.db.users.find_one({'username': username})
-
-    if result:
-        return True
-    else:
-        raise
-
-
-def checkDataActivity(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not data['verb'] == 'post':
-        raise
-
-    # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
-
-
-def checkDataComment(data):
-    if not 'actor' in data:
-        raise
-
-    # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
-
-
-def checkDataFollow(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'follow':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-    if not 'person' in data['object']['objectType']:
-        raise
-
-    # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
-
-
-def checkDataunFollow(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'unfollow':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-    if not 'person' in data['object']['objectType']:
-        raise
-
-    # TODO: Check if data sent is consistent with JSON activitystrea.ms standard specs
-
-
-def checkDataFollowContext(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'follow':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-    if not 'service' in data['object']['objectType']:
-        raise
-
-
-def checkDataunFollowContext(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'unfollow':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-    if not 'service' in data['object']['objectType']:
-        raise
-
-
-def checkDataLike(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'like':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-
-
-def checkDataShare(data):
-    if not 'actor' in data:
-        raise
-    if not 'verb' in data:
-        raise
-    if not 'object' in data:
-        raise
-    if not data['verb'] == 'share':
-        raise
-    if not 'objectType' in data['object']:
-        raise
-
-
-def checkDataAddUser(data):
-    if not 'username' in data:
-        raise
-
-
-def checkIsValidUser(context, data):
-    """Searches a user by username in the db and returns its id if found.
-       Do additional check about the content of the data (eg: 'author' is a valid system username) """
-
-    username = data['actor']['username']
-    #userid = ObjectId(data['actor']['id'])
-
-    result = context.db.users.find_one({'username': username}, {'username': 1})
-    if result:
-        data['actor']['id'] = result.get('_id')
-        return True
-    else:
-        raise
-
-    # Determine if it's necessary do additional checks against the request data
-
-
-def checkIsValidActivity(context, data):
-    """ Do a check to validate that the activity is a registered activity """
-    activityid = ObjectId(data['object']['id'])
-
-    result = context.db.activity.find_one({'_id': activityid})
-
-    if result:
-        return True
-    else:
-        raise
-
-
-def checkIsValidRepliedActivity(context, data):
-    """ Do a check to validate that the activity whom the comment is referring is a registered activity """
-    activityid = ObjectId(data['object']['inReplyTo'][0]['id'])
-
-    result = context.db.activity.find_one({'_id': activityid})
-
-    if result:
-        return True
-    else:
-        raise
-
-
-def checkAreValidFollowUsers(context, data):
-    """ Check if both users follower and following are valid system users """
-    follower = data['actor']['username']
-    #followerid = ObjectId(data['actor']['id'])
-
-    following = data['object']['username']
-    #followingid = ObjectId(data['object']['id'])
-
-    # Same user, can't follow yourself, abort
-    if follower == following:
-        raise
-
-    result_follower = context.db.users.find_one({'username': follower}, {'username': 1})
-    result_following = context.db.users.find_one({'username': following}, {'username': 1})
-
-    if result_follower and result_following:
-        data['actor']['id'] = result_follower.get('_id')
-        data['object']['id'] = result_following.get('_id')
-        return True
-    else:
-        raise
-#    if result_follower.get('username') == follower and result_following.get('username') == following:
-#        return True
-#    else:
-#        raise

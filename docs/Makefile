@@ -39,10 +39,10 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html: $(SPHINX_DEPENDENCIES)
+html:   $(SPHINX_DEPENDENCIES)
 	mkdir -p _build/html _build/doctrees
- 	cd en && make html LANG=en
-    cd ca && make html LANG=ca
+	cd en && make html LANG=en
+	cd ca && make html LANG=ca
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

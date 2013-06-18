@@ -1,5 +1,5 @@
-from hashlib import sha1
 # -*- coding: utf-8 -*-
+from hashlib import sha1
 # ===============================================================
 # Format com deurien estar guardades les dades a la base de dades
 # ===============================================================
@@ -71,54 +71,72 @@ demostatus_with_context = {
 # web service com a arguments
 # =============================================================================
 
-
-
 create_context = {
 
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
+    'tags': ['Assignatura']
 }
 
+create_context_without_displayname = {
+
+    'url': 'http://atenea.upc.edu',
+}
+
+create_invalid_context = {
+
+    'object': {
+        'url': 'http://atenea.upc.edu',
+        'objectType': 'uri Geller',
+    },
+    'displayName': 'Atenea',
+}
+
+create_unauthorized_context = {
+
+    'object': {
+        'objectType': 'Conversation',
+        'participants': ['dummy']
+    }
+}
 
 create_context_full = {
-
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
     'twitterHashtag': 'atenea',
-    'twitterUsername': 'atenaupc',
+    'twitterUsername': 'maxupcnet',
 }
 
 create_context_private_rw = {
 
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
-    'permissions': {'read':'subscribed',
-                    'write':'subscribed',
-                    'join':'restricted',
-                    'invite':'restricted'}
+    'permissions': {'read': 'subscribed',
+                    'write': 'subscribed',
+                    'subscribe': 'restricted',
+                    'invite': 'restricted'}
 }
 
 create_context_private_r = {
 
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
-    'permissions': {'read':'subscribed',
-                    'write':'restricted',
-                    'join':'restricted',
-                    'invite':'restricted'}
+    'permissions': {'read': 'subscribed',
+                    'write': 'restricted',
+                    'subscribe': 'restricted',
+                    'invite': 'restricted'}
 
 }
 
 create_contextA = {
-
     'url': 'http://atenea.upc.edu/A',
     'displayName': 'Atenea A',
+    'tags': ['Assignatura']
 }
 
 create_contextB = {
-
     'url': 'http://atenea.upc.edu/B',
-    'displayName': 'Atenea B',
+    'displayName': 'Atenea B'
 }
 
 
@@ -127,7 +145,6 @@ subscribe_context = {
     "object": {
         "objectType": "context",
         "url": create_context['url'],
-        'displayName': create_context['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -136,7 +153,6 @@ subscribe_contextA = {
     "object": {
         "objectType": "context",
         "url": create_contextA['url'],
-        'displayName': create_contextA['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -145,7 +161,6 @@ subscribe_contextB = {
     "object": {
         "objectType": "context",
         "url": create_contextB['url'],
-        'displayName': create_contextB['displayName']       #displayName not needed, only for assertEquals comparison purposes
     }
 }
 
@@ -158,9 +173,18 @@ user_status = {
     },
 }
 
+user_status_with_url = {
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb url http://example.com </p>"
+    },
+}
+
 user_status_context_with_hashtag = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -171,7 +195,9 @@ user_status_context_with_hashtag = {
 
 user_status_context = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -182,7 +208,9 @@ user_status_context = {
 
 user_status_context_generator = {
     "contexts": [
-        subscribe_context['object']['url']
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -194,7 +222,9 @@ user_status_context_generator = {
 
 user_status_contextA = {
     "contexts": [
-        subscribe_contextA['object']['url']
+        {'url': subscribe_contextA['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -204,7 +234,9 @@ user_status_contextA = {
 
 user_status_contextB = {
     "contexts": [
-        subscribe_contextB['object']['url']
+        {'url': subscribe_contextB['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -214,8 +246,12 @@ user_status_contextB = {
 
 user_status_contextAB = {
     "contexts": [
-        subscribe_contextA['object']['url'],
-        subscribe_contextB['object']['url'],
+        {'url': subscribe_contextA['object']['url'],
+         'objectType': 'context'
+         },
+        {'url': subscribe_contextB['object']['url'],
+         'objectType': 'context'
+         }
     ],
     "object": {
         "objectType": "note",
@@ -228,19 +264,22 @@ context_query = {
 }
 
 context_query_kw_search = {
-    "context": sha1(subscribe_context['object']['url']).hexdigest(),
-    "keyword": ['Testejant','creació']
+    "keyword": ['Testejant', 'creació']
 }
 
-context_query_author_search = {
+context_query_actor_search = {
     "context": sha1(subscribe_context['object']['url']).hexdigest(),
-    "author": 'messi'
+    "actor": 'messi'
 }
 
 
 context_queryA = {
-"context": sha1(subscribe_contextA['object']['url']).hexdigest()}
+    "context": sha1(subscribe_contextA['object']['url']).hexdigest()
+}
 
+context_search_by_tags = {
+    "tags": ['Assignatura']
+}
 
 # Un usuari crea un comentari
 user_comment = {
@@ -256,6 +295,133 @@ user_comment_with_hashtag = {
         "content": "<p>[C] Testejant un #comentari #nou a una activitat</p>"
     }
 }
+
+# Conversations
+
+message = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+invalid_message_without_sender = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+invalid_message_sender_repeated = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "messi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+invalid_message_no_context = {
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+invalid_message_no_participants = {
+    "contexts": [
+        {"objectType": "conversation",
+         }
+    ],
+
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+message_with_tags = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "<p>A <strong>text</strong> A</p>",
+    }
+}
+
+message_s = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "shakira"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+wrong_message = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "UnknownType",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
+message2 = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "M'agrada Terrassa!",
+    }
+}
+
+message3 = {
+    "object": {
+        "objectType": "note",
+        "content": "M'agrada Taradell!",
+    }
+}
+
+
+group_message = {
+    "object": {
+        "objectType": "note",
+        "content": "Quin grup mes guai!",
+        "displayName": "Pelotudos"
+    },
+
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi", "shakira"],
+         "displayName": "Pelotudos"
+         }]
+}
+
+# For revision, not implemented yet
 
 follow = {
     "actor": {
@@ -284,33 +450,32 @@ unfollow = {
 }
 
 
-
 unfollow_context = {
-        "actor": {
-            "objectType": "person",
-            "id": "4e6e1243aceee91143000000",
-            "username": "victor"
-        },
-        "verb": "unfollow",
-        "object": {
-            "objectType": "service",
-            "username": "Introduccio als computadors",
-            "url": "http://atenea.upc.edu/introcomp"
-        },
-    }
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "username": "victor"
+    },
+    "verb": "unfollow",
+    "object": {
+        "objectType": "service",
+        "username": "Introduccio als computadors",
+        "url": "http://atenea.upc.edu/introcomp"
+    },
+}
 
 like = {
-        "actor": {
-            "objectType": "person",
-            "id": "4e6e1243aceee91143000000",
-            "username": "javier"
-        },
-        "verb": "like",
-        "object": {
-            "objectType": "activity",
-            "id": "4e707f80aceee94f49000002"
-        },
-    }
+    "actor": {
+        "objectType": "person",
+        "id": "4e6e1243aceee91143000000",
+        "username": "javier"
+    },
+    "verb": "like",
+    "object": {
+        "objectType": "activity",
+        "id": "4e707f80aceee94f49000002"
+    },
+}
 
 share = {
     "actor": {
@@ -323,4 +488,4 @@ share = {
         "objectType": "activity",
         "id": "4e6eefc5aceee9210d000004",
     },
-  }
+}

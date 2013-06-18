@@ -1,4 +1,0 @@
-Bugs
-====
-
- * Un usuari pot postejar a un context que no està subscrit.

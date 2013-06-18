@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #MADMax  Mongo Access Delegate for Max
 
 from max.exceptions import ObjectNotFound
@@ -40,7 +41,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, show_fields=None, flatten=0, sort=None, sort_dir=DESCENDING, **kwargs):
+    def search(self, query, show_fields=None, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, count=False, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -49,7 +50,8 @@ class MADMaxCollection(object):
                 after: An id pointing to an activity, whose newer fellows will be fetched
                 hashtag: A list of hastags to filter activities by
                 keywords: A list of keywords to filter activities by
-                author: A username to filter activitues by author
+                actor: A username to filter activities by actor
+                tags: A list of tags to filter contexts
         """
 
         #Extract known params from kwargs
@@ -58,7 +60,9 @@ class MADMaxCollection(object):
         before = kwargs.get('before', None)
         hashtag = kwargs.get('hashtag', None)
         keywords = kwargs.get('keywords', None)
-        author = kwargs.get('author', None)
+        actor = kwargs.get('actor', None)
+        username = kwargs.get('username', None)
+        tags = kwargs.get('tags', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -66,38 +70,44 @@ class MADMaxCollection(object):
         else:
             offset = None
 
-        if query:
-            if offset:
-                # Filter the query to return objects created later or earlier than the one
-                # represented by offset (offset not included)
-                query.update({'_id': {condition: offset}})
+        if offset:
+            # Filter the query to return objects created later or earlier than the one
+            # represented by offset (offset not included)
+            query.update({'_id': {condition: offset}})
 
-            if hashtag:
-                # Filter the query to only objects containing certain hashtags
-                hashtag_query = {'$and': []}
-                for hasht in hashtag:
-                    hashtag_query['$and'].append({'object._hashtags': hasht})
-                query.update(hashtag_query)
+        if hashtag:
+            # Filter the query to only objects containing certain hashtags
+            # Filter the query to only objects containing certain hashtags
+            hashtag_query = {'object._hashtags': {'$all': hashtag}}
+            query.update(hashtag_query)
 
-            if author:
-                # Filter the query to only objects containing certain hashtags
-                username_query = {'actor.username':author}
-                query.update(username_query)
+        if actor:
+            # Filter the query to only objects containing certain hashtags
+            username_query = {'actor.username': actor}
+            query.update(username_query)
 
-            if keywords:
-                # Filter the query to only objects containing certain keywords
-                keywords_query = {'$and': []}
-                for keyw in keywords:
-                    keywords_query['$and'].append({'object._keywords': keyw})
-                query.update(keywords_query)
+        if keywords:
+            # Filter the query to only objects containing certain keywords
+            keywords_query = {'object._keywords': {'$all': keywords}}
+            query.update(keywords_query)
 
-            # Cursor is lazy, but better to execute search here for mental sanity
-            self.setVisibleResultFields(show_fields)
-            cursor = self.collection.find(query, self.show_fields)
+        if username:
+            # Filter the query to only objects containing certain hashtags
+            username_query = {"username": {"$regex": username, "$options": "i", }}
+            query.update(username_query)
 
+        if tags:
+            # Filter the query to only objects containing certain hashtags
+            tags_query = {'tags': {'$all': tags}}
+            query.update(tags_query)
 
-        else:
-            cursor = self.collection.find()
+        # Cursor is lazy, but better to execute search here for mental sanity
+        self.setVisibleResultFields(show_fields)
+        cursor = self.collection.find(query, self.show_fields)
+
+        # If it's a count search, return the cursor's count before sorting and limiting
+        if count:
+            return cursor.count()
 
         # Sort and limit the results if specified
         if sort:
@@ -108,7 +118,7 @@ class MADMaxCollection(object):
         # Unpack the lazy cursor,
         # Wrap the result in its Mad Class,
         # and flattens it if specified
-        return [self.ItemWrapper(result, flatten=flatten) for result in cursor]
+        return [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
 
     def _getQuery(self, itemID):
         """
@@ -121,21 +131,23 @@ class MADMaxCollection(object):
             query[self.query_key] = itemID
         return query
 
-    def ItemWrapper(self, item, flatten=0):
+    def ItemWrapper(self, item, flatten=0, **kwargs):
         """
             Transforms a mongoDB item to a wrapped representation of it using
             the appropiate class, mapped by the origin collection of the item.
             Flattened or not by demand
         """
-        class_map = dict(activity='Activity',
-                        users='User',
-                        contexts='Context')
-
-        model = getattr(sys.modules['max.models'], class_map[self.collection.name], None)
+        CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
+        model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[self.collection.name], None)
         wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
+
+        #Also wrap subobjects, only if we are not flattening
+        if not flatten and 'object' in wrapped:
+            wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
+
         if flatten:
-            return wrapped.flatten()
+            return wrapped.flatten(**kwargs)
         else:
             return wrapped
 
@@ -158,7 +170,8 @@ class MADMaxCollection(object):
         if item:
             return self.ItemWrapper(item)
         else:
-            raise ObjectNotFound, "Object with id %s not found inside %s" % (itemID,self.collection.name)
+            querykey = len(query.keys()) == 1 and query.keys()[0] or 'id'
+            raise ObjectNotFound("Object with %s %s not found inside %s" % (querykey, itemID, self.collection.name))
 
     def __getattr__(self, name):
         """
@@ -171,17 +184,27 @@ class MADMaxCollection(object):
         else:
             getattr(self, name)
 
-    def dump(self, flatten=0):
+    def dump(self, flatten=0, **kwargs):
         """
             Returns all records of a collection
         """
 
-        return self.search({}, flatten=flatten)
+        return self.search({}, flatten=flatten, **kwargs)
+
+    def remove(self, query, logical=False):
+        """
+            deletes items matched by query, or marks as not visible if logical.
+        """
+        if logical:
+            self.collection.update(query, {'$set': {'visible': False}}, multi=True)
+        else:
+            self.collection.remove(query)
 
 
 class MADMaxDB(object):
-    """
-        Wrapper for accessing Database
+    """ Wrapper for accessing Database and a specific collection via a class attribute.
+
+        usage: MADMaxDB.<name_of_the_collection>
     """
 
     def __init__(self, db):
@@ -204,7 +227,7 @@ class MADMaxDB(object):
             except:
                 #If failed and user didn't pass a default value
                 if default == UNDEF:
-                    raise AttributeError, name
+                    raise AttributeError(name)
                 else:
                     attr = default
             return attr

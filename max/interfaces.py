@@ -1,7 +1,7 @@
 from zope.interface import Interface, Attribute
 
 
-class IMADObjects(Interface):
+class IMADObjects(Interface):  # pragma: no cover
     """
         Base Class for Objects in the MongoDB, It can be instantiated with a MongoDB Object
         or a request object in the source param.

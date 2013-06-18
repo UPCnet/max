@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, UnknownUserError, ValidationError
+from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, ValidationError
+from bson import ObjectId
 import datetime
-from pyramid.request import Request
+from pyramid.threadlocal import get_current_request
 import sys
 
 
@@ -20,12 +22,12 @@ class MADDict(dict):
             Allow only fields defined in schema to be inserted in the dict
             ignore non schema values
         """
-        if key in self.schema.keys():
+        if key in object.__getattribute__(self, 'schema'):
             dict.__setitem__(self, key, val)
         else:
             pass
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         dictrepr = dict.__repr__(self)
         return '%s(%s)' % (type(self).__name__, dictrepr)
 
@@ -38,19 +40,19 @@ class MADDict(dict):
             Enables setting values of dict's items trough attribute assignment,
             while preserving default setting of class attributes
         """
-        if hasattr(self, key):
-            dict.__setattr__(self, key, value)
-        else:
+        if key in object.__getattribute__(self, 'schema'):
             self.__setitem__(key, value)
+        else:
+            object.__setattr__(self, key, value)
 
     def __getattr__(self, key):
         """
             Maps dict items access to attributes, while preserving access to class attributes
         """
         try:
-            return self.__getattribute__(key)
+            return object.__getattribute__(self, key)
         except AttributeError:
-            return self.__getitem__(key)
+            return dict.__getitem__(self, key)
 
     def _on_create_custom_validations(self):
         return True
@@ -103,9 +105,9 @@ class MADDict(dict):
             if self.schema.get(fieldname).get('required', 0):
                 field_required = True
 
-		# Raise an error unless we are updating
+                # Raise an error unless we are updating
                 if not self.checkParameterExists(fieldname) and not updating:
-                    raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
+                    raise MissingField('Required parameter "%s" not found in the request' % fieldname)
             else:
                 field_required = False
 
@@ -120,8 +122,8 @@ class MADDict(dict):
                         validator = getattr(sys.modules['max.validators'], validator_name, None)
                         if validator:
                             success, message = validator(field_value)
-                            if success == False:
-                                raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
+                            if not success:
+                                raise ValidationError('Validation error on field "%s": %s' % (fieldname, message))
 
                     # Apply formatters to validated fields
                     formatters = self.schema.get(fieldname).get('formatters', [])
@@ -136,7 +138,7 @@ class MADDict(dict):
                 else:
                     # If field was required and we are not updating, raise
                     if field_required and not updating:
-                        raise MissingField, 'Required parameter "%s" found but empty' % fieldname
+                        raise MissingField('Required parameter "%s" found but empty' % fieldname)
                     # Otherwise unset the field value by deleting it's key from the data and from the real object
                     del self.data[fieldname]
                     if fieldname in self:
@@ -187,42 +189,73 @@ class MADBase(MADDict):
     mdb_collection = None
     data = {}
 
-    def fromRequest(self, request, rest_params={}):
-        self.mdb_collection = request.context.db[self.collection]
-
+    def __init__(self):
+        self.request = get_current_request()
+        # When called from outside a pyramyd app, we have no request
+        try:
+            self.db = self.request.context.db
+            self.mdb_collection = self.db[self.collection]
+        except:
+            pass
         self.data = RUDict({})
+
+    def setDates(self):
+        self['published'] = datetime.datetime.utcnow()
+
+    def getOwner(self, request):
+        return request.creator
+
+    def fromRequest(self, request, rest_params={}):
+
         self.data.update(extractPostData(request))
         self.data.update(rest_params)
 
         # Since we are building from a request,
         # overwrite actor with the validated one from the request in source
-        self.data['actor'] = request.actor
+        if 'actor' not in rest_params.keys():
+            self.data['actor'] = request.actor
+
+        # Who is actually doing this?
+        # - The one that is authenticated
+        self.data['_creator'] = request.creator
+        self.data['_owner'] = self.getOwner(request)
 
         self.processFields()
 
         #check if the object we pretend to create already exists
         existing_object = self.alreadyExists()
         if not existing_object:
-            # if we are creating a new object, set the current date and build
-            self['published'] = datetime.datetime.utcnow()
+            # if we are creating a new object, set the object dates.
+            # It uses MADBase.setDates as default, override to set custom dates
+            self.setDates()
             self._on_create_custom_validations()
             self.buildObject()
         else:
             # if it's already on the DB, just populate with the object data
             self.update(existing_object)
 
-    def fromObject(self, source, collection):
-        self.mdb_collection = collection
-        self.update(source)
+    def _post_init_from_object(self, source):
+        return True
 
-    def getMutablePropertiesFromRequest(self, request, mutable_permission = 'operations_mutable'):
+    def fromObject(self, source, collection=None):
+        self.update(source)
+        if 'id' in source:
+            self['_id'] = source['id']
+        self._post_init_from_object(source)
+
+    def fromDatabase(self, key):
+        self.data[self.unique] = key
+        obj = self.alreadyExists()
+        if obj:
+            self.update(obj)
+
+    def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """
         """
         params = extractPostData(request)
         allowed_fields = [fieldName for fieldName in self.schema if self.schema[fieldName].get(mutable_permission, 0)]
         properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
         return properties
-
 
     def insert(self):
         """
@@ -241,7 +274,7 @@ class MADBase(MADDict):
         """
             Removes the object from the DB
         """
-        self.mdb_collection.remove({'_id': self._id})
+        self.mdb_collection.remove({'_id': ObjectId(self._id)})
 
     def addToList(self, field, obj, allow_duplicates=False, safe=True):
         """
@@ -263,21 +296,33 @@ class MADBase(MADDict):
 
         if allow_duplicates or not duplicated:
             self.mdb_collection.update({'_id': self['_id']},
-                                      {'$push': {items: obj},
-                                       '$inc': {count: 1}
-                                      }
-                                     )
+                                       {'$push': {items: obj},
+                                        '$inc': {count: 1}
+                                        }
+                                       )
+            #Self-update to reflect the addition
+            self.setdefault(field, {'items': [], 'totalItems': 0})  # Make sure the field exists
+            self[field]['items'].append(obj)
+            self[field]['totalItems'] += 1
         else:
             if not safe:
-                raise DuplicatedItemError, 'Item already on list "%s"' % (field)
+                raise DuplicatedItemError('Item already on list "%s"' % (field))
 
-    def deleteFromList(self, field, obj, safe=True):
+    def deleteFromList(self, field, obj):
         """
-            Updates an array field of a existing DB object removing the object
+            Updates an array field of a existing DB object removing the object.
 
-            If safe == False, don't perform any deletion, otherwise remove the found objects.
+            If the array contains plain values, obj is the value to delete.
+            If the array contains dicts, obj must be a dict to match its key-value with
+            the value to delete on the array.
+
+            XXX TODO allow object to be either a single object or a list of objects
         """
-        pass
+
+        items = '%s.items' % field
+        count = '%s.totalItems' % field
+
+        self.mdb_collection.update({'_id': self['_id']}, {'$pull': {items: obj}, '$inc': {count: -1}})
 
     def alreadyExists(self):
         """
@@ -285,17 +330,24 @@ class MADBase(MADDict):
             If present, return the object, otherwise returns None
         """
         unique = self.unique
-        query = {unique: self.data.get(unique)}
-        return self.mdb_collection.find_one(query)
+        value = self.data.get(unique)
+        if value:
+            query = {unique: value}
+            return self.mdb_collection.find_one(query)
+        else:
+            # in the case that we don't have the unique value in the request data
+            # Assume that the object doesn't exist
+            # XXX TODO - Test it!!
+            return None
 
-    def flatten(self):
+    def flatten(self, **kwargs):
         """
             Recursively transforms non-json-serializable values and simplifies
             $oid and $data BISON structures. Intended for final output
+            Also removes fields starting with underscore _fieldname
         """
-        dd = dict([(key, self[key]) for key in self.keys()])
-        flatten(dd)
-        return dd
+        dd = dict(self)
+        return flatten(dd, **kwargs)
 
     def getObjectWrapper(self, objType):
         """
@@ -307,7 +359,7 @@ class MADBase(MADDict):
         if module:
             return module
         else:
-            raise ObjectNotSupported, 'Activitystrea.ms object type %s unknown or unsupported' % objType
+            raise ObjectNotSupported('Activitystrea.ms object type %s unknown or unsupported' % objType)
 
     def updateFields(self, fields):
         """

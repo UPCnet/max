@@ -1,3 +1,60 @@
+CHANGELOG
+=========
+
+3.3.2 (2013-06-13)
+------------------
+
+ * Add support for MongoDB cluster.
+
+3.3.1 (2013-06-04)
+------------------
+
+ * Add compatibility with the Osiris oauth server and added fallback for legacy
+   oauth servers
+
+3.3 (2013-06-04)
+------------------
+
+ * Add debug tools
+ * Delete activities
+ * DELETE and PUT requests tunneling
+ * Timeline and contexts authors list
+ * HEAD requests include totalItems count
+ * Strip tags from content
+ * Public contexts search with tags
+ * Add beaker cache to oauth requests
+ * BUGFIX: Rollback on failed conversation creation
+ * Catch exceptions in a log with a bigmax permalink
+ * Documentation report system an rebuilder
+ * Group conversations
+ * Automatically map model classes to collections
+ * Match the package version to the MAXUI version
+
+3.0 (2013-04-15)
+----------------
+
+ * Conversations with socket.io
+ * Improved tests and documentation
+ * Cleanup
+ * Unsubscribe from contexts
+ * Creation and ownership fields
+ * Route unification of /admin and /* endpoints
+ * New security implementation fully based on oauth2 and roles on db
+ * Public contexts
+
+
+2.0 (2012-03-01)
+----------------
+
+ Added this new features:
+
+ * oAuth based user authentication against a oAuth 2.0 server compliant using *Resource owner password credentials* flow
+ * oAuth user - activity actor validation
+ * App hooks dirven apps
+ * Restricted-API access for app driven hooks
+ * Support for restricted-API users and its management UI
+
+
 1.0 (2011-12-1)
 ---------------
 
@@ -14,13 +71,3 @@ Initial version, featuring:
  * No support for user profiles
  * User photos resources hardcoded and stored in fs
 
- 2.0 (2012-03-01)
- ----------------
-
- Added this new features:
-
- * oAuth based user authentication against a oAuth 2.0 server compliant using *Resource owner password credentials* flow
- * oAuth user - activity actor validation
- * App hooks dirven apps
- * Restricted-API access for app driven hooks
- * Support for restricted-API users and its management UI

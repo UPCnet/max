@@ -1,61 +1,119 @@
+# -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
+from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 
-from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import Context
-from max.decorators import MaxRequest, MaxResponse
-from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max import LAST_AUTHORS_LIMIT, AUTHORS_SEARCH_MAX_QUERIES_LIMIT
+from max.MADMax import MADMaxDB
+from max.exceptions import Unauthorized, ObjectNotFound
+from max.oauth2 import oauth2
+from max.decorators import MaxResponse, requirePersonActor
+from max.rest.ResourceHandlers import JSONResourceRoot
 import os
 
-from max.oauth2 import oauth2
-from max.rest.utils import extractPostData, downloadTwitterUserImage
-import requests
-import json
+from max.rest.utils import downloadTwitterUserImage, searchParams, flatten
 import time
 
 
-@view_config(route_name='context', request_method='GET', permission='operations')
+@view_config(route_name='public_contexts', request_method='GET')
 @MaxResponse
-@MaxRequest
-def getContext(context, request):
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
+def getPublicContexts(context, request):
     """
+        /contexts/public
+
+        Return a list of public-subscribable contexts
     """
     mmdb = MADMaxDB(context.db)
-    urlhash = request.matchdict.get('urlHash', None)
-    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
+    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
-    if not found_context:
-        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
+    handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'pubished']))
+    return handler.buildResponse()
 
-    handler = JSONResourceEntity(found_context[0].flatten())
+
+@view_config(route_name='context_activities_authors', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
+def getContextAuthors(context, request):
+    """
+        /contexts/{hash}/activities/authors
+    """
+    chash = request.matchdict['hash']
+    mmdb = MADMaxDB(context.db)
+    actor = request.actor
+    author_limit = request.params.get('limit', LAST_AUTHORS_LIMIT)
+
+    is_subscribed = chash in [subscription['hash'] for subscription in actor.subscribedTo['items']]
+    if not is_subscribed:
+        raise Unauthorized("You're not allowed to access this context")
+
+    query = {}
+    query['contexts.hash'] = chash
+    query['verb'] = 'post'
+    # Include only visible activity, this includes activity with visible=True
+    # and activity WITHOUT the visible field
+    query['visible'] = {'$ne': False}
+
+    sortBy_fields = {
+        'activities': '_id',
+        'comments': 'commented',
+    }
+    sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
+
+    still_has_activities = True
+    distinct_authors = []
+    activities = []
+    before = None
+    queries = 0
+
+    search_params = searchParams(request)
+    while len(distinct_authors) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
+        if not activities:
+            if before is not None:
+                search_params['before'] = before
+            activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
+            still_has_activities = len(activities) > 0
+        if still_has_activities:
+            activity = activities.pop(0)
+            before = activity._id
+            if activity.actor not in distinct_authors:
+                distinct_authors.append(activity.actor)
+
+    handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()
 
 
 @view_config(route_name='context_avatar', request_method='GET')
+@MaxResponse
 def getContextAvatar(context, request):
     """
+        /contexts/{hash}/avatar
+
+        Return the context's avatar. To the date, this is only implemented to
+        work integrated with Twitter.
     """
-    urlHash = request.matchdict['urlHash']
+    chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
-    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, urlHash)
+    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, chash)
 
     if not os.path.exists(context_image_filename):
         mmdb = MADMaxDB(context.db)
-        found_context = mmdb.contexts.getItemsByurlHash(urlHash)
+        found_context = mmdb.contexts.getItemsByhash(chash)
         if len(found_context) > 0:
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
+        else:
+            raise ObjectNotFound("There's no context with hash %s" % chash)
 
     if os.path.exists(context_image_filename):
-        filename = urlHash
         # Calculate time since last download and set if we have to redownload or not
         modification_time = os.path.getmtime(context_image_filename)
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
         if hours_since_last_modification > 3:
             mmdb = MADMaxDB(context.db)
-            found_context = mmdb.contexts.getItemsByurlHash(urlHash)
+            found_context = mmdb.contexts.getItemsByhash(chash)
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
     else:
@@ -67,139 +125,10 @@ def getContextAvatar(context, request):
     return image
 
 
-@view_config(route_name='contexts', request_method='POST', permission='operations')
+@view_config(route_name='context', request_method='DELETE')
 @MaxResponse
-@MaxRequest
-def addContext(context, request):
-    """
-    """
-    # Initialize a Context object from the request
-    newcontext = Context()
-    newcontext.fromRequest(request)
-
-    # If we have the _id setted, then the object already existed in the DB,
-    # otherwise, proceed to insert it into the DB
-    # In both cases, respond with the JSON of the object and the appropiate
-    # HTTP Status Code
-
-    if newcontext.get('_id'):
-        # Already Exists
-        code = 200
-    else:
-        # New User
-        code = 201
-        contextid = newcontext.insert()
-        newcontext['_id'] = contextid
-
-    handler = JSONResourceEntity(newcontext.flatten(), status_code=code)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context', request_method='PUT', permission='operations')
-@MaxResponse
-@MaxRequest
-def ModifyContext(context, request):
-    """
-    """
-    urlHash = request.matchdict['urlHash']
-    contexts = MADMaxCollection(context.db.contexts)
-    maxcontext = contexts.getItemsByurlHash(urlHash)
-    if maxcontext:
-        maxcontext = maxcontext[0]
-    else:
-        raise ObjectNotFound, 'Unknown context: %s' % urlHash
-
-    properties = maxcontext.getMutablePropertiesFromRequest(request)
-    maxcontext.modifyContext(properties)
-    maxcontext.updateUsersSubscriptions()
-    handler = JSONResourceEntity(maxcontext.flatten())
-    return handler.buildResponse()
-
-
-@view_config(route_name='context', request_method='DELETE', permission='operations')
-@MaxResponse
-@MaxRequest
+@oauth2(['widgetcli'])
 def DeleteContext(context, request):
     """
     """
-    mmdb = MADMaxDB(context.db)
-    urlhash = request.matchdict.get('urlHash', None)
-    found_context = mmdb.contexts.getItemsByurlHash(urlhash)
-
-    if not found_context:
-        raise ObjectNotFound, "There's no context matching this url hash: %s" % urlhash
-
-    found_context[0].delete()
-    found_context[0].removeUserSubscriptions()
-    return HTTPNoContent()
-
-
-@view_config(route_name='context_user_permission', request_method='PUT', permission='operations')
-@MaxResponse
-@MaxRequest
-def grantPermissionOnContext(context, request):
-    """
-    """
-    permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'join', 'invite']:
-        raise InvalidPermission, "There's not any permission named '%s'" % permission
-
-    urlhash = request.matchdict.get('urlHash', None)
-    subscription = None
-    pointer = 0
-    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
-            subscription = request.actor.subscribedTo['items'][pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized, "You can't set permissions on a context where you are not subscribed"
-
-    #If we reach here, we are subscribed to a context and ready to set the permission
-
-    permissions = subscription['permissions']
-    if permission in permissions:
-        #Already have the permission
-        code = 200
-    else:
-        #Assign the permission
-        code = 201
-        request.actor.grantPermission(subscription, permission)
-        permissions.append(permission)
-
-    handler = JSONResourceEntity(subscription, status_code=code)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context_user_permission', request_method='DELETE', permission='operations')
-@MaxResponse
-@MaxRequest
-def revokePermissionOnContext(context, request):
-    """
-    """
-    permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'join', 'invite']:
-        raise InvalidPermission, "There's not any permission named '%s'" % permission
-
-    urlhash = request.matchdict.get('urlHash', None)
-    subscription = None
-    pointer = 0
-    while subscription == None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['urlHash'] == urlhash:
-            subscription = request.actor.subscribedTo['items'][pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized, "You can't remove permissions on a context where you are not subscribed"
-
-    #If we reach here, we are subscribed to a context and ready to remove the permission
-
-    code = 200
-    permissions = subscription['permissions']
-    if permission in permissions:
-        #We have the permission, let's delete it
-        request.actor.revokePermission(subscription, permission)
-        subscription['permissions'] = [a for a in permissions if permission != a]
-
-    handler = JSONResourceEntity(subscription, status_code=code)
-    return handler.buildResponse()
+    return HTTPNotImplemented  # pragma: no cover

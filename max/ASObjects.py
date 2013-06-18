@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
 from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
+from hashlib import sha1
+from datetime import datetime
+from rfc3339 import rfc3339
 
 
 class ASObject(MADDict):
@@ -12,7 +16,7 @@ class ASObject(MADDict):
     schema = {}
     objectType = ''
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
@@ -26,24 +30,24 @@ class Note(ASObject):
     """
     data = {}
     objectType = 'Note'
-    schema = {
-                '_id':           dict(),
-                'content':       dict(required=1),
-                'objectType':    dict(required=1),
-                '_hashtags':     dict(),
-                '_keywords':     dict(),
-             }
+    schema = {'_id':           dict(),
+              'content':       dict(required=1, formatters=['stripHTMLTags']),
+              'objectType':    dict(required=1),
+              '_hashtags':     dict(),
+              '_keywords':     dict(),
+              }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
-        self.processFields()
-        self.data['content'] = formatMessageEntities(self.data['content'])
-        hashtags = findHashtags(self.data['content'])
-        if hashtags:
-            self.data['_hashtags'] = hashtags
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(self.data['content'])
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
 
 
@@ -53,26 +57,38 @@ class Comment(ASObject):
     """
     data = {}
     objectType = 'Comment'
-    schema = {
-                '_id':         dict(),
-                'content':     dict(required=1),
-                'objectType':  dict(required=1),
-                'inReplyTo':   dict(required=1),
-                '_hashtags':     dict(),
-                '_keywords':     dict(),                
-             }
+    schema = {'_id':         dict(),
+              'content':     dict(required=1, formatters=['stripHTMLTags']),
+              'objectType':  dict(required=1),
+              'inReplyTo':   dict(required=1),
+              '_hashtags':     dict(),
+              '_keywords':     dict(),
+              }
 
-    def __init__(self, data):
+    def __init__(self, data, creating=True):
         """
         """
         self.data = data
-        self.processFields()
-        self.data['content'] = formatMessageEntities(self.data['content'])
-        hashtags = findHashtags(self.data['content'])
-        if hashtags:
-            self.data['_hashtags'] = hashtags
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(self.data['content'])
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.data['_keywords'] = findKeywords(self.data['content'])
         self.update(self.data)
+
+
+class Conversation(ASObject):
+    """
+        An Max Context Object
+    """
+    data = {}
+    objectType = 'Conversation'
+    schema = {'id':          dict(),
+              'objectType':   dict(required=1),
+              'participants': dict(required=1),
+              }
 
 
 class Context(ASObject):
@@ -81,18 +97,16 @@ class Context(ASObject):
     """
     data = {}
     objectType = 'Context'
-    schema = {
-                '_id':         dict(),
-                'url':         dict(required=1),
-                'objectType':  dict(required=1),
-             }
+    schema = {'_id':         dict(),
+              'url':         dict(required=1),
+              'objectType':  dict(required=1),
+              }
 
-    def __init__(self, data):
+    def getHash(self):
         """
+            Calculates the hash based on the url
         """
-        self.data = data
-        self.processFields()
-        self.update(data)
+        return sha1(self.url).hexdigest()
 
 
 class Person(ASObject):
@@ -101,16 +115,8 @@ class Person(ASObject):
     """
     data = {}
     objectType = 'Person'
-    schema = {
-                '_id':         dict(),
-                'username':    dict(required=1),
-                'displayName': dict(required=0),
-                'objectType':  dict(required=1),
-             }
-
-    def __init__(self, data):
-        """
-        """
-        self.data = data
-        self.processFields()
-        self.update(data)
+    schema = {'_id':         dict(),
+              'username':    dict(required=1),
+              'displayName': dict(required=0),
+              'objectType':  dict(required=1),
+              }
