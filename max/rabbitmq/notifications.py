@@ -3,7 +3,7 @@ import pika
 import json
 
 
-def messageNotification(message):
+def messageNotification(message, talk_server):
     conversation_id = message['contexts'][0]['id']
     username = message['actor']['username']
     text = message['object']['content']
@@ -18,7 +18,7 @@ def messageNotification(message):
 
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host='localhost'
+            host=talk_server
         )
     )
     channel = connection.channel()
@@ -29,10 +29,10 @@ def messageNotification(message):
     )
 
 
-def addConversationExchange(conversation):
+def addConversationExchange(conversation, talk_server):
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host='localhost'
+            host=talk_server
         )
     )
     channel = connection.channel()
