@@ -10,6 +10,7 @@ from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max import CONVERSATION_PARTICIPANTS_LIMIT
+from max.resources import getMAXSettings
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import extractPostData
 from max.rabbitmq.notifications import messageNotification
@@ -144,8 +145,10 @@ def postMessage2Conversation(context, request):
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
 
-    addConversationExchange(current_conversation)
-    messageNotification(newmessage)
+    settings = getMAXSettings(request)
+    talk_server = settings.get('max_talk_server', 'localhost')
+    addConversationExchange(current_conversation, talk_server)
+    messageNotification(newmessage, talk_server)
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
@@ -248,7 +251,9 @@ def addMessage(context, request):
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
 
-    messageNotification(newmessage)
+    settings = getMAXSettings(request)
+    talk_server = settings.get('max_talk_server', 'localhost')
+    messageNotification(newmessage, talk_server)
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
