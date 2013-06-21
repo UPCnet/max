@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.4.2 (2013-06-21)
+------------------
+
+ * Extract maxrules and transfer it to its own package
+
 3.4.1 (2013-06-19)
 ------------------
 
