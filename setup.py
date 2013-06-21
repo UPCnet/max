@@ -27,7 +27,7 @@ requires = [
 test_requires = ['WebTest', 'mock']
 
 setup(name='max',
-      version='3.4.1',
+      version='3.4.2',
       description='Activity Stream and Subscription Enhanced Engine (Motor d\'Activitat i subscripcions eXtes)',
       long_description=README + '\n\n' + CHANGES + '\n\n' + CONTRIBUTORS,
       classifiers=[
@@ -40,7 +40,7 @@ setup(name='max',
       author_email='victor.fernandez@upcnet.es',
       url='https://github.com/upcnet/max',
       keywords='web pylons pyramid mongodb',
-      packages=['max', 'maxrules'],
+      packages=['max'],
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
@@ -52,7 +52,5 @@ setup(name='max',
       entry_points="""
       [paste.app_factory]
       main = max:main
-      [console_scripts]
-      maxrules.twitter = maxrules.twitter:main
       """,
       )
