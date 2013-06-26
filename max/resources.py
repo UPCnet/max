@@ -27,6 +27,14 @@ def loadMAXSettings(settings, config):
     return max_ini_settings
 
 
+def loadCloudAPISettings(registry):
+    cloudapis_settings = registry.max_store.cloudapis.find_one()
+    if cloudapis_settings:
+        return cloudapis_settings
+    else:
+        maxlogger.info("No cloudapis info found. Please run initialization database script.")  #pragma: no cover
+
+
 def loadMAXSecurity(registry):
     security_settings = [a for a in registry.max_store.security.find({})]
     if security_settings:

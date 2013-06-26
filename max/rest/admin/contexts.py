@@ -191,3 +191,16 @@ def revokePermissionOnContext(context, request):
 
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
+
+
+@view_config(route_name='context_subscribed', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def getSubscribedUsers(context, request):
+    """
+    """
+    chash = request.matchdict['hash']
+    mmdb = MADMaxDB(context.db)
+    found_contexts = mmdb.users.search({"subscribedTo.items.hash": chash}, flatten=1, show_fields=["username"], **searchParams(request))
+    handler = JSONResourceRoot(found_contexts)
+    return handler.buildResponse()

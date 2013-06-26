@@ -25,6 +25,7 @@ PUBLIC_RESOURCES = {
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
     'context_activities': {'route': '/contexts/{hash}/activities'},
     'context_activities_authors': {'route': '/contexts/{hash}/activities/authors'},
+    'context_subscribed': {'route': '/contexts/{hash}/subscribed'},
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},
