@@ -4,9 +4,11 @@ from bson import json_util
 from datetime import datetime
 from rfc3339 import rfc3339
 from max.exceptions import InvalidSearchParams, Unauthorized
+from pyramid.threadlocal import get_current_registry
 
 from bson.objectid import ObjectId
 
+import tweepy
 import requests
 import logging
 import urllib2
@@ -26,15 +28,32 @@ def getMaxModelByObjectType(objectType):
     return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 
 
+def get_twitter_api():
+    registry = get_current_registry()
+    twitter_settings = registry.cloudapis_settings.get('twitter', None)
+
+    if twitter_settings:
+        try:
+            # Twitter auth
+            auth = tweepy.OAuthHandler(twitter_settings.get('consumer_key', ''), twitter_settings.get('consumer_secret', ''))
+            auth.set_access_token(twitter_settings.get('access_token', ''), twitter_settings.get('access_token_secret', ''))
+            api = tweepy.API(auth)
+            api.verify_credentials()
+            return api
+        except:
+            # Some error occurred
+            return None
+
+
 def downloadTwitterUserImage(twitterUsername, filename):
     """
     """
     exit_status = False
-    req = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
+    api = get_twitter_api()
+    if api:
+        user = api.get_user(twitterUsername)
+        image_url = user.profile_image_url_https
 
-    if req.status_code == 200:
-        data = json.loads(req.text)
-        image_url = data.get('profile_image_url_https', None)
         if image_url:
             req = requests.get(image_url)
             if req.status_code == 200:
@@ -48,12 +67,10 @@ def downloadTwitterUserImage(twitterUsername, filename):
 
 
 def getUserIdFromTwitter(twitterUsername):
-    res = requests.get('http://api.twitter.com/1/users/show.json?screen_name=%s' % twitterUsername)
-
-    if res.status_code == 404:
-        return None
-
-    return json.loads(res.text).get('id_str', None)
+    api = get_twitter_api()
+    if api:
+        user = api.get_user(twitterUsername)
+        return user.id_str
 
 
 def getUsernameFromXOAuth(request):

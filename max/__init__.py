@@ -9,7 +9,10 @@ from pyramid.config import Configurator
 # logger has to be BEFORE the import of the following resources import
 maxlogger = logging.getLogger('max')
 
-from max.resources import Root, loadMAXSettings, loadMAXSecurity
+from max.resources import Root
+from max.resources import loadMAXSettings
+from max.resources import loadMAXSecurity
+from max.resources import loadCloudAPISettings
 from max.rest.resources import RESOURCES
 
 from pyramid_beaker import set_cache_regions_from_settings
@@ -72,6 +75,9 @@ def main(global_config, **settings):
 
     # Set MAX settings
     config.registry.max_settings = loadMAXSettings(settings, config)
+
+    # Set Twitter settings
+    config.registry.cloudapis_settings = loadCloudAPISettings(config.registry)
 
     # Set security
     config.registry.max_security = loadMAXSecurity(config.registry)
