@@ -193,10 +193,10 @@ def revokePermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_subscribed', request_method='GET', restricted='Manager')
+@view_config(route_name='context_subscriptions', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-def getSubscribedUsers(context, request):
+def getContextSubscriptions(context, request):
     """
     """
     chash = request.matchdict['hash']

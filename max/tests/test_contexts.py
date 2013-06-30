@@ -419,7 +419,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'InvalidPermission')
 
-    def test_get_subscribed_users(self):
+    def test_get_context_subscriptions(self):
         from .mockers import create_context_private_r, subscribe_context
         from hashlib import sha1
         username = 'messi'
@@ -427,7 +427,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         chash = sha1(create_context_private_r['url']).hexdigest()
-        res = self.testapp.get('/contexts/%s/subscribed' % (chash), "", oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/contexts/%s/subscriptions' % (chash), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
 
         self.assertEqual(result.get('items', None)[0].get('username', ''), 'messi')
