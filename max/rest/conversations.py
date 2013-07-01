@@ -146,7 +146,7 @@ def postMessage2Conversation(context, request):
     newmessage['_id'] = message_oid
 
     settings = getMAXSettings(request)
-    talk_server = settings.get('max_talk_server', 'localhost')
+    talk_server = settings.get('max_talk_server', '')
     addConversationExchange(current_conversation, talk_server)
     messageNotification(newmessage, talk_server)
 
@@ -228,7 +228,7 @@ def ModifyContext(context, request):
 
 
 @view_config(route_name='messages', request_method='POST')
-@MaxResponse
+#@MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
 def addMessage(context, request):
@@ -252,7 +252,7 @@ def addMessage(context, request):
     newmessage['_id'] = message_oid
 
     settings = getMAXSettings(request)
-    talk_server = settings.get('max_talk_server', 'localhost')
+    talk_server = settings.get('max_talk_server', '')
     messageNotification(newmessage, talk_server)
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)

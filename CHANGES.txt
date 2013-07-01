@@ -4,7 +4,8 @@ CHANGELOG
 3.4.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+ * Add new endpoint for return the subscribers given a context
+ * Fix tests
 
 
 3.4.2 (2013-06-21)
