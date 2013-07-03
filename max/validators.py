@@ -1,7 +1,7 @@
 import re
 from max.regex import RE_VALID_HASHTAG
 from max.regex import RE_VALID_TWITTER_USERNAME
-
+from max.regex import RE_VALID_IOS_TOKEN
 
 """
     Validators accept ONE parameter containing the value of the field to be validated
@@ -31,3 +31,12 @@ def isValidTwitterUsername(text, message='Invalid twitter username'):
     success = match is not None
     return (success, message)
 
+
+def isValidIOSToken(text, message='Invalid IOS token'):
+    """
+        Is a valid IOS token?
+        See max.regex for more info on the regex
+    """
+    match = re.match(RE_VALID_IOS_TOKEN, text)
+    success = match is not None
+    return (success, message)

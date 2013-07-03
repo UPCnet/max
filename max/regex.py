@@ -18,3 +18,11 @@ RE_VALID_HASHTAG = r'^\s*#?([a-zA-Z0-9_-]+)\s*$'
     The capture parenthesis strips @ and whitespace, and leaves real username as input
 """
 RE_VALID_TWITTER_USERNAME = r'^\s*@?([a-zA-Z0-9_]{1,15})\s*$'
+
+"""
+    A valid IOS token is a string of alphanumeric chars
+    A valid IOS token has EXACTLY THIRTY TWO chars length
+    A valid IOS token doesn't contain preceding nor trailing whitespace.
+    The capture parenthesis strips whitespace, and leaves the token as input
+"""
+RE_VALID_IOS_TOKEN = r'^\s*([a-zA-Z0-9]{32})\s*$'
