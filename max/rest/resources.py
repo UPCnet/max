@@ -3,6 +3,7 @@ PUBLIC_RESOURCES = {
     'user': {'route': '/people/{username}'},
     'avatar': {'route': '/people/{username}/avatar'},
     'user_activities': {'route': '/people/{username}/activities'},
+    'user_device': {'route': '/people/{username}/device/{platform}/{token}'},
 
     'activities': {'route': '/activities'},
     'comments': {'route': '/activities/comments'},

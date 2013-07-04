@@ -119,3 +119,24 @@ def DeleteUser(context, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover
+
+
+@view_config(route_name='user_device', request_method='POST')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def addNewUserDevice(context, request):
+    """ Adds a new user device to the user's profile.
+    """
+    username = request.matchdict['username']
+    platform = request.matchdict['platform']
+    token = request.matchdict['token']
+    rest_params = {'username': username,
+                   'platform': platform,
+                   'token': token}
+
+    actor = request.actor
+    properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
+    actor.modifyUser(properties)
+    handler = JSONResourceEntity(actor.flatten())
+    return handler.buildResponse()
