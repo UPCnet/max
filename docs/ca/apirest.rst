@@ -292,6 +292,91 @@ Operacions sobre el recurs *usuari* del sistema.
     Success
         Retorna la imatge pel seu ús immediat.
 
+.. http:post:: /people/{username}/device/{ios}/{token}
+
+    Afegeix un token de dispositiu al perfil de l'usuari. Aquest token és el que
+    identifica el dispositiu per a que se li puguin enviar notificacions push.
+
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query ios: (REST) El tipus de plataforma
+    :query token: (REST) La cadena de text que representa el token
+
+    Cos de la petició
+
+        Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "username": "messi",
+                "iosDevices": [
+                    "12345678901234567890123456789012"
+                ],
+                "displayName": "Lionel Messi",
+                "talkingIn": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "creator": "test_manager",
+                "following": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "subscribedTo": {
+                    "totalItems": 0,
+                    "items": []
+                },
+                "last_login": "2000-01-01T00:01:00Z",
+                "published": "2000-01-01T00:01:00Z",
+                "owner": "test_manager",
+                "twitterUsername": "messi10oficial",
+                "id": "519b00000000000000000000",
+                "objectType": "person"
+            }
+
+        .. -> expected
+            >>> expected = json.loads(expected)
+            >>> platform = 'ios'
+            >>> token = '12345678901234567890123456789012'
+            >>> response = testapp.post('/people/{}/device/{}/{}'.format(username, platform, token), "", oauth2Header(username), status=201)
+            >>> response
+            <201 Created application/json ...
+            >>> response.json.get('displayName') == expected.get('displayName')
+            True
+
+    Success
+
+        Retorna un objecte ``Person``.
+
+.. http:delete:: /people/{username}/device/{ios}/{token}
+
+    Esborra un token de dispositiu al perfil de l'usuari. Aquest token és el que
+    identifica el dispositiu per a que se li puguin enviar notificacions push.
+
+    :query username: (REST) L'identificador del nou usuari al sistema
+    :query ios: (REST) El tipus de plataforma
+    :query token: (REST) La cadena de text que representa el token
+
+    Cos de la petició
+
+        Aquesta petició no necessita cos.
+
+    Resposta esperada
+
+        Retorna un codi HTTP 204 (deleted) amb el cos buit
+
+        .. actual test
+            >>> platform = 'ios'
+            >>> token = '12345678901234567890123456789012'
+            >>> response = testapp.delete('/people/{}/device/{}/{}'.format(username, platform, token), "", oauth2Header(username), status=204)
+            >>> response
+            <204 No Content ...
+
+    Success
+
+        Retorna un objecte ``Person``.
 
 Activitats de l'usuari
 ----------------------
@@ -881,6 +966,9 @@ Representa el conjunt de comentaris fets a una activitat.
                         "id": "519b00000000000000000000",
                         "actor": {
                             "username": "messi",
+                            "iosDevices": [
+                                "12345678901234567890123456789012"
+                            ],
                             "displayName": "Lionel Messi",
                             "talkingIn": {
                                 "totalItems": 0,
