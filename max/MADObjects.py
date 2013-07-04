@@ -97,7 +97,7 @@ class MADDict(dict):
             - Validates fields
             - Formats fields
 
-            Returns a list of empyt fields for future actions
+            Returns a list of empty fields for future actions
         """
 
         for fieldname in self.schema:
@@ -308,6 +308,39 @@ class MADBase(MADDict):
             if not safe:
                 raise DuplicatedItemError('Item already on list "%s"' % (field))
 
+    def add_to_list(self, field, obj, allow_duplicates=False, safe=True):
+        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'totalItems'
+            Updates an array field of a existing DB object appending the new object.
+
+            if allow_duplicates = True, allows to add items even if its already on the list. If not
+            , looks for `safe` value to either raise an exception if safe==False or pass gracefully if its True
+
+            XXX TODO allow object to be either a single object or a list of objects
+        """
+
+        obj_list = self.get(field, [])
+        if not isinstance(obj_list, list):
+            raise AttributeError('Field {} is not a list.'.format(field))
+
+        duplicated = obj in obj_list
+
+        if allow_duplicates or not duplicated:
+            # Self-update to reflect the addition
+            self.setdefault(field, [])  # Make sure the field exists
+            self[field].append(obj)
+
+            # Validate field
+            self.data = {field: obj}
+            self.processFields(updating=True)
+
+            # If valid, update
+            self.mdb_collection.update({'_id': self['_id']},
+                                       {'$push': {field: obj}}
+                                       )
+        else:
+            if not safe:
+                raise DuplicatedItemError('Item already on list "%s"' % (field))
+
     def deleteFromList(self, field, obj):
         """
             Updates an array field of a existing DB object removing the object.
@@ -323,6 +356,19 @@ class MADBase(MADDict):
         count = '%s.totalItems' % field
 
         self.mdb_collection.update({'_id': self['_id']}, {'$pull': {items: obj}, '$inc': {count: -1}})
+
+    def delete_from_list(self, field, obj):
+        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'totalItems'
+            Updates an array field of a existing DB object removing the object.
+
+            If the array contains plain values, obj is the value to delete.
+            If the array contains dicts, obj must be a dict to match its key-value with
+            the value to delete on the array.
+
+            XXX TODO allow object to be either a single object or a list of objects
+        """
+
+        self.mdb_collection.update({'_id': self['_id']}, {'$pull': {field: obj}})
 
     def alreadyExists(self):
         """
@@ -364,6 +410,7 @@ class MADBase(MADDict):
     def updateFields(self, fields):
         """
             Update fields on objects
+            where fields is a {name_field: value})
         """
         self.data = fields
         self.processFields(updating=True)

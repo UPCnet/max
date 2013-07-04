@@ -3,6 +3,8 @@ from max.MADObjects import MADBase
 import datetime
 from max.rest.utils import getMaxModelByObjectType
 
+PLATFORM_FIELD_SUFFIX = 'Devices'
+
 
 class User(MADBase):
     """
@@ -108,3 +110,9 @@ class User(MADBase):
         for subscription in self[temp_context.user_subscription_storage]['items']:
             if subscription[temp_context.unique.lstrip('_')] == temp_context[temp_context.unique]:
                 return subscription
+
+    def addUserDevice(self, platform, token):
+        self.add_to_list(platform + PLATFORM_FIELD_SUFFIX, token)
+
+    def deleteUserDevice(self, platform, token):
+        self.delete_from_list(platform + PLATFORM_FIELD_SUFFIX, token)

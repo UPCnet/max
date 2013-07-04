@@ -2,9 +2,12 @@
 import os
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 
 from max.exceptions import Unauthorized
+from max.exceptions import ValidationError
+from max.exceptions import ObjectNotFound
 from max.oauth2 import oauth2
 from max.MADMax import MADMaxDB
 from max.models import User
@@ -125,18 +128,41 @@ def DeleteUser(context, request):
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
-def addNewUserDevice(context, request):
+def addUserDevice(context, request):
     """ Adds a new user device to the user's profile.
     """
-    username = request.matchdict['username']
     platform = request.matchdict['platform']
     token = request.matchdict['token']
-    rest_params = {'username': username,
-                   'platform': platform,
-                   'token': token}
+    supported_platforms = ['ios', 'android']
+    if platform not in supported_platforms:
+        raise ValidationError('Not supported platform.')
 
     actor = request.actor
-    properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
-    actor.modifyUser(properties)
-    handler = JSONResourceEntity(actor.flatten())
+
+    code = 201
+    actor.addUserDevice(platform, token)
+    handler = JSONResourceEntity(actor.flatten(), status_code=code)
     return handler.buildResponse()
+
+
+@view_config(route_name='user_device', request_method='DELETE')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def deleteUserDevice(context, request):
+    """ Delete an existing user device to the user's profile.
+    """
+    platform = request.matchdict['platform']
+    token = request.matchdict['token']
+    supported_platforms = ['ios', 'android']
+    if platform not in supported_platforms:
+        raise ValidationError('Not supported platform.')
+
+    actor = request.actor
+
+    if token not in actor.get(platform + 'Devices', ''):
+        raise ObjectNotFound("Token not found in user's devices.")
+
+    actor.deleteUserDevice(platform, token)
+
+    return HTTPNoContent()

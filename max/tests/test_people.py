@@ -166,3 +166,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_create_own_user(self):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header(username), status=201)
+
+    def test_add_device_token(self):
+        username = 'messi'
+        platform = 'ios'
+        token = '12345678901234567890123456789012'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('iosDevices', []), ['12345678901234567890123456789012'])
+
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('iosDevices', []), ['12345678901234567890123456789012'])
+
+    def test_add_device_token_invalid_token(self):
+        username = 'messi'
+        platform = 'ios'
+        token = '1234'
+        self.create_user(username)
+        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=400)
+
+    def test_delete_device_token(self):
+        username = 'messi'
+        platform = 'ios'
+        token = '12345678901234567890123456789012'
+        self.create_user(username)
+        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
+        self.testapp.delete('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=204)
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('iosDevices'), [])
