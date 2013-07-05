@@ -292,7 +292,7 @@ Operacions sobre el recurs *usuari* del sistema.
     Success
         Retorna la imatge pel seu ús immediat.
 
-.. http:post:: /people/{username}/device/{ios}/{token}
+.. http:post:: /people/{username}/device/{platform}/{token}
 
     Afegeix un token de dispositiu al perfil de l'usuari. Aquest token és el que
     identifica el dispositiu per a que se li puguin enviar notificacions push.
@@ -350,7 +350,7 @@ Operacions sobre el recurs *usuari* del sistema.
 
         Retorna un objecte ``Person``.
 
-.. http:delete:: /people/{username}/device/{ios}/{token}
+.. http:delete:: /people/{username}/device/{platform}/{token}
 
     Esborra un token de dispositiu al perfil de l'usuari. Aquest token és el que
     identifica el dispositiu per a que se li puguin enviar notificacions push.
