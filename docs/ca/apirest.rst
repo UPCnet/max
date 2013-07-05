@@ -298,7 +298,7 @@ Operacions sobre el recurs *usuari* del sistema.
     identifica el dispositiu per a que se li puguin enviar notificacions push.
 
     :query username: (REST) L'identificador del nou usuari al sistema
-    :query ios: (REST) El tipus de plataforma
+    :query platform: (REST) El tipus de plataforma
     :query token: (REST) La cadena de text que representa el token
 
     Cos de la petició
@@ -356,7 +356,7 @@ Operacions sobre el recurs *usuari* del sistema.
     identifica el dispositiu per a que se li puguin enviar notificacions push.
 
     :query username: (REST) L'identificador del nou usuari al sistema
-    :query ios: (REST) El tipus de plataforma
+    :query platform: (REST) El tipus de plataforma
     :query token: (REST) La cadena de text que representa el token
 
     Cos de la petició
