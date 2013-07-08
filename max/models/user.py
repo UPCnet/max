@@ -27,8 +27,9 @@ class User(MADBase):
                                          formatters=['stripTwitterUsername'],
                                          validators=['isValidTwitterUsername']
                                          ),
-              'iosDevices':      dict(validators=['isValidIOSToken']),
-              'androidDevices':      dict(validators=['isValidAndroidToken']),
+              'iosDevices':     dict(default=[],
+                                     validators=['isValidIOSToken']),
+              'androidDevices': dict(default=[]),
               }
 
     def buildObject(self):
