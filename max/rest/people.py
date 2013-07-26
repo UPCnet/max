@@ -99,6 +99,20 @@ def getUserAvatar(context, request):
     return image
 
 
+@view_config(route_name='avatar', request_method='POST')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def postUserAvatar(context, request):
+    """
+        /people/{username}/avatar
+
+        Upload user avatar.
+    """
+    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
+    username = request.matchdict['username']
+
+
 @view_config(route_name='user', request_method='PUT')
 @MaxResponse
 @oauth2(['widgetcli'])
