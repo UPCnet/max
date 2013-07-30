@@ -228,7 +228,7 @@ def ModifyContext(context, request):
 
 
 @view_config(route_name='messages', request_method='POST')
-#@MaxResponse
+@MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
 def addMessage(context, request):
