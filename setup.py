@@ -22,7 +22,8 @@ requires = [
     'Paste',
     'bleach',
     'pika',
-    'maxrules'
+    'maxrules',
+    'Pillow'
 ]
 
 test_requires = ['WebTest', 'mock']

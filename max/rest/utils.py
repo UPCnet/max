@@ -359,7 +359,12 @@ def shortenURL(url):
 
 def extractPostData(request):
     if request.body:
-        json_data = json.loads(request.body, object_hook=json_util.object_hook)
+        # Usually look for JSON encoded body, catch the case it does not contain
+        # valid JSON data, e.g when uploading a file
+        try:
+            json_data = json.loads(request.body, object_hook=json_util.object_hook)
+        except:
+            json_data = {}
     else:
         json_data = {}
 

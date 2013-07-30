@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import shutil
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.httpexceptions import HTTPNoContent
@@ -14,6 +15,8 @@ from max.models import User
 from max.rest.utils import searchParams
 from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+
+from PIL import Image
 
 
 @view_config(route_name='users', request_method='GET')
@@ -110,7 +113,43 @@ def postUserAvatar(context, request):
         Upload user avatar.
     """
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
+    if not os.path.exists(AVATAR_FOLDER):
+        os.mkdir(AVATAR_FOLDER)
     username = request.matchdict['username']
+
+    if request.content_type != 'multipart/form-data' and \
+       len(request.POST.keys()) != 1:
+        raise ValidationError('Not supported upload method.')
+
+    file_key = request.POST.keys()[0]
+    input_file = request.POST[file_key].file
+    # original_filename = request.POST[file_key].filename
+    destination_filename = '{}.png'.format(username)
+    destination_large_filename = '{}-large.png'.format(username)
+
+    # Saving the standard (48x48) avatar image in png format, resize if needed
+    file_path = os.path.join(AVATAR_FOLDER, destination_filename)
+    input_file.seek(0)
+    image = Image.open(input_file)
+
+    if image.size[0] > 48:
+        image = image.resize((48, 48), Image.ANTIALIAS)
+    image.save(file_path)
+
+    # Saving the large (176x176) avatar image in png format, resize if needed
+    file_path = os.path.join(AVATAR_FOLDER, destination_large_filename)
+    input_file.seek(0)
+    image = Image.open(input_file)
+
+    if image.size[0] > 176:
+        image = image.resize((176, 176), Image.ANTIALIAS)
+    image.save(file_path)
+
+    # Use with files
+    # with open(file_path, 'wb') as output_file:
+    #     shutil.copyfileobj(input_file, output_file)
+
+    return Response("Uploaded", status_int=201)
 
 
 @view_config(route_name='user', request_method='PUT')
