@@ -33,13 +33,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = requests.request('post', '{}people/{}'.format(self.server.application_url, username), data=json.dumps(payload), headers=oauth2Header(test_manager))
         return res
 
-    def test_upload_profile_avatar(self):
+    def test_upload_and_get_profile_avatar(self):
         username = 'messi'
         avatar_file = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
         files = {'file': ('avatar.png', avatar_file)}
         self.create_user(username)
         res = requests.request('post', '{}people/{}/avatar'.format(self.server.application_url, username), headers=oauth2Header(username), files=files)
         self.assertEqual(res.status_code, 201)
+
+        res = requests.request('get', '{}people/{}/avatar'.format(self.server.application_url, username))
+        self.assertEqual(res.status_code, 200)
 
     def tearDown(self):
         self.server.shutdown()

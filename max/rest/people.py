@@ -95,10 +95,10 @@ def getUserAvatar(context, request):
     """
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
-    filename = os.path.exists('%s/%s.jpg' % (AVATAR_FOLDER, username)) and username or 'missing'
-    data = open('%s/%s.jpg' % (AVATAR_FOLDER, filename)).read()
+    filename = username if os.path.exists(os.path.join(AVATAR_FOLDER, '{}.png'.format(username))) else 'missing'
+    data = open(os.path.join(AVATAR_FOLDER, '{}.png'.format(filename))).read()
     image = Response(data, status_int=200)
-    image.content_type = 'image/jpeg'
+    image.content_type = 'image/png'
     return image
 
 
