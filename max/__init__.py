@@ -68,7 +68,7 @@ def main(global_config, **settings):
     else:
         hosts = settings.get('mongodb.hosts', '')
         replica_set = settings.get('mongodb.replica_set', '')
-        conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set)
+        conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set, use_greenlets=True)
 
     db = conn[settings['mongodb.db_name']]
     config.registry.max_store = db
