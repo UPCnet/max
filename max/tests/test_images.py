@@ -32,7 +32,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # Create folder and default avatar image
         if not os.path.exists(self.app.registry.settings['avatar_folder']):  # pragma: no cover
             os.mkdir(self.app.registry.settings['avatar_folder'])
-        open('%s/missing.jpg' % self.app.registry.settings['avatar_folder'], 'w').write(image)
+        open('%s/missing.png' % self.app.registry.settings['avatar_folder'], 'w').write(image)
 
     def tearDown(self):
         for image in os.listdir(self.app.registry.settings['avatar_folder']):
@@ -87,7 +87,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_full
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
-        open('%s/%s.jpg' % (self.app.registry.settings['avatar_folder'], url_hash), 'w').write(image)
+        open('%s/%s.png' % (self.app.registry.settings['avatar_folder'], url_hash), 'w').write(image)
 
         res = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
         self.assertIn('image', res.content_type)
@@ -100,7 +100,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_full
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
-        image_filename = '%s/%s.jpg' % (self.app.registry.settings['avatar_folder'], url_hash)
+        image_filename = '%s/%s.png' % (self.app.registry.settings['avatar_folder'], url_hash)
 
         # Save the file and rewind its date 4 hours
         open(image_filename, 'w').write(image)

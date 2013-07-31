@@ -193,12 +193,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('androidDevices', []), [token])
 
-    def test_add_device_token_invalid_token(self):
-        username = 'messi'
-        platform = 'ios'
-        token = '1234'
-        self.create_user(username)
-        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=400)
+    # def test_add_device_token_invalid_token(self):
+    #     username = 'messi'
+    #     platform = 'ios'
+    #     token = '1234'
+    #     self.create_user(username)
+    #     self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=400)
 
     def test_delete_device_token(self):
         username = 'messi'

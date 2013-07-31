@@ -96,7 +96,7 @@ def getContextAvatar(context, request):
     """
     chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
-    context_image_filename = '%s/%s.jpg' % (AVATAR_FOLDER, chash)
+    context_image_filename = '%s/%s.png' % (AVATAR_FOLDER, chash)
 
     if not os.path.exists(context_image_filename):
         mmdb = MADMaxDB(context.db)
@@ -117,11 +117,11 @@ def getContextAvatar(context, request):
             twitter_username = found_context[0]['twitterUsername']
             downloadTwitterUserImage(twitter_username, context_image_filename)
     else:
-        context_image_filename = '%s/missing.jpg' % (AVATAR_FOLDER)
+        context_image_filename = '%s/missing.png' % (AVATAR_FOLDER)
 
     data = open(context_image_filename).read()
     image = Response(data, status_int=200)
-    image.content_type = 'image/jpeg'
+    image.content_type = 'image/png'
     return image
 
 
