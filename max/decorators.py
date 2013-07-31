@@ -8,6 +8,9 @@ from max.rest.resources import RESOURCES
 from max.rest.utils import getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
 from max.models import User, Context
 
+from pymongo.errors import AutoReconnect
+from pymongo.errors import ConnectionFailure
+
 import traceback
 from datetime import datetime
 import json
@@ -166,6 +169,43 @@ def saveException(request, error):  # pragma: no cover
     return entry['hash']
 
 
+def catch_exception(request, e):
+    if isinstance(e, ConnectionFailure):
+        return JSONHTTPInternalServerError(error=dict(error='DatabaseConnectionError', error_description='Please try again later.'))
+    elif isinstance(e, InvalidId):
+        return JSONHTTPBadRequest(error=dict(error=InvalidId.__name__, error_description=e.value))
+    elif isinstance(e, ObjectNotSupported):
+        return JSONHTTPBadRequest(error=dict(error=ObjectNotSupported.__name__, error_description=e.value))
+    elif isinstance(e, ObjectNotFound):
+        return JSONHTTPNotFound(error=dict(error=ObjectNotFound.__name__, error_description=e.value))
+    elif isinstance(e, MissingField):
+        return JSONHTTPBadRequest(error=dict(error=MissingField.__name__, error_description=e.value))
+    elif isinstance(e, DuplicatedItemError):
+        return JSONHTTPBadRequest(error=dict(error=DuplicatedItemError.__name__, error_description=e.value))
+    elif isinstance(e, UnknownUserError):
+        return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=e.value))
+    elif isinstance(e, Unauthorized):
+        return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=e.value))
+    elif isinstance(e, InvalidSearchParams):
+        return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=e.value))
+    elif isinstance(e, InvalidPermission):
+        return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=e.value))
+    elif isinstance(e, ValidationError):
+        return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=e.value))
+    elif isinstance(e, Forbidden):
+        return JSONHTTPForbidden(error=dict(error=Forbidden.__name__, error_description=e.value))
+
+    # JSON decode error????
+    elif isinstance(e, ValueError):
+        return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
+    # This code will only raise if a non-tested thing appear
+    # So, as the tests will not ever see this, we exlcude it from coverage
+    else:  # pragma: no cover
+        error = traceback.format_exc()
+        sha1_hash = saveException(request, error)
+        max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
+        return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
+
 def MaxResponse(fun):
     def replacement(*args, **kwargs):
         # Handle exceptions throwed in the process of executing the REST method and
@@ -176,39 +216,19 @@ def MaxResponse(fun):
         # return response
         try:
             response = fun(*args, **kwargs)
-        except InvalidId, message:
-            return JSONHTTPBadRequest(error=dict(error=InvalidId.__name__, error_description=message.value))
-        except ObjectNotSupported, message:
-            return JSONHTTPBadRequest(error=dict(error=ObjectNotSupported.__name__, error_description=message.value))
-        except ObjectNotFound, message:
-            return JSONHTTPNotFound(error=dict(error=ObjectNotFound.__name__, error_description=message.value))
-        except MissingField, message:
-            return JSONHTTPBadRequest(error=dict(error=MissingField.__name__, error_description=message.value))
-        except DuplicatedItemError, message:
-            return JSONHTTPBadRequest(error=dict(error=DuplicatedItemError.__name__, error_description=message.value))
-        except UnknownUserError, message:
-            return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=message.value))
-        except Unauthorized, message:
-            return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=message.value))
-        except InvalidSearchParams, message:
-            return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=message.value))
-        except InvalidPermission, message:
-            return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=message.value))
-        except ValidationError, message:
-            return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=message.value))
-        except Forbidden, message:
-            return JSONHTTPForbidden(error=dict(error=Forbidden.__name__, error_description=message.value))
-
-        # JSON decode error????
-        except ValueError:
-            return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
-        # This code will only raise if a non-tested thing appear
-        # So, as the tests will not ever see this, we exlcude it from coverage
-        except:  # pragma: no cover
-            error = traceback.format_exc()
-            sha1_hash = saveException(request, error)
-            max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
-            return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
+        except AutoReconnect:
+            tryin_to_reconnect = True
+            while tryin_to_reconnect:
+                try:
+                    response = fun(*args, **kwargs)
+                except AutoReconnect:
+                    pass
+                except Exception, e:
+                    return catch_exception(request, e)
+                else:
+                    tryin_to_reconnect = False
+        except Exception, e:
+            return catch_exception(request, e)
         else:
             # Don't cache by default, get configuration from resource if any
             route_cache_settings = RESOURCES.get(request.matched_route.name, {}).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
