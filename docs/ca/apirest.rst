@@ -292,6 +292,20 @@ Operacions sobre el recurs *usuari* del sistema.
     Success
         Retorna la imatge pel seu ús immediat.
 
+.. http:post:: /people/{username}/avatar
+
+    Permet a l'usuari del sistema pujar la seva imatge del seu perfil (avatar).
+
+    :query username: (REST) L'identificador de l'usuari
+
+    Cos de la petició
+
+        La petició ha d'estar feta mitjançant multipart/form-data amb les
+        capçaleres corresponents d'oAuth en aquest endpoint.
+
+    Success
+        Retorna un codi **201** (Created)
+
 .. http:post:: /people/{username}/device/{platform}/{token}
 
     Afegeix un token de dispositiu al perfil de l'usuari. Aquest token és el que
