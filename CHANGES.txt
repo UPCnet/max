@@ -1,11 +1,23 @@
 CHANGELOG
 =========
 
-3.4.4 (unreleased)
+3.4.4 (2013-08-02)
 ------------------
 
-- Nothing changed yet.
-
+ * Improve the image resizing&cropping. [Victor Fernandez de Alba]
+ * Documentation of the upload avatar endpoint [Victor Fernandez de Alba]
+ * Use greenlets always in case we are using cluster [Victor Fernandez de Alba]
+ * Fix images as png and default avatars folder [Victor Fernandez de Alba]
+ * Refactor the MaxResponse part for make it cluster-aware. [Victor Fernandez de Alba]
+ * Updated get user's profile avatar. [Victor Fernandez de Alba]
+ * Fix comment in decorator [Victor Fernandez de Alba]
+ * New endpoint for uploading user's avatar. [Victor Fernandez de Alba]
+ * Eliminate the validation of the ios token. [Victor Fernandez de Alba]
+ * Fix android store token, no validation on android tokens [Victor Fernandez de Alba]
+ * Added documentation for the new endpoints. [Victor Fernandez de Alba]
+ * New endpoints to store and delete device tokens for push notifications. [Victor Fernandez de Alba]
+ * New user model added new properties to handle devices tokens for push notifications [Victor Fernandez de Alba]
+ * Add properties to user model [Victor Fernandez de Alba]
 
 3.4.3 (2013-07-01)
 ------------------
