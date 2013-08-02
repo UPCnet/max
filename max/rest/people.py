@@ -133,7 +133,8 @@ def postUserAvatar(context, request):
     image = Image.open(input_file)
 
     if image.size[0] > 48:
-        image = image.resize((48, 48), Image.ANTIALIAS)
+        image.thumbnail((48,9800), Image.ANTIALIAS)
+        image = image.transform((48,48), Image.EXTENT, (0, 0, 48, 48), Image.BICUBIC)
     image.save(file_path)
 
     # Saving the large (176x176) avatar image in png format, resize if needed
@@ -142,7 +143,8 @@ def postUserAvatar(context, request):
     image = Image.open(input_file)
 
     if image.size[0] > 176:
-        image = image.resize((176, 176), Image.ANTIALIAS)
+        image.thumbnail((176,9800), Image.ANTIALIAS)
+        image = image.transform((176,176), Image.EXTENT, (0, 0, 176, 176), Image.BICUBIC)
     image.save(file_path)
 
     # Use with files
