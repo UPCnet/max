@@ -28,9 +28,9 @@ def getPushTokensForConversation(context, request):
     result = []
     for user in users:
         for idevice in user.get('iosDevices'):
-            result.append(dict(token=idevice, platform='iOS'))
+            result.append(dict(token=idevice, platform='iOS', username=user.get('username')))
         for adevice in user.get('androidDevices'):
-            result.append(dict(token=idevice, platform='android'))
+            result.append(dict(token=idevice, platform='android', username=user.get('username')))
 
     handler = JSONResourceRoot(result)
     return handler.buildResponse()
