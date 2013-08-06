@@ -8,7 +8,7 @@ from mock import patch
 from paste.deploy import loadapp
 
 from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
-from max.tests import test_default_security
+from max.tests import test_manager, test_default_security
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -830,3 +830,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['displayName'], 'La Shakira')
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient2), status=200)
         self.assertEqual(res.json['displayName'], 'Leo Messi')
+
+    def test_get_pushtokens_for_given_conversations(self):
+        """ doctest .. http:get:: /conversations/{id}/tokens """
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        platform = 'ios'
+        token_sender = '12345678901234567890123456789012'
+        token_recipient = '12345678901234567890123456789012'
+        self.testapp.post('/people/%s/device/%s/%s' % (sender, platform, token_sender), "", oauth2Header(sender), status=201)
+        self.testapp.post('/people/%s/device/%s/%s' % (recipient, platform, token_recipient), "", oauth2Header(recipient), status=201)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        res = self.testapp.get('/conversations/{}/tokens'.format(conversation_id), json.dumps(message), oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['items'][0]['platform'], u'iOS')
+        self.assertEqual(res.json['items'][0]['token'], u'12345678901234567890123456789012')
+        self.assertEqual(res.json['totalItems'], 2)

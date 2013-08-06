@@ -31,6 +31,7 @@ PUBLIC_RESOURCES = {
     # MAX 3.0
     'conversations': {'route': '/conversations'},
     'conversation': {'route': '/conversations/{id}'},
+    'pushtokens': {'route': '/conversations/{id}/tokens'},
     'messages': {'route': '/conversations/{id}/messages'},
     'message': {'route': '/conversations/{id}/messages/{activity}'},
     'participants': {'route': '/conversations/{id}/participants'},

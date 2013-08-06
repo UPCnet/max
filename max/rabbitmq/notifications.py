@@ -44,7 +44,7 @@ def addConversationExchange(conversation, talk_server):
                                  durable=True,
                                  type='fanout')
         # For binding push feature
-        # channel.queue_bind(exchange=conversation.getIdentifier(), queue="push")
+        channel.queue_bind(exchange=conversation.getIdentifier(), queue="push")
 
         message = {
             'conversation': conversation.getIdentifier()
