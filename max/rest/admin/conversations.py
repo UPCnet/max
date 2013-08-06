@@ -10,7 +10,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 
 @view_config(route_name='pushtokens', request_method='GET')
 @MaxResponse
-# @oauth2(['widgetcli'])
+@oauth2(['widgetcli'])
 def getPushTokensForConversation(context, request):
     """
          /conversations/{id}/tokens
