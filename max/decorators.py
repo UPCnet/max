@@ -206,6 +206,7 @@ def catch_exception(request, e):
         max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
         return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
 
+
 def MaxResponse(fun):
     def replacement(*args, **kwargs):
         # Handle exceptions throwed in the process of executing the REST method and
