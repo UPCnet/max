@@ -67,6 +67,121 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
         self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=204)
 
+    def test_get_deletable_mark_for_own_activity(self):
+        """
+           Given a plain user
+           When i post an activity
+           Then i have the permission to delete it
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username), status=200)
+        self.assertEqual(res.json['deletable'], True)
+
+    def test_get_deletable_mark_for_own_activity_in_context(self):
+        """
+           Given a plain user
+           and a regular context
+           When i post an activity in a context
+           Then i have the permission to delete it
+        """
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username), status=200)
+        self.assertEqual(res.json['deletable'], True)
+
+    def test_get_deletable_mark_for_others_activity_in_context(self):
+        """
+           Given a plain user
+           and a regular context
+           When i post an activity in a context
+           Then i don't have the permission to delete it
+        """
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username_not_me), status=200)
+        self.assertEqual(res.json['deletable'], False)
+
+    def test_get_deletable_mark_for_others_activity_in_context_with_deletable_permission(self):
+        """
+           Given a plain user
+           and context where everyone can delete
+           When another one posts an activity
+           Then i have the permission to delete it
+        """
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context_deletable_activities
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context_deletable_activities)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username_not_me), status=200)
+        self.assertEqual(res.json['deletable'], True)
+
+    def test_get_deletable_mark_for_others_activity_in_context_with_granted_permissions(self):
+        """
+           Given a plain user
+           and a regular context
+           When another one posts an activity
+           and i've have granted the permission to delete
+           Then i have the permission to delete it
+           and i can actually delete it
+        """
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+        from hashlib import sha1
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        self.create_context(create_context)
+        chash = sha1(create_context['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
+        permission = 'delete'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
+        res = self.create_activity(username_not_me, user_status_context)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username), status=200)
+        self.assertEqual(res.json['deletable'], True)
+        self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=204)
+
+    def test_get_deletable_mark_for_others_activity(self):
+        """
+           Given a plain user
+           When another user posts an activity
+           Then i don't have the permission to delete it
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.create_user(username2)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username2), status=200)
+        self.assertEqual(res.json['deletable'], False)
+
     def test_delete_inexistent_activity(self):
         """
             Given a plain user

@@ -79,6 +79,8 @@ class BaseContext(MADBase):
         unsubscribe_permission = self.permissions.get('unsubscribe', self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']))
         if unsubscribe_permission in ['public']:
             user_permissions.append('unsubscribe')
+        if self.permissions.get('delete', DEFAULT_CONTEXT_PERMISSIONS['delete'] in ['subscribed']):
+            user_permissions.append('delete')
 
         #Assign permissions to the subscription object before adding it
         subscription['permissions'] = user_permissions

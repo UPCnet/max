@@ -78,6 +78,18 @@ create_context = {
     'tags': ['Assignatura']
 }
 
+create_context_deletable_activities = {
+
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
+    'tags': ['Assignatura'],
+    'permissions': {'read': 'subscribed',
+                    'write': 'subscribed',
+                    'subscribe': 'restricted',
+                    'invite': 'restricted',
+                    'delete': 'subscribed'}
+
+}
 create_context_without_displayname = {
 
     'url': 'http://atenea.upc.edu',

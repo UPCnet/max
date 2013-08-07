@@ -128,7 +128,7 @@ def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'subscribe', 'invite']:
+    if permission not in ['read', 'write', 'subscribe', 'invite', 'delete']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     chash = request.matchdict.get('hash', None)
@@ -140,7 +140,7 @@ def grantPermissionOnContext(context, request):
         pointer += 1
 
     if not subscription:
-        raise Unauthorized("You can't set permissions on a context where you are not subscribed")
+        raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
 
     #If we reach here, we are subscribed to a context and ready to set the permission
 

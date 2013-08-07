@@ -19,7 +19,7 @@ from pyramid_beaker import set_cache_regions_from_settings
 from pyramid.settings import asbool
 from max import debug
 
-DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public')
+DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6

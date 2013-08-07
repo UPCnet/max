@@ -164,11 +164,11 @@ def deleteActivity(context, request):
     except:
         raise ObjectNotFound("There's no activity with id: %s" % activityid)
 
-    # Only the owner can delete the activity
-    if request.actor.username == found_activity._owner:
+    # Check if the user can delete the activity
+    if found_activity.deletable:
         found_activity.delete()
     else:
-        raise Unauthorized("You're not the owner of this activity, so tou can't delete it")
+        raise Unauthorized("You're not the owner of this activity, so you can't delete it")
 
     return HTTPNoContent()
 

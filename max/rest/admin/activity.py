@@ -91,6 +91,7 @@ def addAdminContextActivity(context, request):
 @view_config(route_name='activities', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
 def getActivities(context, request):
     """
     """
@@ -104,15 +105,13 @@ def getActivities(context, request):
 @view_config(route_name='activity', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
 def deleteActivity(context, request):
     """
     """
     mmdb = MADMaxDB(context.db)
     activityid = request.matchdict.get('activity', None)
-    try:
-        found_activity = mmdb.activity[activityid]
-    except:
-        raise ObjectNotFound("There's no activity with id: %s" % activityid)
+    found_activity = mmdb.activity[activityid]
 
     found_activity.delete()
     return HTTPNoContent()

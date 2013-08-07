@@ -150,6 +150,8 @@ class Activity(BaseActivity):
     collection = 'activity'
     context_collection = 'contexts'
     unique = '_id'
+    schema = dict(BaseActivity.schema)
+    schema['deletable'] = dict(required=0)
 
     def _on_create_custom_validations(self):
         """
@@ -178,3 +180,20 @@ class Activity(BaseActivity):
         if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
             result = result and self.data['actor']['url'] == self.data.get('contexts')[0]
         return result
+
+    def _post_init_from_object(self, source):
+        """
+            * Set the deletable flag on the object. If user is the owner don't check anything else,
+            otherwhise, check if user has permissions to delete activities on that context
+        """
+        if self.request.actor is not None:
+            # Execute only if we have a actor in the request. I we don't have a actor
+            # probably (ehem) is a restricted function, and we don't need this flag.
+            self['deletable'] = self.request.actor.username == self._owner
+            if not self['deletable'] and self.get('contexts'):
+                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.subscribedTo['items'] if 'delete' in subscription['permissions']]
+                for context in self.get('contexts'):
+                    self['deletable'] = context['hash'] in subscriptions_with_delete_permission
+
+
+
