@@ -86,7 +86,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(result.get('totalItems', ''), 1)
         self.assertEqual(result.get('items', '')[0].get('username', ''), username)
-        self.assertEqual(len(result.get('items', '')[0].keys()), 3)  # Check how many fields each result has
+        self.assertEqual(len(result.get('items', '')[0].keys()), 4)  # Check how many fields each result has
 
     def test_get_user_not_me(self):
         username = 'messi'
