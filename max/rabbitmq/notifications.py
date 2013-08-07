@@ -8,6 +8,7 @@ def messageNotification(message, talk_server):
     if talk_server:
         conversation_id = message['contexts'][0]['id']
         username = message['actor']['username']
+        displayName = message['actor']['displayName']
         text = message['object']['content']
         message_id = message['_id']
 
@@ -15,6 +16,7 @@ def messageNotification(message, talk_server):
             'conversation': conversation_id,
             'message': text,
             'username': username,
+            'displayName': displayName,
             'messageID': message_id
         }
 
