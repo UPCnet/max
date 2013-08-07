@@ -14,7 +14,6 @@ import logging
 import urllib2
 import re
 import sys
-import os
 
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
