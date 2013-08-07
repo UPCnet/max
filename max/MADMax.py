@@ -52,6 +52,7 @@ class MADMaxCollection(object):
                 keywords: A list of keywords to filter activities by
                 actor: A username to filter activities by actor
                 tags: A list of tags to filter contexts
+                twitter_enabled: Boolean for returning objects Twitter attributes
         """
 
         #Extract known params from kwargs
@@ -63,6 +64,7 @@ class MADMaxCollection(object):
         actor = kwargs.get('actor', None)
         username = kwargs.get('username', None)
         tags = kwargs.get('tags', None)
+        twitter_enabled = kwargs.get('twitter_enabled', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -100,6 +102,17 @@ class MADMaxCollection(object):
             # Filter the query to only objects containing certain hashtags
             tags_query = {'tags': {'$all': tags}}
             query.update(tags_query)
+
+        if twitter_enabled:
+            # Filter the query to only objects (contexts) containing a certain
+            # twitter_hashtag
+            twe_query = {"$or":
+                [
+                    {"twitterUsername": {"$exists": True}},
+                    {"twitterHashtag": {"$exists": True}},
+                ]
+            }
+            query.update(twe_query)
 
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)

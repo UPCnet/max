@@ -105,9 +105,12 @@ def searchParams(request):
     params = {}
     limit = request.params.get('limit', 10)
     try:
-        params['limit'] = int(limit)
+        limit = int(limit)
     except:
         raise InvalidSearchParams('limit must be a positive integer')
+    else:
+        if limit:
+            params['limit'] = limit
 
     after = request.params.get('after')
     if after:
@@ -151,6 +154,10 @@ def searchParams(request):
             if retag:
                 retags.append(retag)
         params['tags'] = retags
+
+    twitter_enabled = request.params.get('twitter_enabled')
+    if twitter_enabled:
+        params['twitter_enabled'] = twitter_enabled
 
     return params
 

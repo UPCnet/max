@@ -137,3 +137,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # self.assertEqual(result.get('actor', None).get('hash', None), url_hash)
         # self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         # self.assertEqual(result.get('contexts', None)[0], subscribe_context['object'])
+
+    def test_get_users_twitter_enabled(self):
+        """ Doctest .. http:get:: /people """
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.create_user(username2)
+        self.modify_user(username, {"twitterUsername": "messipowah"})
+        res = self.testapp.get('/people', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
+
+        self.assertEqual(res.json.get('totalItems', ''), 1)
+
+    def test_get_context_twitter_enabled(self):
+        from .mockers import create_context, create_contextA
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+        self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
+
+        res = self.testapp.get('/contexts', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
+
+        self.assertEqual(res.json.get('totalItems', ''), 1)
