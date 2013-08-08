@@ -45,20 +45,11 @@ Usuaris
                 "username": "messi",
                 "iosDevices": [],
                 "displayName": "messi",
-                "talkingIn": {
-                    "totalItems": 0,
-                    "items": []
-                },
+                "talkingIn": [],
                 "creator": "test_manager",
                 "androidDevices": [],
-                "following": {
-                    "totalItems": 0,
-                    "items": []
-                },
-                "subscribedTo": {
-                    "totalItems": 0,
-                    "items": []
-                },
+                "following": [],
+                "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
@@ -177,30 +168,27 @@ Contexts
 
         .. code-block:: python
 
-            {
-                "totalItems": 1,
-                "items": [
-                    {
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
-                        "url": "http://atenea.upc.edu",
-                        "tags": [
-                            "Assignatura"
-                        ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
-                        "id": "519b00000000000000000000",
-                        "permissions": {
-                            "read": "public",
-                            "write": "public",
-                            "invite": "public",
-                            "subscribe": "public"
-                        }
+            [
+                {
+                    "displayName": "Atenea",
+                    "creator": "test_manager",
+                    "url": "http://atenea.upc.edu",
+                    "tags": [
+                        "Assignatura"
+                    ],
+                    "published": "2000-01-01T00:01:00Z",
+                    "owner": "test_manager",
+                    "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                    "objectType": "context",
+                    "id": "519b00000000000000000000",
+                    "permissions": {
+                        "read": "public",
+                        "write": "public",
+                        "invite": "public",
+                        "subscribe": "public"
                     }
-                ]
-            }
+                }
+            ]
 
         .. -> expected
             >>> expected = json.loads(expected)
@@ -389,10 +377,7 @@ Subscripcions
             {
                 "generator": null,
                 "creator": "test_manager",
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
+                "replies": [],
                 "object": {
                     "url": "http://atenea.upc.edu",
                     "objectType": "context"
@@ -623,10 +608,7 @@ Activitats
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "objectType": "note"
                 },
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
+                "replies": [],
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
@@ -726,10 +708,7 @@ Activitats
                     ],
                     "objectType": "note"
                 },
-                "replies": {
-                    "totalItems": 0,
-                    "items": []
-                },
+                "replies": [],
                 "actor": {
                     "url": "http://atenea.upc.edu",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
