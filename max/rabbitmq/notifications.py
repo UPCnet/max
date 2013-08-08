@@ -6,6 +6,23 @@ import pika
 import json
 
 
+def restartTweety():
+    settings = getMAXSettings(get_current_request())
+    talk_server = settings.get('max_talk_server', '')
+
+    # If talk server is not defined, then we assume that we are on tests
+    if talk_server:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=talk_server
+            )
+        )
+        channel = connection.channel()
+        channel.basic_publish(exchange='',
+                          routing_key='tweety_restart',
+                          body='')
+
+
 def messageNotification(message):
     settings = getMAXSettings(get_current_request())
     talk_server = settings.get('max_talk_server', '')
