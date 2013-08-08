@@ -43,12 +43,14 @@ Usuaris
 
             {
                 "username": "messi",
+                "iosDevices": [],
                 "displayName": "messi",
                 "talkingIn": {
                     "totalItems": 0,
                     "items": []
                 },
                 "creator": "test_manager",
+                "androidDevices": [],
                 "following": {
                     "totalItems": 0,
                     "items": []

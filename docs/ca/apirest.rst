@@ -79,6 +79,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "items": [
                     {
                         "username": "messi",
+                        "displayName": "messi",
                         "id": "519b00000000000000000000",
                         "objectType": "person"
                     }
@@ -126,12 +127,14 @@ Operacions sobre el recurs *usuari* del sistema.
 
             {
                 "username": "messi",
+                "iosDevices": [],
                 "displayName": "Lionel Messi",
                 "talkingIn": {
                     "totalItems": 0,
                     "items": []
                 },
                 "creator": "test_manager",
+                "androidDevices": [],
                 "following": {
                     "totalItems": 0,
                     "items": []
@@ -192,12 +195,14 @@ Operacions sobre el recurs *usuari* del sistema.
 
             {
                 "username": "neymar",
+                "iosDevices": [],
                 "displayName": "Neymar JR",
                 "talkingIn": {
                     "totalItems": 0,
                     "items": []
                 },
                 "creator": "neymar",
+                "androidDevices": [],
                 "following": {
                     "totalItems": 0,
                     "items": []
@@ -242,12 +247,14 @@ Operacions sobre el recurs *usuari* del sistema.
 
             {
                 "username": "messi",
+                "iosDevices": [],
                 "displayName": "Lionel Messi",
                 "talkingIn": {
                     "totalItems": 0,
                     "items": []
                 },
                 "creator": "test_manager",
+                "androidDevices": [],
                 "following": {
                     "totalItems": 0,
                     "items": []
@@ -334,6 +341,7 @@ Operacions sobre el recurs *usuari* del sistema.
                     "items": []
                 },
                 "creator": "test_manager",
+                "androidDevices": [],
                 "following": {
                     "totalItems": 0,
                     "items": []
@@ -611,6 +619,7 @@ l'usuari ha estat previament subscrit a aquest context.
                         },
                         "id": "519b00000000000000000000",
                         "verb": "post",
+                        "deletable": true,
                         "published": "2000-01-01T00:01:00Z",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
@@ -632,6 +641,7 @@ l'usuari ha estat previament subscrit a aquest context.
                         },
                         "id": "519b00000000000000000000",
                         "verb": "post",
+                        "deletable": true,
                         "published": "2000-01-01T00:01:00Z",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
@@ -732,6 +742,7 @@ concret.
                         },
                         "id": "519b00000000000000000000",
                         "verb": "post",
+                        "deletable": true,
                         "published": "2000-01-01T00:01:00Z",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
@@ -826,6 +837,7 @@ indirectament.
                         },
                         "id": "519b00000000000000000000",
                         "verb": "post",
+                        "deletable": true,
                         "published": "2000-01-01T00:01:00Z",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
@@ -847,6 +859,7 @@ indirectament.
                         },
                         "id": "519b00000000000000000000",
                         "verb": "post",
+                        "deletable": true,
                         "published": "2000-01-01T00:01:00Z",
                         "commented": "2000-01-01T00:01:00Z",
                         "objectType": "activity"
@@ -980,14 +993,13 @@ Representa el conjunt de comentaris fets a una activitat.
                         "id": "519b00000000000000000000",
                         "actor": {
                             "username": "messi",
-                            "iosDevices": [
-                                "12345678901234567890123456789012"
-                            ],
+                            "iosDevices": [],
                             "displayName": "Lionel Messi",
                             "talkingIn": {
                                 "totalItems": 0,
                                 "items": []
                             },
+                            "androidDevices": [],
                             "objectType": "person"
                         },
                         "published": "2000-01-01T00:01:00Z"
