@@ -187,6 +187,7 @@ class MADBase(MADDict):
     unique = ''
     collection = ''
     mdb_collection = None
+    old = {}
     data = {}
 
     def __init__(self):
@@ -198,6 +199,9 @@ class MADBase(MADDict):
         except:
             pass
         self.data = RUDict({})
+
+    def field_changed(self, field):
+        return self.get(field, None) != self.old.get(field, None)
 
     def setDates(self):
         self['published'] = datetime.datetime.utcnow()
@@ -237,8 +241,12 @@ class MADBase(MADDict):
     def _post_init_from_object(self, source):
         return True
 
+    def _on_saving_object(self):
+        return True
+
     def fromObject(self, source, collection=None):
         self.update(source)
+        self.old.update(source)
         if 'id' in source:
             self['_id'] = source['id']
         self._post_init_from_object(source)
@@ -248,6 +256,7 @@ class MADBase(MADDict):
         obj = self.alreadyExists()
         if obj:
             self.update(obj)
+            self.old.update(obj)
 
     def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """
@@ -269,6 +278,7 @@ class MADBase(MADDict):
             Updates itself to the database
         """
         self.mdb_collection.save(self)
+        self._on_saving_object(self)
 
     def delete(self):
         """
