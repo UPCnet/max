@@ -59,6 +59,12 @@ Defineix qui es pot dessubscriure d'un context. Aquest permís es dona automàti
     - public - Qualsevol usuari pot dessubscriure's del context previament subscrit
 
 
+DELETE
+~~~~~~
+Defineix qui podrà borrar activitats d'un contexte. Per defecte el permís es restricted.
+    - restricted - Només els propietaris de l'activitat i usuaris autoritzats expresament poden esborrar activitats.
+    - subscribed - Qualsevol persona subscrita al context pot esborrar qualsevol activitat
+
 Si no s'especifiquen en la creació del context, els permisos per defecte són:
 
     read='public', write='public', subscribe='public', invite='public'
