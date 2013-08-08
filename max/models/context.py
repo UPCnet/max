@@ -3,7 +3,7 @@ from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.rest.utils import getUserIdFromTwitter
 from max import DEFAULT_CONTEXT_PERMISSIONS
-from max.rabbitmq import restartTweety
+from max.rabbitmq.notifications import restartTweety
 from hashlib import sha1
 
 
