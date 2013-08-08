@@ -20,16 +20,12 @@ el contrari.
 
 Les respostes que retorna el sistema, en cas que siguin 1 o múltiples resultats
 (Associats a col.leccions o entitats) seràn, o bé un sol objecte JSON en cas de
-l'accés a una entitat concreta, o una estructura que englobi un conjunt de
-resultats, indicant el total d'elements retornats::
+l'accés a una entitat concreta, o una llista o array de resultats::
 
-    {
-        "totalItems": 2,
-        "items": [
-                   { ... },
-                   { ... }
-                 ]
-    }
+    [
+       { ... },
+       { ... }
+    ]
 
 .. this is some setup, it is hidden in a reST comment
 
@@ -87,12 +83,13 @@ Operacions sobre el recurs *usuari* del sistema.
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/people', payload, oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('displayName') == eval(expected).get('displayName')
+            >>> response.json[0].get('displayName') == expected[0].get('displayName')
             True
-            >>> response.json.get('twitterUsername') == eval(expected).get('twitterUsername')
+            >>> response.json[0].get('twitterUsername') == expected[0].get('twitterUsername')
             True
 
     **Codis d'error**:
@@ -654,9 +651,9 @@ l'usuari ha estat previament subscrit a aquest context.
             >>> response = testapp.get('/people/{}/activities'.format(username), "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
+            >>> response.json[0].get('actor').get('displayName') == expected[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
 
     .. note::
@@ -774,9 +771,9 @@ concret.
             >>> response = testapp.get('/contexts/%s/activities'% (eval(payload)['context']), '', oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
+            >>> response.json[0].get('actor').get('displayName') == expected[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
 
     Success
@@ -872,9 +869,9 @@ indirectament.
             >>> response = testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
+            >>> response.json[0].get('actor').get('displayName') == expected[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
 
     Success
@@ -1012,9 +1009,9 @@ Representa el conjunt de comentaris fets a una activitat.
             >>> response = testapp.get('/activities/{}/comments'.format(activity.json.get('id')), payload, oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('actor').get('displayName') == expected.get('items')[0].get('actor').get('displayName')
+            >>> response.json[0].get('actor').get('displayName') == expected[0].get('actor').get('displayName')
             True
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
 
     Success
@@ -1083,9 +1080,9 @@ Subscripcions
             >>> response = testapp.get('/contexts/public', payload, oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
-            >>> response.json.get('items')[0]['objectType'] == expected.get('items')[0]['objectType']
+            >>> response.json[0]['objectType'] == expected[0]['objectType']
             True
 
 
@@ -1214,10 +1211,11 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
             }
 
         .. -> expected
+            >>> expected = json.loads(expected)
             >>> response = testapp.get('/people/{}/subscriptions'.format(username), "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('totalItems') == eval(expected).get('totalItems')
+            >>> len(response.json) == len(expected)
             True
 
 .. http:delete:: /people/{username}/subscriptions/{hash}
@@ -1434,9 +1432,9 @@ Aquests són els serveis associats.
             >>> response = testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('object').get('objectType') == expected.get('items')[0].get('object').get('objectType')
+            >>> response.json[0].get('object').get('objectType') == expected[0].get('object').get('objectType')
             True
-            >>> response.json.get('items')[0].get('contexts')[0].get('displayName') == expected.get('items')[0].get('contexts')[0].get('displayName')
+            >>> response.json[0].get('contexts')[0].get('displayName') == expected[0].get('contexts')[0].get('displayName')
             True
 
     Success
@@ -1489,9 +1487,9 @@ Aquests són els serveis associats.
             >>> response = testapp.get('/conversations', "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('items')[0].get('objectType') == eval(expected).get('items')[0].get('objectType')
+            >>> response.json[0].get('objectType') == eval(expected)[0].get('objectType')
             True
-            >>> response.json.get('items')[0].get('displayName') == eval(expected).get('items')[0].get('displayName')
+            >>> response.json[0].get('displayName') == eval(expected)[0].get('displayName')
             True
 
     Success
@@ -1852,9 +1850,9 @@ que són accessibles per usuaris normals estàn documentats aquí
             >>> response = testapp.get('/contexts/public', '', oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('totalItems') == expected.get('totalItems')
+            >>> len(response.json) == len(expected)
             True
-            >>> response.json.get('items')[0]['objectType'] == expected.get('items')[0]['objectType']
+            >>> response.json[0]['objectType'] == expected[0]['objectType']
             True
 
 

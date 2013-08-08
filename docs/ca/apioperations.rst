@@ -207,7 +207,7 @@ Contexts
             >>> response = testapp.get('/contexts', payload, oauth2Header(test_manager), status=200)
             >>> response
             <200 OK application/json ...
-            >>> response.json.get('totalItems') == 1
+            >>> len(response.json) == len(expected)
             True
 
 .. http:put:: /contexts/{hash}
