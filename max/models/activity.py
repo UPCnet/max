@@ -24,7 +24,7 @@ class BaseActivity(MADBase):
               'published':   dict(required=0),
               'commented':   dict(required=0),
               'contexts':    dict(required=0),
-              'replies':     dict(required=0, default={'items': [], 'totalItems': 0}),
+              'replies':     dict(required=0, default=[]),
               'generator':   dict(required=0, default=None),
               }
 
@@ -129,7 +129,7 @@ class BaseActivity(MADBase):
             if fieldname in comment['actor']:
                 del comment['actor'][fieldname]
 
-        self.addToList('replies', comment, allow_duplicates=True)
+        self.add_to_list('replies', comment, allow_duplicates=True)
 
         activity_keywords = self.object.setdefault('_keywords', [])
         activity_keywords.extend(comment.get('_keywords', []))
@@ -191,7 +191,7 @@ class Activity(BaseActivity):
             # probably (ehem) is a restricted function, and we don't need this flag.
             self['deletable'] = self.request.actor.username == self._owner
             if not self['deletable'] and self.get('contexts'):
-                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.subscribedTo['items'] if 'delete' in subscription['permissions']]
+                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.subscribedTo if 'delete' in subscription['permissions']]
                 for context in self.get('contexts'):
                     self['deletable'] = context['hash'] in subscriptions_with_delete_permission
 

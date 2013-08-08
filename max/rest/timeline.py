@@ -15,12 +15,12 @@ def timelineQuery(mmdb, actor):
 
     # Add the activity of the people that the user follows
     actors_followings = []
-    for following in actor['following']['items']:
+    for following in actor['following']:
         actors_followings.append({'actor.username': following['username']})
 
     # Add the activity of the people that posts to a particular context
     contexts_followings = []
-    for subscribed in actor['subscribedTo']['items']:
+    for subscribed in actor['subscribedTo']:
         # Don't show conversations in timeline
             contexts_followings.append({'contexts.url': subscribed['url']})
 

@@ -84,9 +84,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people', json.dumps({"username": username}), oauth2Header(username), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get('totalItems', ''), 1)
-        self.assertEqual(result.get('items', '')[0].get('username', ''), username)
-        self.assertEqual(len(result.get('items', '')[0].keys()), 4)  # Check how many fields each result has
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('username', ''), username)
+        self.assertEqual(len(result[0].keys()), 4)  # Check how many fields each result has
 
     def test_get_user_not_me(self):
         username = 'messi'
@@ -140,12 +140,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         query = {'username': 'usuarimoltll'}
         res = self.testapp.get('/people', json.dumps(query), oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('items', '')[0].get('username', ''), username)
+        self.assertEqual(result[0].get('username', ''), username)
 
         query = {'username': 'usuarimo'}
         res = self.testapp.get('/people', json.dumps(query), oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('items', '')[0].get('username', ''), username)
+        self.assertEqual(result[0].get('username', ''), username)
 
     def test_get_all_users_with_regex_weird(self):
         username1 = 'victor.fernandez'
@@ -156,12 +156,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         query = {'username': username1}
         res = self.testapp.get('/people', query, oauth2Header(username1), status=200)
         result = json.loads(res.text)
-        self.assertEqual(len(result.get('items', '')), 2)
+        self.assertEqual(len(result), 2)
 
         query = {'username': username2}
         res = self.testapp.get('/people', query, oauth2Header(username2), status=200)
         result = json.loads(res.text)
-        self.assertEqual(len(result.get('items', '')), 1)
+        self.assertEqual(len(result), 1)
 
     def test_create_own_user(self):
         username = 'messi'

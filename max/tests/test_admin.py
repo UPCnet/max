@@ -31,8 +31,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         res = self.testapp.get('/people', "", oauth2Header(test_manager))
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('username'), 'messi')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('username'), 'messi')
 
     def test_admin_post_activity_without_context(self):
         from .mockers import user_status
@@ -77,8 +77,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_get_security(self):
         res = self.testapp.get('/admin/security', "", status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('roles', None).get('Manager')[0], 'test_manager')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('roles', None).get('Manager')[0], 'test_manager')
 
     def test_get_other_activities(self):
         from .mockers import user_status_context
@@ -123,7 +123,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/activities' % username, context_query, oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(len(result), 1)
 
     # def test_admin_post_activity_with_unauthorized_context_type_as_actor(self):
     #     from .mockers import create_unauthorized_context
@@ -147,7 +147,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.modify_user(username, {"twitterUsername": "messipowah"})
         res = self.testapp.get('/people', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
 
-        self.assertEqual(res.json.get('totalItems', ''), 1)
+        self.assertEqual(len(res.json), 1)
 
     def test_get_context_twitter_enabled(self):
         from .mockers import create_context, create_contextA
@@ -157,4 +157,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
 
-        self.assertEqual(res.json.get('totalItems', ''), 1)
+        self.assertEqual(len(res.json), 1)

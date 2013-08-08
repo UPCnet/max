@@ -308,9 +308,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status)
         res = self.testapp.get('/people/%s/activities' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
 
     def test_get_activity_not_me(self):
         from .mockers import user_status
@@ -338,14 +338,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username_not_me, user_status_context)
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertIn('context', result)
-        self.assertEqual(result.get('totalItems', None), 2)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_activities_does_not_show_private_fields(self):
         """
@@ -362,8 +361,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
-        self.assertEqual(res.json.get('totalItems', None), 1)
-        self.assertNotIn('_keywords', res.json['items'][0]['object'])
+        self.assertEqual(len(res.json), 1)
+        self.assertNotIn('_keywords', res.json[0]['object'])
 
     def test_get_activities_from_inexistent_context(self):
         username = 'messi'
@@ -396,10 +395,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
-        self.assertEqual(res.json.get('totalItems', None), 3)
-        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_2_id)
-        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_1_id)
-        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)
+        self.assertEqual(len(res.json), 3)
+        self.assertEqual(res.json[0].get('id', None), activity_2_id)
+        self.assertEqual(res.json[1].get('id', None), activity_1_id)
+        self.assertEqual(res.json[2].get('id', None), activity_0_id)
 
     def test_get_activities_from_recursive_contexts(self):
         """
@@ -429,26 +428,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 2)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username_not_me), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 3)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'xavi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'xavi')
-        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[2].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[2].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[2].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
+        self.assertEqual(result[1].get('actor', None).get('username'), 'xavi')
+        self.assertEqual(result[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(result[2].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[2].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[2].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_get_activities_from_recursive_public_contexts(self):
         from .mockers import context_query
@@ -469,7 +468,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 2)
+        self.assertEqual(len(result), 2)
 
     def test_get_activities_from_recursive_subscribed_contexts(self):
         from .mockers import context_query
@@ -488,7 +487,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username_not_me, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextB)
 
-        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=403)
+        self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=403)
 
     def test_post_activity_with_generator(self):
         """ Post an activity to a context which allows everyone to read and write
@@ -513,7 +512,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)
 
     def test_get_timeline(self):
         """ doctest .. http:get:: /people/{username}/timeline """
@@ -531,13 +530,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status_contextA)
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 3)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[1].get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_timeline_does_not_show_private_fields(self):
         """
@@ -550,8 +549,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_activity(username, user_status)
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
-        self.assertEqual(res.json.get('totalItems', None), 1)
-        self.assertNotIn('_keywords', res.json['items'][0]['object'])
+        self.assertEqual(len(res.json), 1)
+        self.assertNotIn('_keywords', res.json[0]['object'])
 
     def test_post_comment(self):
         """ doctest .. http:post:: /activities/{activity}/comments """
@@ -582,9 +581,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
         res = self.testapp.get('/activities/%s/comments' % str(activity.get('id')), "", oauth2Header(username), status=200)
         result = res.json
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('objectType', None), 'comment')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('objectType', None), 'comment')
 
     def test_timeline_order_sorted_by_last_comment_publish_date(self):
         """
@@ -606,10 +605,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/people/%s/timeline?sortBy=comments' % username, "", oauth2Header(username), status=200)
-        self.assertEqual(res.json.get('totalItems', None), 3)
-        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_1_id)
-        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_2_id)
-        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)
+        self.assertEqual(len(res.json), 3)
+        self.assertEqual(res.json[0].get('id', None), activity_1_id)
+        self.assertEqual(res.json[1].get('id', None), activity_2_id)
+        self.assertEqual(res.json[2].get('id', None), activity_0_id)
 
     def test_timeline_order_sorted_by_activity_publish_date(self):
         """
@@ -627,7 +626,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/people/%s/timeline?sortBy=activities' % username, "", oauth2Header(username), status=200)
-        self.assertEqual(res.json.get('totalItems', None), 3)
-        self.assertEqual(res.json.get('items', None)[0].get('id', None), activity_2_id)
-        self.assertEqual(res.json.get('items', None)[1].get('id', None), activity_1_id)
-        self.assertEqual(res.json.get('items', None)[2].get('id', None), activity_0_id)
+        self.assertEqual(len(res.json), 3)
+        self.assertEqual(res.json[0].get('id', None), activity_2_id)
+        self.assertEqual(res.json[1].get('id', None), activity_1_id)
+        self.assertEqual(res.json[2].get('id', None), activity_0_id)

@@ -32,7 +32,7 @@ def subscribe(context, request):
     newactivity.fromRequest(request, rest_params=rest_params)
 
     #Check if user is already subscribed
-    subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo['items']]
+    subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo]
     chash = sha1(newactivity.object['url']).hexdigest()
     if chash in subscribed_contexts_hashes:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity

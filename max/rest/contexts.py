@@ -45,7 +45,7 @@ def getContextAuthors(context, request):
     actor = request.actor
     author_limit = request.params.get('limit', LAST_AUTHORS_LIMIT)
 
-    is_subscribed = chash in [subscription['hash'] for subscription in actor.subscribedTo['items']]
+    is_subscribed = chash in [subscription['hash'] for subscription in actor.subscribedTo]
     if not is_subscribed:
         raise Unauthorized("You're not allowed to access this context")
 

@@ -58,7 +58,7 @@ class BaseContext(MADBase):
     def subscribedUsers(self):
         """
         """
-        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+        criteria = {'{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
         subscribed_users = self.mdb_collection.database.users.find(criteria)
         return [user for user in subscribed_users]
 
@@ -94,8 +94,8 @@ class BaseContext(MADBase):
         ids = [user['_id'] for user in self.subscribedUsers()]
 
         for obid in ids:
-            criteria = {'_id': obid, '{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
-            what = {'$set': {'{}.items.$.displayName'.format(self.user_subscription_storage): self.displayName}}
+            criteria = {'_id': obid, '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+            what = {'$set': {'{}.$.displayName'.format(self.user_subscription_storage): self.displayName}}
             self.mdb_collection.database.users.update(criteria, what)
 
     def removeUserSubscriptions(self, users_to_delete=[]):
@@ -104,7 +104,7 @@ class BaseContext(MADBase):
             user if userd_to_delete is provided
         """
         usersdb = MADMaxCollection(self.mdb_collection.database.users)
-        criteria = {'{}.items.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+        criteria = {'{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
         users = usersdb.search(criteria)
 
         for user in users:

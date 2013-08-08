@@ -161,7 +161,7 @@ def getMessages(context, request):
          Return all messages from a conversation
     """
     cid = request.matchdict['id']
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
     mmdb = MADMaxDB(context.db)
@@ -185,7 +185,7 @@ def getConversation(context, request):
     conversations = MADMaxCollection(context.db.conversations)
     conversation = conversations[cid]
 
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn.get("items", [])]:
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
     if len(conversation.participants) == 2:
@@ -267,7 +267,7 @@ def joinConversation(context, request):
     cid = request.matchdict['id']
 
     #Check if user is already subscribed
-    current_conversations = [a['id'] for a in actor.talkingIn['items']]
+    current_conversations = [a['id'] for a in actor.talkingIn]
     if cid in current_conversations:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was susbcribed. This way in th return data we'll have the date of subscription

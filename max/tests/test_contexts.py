@@ -257,8 +257,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
-        self.assertEqual(result.get('subscribedTo', {}).get('totalItems', None), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items', [None, ])[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result.get('subscribedTo', [])), 1)
+        self.assertEqual(result.get('subscribedTo', [])[0]['url'], subscribe_contextA['object']['url'])
 
     def test_user_cannot_see_activity_from_deleted_context(self):
         """
@@ -295,7 +295,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
         res = self.testapp.get('/people/%s/timeline' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)
 
     def test_add_private_rw_context(self):
         from hashlib import sha1
@@ -323,10 +323,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
-        self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
-        self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
-        self.assertEqual('write' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+        self.assertEqual(len(result.get('subscribedTo', [])), 1)
+        self.assertEqual(result.get('subscribedTo', {})[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual('read' in result.get('subscribedTo', {})[0]['permissions'], True)
+        self.assertEqual('write' in result.get('subscribedTo', {})[0]['permissions'], True)
 
     def test_check_permissions_on_subscribed_write_restricted_context(self):
         from .mockers import create_context_private_r, subscribe_context
@@ -336,10 +336,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
         result = json.loads(res.text)
-        self.assertEqual(result.get('subscribedTo', {}).get('totalItems'), 1)
-        self.assertEqual(result.get('subscribedTo', {}).get('items')[0]['url'], subscribe_context['object']['url'])
-        self.assertEqual('read' in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
-        self.assertEqual('write' not in result.get('subscribedTo', {}).get('items')[0]['permissions'], True)
+        self.assertEqual(len(result.get('subscribedTo', [])), 1)
+        self.assertEqual(result.get('subscribedTo', {})[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual('read' in result.get('subscribedTo', {})[0]['permissions'], True)
+        self.assertEqual('write' not in result.get('subscribedTo', {})[0]['permissions'], True)
 
     def test_post_on_subscribed_write_restricted_context_without_write_permission(self):
         from .mockers import create_context_private_r, subscribe_context, user_status_context
@@ -430,4 +430,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/contexts/%s/subscriptions' % (chash), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get('items', None)[0].get('username', ''), 'messi')
+        self.assertEqual(result[0].get('username', ''), 'messi')

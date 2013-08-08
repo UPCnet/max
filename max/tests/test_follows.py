@@ -39,7 +39,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['verb'], 'follow')
 
         res = self.testapp.get('/people/%s' % (username), '', oauth2Header(username), status=200)
-        self.assertEqual(username2, res.json['following']['items'][0]['username'])
+        self.assertEqual(username2, res.json['following'][0]['username'])
 
     def test_user_sees_followed_activity(self):
         """
@@ -59,7 +59,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['verb'], 'follow')
 
         res = self.testapp.get('/people/%s/timeline' % (username), '', oauth2Header(username), status=200)
-        self.assertEqual(res.json['totalItems'], 2)
+        self.assertEqual(len(res.json), 2)
 
 
     # IMPORTANT !!!!!!!!!!!!!!!!

@@ -37,7 +37,7 @@ class IMADObjects(Interface):  # pragma: no cover
     def addToList(field, obj, allow_duplicates=False, safe=True):
         """
             Updates an array field of a existing DB object appending the new object
-            and incrementing the totalItems counter.
+            and incrementing the total Items counter.
 
             if allow_duplicates = True, allows to add items even if its already on the list. If not
             , looks for `safe` value to either raise an exception if safe==False or pass gracefully if its True

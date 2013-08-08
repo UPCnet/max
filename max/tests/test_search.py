@@ -82,7 +82,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), context_query_kw_search, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
+        self.assertEqual(len(result), 1)
 
     def test_context_activities_actor_search(self):
         """
@@ -104,9 +104,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts/%s/activities?actor=%s' % (context_query['context'], username), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 2)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
 
     def test_contexts_search(self):
         """
@@ -120,7 +120,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextA)
         self.create_context(create_contextB)
         res = self.testapp.get('/contexts', '', oauth2Header(test_manager), status=200)
-        self.assertEqual(res.json['totalItems'], 3)
+        self.assertEqual(len(res.json), 3)
 
     def test_contexts_search_with_tags(self):
         """
@@ -135,7 +135,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextA)  # Tagged "Assignatura"
         self.create_context(create_contextB)  # Not tagged
         res = self.testapp.get('/contexts?tags', context_search_by_tags, oauth2Header(test_manager), status=200)
-        self.assertEqual(res.json['totalItems'], 2)
+        self.assertEqual(len(res.json), 2)
 
     def test_public_contexts_search_with_tags(self):
         """
@@ -153,7 +153,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='subscribed'))
         self.create_context(create_contextB)
         res = self.testapp.get('/contexts/public?tags', context_search_by_tags, oauth2Header(username), status=200)
-        self.assertEqual(res.json['totalItems'], 1)
+        self.assertEqual(len(res.json), 1)
 
     def test_search_with_invalid_parameters(self):
         """

@@ -392,7 +392,7 @@ def canWriteInContexts(actor, contexts):
         if subscription is None:
             #update subscriptions dict
             u_field = context.unique.lstrip('_')
-            subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {}).get('items', [])])
+            subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {})])
             subscriptions.update(subsc)
             subscription = subscriptions.get(context.getIdentifier(), None)
             if subscription is None:
@@ -416,7 +416,7 @@ def canReadContext(actor, url):
     if url == []:
         return True
 
-    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo']['items'] if 'read' in a['permissions']]
+    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo'] if 'read' in a['permissions']]
 
     if url not in subscribed_contexts_urls:
 

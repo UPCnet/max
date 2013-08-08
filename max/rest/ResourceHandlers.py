@@ -10,21 +10,18 @@ class ResourceRoot(object):
     """
     response_content_type = 'application/text'
 
-    def __init__(self, data, status_code=200, stats=False, extension={}):
+    def __init__(self, data, status_code=200, stats=False):
         """
         """
         self.data = data
         self.status_code = status_code
-        self.extension = extension
         self.stats = stats
         self.headers = {}
 
     def wrap(self):
         """
         """
-        wrapper = {"items": self.data,
-                   "totalItems": len(self.data)}
-        wrapper.update(self.extension)
+        wrapper = self.data
         return wrapper
 
     def buildResponse(self, payload=None):

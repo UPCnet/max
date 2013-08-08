@@ -42,7 +42,7 @@ def getActivityComments(context, request):
 
     #handler = JSONResourceRoot(activities)
     replies = refering_activity.get('replies', {})
-    items = replies.get('items', [])
+    items = replies
     result = flatten(items, keep_private_fields=False)
     handler = JSONResourceRoot(result)
     return handler.buildResponse()

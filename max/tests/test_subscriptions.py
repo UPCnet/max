@@ -92,9 +92,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/subscriptions' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems'), 2)
-        self.assertEqual(result.get('items')[0].get('url'), 'http://atenea.upc.edu/A')
-        self.assertEqual(result.get('items')[1].get('url'), 'http://atenea.upc.edu/B')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('url'), 'http://atenea.upc.edu/A')
+        self.assertEqual(result[1].get('url'), 'http://atenea.upc.edu/B')
 
     def test_get_subscriptions_from_another_user(self):
         """
@@ -140,7 +140,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), oauth2Header(username), status=201)
         res = self.testapp.get('/people/%s/subscriptions' % username, '', oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertIn('unsubscribe', result['items'][0]['permissions'])
+        self.assertIn('unsubscribe', result[0]['permissions'])
 
     def test_subscribe_to_public_context_as_plain_user_already_subscribed(self):
         """
@@ -170,7 +170,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         res = self.testapp.get('/contexts/public', {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result['totalItems'], 1)
+        self.assertEqual(len(result), 1)
 
     def test_unsubscribe_from_inexistent_subscription_as_plain_user(self):
         """
@@ -231,7 +231,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result['totalItems'], 0)
+        self.assertEqual(len(result), 0)
 
     def test_unsubscribe_from_public_context_as_plain_user(self):
         """
@@ -250,7 +250,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.user_unsubscribe_user_from_context(username, url_hash, expect=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result['totalItems'], 0)
+        self.assertEqual(len(result), 0)
 
     def test_unsubscribe_from_public_context_as_admin(self):
         """
@@ -268,7 +268,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_unsubscribe_user_from_context(username, url_hash, expect=204)
         res = self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result['totalItems'], 0)
+        self.assertEqual(len(result), 0)
 
     # def test_change_public_context_to_restricted(self):
     #     """

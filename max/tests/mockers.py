@@ -4,36 +4,6 @@ from hashlib import sha1
 # Format com deurien estar guardades les dades a la base de dades
 # ===============================================================
 
-# Un usuari de demo1
-demouser1 = {
-    'username': 'victor',
-    'url': 'http://max.upc.edu/profiles/victor',
-    'objectType': 'person',
-    'following': {
-        'totalItems': 0,
-        'items': []
-    },
-    'subscribedTo': {
-        'totalItems': 0,
-        'items': []
-    }
-}
-
-# Un usuari de demo2
-demouser2 = {
-    'username': 'javier',
-    'url': 'http://max.upc.edu/profiles/javier',
-    'objectType': 'person',
-    'following': {
-        'totalItems': 0,
-        'items': []
-    },
-    'subscribedTo': {
-        'totalItems': 0,
-        'items': []
-    }
-}
-
 # Una activity de demo
 demostatus = {
     "actor": {

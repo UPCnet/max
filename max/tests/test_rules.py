@@ -47,10 +47,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_to_unsubscribed_context(self):
         from maxrules.tasks import processTweet
@@ -66,7 +66,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)
 
     def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_newest(self):
         from maxrules.tasks import processTweet
@@ -89,10 +89,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
 
     def test_process_new_tweet_from_double_registered_hashtag_subscribed_only_on_oldest(self):
         from maxrules.tasks import processTweet
@@ -115,10 +115,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_double_registered_hashtag_subscribed_in_both(self):
         from maxrules.tasks import processTweet
@@ -141,13 +141,13 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 2)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
-        self.assertEqual(result.get('items', None)[1].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[1].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextB['object']['url'])
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[1].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_uppercase_from_twitter(self):
         """
@@ -168,10 +168,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_twitter_username_uppercase_case_from_twitter(self):
         """
@@ -190,11 +190,11 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
+        self.assertEqual(result[0].get('actor', None).get('objectType'), 'uri')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_twitter_username_different_case_in_max(self):
         """
@@ -214,11 +214,11 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('objectType'), 'uri')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('url'), subscribe_contextA['object']['url'])
+        self.assertEqual(result[0].get('actor', None).get('objectType'), 'uri')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_hashtag_different_case_in_max(self):
         """
@@ -239,10 +239,10 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 1)
-        self.assertEqual(result.get('items', None)[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result.get('items', None)[0].get('object', None).get('objectType', None), 'note')
-        self.assertEqual(result.get('items', None)[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result[0].get('contexts', None)[0]['url'], subscribe_contextA['object']['url'])
 
     def test_process_new_tweet_from_unassociated_user(self):
         """
@@ -261,7 +261,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)
 
     def test_process_new_tweet_from_unassociated_context(self):
         """
@@ -280,7 +280,7 @@ class RulesTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)
 
     def test_process_tweet_from_debug_hashtag(self):
         """
@@ -300,4 +300,4 @@ class RulesTests(unittest.TestCase, MaxTestBase):
         processTweet('leomessi', u'Ehteee, acabo de batir el récor de goles en el Barça #%s #Assignatura1' % (debug_hashtag))
         res = self.testapp.get('/people/%s/timeline' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get('totalItems', None), 0)
+        self.assertEqual(len(result), 0)

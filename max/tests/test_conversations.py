@@ -102,7 +102,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/conversations', json.dumps(wrong_message), oauth2Header(sender), status=400)
         res = self.testapp.get('/conversations', '', oauth2Header(sender), status=200)
 
-        self.assertEqual(res.json["totalItems"], 0)
+        self.assertEqual(len(res.json), 0)
 
     def test_post_message_to_conversation_check_conversation(self):
         from .mockers import message
@@ -136,7 +136,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/conversations/%s/messages' % cid, {}, oauth2Header(sender), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get("totalItems", None), 2)
+        self.assertEqual(len(result), 2)
 
     def test_post_message_to_new_conversation_check_message_not_in_another_conversation(self):
         from .mockers import message, message_s
@@ -157,7 +157,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/conversations/%s/messages' % cid1, {}, oauth2Header(sender), status=200)
         result = json.loads(res.text)
-        self.assertEqual(result.get("totalItems", None), 1)
+        self.assertEqual(len(result), 1)
 
     def test_post_messages_to_an_already_existing_conversation(self):
         from .mockers import message, message2
@@ -173,11 +173,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(sender), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("totalItems", None), 2)
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("items")[0].get("objectType", None), "message")
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result[0].get("objectType", None), "message")
 
     def test_post_messages_to_a_known_conversation_without_specifying_participants(self):
         from .mockers import message, message3
@@ -193,11 +193,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(sender), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("totalItems", None), 2)
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
-        self.assertEqual(result.get("items")[0].get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("items")[0].get("objectType", None), "message")
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result[0].get("objectType", None), "message")
 
     def test_get_messages_from_a_conversation_as_a_recipient(self):
         """ doctest .. http:get:: /conversations/{id}/messages """
@@ -213,7 +213,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(recipient), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("totalItems", None), 2)
+        self.assertEqual(len(result), 2)
 
     def test_get_conversation_for_user_not_in_participants(self):
         from .mockers import message, message2
@@ -263,8 +263,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations', "", oauth2Header(sender), status=200)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("totalItems", None), 1)
-        self.assertEqual(result.get("items")[0].get("objectType", ""), "conversation")
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get("objectType", ""), "conversation")
 
     def test_post_message_to_inexistent_group_conversation_creates_conversation(self):
         """
@@ -327,14 +327,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         conversation_id = res.json['contexts'][0]['id']
 
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient), status=200)
-        self.assertEqual(res.json['totalItems'], 1)
-        self.assertEqual(res.json['items'][0]['contexts'][0]['id'], conversation_id)
-        self.assertEqual(res.json['items'][0]['object']['content'], creation_message['object']['content'])
+        self.assertEqual(len(res.json), 1)
+        self.assertEqual(res.json[0]['contexts'][0]['id'], conversation_id)
+        self.assertEqual(res.json[0]['object']['content'], creation_message['object']['content'])
 
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient2), status=200)
-        self.assertEqual(res.json['totalItems'], 1)
-        self.assertEqual(res.json['items'][0]['contexts'][0]['id'], conversation_id)
-        self.assertEqual(res.json['items'][0]['object']['content'], creation_message['object']['content'])
+        self.assertEqual(len(res.json), 1)
+        self.assertEqual(res.json[0]['contexts'][0]['id'], conversation_id)
+        self.assertEqual(res.json[0]['object']['content'], creation_message['object']['content'])
 
     def test_add_inexistent_participant_to_inexistent_conversation(self):
         """
@@ -571,7 +571,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(sender), status=200)
-        self.assertEqual(res.json['totalItems'], 2)
+        self.assertEqual(len(res.json), 2)
 
     def test_user_leaves_conversation_cannot_see_conversation_messages(self):
         """
@@ -849,7 +849,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         conversation_id = res.json['contexts'][0]['id']
 
         res = self.testapp.get('/conversations/{}/tokens'.format(conversation_id), json.dumps(message), oauth2Header(test_manager), status=200)
-        self.assertEqual(res.json['items'][0]['platform'], u'iOS')
-        self.assertEqual(res.json['items'][0]['token'], u'12345678901234567890123456789012')
-        self.assertEqual(res.json['items'][0]['username'], u'xavi')
-        self.assertEqual(res.json['totalItems'], 2)
+        self.assertEqual(res.json[0]['platform'], u'iOS')
+        self.assertEqual(res.json[0]['token'], u'12345678901234567890123456789012')
+        self.assertEqual(res.json[0]['username'], u'xavi')
+        self.assertEqual(len(res.json), 2)

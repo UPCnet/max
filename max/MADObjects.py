@@ -287,40 +287,8 @@ class MADBase(MADDict):
         """
         self.mdb_collection.remove({'_id': ObjectId(self._id)})
 
-    def addToList(self, field, obj, allow_duplicates=False, safe=True):
-        """
-            Updates an array field of a existing DB object appending the new object
-            and incrementing the totalItems counter.
-
-            if allow_duplicates = True, allows to add items even if its already on the list. If not
-            , looks for `safe` value to either raise an exception if safe==False or pass gracefully if its True
-
-            XXX TODO allow object to be either a single object or a list of objects
-        """
-
-        obj_list = self.get(field, {'items': [], 'totalItems': 0})
-
-        items = '%s.items' % field
-        count = '%s.totalItems' % field
-
-        duplicated = obj in obj_list['items']
-
-        if allow_duplicates or not duplicated:
-            self.mdb_collection.update({'_id': self['_id']},
-                                       {'$push': {items: obj},
-                                        '$inc': {count: 1}
-                                        }
-                                       )
-            #Self-update to reflect the addition
-            self.setdefault(field, {'items': [], 'totalItems': 0})  # Make sure the field exists
-            self[field]['items'].append(obj)
-            self[field]['totalItems'] += 1
-        else:
-            if not safe:
-                raise DuplicatedItemError('Item already on list "%s"' % (field))
-
     def add_to_list(self, field, obj, allow_duplicates=False, safe=True):
-        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'totalItems'
+        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'total Items'
             Updates an array field of a existing DB object appending the new object.
 
             if allow_duplicates = True, allows to add items even if its already on the list. If not
@@ -352,24 +320,8 @@ class MADBase(MADDict):
             if not safe:
                 raise DuplicatedItemError('Item already on list "%s"' % (field))
 
-    def deleteFromList(self, field, obj):
-        """
-            Updates an array field of a existing DB object removing the object.
-
-            If the array contains plain values, obj is the value to delete.
-            If the array contains dicts, obj must be a dict to match its key-value with
-            the value to delete on the array.
-
-            XXX TODO allow object to be either a single object or a list of objects
-        """
-
-        items = '%s.items' % field
-        count = '%s.totalItems' % field
-
-        self.mdb_collection.update({'_id': self['_id']}, {'$pull': {items: obj}, '$inc': {count: -1}})
-
     def delete_from_list(self, field, obj):
-        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'totalItems'
+        """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'total Items'
             Updates an array field of a existing DB object removing the object.
 
             If the array contains plain values, obj is the value to delete.

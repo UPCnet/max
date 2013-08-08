@@ -134,9 +134,9 @@ def grantPermissionOnContext(context, request):
     chash = request.matchdict.get('hash', None)
     subscription = None
     pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo['items'][pointer]
+    while subscription is None and pointer < len(request.actor.subscribedTo):
+        if request.actor.subscribedTo[pointer]['hash'] == chash:
+            subscription = request.actor.subscribedTo[pointer]
         pointer += 1
 
     if not subscription:
@@ -172,9 +172,9 @@ def revokePermissionOnContext(context, request):
     chash = request.matchdict.get('hash', None)
     subscription = None
     pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo['items']):
-        if request.actor.subscribedTo['items'][pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo['items'][pointer]
+    while subscription is None and pointer < len(request.actor.subscribedTo):
+        if request.actor.subscribedTo[pointer]['hash'] == chash:
+            subscription = request.actor.subscribedTo[pointer]
         pointer += 1
 
     if not subscription:
@@ -201,6 +201,6 @@ def getContextSubscriptions(context, request):
     """
     chash = request.matchdict['hash']
     mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.users.search({"subscribedTo.items.hash": chash}, flatten=1, show_fields=["username"], **searchParams(request))
+    found_contexts = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username"], **searchParams(request))
     handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()

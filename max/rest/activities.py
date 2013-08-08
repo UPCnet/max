@@ -78,7 +78,7 @@ def getActivities(context, request):
     mmdb = MADMaxDB(context.db)
 
     # subscribed Uri contexts with read permission
-    subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo.get('items', []) if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
+    subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
 
     # get the defined read context
     result_contexts = mmdb.contexts.getItemsByhash(chash)
@@ -126,8 +126,7 @@ def getActivities(context, request):
         # won't get anything
         raise Forbidden("You don't have permission to see anyting in this context and it's child")
 
-    # pass the read context as a extension to the resource
-    handler = JSONResourceRoot(activities, extension=dict(context=rcontext.flatten()), stats=is_head)
+    handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()
 
 
