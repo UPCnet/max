@@ -3,6 +3,7 @@ from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.rest.utils import getUserIdFromTwitter
 from max import DEFAULT_CONTEXT_PERMISSIONS
+from max.rabbitmq import restartTweety
 from hashlib import sha1
 
 
@@ -197,3 +198,7 @@ class Context(BaseContext):
             del self['twitterUsernameId']
 
         self.save()
+
+    def _on_saving_object(self):
+        if self.field_changed('twitterUsername'):
+            restartTweety()
