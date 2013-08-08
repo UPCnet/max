@@ -24,9 +24,10 @@ for filename in files:
     shutil.copy(filename + '.backup', filename)
     os.remove(filename + '.backup')
     # Parse printed blocks with expected results
-    prints = re.findall(r'Failed example:\s+print response.*?Got:.*?({.*?)\n[-\n]', output, re.DOTALL)
+    prints = re.findall(r'Failed example:\s+print response.*?Got:.*?([{\[]+.*?)\n[-\n]', output, re.DOTALL)
 
     # Make json pretty
+    import ipdb;ipdb.set_trace()
     pretty = [json.dumps(json.loads(a), indent=4) for a in prints]
 
     # Add left paddding
