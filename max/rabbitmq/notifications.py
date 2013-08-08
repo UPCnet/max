@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+from max.resources import getMAXSettings
+from pyramid.threadlocal import get_current_request
+
 import pika
 import json
 
 
-def messageNotification(message, talk_server):
+def messageNotification(message):
+    settings = getMAXSettings(get_current_request())
+    talk_server = settings.get('max_talk_server', '')
+
     # If talk server is not defined, then we assume that we are on tests
     if talk_server:
         conversation_id = message['contexts'][0]['id']
@@ -33,7 +39,10 @@ def messageNotification(message, talk_server):
         )
 
 
-def addConversationExchange(conversation, talk_server):
+def addConversationExchange(conversation):
+    settings = getMAXSettings(get_current_request())
+    talk_server = settings.get('max_talk_server', '')
+
     # If talk server is not defined, then we assume that we are on tests
     if talk_server:
         connection = pika.BlockingConnection(
