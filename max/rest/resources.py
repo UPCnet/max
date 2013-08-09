@@ -12,6 +12,7 @@ PUBLIC_RESOURCES = {
     'timeline_authors': {'route': '/people/{username}/timeline/authors'},
 
     'activity_comments': {'route': '/activities/{activity}/comments'},
+    'activity_comment': {'route': '/activities/{activity}/comments/{comment}'},
 
     'subscriptions': {'route': '/people/{username}/subscriptions'},
     'subscription': {'route': '/people/{username}/subscriptions/{hash}'},
@@ -50,7 +51,6 @@ PUBLIC_RESOURCES = {
     # Not implemented / Not in roadmap
     'user_comments': {'route': '/people/{username}/comments'},
     'user_conversations': {'route': '/people/{username}/conversations'},
-    'comment': {'route': '/activities/{activity}/comments/{commentId}'},
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
 

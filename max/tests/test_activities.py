@@ -585,6 +585,56 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result[0].get('objectType', None), 'comment')
 
+    def test_delete_own_comment(self):
+        """
+            Given i'm plain user
+            When i comment an activity
+            Then i can delete it
+        """
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        self.create_user(username)
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+        comment_id = res.json['id']
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=204)
+
+    def test_delete_others_comment_in_own_activity(self):
+        """
+            Given i'm a plain user
+            When someone else commments on an activity of mine
+            Then I can delete it, 'cause the activity is mine
+        """
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username_not_me), status=201)
+        comment_id = res.json['id']
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=204)
+
+    def test_delete_others_comment_in_others_activity(self):
+        """
+            Given i'm a plain user
+            When someone else comments on someone else's activity
+            Then i can't delete it
+        """
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        username_not_me = 'xavi'
+        self.create_user(username)
+        self.create_user(username_not_me)
+        activity = self.create_activity(username_not_me, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username_not_me), status=201)
+        comment_id = res.json['id']
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=401)
+
     def test_timeline_order_sorted_by_last_comment_publish_date(self):
         """
             Given a plain user

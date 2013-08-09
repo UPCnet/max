@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
 
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.decorators import MaxResponse, requirePersonActor
+from max.exceptions import ObjectNotFound, Unauthorized
 from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.utils import flatten
@@ -95,18 +96,45 @@ def addActivityComment(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='comment', request_method='GET')
+@view_config(route_name='activity_comment', request_method='GET')
 def getActivityComment(context, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover
 
 
-@view_config(route_name='comments', request_method='PUT')
+@view_config(route_name='activity_comments', request_method='PUT')
 def modifyActivityComments(context, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover
+
+
+@view_config(route_name='activity_comment', request_method='DELETE')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def deleteActivityComment(context, request):
+    """
+    """
+    mmdb = MADMaxDB(context.db)
+    activityid = request.matchdict.get('activity', None)
+    commentid = request.matchdict.get('comment', None)
+    try:
+        found_activity = mmdb.activity[activityid]
+    except:
+        raise ObjectNotFound("There's no activity with id: %s" % activityid)
+
+    comment = found_activity.get_comment(commentid)
+    if not comment:
+        raise ObjectNotFound("There's no comment with id: %s" % commentid)
+
+    if found_activity.deletable or request.actor.username == comment['actor']['username']:
+        found_activity.delete_comment(commentid)
+    else:
+        raise Unauthorized("You're not allowed to delete this comment")
+
+    return HTTPNoContent()
 
 
 @view_config(route_name='comments', request_method='DELETE')

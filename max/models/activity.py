@@ -117,13 +117,17 @@ class BaseActivity(MADBase):
         self.updateFields(properties)
         self.save()
 
+    def get_comment(self, commentid):
+        comments = [comment for comment in self.replies if comment['id'] == commentid]
+        return comments[0] if comments is not [] else False
+
     def addComment(self, comment):
         """
             Adds a comment to an existing activity and updates refering activity keywords and hashtags
         """
 
         #Clean innecessary fields
-        non_needed_actor_fields = ['subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
+        non_needed_actor_fields = ['talkingIn', 'androidDevices', 'iosDevices', 'subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
         for fieldname in non_needed_actor_fields:
             if fieldname in comment['actor']:
                 del comment['actor'][fieldname]
@@ -140,6 +144,12 @@ class BaseActivity(MADBase):
         self.commented = comment['published']
 
         self.save()
+
+    def delete_comment(self, commentid):
+        """
+        """
+        self.delete_from_list('replies', {'id': commentid})
+        # XXX TODO Update activity hastags and keywords
 
 
 class Activity(BaseActivity):
