@@ -230,12 +230,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Then the actor will be that context
             And the creator and owner will be the admin user
         """
-        from .mockers import user_status_context
+        from .mockers import user_status_as_context
         from .mockers import create_context
         from hashlib import sha1
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
-        res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager), status=201)
+        res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_as_context), oauth2Header(test_manager), status=201)
         self.assertEqual(res.json['actor']['hash'], url_hash)
         self.assertEqual(res.json['creator'], test_manager)
         self.assertEqual(res.json['owner'], test_manager)

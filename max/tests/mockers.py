@@ -187,6 +187,12 @@ user_status_context = {
     },
 }
 
+user_status_as_context = {
+    "object": {
+        "objectType": "note",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+    },
+}
 
 user_status_context_generator = {
     "contexts": [
