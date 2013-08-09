@@ -79,25 +79,24 @@ class BaseActivity(MADBase):
             if isPerson:
                 ob['object']['_keywords'].append(self.data['actor']['username'])
 
-        if 'contexts' in self.data:
-            if isPerson:
-                # When a person posts an activity it can be targeted
-                # to multiple contexts. here we construct the basic info
-                # of each context and store them in contexts key
-                ob['contexts'] = []
-                for cobject in self.data['contexts']:
-                    subscription = dict(self.data['actor'].getSubscription(cobject))
+        if isPerson and 'contexts' in self.data:
+            # When a person posts an activity it can be targeted
+            # to multiple contexts. here we construct the basic info
+            # of each context and store them in contexts key
+            ob['contexts'] = []
+            for cobject in self.data['contexts']:
+                subscription = dict(self.data['actor'].getSubscription(cobject))
 
-                    #Clean innecessary fields
-                    non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id']
-                    for fieldname in non_needed_subscription_fields:
-                        if fieldname in subscription:
-                            del subscription[fieldname]
-                    ob['contexts'].append(subscription)
-            if isContext:
-                # When a context posts an activity it can be posted only
-                # to itself, so add it directly
-                    ob['contexts'] = [self.data['actor'], ]
+                #Clean innecessary fields
+                non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id']
+                for fieldname in non_needed_subscription_fields:
+                    if fieldname in subscription:
+                        del subscription[fieldname]
+                ob['contexts'].append(subscription)
+        if isContext:
+            # When a context posts an activity it can be posted only
+            # to itself, so add it directly
+                ob['contexts'] = [self.data['actor'], ]
         self.update(ob)
 
         # Set defaults
