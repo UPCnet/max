@@ -204,5 +204,6 @@ class Activity(BaseActivity):
                 for context in self.get('contexts'):
                     self['deletable'] = context['hash'] in subscriptions_with_delete_permission
 
-
-
+            # Mark the comments with the deletable flag too
+            for comment in self.replies:
+                comment['deletable'] = self['deletable'] or self.request.actor.username == comment['actor']['username']

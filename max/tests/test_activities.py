@@ -182,6 +182,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username2), status=200)
         self.assertEqual(res.json['deletable'], False)
 
+    def test_get_deletable_mark_for_own_comment(self):
+        """
+        """
+        pass
+
+    def test_get_deletable_mark_for_others_comment_in_own_activity(self):
+        """
+        """
+        pass
+
+    def test_get_deletable_mark_for_others_comment_in_others_activity(self):
+        """
+        """
+        pass
+
     def test_delete_inexistent_activity(self):
         """
             Given a plain user
