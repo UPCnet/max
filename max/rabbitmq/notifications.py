@@ -26,6 +26,7 @@ def restartTweety():
 def messageNotification(message):
     settings = getMAXSettings(get_current_request())
     talk_server = settings.get('max_talk_server', '')
+    maxserver_id = settings.get('max_server_id', '')
 
     # If talk server is not defined, then we assume that we are on tests
     if talk_server:
@@ -40,7 +41,8 @@ def messageNotification(message):
             'message': text,
             'username': username,
             'displayName': displayName,
-            'messageID': message_id
+            'messageID': message_id,
+            'server_id': maxserver_id
         }
 
         connection = pika.BlockingConnection(
