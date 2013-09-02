@@ -128,6 +128,7 @@ def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
+    granted_permission = '+{}'.format(permission)
     if permission not in ['read', 'write', 'subscribe', 'invite', 'delete']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
@@ -145,7 +146,7 @@ def grantPermissionOnContext(context, request):
     #If we reach here, we are subscribed to a context and ready to set the permission
 
     permissions = subscription['permissions']
-    if permission in permissions:
+    if granted_permission in permissions:
         #Already have the permission
         code = 200
     else:
