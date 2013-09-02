@@ -270,29 +270,57 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(len(result), 0)
 
-    # def test_change_public_context_to_restricted(self):
-    #     """
-    #         Create a public context, user subscribes to context.
-    #         Change the context to join=restricted, and user fails to remove his subscription
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
-    #     self.user_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     self.user_unsubscribe_user_from_context(username, subscribe_context, expect=401)
+    def test_change_public_context_to_restricted(self):
+        """
+            Create a public context, user subscribes to context.
+            Change the context to write=restricted, and user fails to write in the context.
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        from .mockers import user_status_context
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        data = json.dumps({"permissions": {'write': 'restricted'}})
+        res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['permissions']['read'], 'subscribed')
+        self.assertEqual(res.json['permissions']['write'], 'restricted')
+        res = self.create_activity(username, user_status_context, expect=401)
 
-    # def test_change_restricted_context_to_public(self):
-    #     """
-    #         Create a restricted context, admin subscribes the user to context.
-    #         Change the context to join=public, and user successfully removes himself from context
-    #     """
-    #     from .mockers import create_context
-    #     from .mockers import subscribe_context
-    #     username = 'messi'
-    #     self.create_user(username)
-    #     self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-    #     self.admin_subscribe_user_to_context(username, subscribe_context, expect=200)
-    #     self.user_unsubscribe_user_from_context(username, subscribe_context, expect=200)
+    def test_change_public_context_to_restricted_preserve_granted_write_permission(self):
+        """
+            Create a public context, user subscribes to context.
+            Extra grant write permission to the user
+            Change the context to write=restricted, and user still have the write permission
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        from .mockers import user_status_context
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        permission = 'write'
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (url_hash, username, permission), "", oauth2Header(test_manager), status=200)
 
+        data = json.dumps({"permissions": {'write': 'restricted'}})
+        res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['permissions']['read'], 'subscribed')
+        self.assertEqual(res.json['permissions']['write'], 'restricted')
+        res = self.create_activity(username, user_status_context, expect=201)
+
+    def test_change_restricted_context_to_public(self):
+        """
+            Create a restricted context, admin subscribes the user to context,
+            Change the context to join=public, and user successfully removes himself from context
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=200)
+        self.user_unsubscribe_user_from_context(username, subscribe_context, expect=200)

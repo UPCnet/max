@@ -23,7 +23,8 @@ class BaseContext(MADBase):
                                                   'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
                                                   'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
                                                   'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
-                                                  }
+                                                  },
+                                         operations_mutable=1
                                          ),
               }
 
@@ -69,10 +70,21 @@ class BaseContext(MADBase):
         if '_id' != self.unique:
             fields_to_squash.append('_id')
         subscription = self.flatten(squash=fields_to_squash)
+
         #If we are subscribing the user, read permission is granted
         user_permissions = ['read']
 
-        #Set other permissions based on context defaults
+        # Add subscription permissions based on defaults and context values
+        user_permissions = self.subscription_permissions(base=user_permissions)
+
+        #Assign permissions to the subscription object before adding it
+        subscription['permissions'] = user_permissions
+        return subscription
+
+    def subscription_permissions(self, base=[]):
+        user_permissions = base
+        if self.permissions.get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) in ['subscribed', 'public']:
+            user_permissions.append('read')
         if self.permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
             user_permissions.append('write')
         if self.permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
@@ -83,20 +95,32 @@ class BaseContext(MADBase):
         if self.permissions.get('delete', DEFAULT_CONTEXT_PERMISSIONS['delete'] in ['subscribed']):
             user_permissions.append('delete')
 
-        #Assign permissions to the subscription object before adding it
-        subscription['permissions'] = user_permissions
-        return subscription
+        return list(set(user_permissions))
 
     def updateUsersSubscriptions(self):
         """
+            Updates fields with changes.
+            Now only updates displayName and permissions
         """
-        # XXX TODO For now only updates displayName
-        ids = [user['_id'] for user in self.subscribedUsers()]
 
-        for obid in ids:
-            criteria = {'_id': obid, '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
-            what = {'$set': {'{}.$.displayName'.format(self.user_subscription_storage): self.displayName}}
-            self.mdb_collection.database.users.update(criteria, what)
+        updatable_fields = ['permissions', 'displayName']
+        has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
+
+        if has_updatable_fields:
+            for user in self.subscribedUsers():
+                obid = user['_id']
+                import ipdb;ipdb.set_trace()
+                criteria = {'_id': obid, '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+                updates = {}
+
+                if self.field_changed('displayName'):
+                    updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
+
+                if self.field_changed('permissions'):
+                    updates.update({'{}.$.permissions'.format(self.user_subscription_storage): self.subscription_permissions()})
+
+                combined_updates = {'$set': updates}
+                self.mdb_collection.database.users.update(criteria, combined_updates)
 
     def removeUserSubscriptions(self, users_to_delete=[]):
         """

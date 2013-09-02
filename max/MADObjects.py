@@ -5,6 +5,7 @@ from bson import ObjectId
 import datetime
 from pyramid.threadlocal import get_current_request
 import sys
+from copy import deepcopy
 
 
 class MADDict(dict):
@@ -33,7 +34,10 @@ class MADDict(dict):
 
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).iteritems():
-            self[k] = v
+            if isinstance(self.get(k, None), dict) and isinstance(v, dict):
+                self[k].update(v)
+            else:
+                self[k] = v
 
     def __setattr__(self, key, value):
         """
@@ -247,6 +251,7 @@ class MADBase(MADDict):
     def fromObject(self, source, collection=None):
         self.update(source)
         self.old.update(source)
+        self.old = deepcopy(self.old)
         if 'id' in source:
             self['_id'] = source['id']
         self._post_init_from_object(source)
@@ -257,6 +262,7 @@ class MADBase(MADDict):
         if obj:
             self.update(obj)
             self.old.update(obj)
+            self.old = deepcopy(self.old)
 
     def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """
