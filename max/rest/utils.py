@@ -378,6 +378,20 @@ def extractPostData(request):
     # TODO: Do more syntax and format checks of sent data
 
 
+def hasPermission(subscription, permission):
+    """
+        Determines if the subscription has a permission. Valid permissions are
+        write, read, +write, +read ...
+        If there's a revoked, permission (-read, -write) this invalides any plain_permission.
+        A granted (+read, +write) permission oversees any revoke permission
+    """
+    permissions = subscription.get('permissions', [])
+    has_plain_permission = permission in permissions
+    has_granted_permission = '+{}'.format(permission) in permissions
+    has_revoked_permission = '-{}'.format(permission) in permissions
+    return (has_plain_permission and not has_revoked_permission) or has_granted_permission
+
+
 def canWriteInContexts(actor, contexts):
     """
     """
@@ -401,7 +415,7 @@ def canWriteInContexts(actor, contexts):
         # If user is trying to post on a subscribed context/s
         # Check that has write permission in all the contexts
 
-        allowed_to_write = 'write' in subscription.get('permissions', [])
+        allowed_to_write = hasPermission(subscription, 'write')
         if not allowed_to_write:
             raise Unauthorized("You are not allowed to post to this context : %s" % context.getIdentifier())
 
@@ -416,7 +430,7 @@ def canReadContext(actor, url):
     if url == []:
         return True
 
-    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo'] if 'read' in a['permissions']]
+    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo'] if hasPermission(a['permissions'], 'read')]
 
     if url not in subscribed_contexts_urls:
 
