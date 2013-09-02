@@ -152,8 +152,8 @@ def grantPermissionOnContext(context, request):
     else:
         #Assign the permission
         code = 201
-        request.actor.grantPermission(subscription, permission)
-        permissions.append(permission)
+        new_permissions = request.actor.grantPermission(subscription, permission)
+        subscription['permissions'] = new_permissions
 
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
@@ -167,6 +167,7 @@ def revokePermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
+    revoked_permission = '-{}'.format(permission)
     if permission not in ['read', 'write', 'subscribe', 'invite']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
@@ -185,10 +186,10 @@ def revokePermissionOnContext(context, request):
 
     code = 200
     permissions = subscription['permissions']
-    if permission in permissions:
+    if revoked_permission in permissions:
         #We have the permission, let's delete it
-        request.actor.revokePermission(subscription, permission)
-        subscription['permissions'] = [a for a in permissions if permission != a]
+        new_permissions = request.actor.revokePermission(subscription, permission)
+        subscription['permissions'] = new_permissions
 
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
