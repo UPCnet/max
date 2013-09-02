@@ -98,6 +98,7 @@ class User(MADBase):
          # overwrite permissions
         what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
         self.mdb_collection.update(criteria, what)
+        return new_permissions
 
     def revokePermission(self, subscription, permission):
         """
@@ -119,6 +120,7 @@ class User(MADBase):
 
         what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
         self.mdb_collection.update(criteria, what)
+        return new_permissions
 
     def getSubscription(self, context):
         """
