@@ -2,6 +2,7 @@
 from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.rest.utils import getUserIdFromTwitter
+from max.models.user import User
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.rabbitmq.notifications import restartTweety
 from hashlib import sha1
@@ -108,16 +109,63 @@ class BaseContext(MADBase):
 
         if has_updatable_fields:
             for user in self.subscribedUsers():
-                obid = user['_id']
-                import ipdb;ipdb.set_trace()
-                criteria = {'_id': obid, '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
+                user_object = User()
+                user_object.fromObject(user)
+                criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 
                 if self.field_changed('displayName'):
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
 
                 if self.field_changed('permissions'):
-                    updates.update({'{}.$.permissions'.format(self.user_subscription_storage): self.subscription_permissions()})
+                    default_subscription_permissions = self.subscription_permissions()
+                    subscription = user_object.getSubscription(self)
+                    revokes = []
+                    grants = []
+
+                    # Collect user grants for this subscription
+                    for permission in subscription.get('permissions', []):
+                        prefix = permission[0]
+                        permission_name = permission[1:]
+                        if prefix == '+':
+                            grants.append(permission_name)
+
+                    # Collect user revokes, only if there's no grant
+                    for permission in subscription.get('permissions', []):
+                        prefix = permission[0]
+                        permission_name = permission[1:]
+                        if prefix == '-' and permission_name not in grants:
+                            revokes.append(permission_name)
+
+                    new_permissions = []
+
+                    # If theres a default permission overseeded by a grant
+                    # or a revoke, add it to the new permissions, otherwise
+                    # preserve the plain permission
+                    for permission in default_subscription_permissions:
+                        permission_is_revoked = permission in revokes
+                        permission_is_granted = permission in grants
+
+                        if permission_is_granted:
+                            new_permissions.append('+{}'.format(permission))
+                        elif permission_is_revoked:
+                            new_permissions.append('-{}'.format(permission))
+                        else:
+                            new_permissions.append(permission)
+
+                    # Preserve the grants of permissions not included in defaults
+                    for permission in grants:
+                        prefixed = '+{}'.format(permission)
+                        if prefixed not in new_permissions:
+                            new_permissions.append(prefixed)
+
+                    # Preserve the revokes of permissions not included in defaults
+                    for permission in revokes:
+                        prefixed = '-{}'.format(permission)
+                        if prefixed not in new_permissions:
+                            new_permissions.append(prefixed)
+
+                    updates.update({'{}.$.permissions'.format(self.user_subscription_storage): new_permissions})
 
                 combined_updates = {'$set': updates}
                 self.mdb_collection.database.users.update(criteria, combined_updates)
