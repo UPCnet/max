@@ -79,26 +79,45 @@ class User(MADBase):
 
     def grantPermission(self, subscription, permission):
         """
+        Grant a permission persistently, so a change in the context permissions defaults doesn't
+        leave the user without the permission
         """
         criteria = {}
+        new_permissions = []
+
+        for old_permission in subscription['permissions']:
+            if permission not in old_permission:
+                # Don't add current permission , netiher plain form nor the prefixed (+-)
+                # Only the different ones
+                new_permissions.append(old_permission)
+        new_permissions.append('+{}'.format(permission))
+
         criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
-         # Add permission to permissions array, of matched object
-        what = {'$addToSet': {'subscribedTo.$.permissions': permission}}
-
+         # overwrite permissions
+        what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
         self.mdb_collection.update(criteria, what)
 
     def revokePermission(self, subscription, permission):
         """
+        Revoke a permission persistently, so a change in the context permissions defaults doesn't
+        grant the permission automatically
         """
         criteria = {}
+        new_permissions = []
+
+        for old_permission in subscription['permissions']:
+            if permission not in old_permission:
+                # Don't add current permission , netiher plain form nor the prefixed (+-)
+                # Only the different ones
+                new_permissions.append(old_permission)
+        new_permissions.append('-{}'.format(permission))
+
         criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
-         # deletes permission from permissions array, of matched object
-        what = {'$pull': {'subscribedTo.$.permissions': permission}}
-
+        what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
         self.mdb_collection.update(criteria, what)
 
     def getSubscription(self, context):
