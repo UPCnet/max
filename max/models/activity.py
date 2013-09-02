@@ -6,7 +6,7 @@ from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.models.user import User
 from max.models.context import Context
-from max.rest.utils import canWriteInContexts
+from max.rest.utils import canWriteInContexts, hasPermission
 
 
 class BaseActivity(MADBase):
@@ -200,7 +200,7 @@ class Activity(BaseActivity):
             # probably (ehem) is a restricted function, and we don't need this flag.
             self['deletable'] = self.request.actor.username == self._owner
             if not self['deletable'] and self.get('contexts'):
-                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.subscribedTo if 'delete' in subscription['permissions']]
+                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.subscribedTo if hasPermission(subscription,'delete')]
                 for context in self.get('contexts'):
                     self['deletable'] = context['hash'] in subscriptions_with_delete_permission
 
