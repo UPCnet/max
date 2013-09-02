@@ -251,7 +251,7 @@ class MADBase(MADDict):
     def fromObject(self, source, collection=None):
         self.update(source)
         self.old.update(source)
-        self.old = deepcopy(self.old)
+        self.old = deepcopy(flatten(self.old))
         if 'id' in source:
             self['_id'] = source['id']
         self._post_init_from_object(source)
@@ -262,7 +262,7 @@ class MADBase(MADDict):
         if obj:
             self.update(obj)
             self.old.update(obj)
-            self.old = deepcopy(self.old)
+            self.old = deepcopy(flatten(self.old))
 
     def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
         """
