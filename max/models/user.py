@@ -84,6 +84,8 @@ class User(MADBase):
         subscription['permissions'] = context.subscription_permissions()
 
         criteria = {}
+        criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
+        criteria.update({'_id': self._id})                 # of collection entry with _id
 
         # overwrite permissions
         what = {

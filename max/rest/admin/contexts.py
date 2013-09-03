@@ -177,9 +177,9 @@ def resetPermissionsOnContext(context, request):
     #If we reach here, we are subscribed to a context and ready to reset the permissions
 
     contexts = MADMaxCollection(context.db.contexts)
-    maxcontext = contexts.getItemsByhash(chash)
+    maxcontext = contexts.getItemsByhash(chash)[0]
 
-    subscription = request.actor.resetSubscriptionPermissions(subscription, maxcontext)
+    subscription = request.actor.reset_permissions(subscription, maxcontext)
     handler = JSONResourceEntity(subscription, status_code=200)
     return handler.buildResponse()
 
