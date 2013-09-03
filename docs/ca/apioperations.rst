@@ -492,9 +492,9 @@ s'explica amb profunditat en l'apartat de permisos.
 
         .. -> expected
             >>> expected = json.loads(expected)
-            >>> response = testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
+            >>> response = testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201)
             >>> response
-            <200 OK application/json ...
+            <201 Created application/json ...
 
     Success
 
@@ -533,9 +533,9 @@ s'explica amb profunditat en l'apartat de permisos.
 
         .. -> expected
             >>> expected = json.loads(expected)
-            >>> response = testapp.delete('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
+            >>> response = testapp.delete('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201)
             >>> response
-            <200 OK application/json ...
+            <201 Created application/json ...
             >>> response.json.get('displayName') == expected.get('displayName')
             True
             >>> response.json.get('permissions') == expected.get('permissions')
