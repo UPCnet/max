@@ -17,6 +17,7 @@ import json
 from hashlib import sha1
 import logging
 logger = logging.getLogger('exceptions')
+from pyramid.settings import asbool
 
 
 def getUserActor(db, username):
@@ -165,8 +166,9 @@ def saveException(request, error):  # pragma: no cover
     )
     dump = json.dumps(entry)
     entry['hash'] = sha1(dump).hexdigest()
-    logger.debug(ERROR_TEMPLATE.format(**entry))
-    return entry['hash']
+    exception_log = ERROR_TEMPLATE.format(**entry)
+    logger.debug(exception_log)
+    return entry['hash'], exception_log
 
 
 def catch_exception(request, e):
@@ -202,9 +204,14 @@ def catch_exception(request, e):
     # So, as the tests will not ever see this, we exlcude it from coverage
     else:  # pragma: no cover
         error = traceback.format_exc()
-        sha1_hash = saveException(request, error)
+        sha1_hash, log = saveException(request, error)
         max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
-        return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description='Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)))
+
+        error_description = 'Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)
+        if asbool(request.registry.settings.get('testing', False)):  # pragma: no cover
+            error_description = 'An exception occurred. Below is the catched exception.\n\nSorry for the convenience.\n\n' + log.replace('\n', '\n    ')[:-4]
+
+        return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description=error_description))
 
 
 def MaxResponse(fun):
