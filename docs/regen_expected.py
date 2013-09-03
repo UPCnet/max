@@ -27,7 +27,6 @@ for filename in files:
     prints = re.findall(r'Failed example:\s+print response.*?Got:.*?([{\[]+.*?)\n[-\n]', output, re.DOTALL)
 
     # Make json pretty
-    import ipdb;ipdb.set_trace()
     pretty = [json.dumps(json.loads(a), indent=4) for a in prints]
 
     # Add left paddding
