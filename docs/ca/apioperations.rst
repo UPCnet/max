@@ -456,13 +456,20 @@ Permisos a contexts
 -------------------
 
 Sobre els objectes context es poden otorgar o revocar permisos a usuaris del
-sistema. Aquests permisos són bàsicament de lectura/escriptura, tal i com
-s'explica amb profunditat en l'apartat de permisos.
+sistema. Aquests permisos són qualsevol dels permisos definitsen profunditat
+en l'apartat de permisos. Els permisos otorgats amb aquest sistema són persistents,
+per tant un canvi de permisos en els valors per defecte del context no afecta als permisos afegits/denegats.
+
+Per tornar un usuari am permisos afegits/denegats als valors per defecte del contexte, haurem de resetejar els
+permisos d'aquell usuari en aquell contexte.
+
+Un usuari pot tenir un permis per defecte, i tot i aixi otorgar-li el permis de manera persistent, de manera
+que a partir de llavors, no el pot perdre exepte per eliminació explícita.
 
 .. http:put:: /contexts/{hash}/permissions/{username}/{permission}
 
     Afegeix els permisos per un context donat un identificador d'usuari i el
-    permís que li vols donar.
+    permís que li vols donar, de forma persistent.
 
     :query hash: (REST) El hash del context en concret. Aquest hash es calcula
         fent una suma de verificació sha1 de la URL del context.
@@ -499,12 +506,12 @@ s'explica amb profunditat en l'apartat de permisos.
     Success
 
         Si el permís ja estava otorgat, el codi HTTP de resposta és 200, si no, torna un 201.
-        En el cos, torna l'objecte ``Context`` modificat.
+        En el cos, torna la subscripció modificada.
 
 .. http:delete:: /contexts/{hash}/permissions/{username}/{permission}
 
-    Esborra els permisos per un context donat un identificador d'usuari i el
-    permís que li vols donar.
+    Denega els permis per un context donat un identificador d'usuari i el
+    permís que li vols donar de manera persistent
 
     :query hash: (REST) El hash del context en concret. Aquest hash es calcula
         fent una suma de verificació sha1 de la URL del context.
@@ -547,8 +554,57 @@ s'explica amb profunditat en l'apartat de permisos.
     <201 Created application/json ...
 
     Success
+        Si el permís ja estava denegat, el codi HTTP de resposta és 200, si no, torna un 201.
+        Torna la subscripció modificada.
 
-        Torna l'objecte ``Context`` modificat.
+.. http:post:: /contexts/{hash}/permissions/{username}/defaults
+
+    Reseteja els permisos d'un usuari en un contexte als per defecte d'aquell contexte. Això elimina
+    qualsevol permis persistent afegit o denegat anteriorment.
+
+    :query hash: (REST) El hash del context en concret. Aquest hash es calcula
+        fent una suma de verificació sha1 de la URL del context.
+    :query username: (REST) L'identificador del nou usuari al sistema
+
+    Cos de la petició
+
+        Aquesta petició no te cos.
+
+    Resposta esperada
+
+        .. code-block:: python
+
+            {
+                "twitterHashtag": "assignatura1",
+                "displayName": "Atenea",
+                "url": "http://atenea.upc.edu",
+                "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "permissions": [
+                    "read",
+                    "write",
+                    "unsubscribe"
+                ],
+                "objectType": "context"
+            }
+
+        .. -> expected
+            >>> expected = json.loads(expected)
+            >>> response = testapp.post('/contexts/{}/permissions/{}/defaults'.format(context_hash, username), "", oauth2Header(test_manager), status=200)
+            >>> response
+            <200 OK application/json ...
+            >>> response.json.get('displayName') == expected.get('displayName')
+            True
+            >>> response.json.get('permissions') == expected.get('permissions')
+            True
+
+.. put the write permissions of the test user back for further testing :)
+
+    >>> testapp.put('/contexts/{}/permissions/{}/write'.format(context_hash, username), "", oauth2Header(test_manager), status=201)
+    <201 Created application/json ...
+
+    Success
+        Si el permís ja estava denegat, el codi HTTP de resposta és 200, si no, torna un 201.
+        Torna la subscripció modificada.
 
 
 Activitats
