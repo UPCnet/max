@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
 import datetime
-from max.rest.utils import getMaxModelByObjectType
+from max.rest.utils import getMaxModelByObjectType, flatten
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
 
@@ -97,6 +97,9 @@ class User(MADBase):
         }
 
         self.mdb_collection.update(criteria, what)
+
+        fields_to_squash = ['published', 'owner', 'creator', 'tags', 'vetos', 'grants']
+        subscription = flatten(subscription, squash=fields_to_squash)
         return subscription
 
     def grantPermission(self, subscription, permission):
@@ -138,6 +141,9 @@ class User(MADBase):
 
         # update subscription permissions
         subscription['permissions'] = new_permissions
+        fields_to_squash = ['published', 'owner', 'creator', 'tags', 'vetos', 'grants']
+        subscription = flatten(subscription, squash=fields_to_squash)
+
         return subscription
 
     def revokePermission(self, subscription, permission):
@@ -172,6 +178,9 @@ class User(MADBase):
             }
         }
         subscription['permissions'] = new_permissions
+        fields_to_squash = ['published', 'owner', 'creator', 'tags', 'vetos', 'grants']
+        subscription = flatten(subscription, squash=fields_to_squash)
+
         self.mdb_collection.update(criteria, what)
         return subscription
 

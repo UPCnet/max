@@ -147,6 +147,7 @@ def grantPermissionOnContext(context, request):
     if permission in subscription.get('_grants', []):
         #Already have the permission grant
         code = 200
+        open('/tmp/debug', 'w').write(str(subscription))
     else:
         #Assign the permission
         code = 201
@@ -178,7 +179,6 @@ def resetPermissionsOnContext(context, request):
 
     contexts = MADMaxCollection(context.db.contexts)
     maxcontext = contexts.getItemsByhash(chash)[0]
-
     subscription = request.actor.reset_permissions(subscription, maxcontext)
     handler = JSONResourceEntity(subscription, status_code=200)
     return handler.buildResponse()
@@ -216,7 +216,7 @@ def revokePermissionOnContext(context, request):
         #We have the permission, let's delete it
         subscription = request.actor.revokePermission(subscription, permission)
         code = 201
-
+        open('/tmp/debug', 'w').write(str(subscription))
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
 

@@ -88,7 +88,7 @@ class BaseActivity(MADBase):
                 subscription = dict(self.data['actor'].getSubscription(cobject))
 
                 #Clean innecessary fields
-                non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id']
+                non_needed_subscription_fields = ['tags', 'published', 'permissions', 'id', '_vetos', '_grants']
                 for fieldname in non_needed_subscription_fields:
                     if fieldname in subscription:
                         del subscription[fieldname]

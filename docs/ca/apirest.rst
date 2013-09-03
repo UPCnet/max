@@ -892,18 +892,16 @@ Representa el conjunt de comentaris fets a una activitat.
 
             [
                 {
-                    "content": "[C] Testejant un comentari nou a una activitat",
-                    "objectType": "comment",
-                    "id": "519b00000000000000000000",
                     "actor": {
                         "username": "messi",
-                        "iosDevices": [],
                         "displayName": "Lionel Messi",
-                        "talkingIn": [],
-                        "androidDevices": [],
                         "objectType": "person"
                     },
-                    "published": "2000-01-01T00:01:00Z"
+                    "content": "[C] Testejant un comentari nou a una activitat",
+                    "deletable": true,
+                    "published": "2000-01-01T00:01:00Z",
+                    "id": "519b00000000000000000000",
+                    "objectType": "comment"
                 }
             ]
 
@@ -1086,8 +1084,8 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                     "permissions": [
                         "read",
                         "write",
-                        "invite",
-                        "unsubscribe"
+                        "unsubscribe",
+                        "invite"
                     ]
                 },
                 {
@@ -1098,8 +1096,8 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                     "permissions": [
                         "read",
                         "write",
-                        "invite",
-                        "unsubscribe"
+                        "unsubscribe",
+                        "invite"
                     ]
                 }
             ]

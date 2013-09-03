@@ -482,12 +482,12 @@ s'explica amb profunditat en l'apartat de permisos.
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "objectType": "context",
                 "permissions": [
                     "read",
                     "write",
                     "unsubscribe"
-                ]
+                ],
+                "objectType": "context"
             }
 
         .. -> expected
@@ -524,11 +524,11 @@ s'explica amb profunditat en l'apartat de permisos.
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "objectType": "context",
                 "permissions": [
                     "read",
                     "unsubscribe"
-                ]
+                ],
+                "objectType": "context"
             }
 
         .. -> expected
@@ -599,8 +599,8 @@ Activitats
                     {
                         "url": "http://atenea.upc.edu",
                         "twitterHashtag": "assignatura1",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "displayName": "Atenea",
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }
                 ],
