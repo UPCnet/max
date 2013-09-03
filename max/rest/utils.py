@@ -380,15 +380,14 @@ def extractPostData(request):
 
 def hasPermission(subscription, permission):
     """
-        Determines if the subscription has a permission. Valid permissions are
-        write, read, +write, +read ...
-        If there's a revoked, permission (-read, -write) this invalides any plain_permission.
-        A granted (+read, +write) permission oversees any revoke permission
+        Determines if the subscription has a permission.
+        If there's a revoked, permission this invalides any plain_permission.
+        A granted permission oversees any revoke permission
     """
     permissions = subscription.get('permissions', [])
     has_plain_permission = permission in permissions
-    has_granted_permission = '+{}'.format(permission) in permissions
-    has_revoked_permission = '-{}'.format(permission) in permissions
+    has_granted_permission = permission in subscription.get('_grants', [])
+    has_revoked_permission = permission in subscription.get('_grants', [])
     return (has_plain_permission and not has_revoked_permission) or has_granted_permission
 
 

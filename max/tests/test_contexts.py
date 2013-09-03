@@ -376,7 +376,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
-        self.assertEqual('+write' in result['permissions'], True)
+        self.assertEqual('write' in result['permissions'], True)
 
     def test_revoke_write_permission_on_write_restricted_context(self):
         """ doctest .. http:delete:: /contexts/{hash}/permissions/{username}/{permission} """
@@ -389,7 +389,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         chash = sha1(create_context_private_r['url']).hexdigest()
         permission = 'write'
         res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
-        res = self.testapp.delete('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=200)
+        res = self.testapp.delete('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=201)
         result = json.loads(res.text)
         self.assertEqual('read' in result['permissions'], True)
         self.assertEqual('write' not in result['permissions'], True)

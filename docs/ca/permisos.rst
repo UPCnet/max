@@ -23,14 +23,16 @@ estés creant activitat en nom d'una altra persona. L'actor tampoc es pot modifi
 Contextos
 ---------
 
-Els permisos dels contextos serveixen per assignar permis de
-lectura/escriptura als usuaris en el moment de la subscripció. El permís que
-s'utilitza és el que queda assignat a la subscripció de l'usuari, segons el
-criteri escollit:
+Els permisos dels contextos serveixen per determinar quines accions poden dur a terme
+els usuaris sobre ell. Quan es crea un contexte se li especifica un valor per cada permis,
+que determinara que pot cada usuari que interactui amb el contexte. Els permisos de cada usuari
+es posaran en el moment de la subscripció segons el valor escollit en el contexte, poden ser modificats
+individualment per ususari més endavant:
+
 
 READ
 ~~~~
-Defineix qui pot llegir l'activitat escrita sota el context
+Defineix qui pot llegir l'activitat escrita al context
 
     - subscribed - Tots els usuaris subscrits al context poden llegir
     - public -  Qualsevol usuari sense esta subscrit al context el pot llegir
@@ -54,7 +56,7 @@ Defineix qui es pot subscriure al context
 
 UNSUBSCRIBE
 ~~~~~~~~~~~
-Defineix qui es pot dessubscriure d'un context. Aquest permís es dona automàticament en cas que el permís subscribe sigui public.Només cal especificar-lo si es vol modificar el compartament per defecte.
+Defineix qui es pot dessubscriure d'un context. Aquest permís es dona automàticament en cas que el permís subscribe sigui public. Només cal especificar-lo si es vol modificar el compartament per defecte.
     - restricted - Només els usuaris administradors poden dessubscriure usuaris del context
     - public - Qualsevol usuari pot dessubscriure's del context previament subscrit
 

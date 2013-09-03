@@ -24,6 +24,7 @@ PUBLIC_RESOURCES = {
     'context': {'route': '/contexts/{hash}'},
     'context_avatar': {'route': '/contexts/{hash}/avatar'},
     'public_contexts': {'route': '/contexts/public'},
+    'context_user_permissions_defaults': {'route': '/contexts/{hash}/permissions/{username}/defaults'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
     'context_activities': {'route': '/contexts/{hash}/activities'},
     'context_activities_authors': {'route': '/contexts/{hash}/activities/authors'},

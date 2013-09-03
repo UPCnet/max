@@ -77,28 +77,66 @@ class User(MADBase):
         self.updateFields(properties)
         self.save()
 
+    def reset_permissions(self, subscription, context):
+
+        subscription['_grants'] = []
+        subscription['_vetos'] = []
+        subscription['permissions'] = context.subscription_permissions()
+
+        criteria = {}
+
+        # overwrite permissions
+        what = {
+            '$set': {
+                'subscribedTo.$.permissions': subscription['permissions'],
+                'subscribedTo.$._grants': subscription['_grants'],
+                'subscribedTo.$._vetos': subscription['_vetos'],
+            }
+        }
+
+        self.mdb_collection.update(criteria, what)
+        return subscription
+
     def grantPermission(self, subscription, permission):
         """
         Grant a permission persistently, so a change in the context permissions defaults doesn't
         leave the user without the permission
         """
         criteria = {}
-        new_permissions = []
 
-        for old_permission in subscription['permissions']:
-            if permission not in old_permission:
-                # Don't add current permission , netiher plain form nor the prefixed (+-)
-                # Only the different ones
-                new_permissions.append(old_permission)
-        new_permissions.append('+{}'.format(permission))
+        # Add current permissions
+        new_permissions = list(subscription['permissions'])
+
+        # Add new permission if not present
+        if permission not in new_permissions:
+            new_permissions.append(permission)
+
+        # Add permission to grants if not present
+        subscription.setdefault('_grants', [])
+        if permission not in subscription['_grants']:
+            subscription['_grants'].append(permission)
+
+        # Remove permission from vetos if present
+        subscription.setdefault('_vetos', [])
+        subscription['_vetos'] = [vetted for vetted in subscription['_vetos'] if vetted != permission]
 
         criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # overwrite permissions
-        what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
+        what = {
+            '$set': {
+                'subscribedTo.$.permissions': new_permissions,
+                'subscribedTo.$._grants': subscription['_grants'],
+                'subscribedTo.$._vetos': subscription['_vetos'],
+            }
+        }
+
         self.mdb_collection.update(criteria, what)
-        return new_permissions
+
+        # update subscription permissions
+        subscription['permissions'] = new_permissions
+        return subscription
 
     def revokePermission(self, subscription, permission):
         """
@@ -108,19 +146,32 @@ class User(MADBase):
         criteria = {}
         new_permissions = []
 
-        for old_permission in subscription['permissions']:
-            if permission not in old_permission:
-                # Don't add current permission , netiher plain form nor the prefixed (+-)
-                # Only the different ones
-                new_permissions.append(old_permission)
-        new_permissions.append('-{}'.format(permission))
+        # Add current permissions except revoked one
+        new_permissions = [p for p in subscription['permissions'] if permission != p]
+
+        # Add permission to vetos if not present
+        subscription.setdefault('_vetos', [])
+        if permission not in subscription['_vetos']:
+            subscription['_vetos'].append(permission)
+
+        # Remove permission from grants if present
+        subscription.setdefault('_grants', [])
+        subscription['_grants'] = [granted for granted in subscription['_grants'] if granted != permission]
 
         criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
-        what = {'$set': {'subscribedTo.$.permissions': new_permissions}}
+         # overwrite permissions
+        what = {
+            '$set': {
+                'subscribedTo.$.permissions': new_permissions,
+                'subscribedTo.$._grants': subscription['_grants'],
+                'subscribedTo.$._vetos': subscription['_vetos'],
+            }
+        }
+        subscription['permissions'] = new_permissions
         self.mdb_collection.update(criteria, what)
-        return new_permissions
+        return subscription
 
     def getSubscription(self, context):
         """
