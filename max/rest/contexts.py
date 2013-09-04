@@ -101,8 +101,6 @@ def getContext(context, request):
     if not found_context:
         raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
-    import ipdb;ipdb.set_trace()
-
     handler = JSONResourceEntity(found_context[0].flatten())
     return handler.buildResponse()
 
