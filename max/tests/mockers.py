@@ -298,6 +298,18 @@ message = {
     }
 }
 
+message_oneself = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "messi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
 invalid_message_without_sender = {
     "contexts": [
         {"objectType": "conversation",
@@ -405,6 +417,20 @@ group_message = {
     "contexts": [
         {"objectType": "conversation",
          "participants": ["messi", "xavi", "shakira"],
+         "displayName": "Pelotudos"
+         }]
+}
+
+group_message_duplicated = {
+    "object": {
+        "objectType": "note",
+        "content": "Quin grup mes guai!",
+        "displayName": "Pelotudos"
+    },
+
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi", "messi"],
          "displayName": "Pelotudos"
          }]
 }

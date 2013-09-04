@@ -45,6 +45,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get("objectType", None), "message")
         self.assertEqual(result.get("object", None).get("objectType", None), "note")
 
+    def test_post_message_to_conversation_to_oneself(self):
+        """ doctest .. http:post:: /conversations """
+        from .mockers import message_oneself
+        sender = 'messi'
+        self.create_user(sender)
+
+        self.testapp.post('/conversations', json.dumps(message_oneself), oauth2Header(sender), status=400)
+
     def test_post_message_to_conversation_without_context(self):
         """
         """
@@ -282,6 +290,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient2)
 
         self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+
+    def test_post_message_to_inexistent_group_conversation_with_oneself_repeated(self):
+        """
+            Given a plain user
+            When I post a message to more than one person
+            Then a new conversation is created
+        """
+        from .mockers import group_message_duplicated as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=400)
 
     def test_post_messages_to_existing_group_conversation_creates_another_conversation(self):
         """
