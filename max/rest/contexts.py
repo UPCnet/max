@@ -8,7 +8,7 @@ from max.MADMax import MADMaxDB
 from max.exceptions import Unauthorized, ObjectNotFound
 from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
 
 from max.rest.utils import downloadTwitterUserImage, searchParams, flatten
@@ -82,6 +82,28 @@ def getContextAuthors(context, request):
                 distinct_authors.append(activity.actor)
 
     handler = JSONResourceRoot(distinct_authors)
+    return handler.buildResponse()
+
+
+@view_config(route_name='context', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+def getContext(context, request):
+    """
+        /contexts/{hash}
+
+        [RESTRICTED] Return a context by its hash.
+    """
+    mmdb = MADMaxDB(context.db)
+    chash = request.matchdict.get('hash', None)
+    found_context = mmdb.contexts.getItemsByhash(chash)
+
+    if not found_context:
+        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
+
+    import ipdb;ipdb.set_trace()
+
+    handler = JSONResourceEntity(found_context[0].flatten())
     return handler.buildResponse()
 
 
