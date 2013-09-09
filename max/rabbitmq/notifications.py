@@ -4,18 +4,27 @@ from pyramid.threadlocal import get_current_request
 
 import pika
 import json
+import re
+
+
+def pika_connection_params():
+    settings = getMAXSettings(get_current_request())
+    rabbitmq = settings.get('max_rabbitmq', None)
+    if rabbitmq is None:
+        return None
+    host, port = re.search(r'\s*(\w+):?(\d*)\s*', 'localhost:54').groups()
+    params = {'host': host}
+    if port:
+        params['port'] = int(port)
+    return params
 
 
 def restartTweety():
-    settings = getMAXSettings(get_current_request())
-    talk_server = settings.get('max_talk_server', '')
-
-    # If talk server is not defined, then we assume that we are on tests
-    if talk_server:
+    pika_params = pika_connection_params()
+    # If pika_parameters is not defined, then we assume that we are on tests
+    if pika_params:
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=talk_server
-            )
+            pika.ConnectionParameters(**pika_params)
         )
         channel = connection.channel()
         channel.basic_publish(exchange='',
@@ -25,11 +34,11 @@ def restartTweety():
 
 def messageNotification(message):
     settings = getMAXSettings(get_current_request())
-    talk_server = settings.get('max_talk_server', '')
+    pika_params = pika_connection_params()
     maxserver_id = settings.get('max_server_id', '')
 
     # If talk server is not defined, then we assume that we are on tests
-    if talk_server:
+    if pika_params:
         conversation_id = message['contexts'][0]['id']
         username = message['actor']['username']
         displayName = message['actor']['displayName']
@@ -46,9 +55,7 @@ def messageNotification(message):
         }
 
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=talk_server
-            )
+            pika.ConnectionParameters(**pika_params)
         )
         channel = connection.channel()
         channel.basic_publish(
@@ -59,15 +66,11 @@ def messageNotification(message):
 
 
 def addConversationExchange(conversation):
-    settings = getMAXSettings(get_current_request())
-    talk_server = settings.get('max_talk_server', '')
-
-    # If talk server is not defined, then we assume that we are on tests
-    if talk_server:
+    pika_params = pika_connection_params()
+    # If pika_parameters is not defined, then we assume that we are on tests
+    if pika_params:
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=talk_server
-            )
+            pika.ConnectionParameters(**pika_params)
         )
         channel = connection.channel()
         channel.exchange_declare(exchange=conversation.getIdentifier(),
