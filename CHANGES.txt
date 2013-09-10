@@ -1,11 +1,60 @@
 CHANGELOG
 =========
 
-3.4.5 (unreleased)
-------------------
+3.5 (2013-09-10)
+----------------
 
-- Nothing changed yet.
-
+ * Bye bye celery [Victor Fernandez de Alba]
+ * Delete log prints and fix rabbit url [Carles Bruguera]
+ * Cleanup and make use of defined rabbitmq ports [Carles Bruguera]
+ * Add tests for duplicated people in conversations [Carles Bruguera]
+ * Add unrestricted get /context/{hash} [Carles Bruguera]
+ * Updated report [Carles Bruguera]
+ * Add permission reset on context subscription docs [Carles Bruguera]
+ * Updated expected responses [Carles Bruguera]
+ * Fix status codes [Carles Bruguera]
+ * Test and finish reset user context permissions [Carles Bruguera]
+ * Exception log in tests #awesomenesoftheday [Carles Bruguera]
+ * Change grants/vetos location outside permissions [Carles Bruguera]
+ * Fix tests [Carles Bruguera]
+ * Adapt delete permissions check [Carles Bruguera]
+ * Adapt canWriteInContexts to new permission name schema [Carles Bruguera]
+ * Return the susbcription with the updated permissions [Carles Bruguera]
+ * Return new permissions [Carles Bruguera]
+ * Check for the present of the grant, not the permission itself [Carles Bruguera]
+ * refactor grant/revoke permission for user in context * Now explicit grants on a permission are marked with a (+) prefix and revokes with a (-) [Carl
+ * Calculate subscription permissions, joining defaults, grants and revokes [Carles Bruguera]
+ * Deepcopy the flattened copy, cannot deepcopy nested models [Carles Bruguera]
+ * Update subscriptions on modify context permissions [Carles Bruguera]
+ * Deprecate maxrules tests, renamed to old [Victor Fernandez de Alba]
+ * Added server_id parameter to identify the maxserver who emits the message. [Victor Fernandez de Alba]
+ * Add deletable mark to comments [Carles Bruguera]
+ * Add admin version of delete a comment [Carles Bruguera]
+ * Add endpoint to delete a comment by a user [Carles Bruguera]
+ * Update tests for correction made previously in post as context endpoint [Victor Fernandez de Alba]
+ * Don't require a context to post as a context [Carles Bruguera]
+ * Regenerate expected responses without totalItems pattern [sunbit]
+ * Fix script to allow jsons starting with array [sunbit]
+ * Remove totalItems and items pattern from doctests [sunbit]
+ * Refactored to use simple arrays instead of totalItems [sunbit]
+ * Fix not restarting on creating Fix imports [sunbit]
+ * Restart Tweety process when changing or creating twitterUsername field [sunbit]
+ * Add callback after saving a MadObject [sunbit]
+ * Add call to restart tweety process via a rabbit queue [sunbit]
+ * Move getting the talK_server out of rest code [sunbit]
+ * Document new delete permission [sunbit]
+ * Update expected results with last fields additions [sunbit]
+ * Add displayName to public /people [sunbit]
+ * Added new filter options for maxtweety [Victor Fernandez de Alba]
+ * Add non-persistent "deletable" attribute to activities Add delete permission to contexts to allow non-owners to delete activities Allow granting del
+ * Add displayName to rabbitmq notifications [sunbit]
+ * Remove unused import [sunbit]
+ * pep8 [sunbit]
+ * Add username to the list of push tokens. [Victor Fernandez de Alba]
+ * Added back the auth for the new endpoint [Victor Fernandez de Alba]
+ * Added new admin endpoint for querying push tokens for a conversation. [Victor Fernandez de Alba]
+ * Back to development: 3.4.5 [Victor Fernandez de Alba]
+ * Fix manifest [Victor Fernandez de Alba]
 
 3.4.4 (2013-08-02)
 ------------------
