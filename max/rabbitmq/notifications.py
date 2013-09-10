@@ -12,7 +12,7 @@ def pika_connection_params():
     rabbitmq = settings.get('max_rabbitmq', None)
     if rabbitmq is None:
         return None
-    host, port = re.search(r'\s*(\w+):?(\d*)\s*', 'localhost:54').groups()
+    host, port = re.search(r'\s*(\w+):?(\d*)\s*', rabbitmq).groups()
     params = {'host': host}
     if port:
         params['port'] = int(port)
@@ -53,7 +53,6 @@ def messageNotification(message):
             'messageID': message_id,
             'server_id': maxserver_id
         }
-
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(**pika_params)
         )
