@@ -16,7 +16,6 @@ requires = [
     'rfc3339',
     'requests',
     'tweepy',
-    'celery',
     'beaker',
     'waitress',
     'Paste',
