@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-3.5.1 (unreleased)
+3.5.1 (2013-09-13)
 ------------------
 
-- Nothing changed yet.
-
+ * Guard on token len [Victor Fernandez de Alba]
+ * Add defaults to get tokens endpoint [Victor Fernandez de Alba]
 
 3.5 (2013-09-10)
 ----------------
