@@ -192,6 +192,9 @@ def addUserDevice(context, request):
     if platform not in supported_platforms:
         raise ValidationError('Not supported platform.')
 
+    if len(token) != 64:
+        raise ValidationError('No valid token.')
+
     actor = request.actor
 
     code = 201
