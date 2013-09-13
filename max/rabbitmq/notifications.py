@@ -4,27 +4,15 @@ from pyramid.threadlocal import get_current_request
 
 import pika
 import json
-import re
-
-
-def pika_connection_params():
-    settings = getMAXSettings(get_current_request())
-    rabbitmq = settings.get('max_rabbitmq', None)
-    if rabbitmq is None:
-        return None
-    host, port = re.search(r'\s*(\w+):?(\d*)\s*', rabbitmq).groups()
-    params = {'host': host}
-    if port:
-        params['port'] = int(port)
-    return params
 
 
 def restartTweety():
-    pika_params = pika_connection_params()
+    settings = getMAXSettings(get_current_request())
+    rabbitmq_url = settings.get('max_rabbitmq', None)
     # If pika_parameters is not defined, then we assume that we are on tests
-    if pika_params:
+    if rabbitmq_url:
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**pika_params)
+            pika.URLParameters(rabbitmq_url)
         )
         channel = connection.channel()
         channel.basic_publish(exchange='',
@@ -34,11 +22,11 @@ def restartTweety():
 
 def messageNotification(message):
     settings = getMAXSettings(get_current_request())
-    pika_params = pika_connection_params()
+    rabbitmq_url = settings.get('max_rabbitmq', None)
     maxserver_id = settings.get('max_server_id', '')
 
     # If talk server is not defined, then we assume that we are on tests
-    if pika_params:
+    if rabbitmq_url:
         conversation_id = message['contexts'][0]['id']
         username = message['actor']['username']
         displayName = message['actor']['displayName']
@@ -54,7 +42,7 @@ def messageNotification(message):
             'server_id': maxserver_id
         }
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**pika_params)
+            pika.URLParameters(rabbitmq_url)
         )
         channel = connection.channel()
         channel.basic_publish(
@@ -65,11 +53,12 @@ def messageNotification(message):
 
 
 def addConversationExchange(conversation):
-    pika_params = pika_connection_params()
+    settings = getMAXSettings(get_current_request())
+    rabbitmq_url = settings.get('max_rabbitmq', None)
     # If pika_parameters is not defined, then we assume that we are on tests
-    if pika_params:
+    if rabbitmq_url:
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(**pika_params)
+            pika.URLParameters(rabbitmq_url)
         )
         channel = connection.channel()
         channel.exchange_declare(exchange=conversation.getIdentifier(),
