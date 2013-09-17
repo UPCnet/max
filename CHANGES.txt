@@ -1,10 +1,10 @@
 CHANGELOG
 =========
 
-3.5.2 (unreleased)
+3.5.2 (2013-09-17)
 ------------------
 
-- Nothing changed yet.
+ * Rerelease
 
 
 3.5.1 (2013-09-13)
