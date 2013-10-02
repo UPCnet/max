@@ -4,6 +4,7 @@ from pyramid.threadlocal import get_current_request
 
 import pika
 import json
+import datetime
 
 
 def restartTweety():
@@ -15,9 +16,11 @@ def restartTweety():
             pika.URLParameters(rabbitmq_url)
         )
         channel = connection.channel()
-        channel.basic_publish(exchange='',
-                          routing_key='tweety_restart',
-                          body='')
+        restart_request_time = datetime.datetime.now().strftime('%s.%f')
+        channel.basic_publish(
+            exchange='',
+            routing_key='tweety_restart',
+            body=restart_request_time)
 
 
 def messageNotification(message):
