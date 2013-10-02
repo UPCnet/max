@@ -195,6 +195,7 @@ class MADBase(MADDict):
     data = {}
 
     def __init__(self):
+        self.old = {}
         self.request = get_current_request()
         # When called from outside a pyramyd app, we have no request
         try:
