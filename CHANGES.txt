@@ -1,11 +1,13 @@
 CHANGELOG
 =========
 
-3.5.3 (unreleased)
+3.5.3 (2013-10-03)
 ------------------
 
-- Nothing changed yet.
-
+ * Send restart request time in the body [Carles Bruguera]
+ * Initialize always to a empyt dict [Carles Bruguera]
+ * Typo in endpoint [Victor Fernandez de Alba]
+ * Relax the device token guard [Victor Fernandez de Alba]
 
 3.5.2 (2013-09-17)
 ------------------
