@@ -173,33 +173,33 @@ def saveException(request, error):  # pragma: no cover
 
 def catch_exception(request, e):
     if isinstance(e, ConnectionFailure):
-        return JSONHTTPInternalServerError(error=dict(error='DatabaseConnectionError', error_description='Please try again later.'))
+        return JSONHTTPInternalServerError(error=dict(objectType='error', error='DatabaseConnectionError', error_description='Please try again later.'))
     elif isinstance(e, InvalidId):
-        return JSONHTTPBadRequest(error=dict(error=InvalidId.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidId.__name__, error_description=e.value))
     elif isinstance(e, ObjectNotSupported):
-        return JSONHTTPBadRequest(error=dict(error=ObjectNotSupported.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=ObjectNotSupported.__name__, error_description=e.value))
     elif isinstance(e, ObjectNotFound):
-        return JSONHTTPNotFound(error=dict(error=ObjectNotFound.__name__, error_description=e.value))
+        return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description=e.value))
     elif isinstance(e, MissingField):
-        return JSONHTTPBadRequest(error=dict(error=MissingField.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=MissingField.__name__, error_description=e.value))
     elif isinstance(e, DuplicatedItemError):
-        return JSONHTTPBadRequest(error=dict(error=DuplicatedItemError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=DuplicatedItemError.__name__, error_description=e.value))
     elif isinstance(e, UnknownUserError):
-        return JSONHTTPBadRequest(error=dict(error=UnknownUserError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=UnknownUserError.__name__, error_description=e.value))
     elif isinstance(e, Unauthorized):
-        return JSONHTTPUnauthorized(error=dict(error=Unauthorized.__name__, error_description=e.value))
+        return JSONHTTPUnauthorized(error=dict(objectType='error', error=Unauthorized.__name__, error_description=e.value))
     elif isinstance(e, InvalidSearchParams):
-        return JSONHTTPBadRequest(error=dict(error=InvalidSearchParams.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidSearchParams.__name__, error_description=e.value))
     elif isinstance(e, InvalidPermission):
-        return JSONHTTPBadRequest(error=dict(error=InvalidPermission.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidPermission.__name__, error_description=e.value))
     elif isinstance(e, ValidationError):
-        return JSONHTTPBadRequest(error=dict(error=ValidationError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=e.value))
     elif isinstance(e, Forbidden):
-        return JSONHTTPForbidden(error=dict(error=Forbidden.__name__, error_description=e.value))
+        return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.value))
 
     # JSON decode error????
     elif isinstance(e, ValueError):
-        return JSONHTTPBadRequest(error=dict(error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
     # This code will only raise if a non-tested thing appear
     # So, as the tests will not ever see this, we exlcude it from coverage
     else:  # pragma: no cover
@@ -211,7 +211,7 @@ def catch_exception(request, e):
         if asbool(request.registry.settings.get('testing', False)):  # pragma: no cover
             error_description = 'An exception occurred. Below is the catched exception.\n\nSorry for the convenience.\n\n' + log.replace('\n', '\n    ')[:-4]
 
-        return JSONHTTPInternalServerError(error=dict(error='ServerError', error_description=error_description))
+        return JSONHTTPInternalServerError(error=dict(objectType='error', error='ServerError', error_description=error_description))
 
 
 def MaxResponse(fun):
