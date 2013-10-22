@@ -87,13 +87,18 @@ def getUserTimelineAuthors(context, request):
     sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
 
     still_has_activities = True
+
+    # Save full author object to construct de response
+    # and a separate username field to make the uniquefication easier
     distinct_authors = []
+    distinct_usernames = []
+
     activities = []
     before = None
     queries = 0
 
     search_params = searchParams(request)
-    while len(distinct_authors) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
+    while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
         if not activities:
             if before is not None:
                 search_params['before'] = before
@@ -103,8 +108,9 @@ def getUserTimelineAuthors(context, request):
         if still_has_activities:
             activity = activities.pop(0)
             before = activity._id
-            if activity.actor not in distinct_authors:
+            if activity.actor['username'] not in distinct_usernames:
                 distinct_authors.append(activity.actor)
+                distinct_usernames.append(activity.actor['username'])
 
     handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()
