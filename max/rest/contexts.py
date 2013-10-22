@@ -43,7 +43,7 @@ def getContextAuthors(context, request):
     chash = request.matchdict['hash']
     mmdb = MADMaxDB(context.db)
     actor = request.actor
-    author_limit = request.params.get('limit', LAST_AUTHORS_LIMIT)
+    author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
 
     is_subscribed = chash in [subscription['hash'] for subscription in actor.subscribedTo]
     if not is_subscribed:

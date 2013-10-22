@@ -74,7 +74,7 @@ def getUserTimelineAuthors(context, request):
          Retorna totes els 8 ultims autors d'un timeline
     """
     # Get the author limit from the request or set a default
-    author_limit = request.params.get('limit', LAST_AUTHORS_LIMIT)
+    author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
     actor = request.actor
     mmdb = MADMaxDB(context.db)
 
