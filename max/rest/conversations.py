@@ -92,8 +92,9 @@ def postMessage2Conversation(context, request):
                                                 'write': 'subscribed',
                                                 'subscribe': 'restricted',
                                                 'unsubscribe': 'public',
-                                                'invite': 'restricted'}
-                                   )
+                                                'invite': 'restricted'})
+        if ctxts[0].get('displayName', False):
+            conversation_params['displayName'] = ctxts[0]['displayName']
         newconversation = Conversation()
         newconversation.fromRequest(request, rest_params=conversation_params)
 

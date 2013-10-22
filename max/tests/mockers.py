@@ -411,7 +411,6 @@ group_message = {
     "object": {
         "objectType": "note",
         "content": "Quin grup mes guai!",
-        "displayName": "Pelotudos"
     },
 
     "contexts": [
@@ -425,7 +424,6 @@ group_message_duplicated = {
     "object": {
         "objectType": "note",
         "content": "Quin grup mes guai!",
-        "displayName": "Pelotudos"
     },
 
     "contexts": [

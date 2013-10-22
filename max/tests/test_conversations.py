@@ -288,8 +288,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
-
-        self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        resp = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        self.assertEqual(resp.json['contexts'][0]['displayName'], creation_message['contexts'][0]['displayName'])
 
     def test_post_message_to_inexistent_group_conversation_with_oneself_repeated(self):
         """
