@@ -177,7 +177,7 @@ class Context(BaseContext):
     schema = dict(BaseContext.schema)
     schema['hash'] = dict()
     schema['url'] = dict(required=1)
-    schema['tags'] = dict(default=[])
+    schema['tags'] = dict(operations_mutable=1, default=[])
     schema['twitterHashtag'] = dict(operations_mutable=1,
                                     formatters=['stripHash'],
                                     validators=['isValidHashtag'],
