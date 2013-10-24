@@ -6,8 +6,8 @@ from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxDB, MADMaxCollection
 from max.models import Context
-from max.rest.utils import searchParams
-from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound
+from max.rest.utils import searchParams, extractPostData
+from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound, ValidationError
 from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 
 
@@ -232,3 +232,77 @@ def getContextSubscriptions(context, request):
     found_contexts = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username"], **searchParams(request))
     handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
+
+
+@view_config(route_name='context_tags', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def getContextTags(context, request):
+    """
+    """
+    chash = request.matchdict['hash']
+    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    context = contexts[chash]
+    handler = JSONResourceRoot(context.tags)
+    return handler.buildResponse()
+
+
+@view_config(route_name='context_tags', request_method='DELETE', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def clearContextTags(context, request):
+    """
+    """
+    chash = request.matchdict['hash']
+    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    context = contexts[chash]
+    context.tags = []
+    context.save()
+    handler = JSONResourceRoot([])
+    return handler.buildResponse()
+
+
+@view_config(route_name='context_tags', request_method='PUT', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def updateContextTags(context, request):
+    """
+    """
+    chash = request.matchdict['hash']
+    tags = extractPostData(request)
+
+    # Validate tags is a list of strings
+    valid_tags = isinstance(tags, list)
+    if valid_tags:
+        valid_tags = False not in [isinstance(tag, (str, unicode)) for tag in tags]
+    if not valid_tags:
+        raise ValidationError("Sorry, We're expecting a list of strings...")
+
+    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    context = contexts[chash]
+    context.tags
+    context.tags.extend(tags)
+    context.tags = list(set(context.tags))
+    context.save()
+    handler = JSONResourceRoot(context.tags)
+    return handler.buildResponse()
+
+
+@view_config(route_name='context_tag', request_method='DELETE', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def removeContextTag(context, request):
+    """
+    """
+    chash = request.matchdict['hash']
+    tag = request.matchdict['tag']
+    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    context = contexts[chash]
+
+    try:
+        context.tags.remove(tag)
+    except ValueError:
+        raise ObjectNotFound('This context has no tag "{}"'.format(tag))
+
+    context.save()
+    return HTTPNoContent()

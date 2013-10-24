@@ -103,7 +103,7 @@ class BaseContext(MADBase):
             Updates fields with changes.
             Now only updates displayName and permissions
         """
-        updatable_fields = ['permissions', 'displayName']
+        updatable_fields = ['permissions', 'displayName', 'tags']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
         if has_updatable_fields:
@@ -115,6 +115,9 @@ class BaseContext(MADBase):
 
                 if self.field_changed('displayName'):
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
+
+                if self.field_changed('tags'):
+                    updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.tags})
 
                 if self.field_changed('permissions'):
                     subscription = user_object.getSubscription(self)
@@ -177,7 +180,7 @@ class Context(BaseContext):
     schema = dict(BaseContext.schema)
     schema['hash'] = dict()
     schema['url'] = dict(required=1)
-    schema['tags'] = dict(operations_mutable=1, default=[])
+    schema['tags'] = dict(default=[])
     schema['twitterHashtag'] = dict(operations_mutable=1,
                                     formatters=['stripHash'],
                                     validators=['isValidHashtag'],

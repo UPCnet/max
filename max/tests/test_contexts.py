@@ -186,15 +186,49 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
         self.assertEqual(result.get('twitterUsernameId', None), '526326641')
 
-    def test_modify_context_with_tags_overwrites_tags(self):
+    def test_get_context_tags(self):
         from hashlib import sha1
         from .mockers import create_context
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"tags": ['prova']}), oauth2Header(test_manager), status=200)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('hash', None), url_hash)
-        self.assertEqual(result.get('tags', None), ['prova'])
+        res = self.testapp.get('/contexts/%s/tags' % url_hash, "", oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json, ['Assignatura'])
+
+    def test_update_context_tags_updates_existing_tags(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s/tags' % url_hash, json.dumps(['prova']), oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json, ['Assignatura', 'prova'])
+
+    def test_clear_context_tags(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.delete('/contexts/%s/tags' % url_hash, "", oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json, [])
+
+    def test_remove_context_tag(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.testapp.put('/contexts/%s/tags' % url_hash, json.dumps(['prova']), oauth2Header(test_manager), status=200)
+        self.testapp.delete('/contexts/%s/tags/%s' % (url_hash, 'Assignatura'), "", oauth2Header(test_manager), status=204)
+
+    def test_modify_context_displayName_updates_subscription(self):
+        from hashlib import sha1
+        from .mockers import create_context, subscribe_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"displayName": "New Name"}), oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/people/%s/subscriptions' % username, '', oauth2Header(username), status=200)
+        self.assertEqual(res.json[0]['displayName'], 'New Name')
 
     def test_modify_context_unsetting_property(self):
         from hashlib import sha1

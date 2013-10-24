@@ -29,6 +29,8 @@ PUBLIC_RESOURCES = {
     'context_activities': {'route': '/contexts/{hash}/activities'},
     'context_activities_authors': {'route': '/contexts/{hash}/activities/authors'},
     'context_subscriptions': {'route': '/contexts/{hash}/subscriptions'},
+    'context_tags': {'route': '/contexts/{hash}/tags'},
+    'context_tag': {'route': '/contexts/{hash}/tags/{tag}'},
 
     # MAX 3.0
     'conversations': {'route': '/conversations'},
