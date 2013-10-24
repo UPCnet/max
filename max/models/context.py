@@ -67,7 +67,7 @@ class BaseContext(MADBase):
     def prepareUserSubscription(self):
         """
         """
-        fields_to_squash = ['published', 'owner', 'creator', 'tags']
+        fields_to_squash = ['published', 'owner', 'creator']
         if '_id' != self.unique:
             fields_to_squash.append('_id')
         subscription = self.flatten(squash=fields_to_squash)
