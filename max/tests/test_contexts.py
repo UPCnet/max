@@ -186,6 +186,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('twitterUsername', None), 'maxupcnet')
         self.assertEqual(result.get('twitterUsernameId', None), '526326641')
 
+    def test_modify_context_with_tags_overwrites_tags(self):
+        from hashlib import sha1
+        from .mockers import create_context
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"tags": ['prova']}), oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('hash', None), url_hash)
+        self.assertEqual(result.get('tags', None), ['prova'])
+
     def test_modify_context_unsetting_property(self):
         from hashlib import sha1
         from .mockers import create_context
