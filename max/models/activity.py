@@ -78,7 +78,9 @@ class BaseActivity(MADBase):
         if ob['object'].get('_keywords', None):
             if isPerson:
                 ob['object']['_keywords'].append(self.data['actor']['username'])
-
+                ob['object']['_keywords'].extend(self.data['actor']['username'].split('.'))
+                ob['object']['_keywords'].extend(self.data['actor'].get('displayName', '').lower().split())
+                ob['object']['_keywords'] = list(set(ob['object']['_keywords']))
         if isPerson and 'contexts' in self.data:
             # When a person posts an activity it can be targeted
             # to multiple contexts. here we construct the basic info
@@ -136,6 +138,9 @@ class BaseActivity(MADBase):
 
         activity_keywords = self.object.setdefault('_keywords', [])
         activity_keywords.extend(comment.get('_keywords', []))
+        activity_keywords.append(comment['actor']['username'])
+        activity_keywords.extend(comment['actor']['username'].split('.'))
+        activity_keywords.extend(comment['actor'].get('displayName', '').lower().split())
         self.object['_keywords'] = list(set(activity_keywords))
 
         activity_hashtags = self.object.setdefault('_hashtags', [])
