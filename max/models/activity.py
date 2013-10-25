@@ -56,8 +56,8 @@ class BaseActivity(MADBase):
         isContext = isinstance(self.data['actor'], Context)
 
         # XXX Assuming here we only support Person as user
-        # XXX Assuming here we only support Uri as context
-        actorType = isPerson and 'person' or 'uri'
+        # XXX Assuming here we only support Context as context
+        actorType = isPerson and 'person' or 'context'
         ob = {'actor': {'objectType': actorType,
                         'displayName': self.data['actor']['displayName'],
                         },
