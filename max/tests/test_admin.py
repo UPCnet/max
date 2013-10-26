@@ -21,6 +21,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.security.insert(test_default_security)
+        self.app.registry.max_security = test_default_security
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
@@ -79,6 +80,53 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].get('roles', None).get('Manager')[0], 'test_manager')
+
+    def test_security_add_user_to_role(self):
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
+        self.assertListEqual(['messi', 'test_manager'], res.json)
+
+    def test_security_add_user_to_non_allowed_role(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('WrongRole', username), "", oauth2Header(test_manager), status=400)
+
+    def test_security_remove_user_from_non_allowed_role(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('WrongRole', username), "", oauth2Header(test_manager), status=400)
+
+    def test_security_add_user_to_role_already_has_role(self):
+        res = self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', 'test_manager'), "", oauth2Header(test_manager), status=200)
+        self.assertListEqual(['test_manager'], res.json)
+
+    def test_security_remove_user_from_role(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
+        res = self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=200)
+        self.assertListEqual(['test_manager'], res.json)
+
+    def test_security_remove_user_from_role_user_not_in_role(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=404)
+
+    def test_security_add_user_to_role_check_security_reloaded(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.get('/activities', "", oauth2Header(username), status=404)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
+        self.testapp.get('/activities', "", oauth2Header(username), status=200)
+
+    def test_security_remove_user_from_role_check_security_reloaded(self):
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
+        self.testapp.get('/activities', "", oauth2Header(username), status=200)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=200)
+        self.testapp.get('/activities', "", oauth2Header(username), status=404)
 
     def test_get_other_activities(self):
         from .mockers import user_status_context
