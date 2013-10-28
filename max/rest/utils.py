@@ -135,7 +135,7 @@ def searchParams(request):
 
     actor = request.params.get('actor')
     if actor:
-        params['actor'] = actor.lower()
+        params['actor'] = actor.lower().rstrip()
 
     keywords = request.params.getall('keyword')
     if keywords:

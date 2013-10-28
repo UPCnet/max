@@ -113,6 +113,30 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
 
+    def test_timeline_activities_actor_search(self):
+        """
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        username2 = 'xavi'
+        self.create_user(username2)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username2, user_status_context)
+        self.create_activity(username2, user_status_context)
+
+        res = self.testapp.get('/people/%s/timeline?actor=%s' % (username, username), '', oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+
     def test_contexts_search(self):
         """
             Given an admin user
