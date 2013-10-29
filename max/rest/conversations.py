@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
+from pyramid.response import Response
 from pymongo import ASCENDING
 
 from max.exceptions import ValidationError, Unauthorized, Forbidden, ObjectNotFound
@@ -14,6 +15,8 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import extractPostData
 from max.rabbitmq.notifications import messageNotification
 from max.rabbitmq.notifications import addConversationExchange
+
+import os
 
 
 @view_config(route_name='conversations', request_method='GET')
@@ -365,3 +368,19 @@ def DeleteConversation(context, request):
     ctx.removeActivities(logical=False)
     ctx.delete()
     return HTTPNoContent()
+
+
+@view_config(route_name='conversation_avatar', request_method='GET')
+def getConversationUserAvatar(context, request):
+    """
+        /conversation/{id}/avatar
+
+        Returns conversation avatar. Public endpoint.
+    """
+    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
+    cid = request.matchdict['id']
+    filename = cid if os.path.exists(os.path.join(AVATAR_FOLDER, '{}.png'.format(cid))) else 'missing-conversation'
+    data = open(os.path.join(AVATAR_FOLDER, '{}.png'.format(filename))).read()
+    image = Response(data, status_int=200)
+    image.content_type = 'image/png'
+    return image
