@@ -1,11 +1,23 @@
 CHANGELOG
 =========
 
-3.5.4 (unreleased)
+3.5.4 (2013-10-29)
 ------------------
 
-- Nothing changed yet.
-
+* Add conversations avatar endpoint [Carles Bruguera]
+* Trim bad characters at the end of actor search [Carles Bruguera]
+* Add endpoints to add/remove users to roles [Carles Bruguera]
+* Reload security settngs on any change [Carles Bruguera]
+* Fix ancient URI reference [Carles Bruguera]
+* Add specific endpoints to manage context tags [Carles Bruguera]
+* Test modify context overwrites tags [Carles Bruguera]
+* Do not remove tags from user subscription data [Carles Bruguera]
+* Add displayName and username parts to activity keywords [Carles Bruguera]
+* Allow operations mutable to the tags attribute [Victor Fernandez de Alba]
+* read limit as integer [Carles Bruguera]
+* Unique based on username instead of full object [Carles Bruguera]
+* Add displayName on conversation creation if provided [Carles Bruguera]
+* Add objectType to errors [Carles Bruguera]
 
 3.5.3 (2013-10-03)
 ------------------
