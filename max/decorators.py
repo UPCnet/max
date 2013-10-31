@@ -51,13 +51,13 @@ def requirePersonActor(exists=True, force_own=True):
             # If we have a username in the URI, take it
             uri_username = getUsernameFromURI(request)
             if uri_username:
-                username = uri_username
+                username = uri_username.lower()
 
             # If we have a username in a POST body, take it
             if request.method == 'POST':
                 post_username = getUsernameFromPOSTBody(request)
                 if post_username:
-                    username = post_username
+                    username = post_username.lower()
 
             # Check a valid actor exists in the tdatabase
             if exists:

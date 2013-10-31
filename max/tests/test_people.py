@@ -69,11 +69,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
 
+    def test_create_same_user_case_insensitive(self):
+        username = 'messi'
+        username_case = 'Messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s' % username_case, "", oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('username', None), 'messi')
+
     def test_get_user(self):
         """ Doctest .. http:get:: /people/{username} """
         username = 'messi'
         self.create_user(username)
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        result = json.loads(res.text)
+        self.assertEqual(result.get('username', None), 'messi')
+
+    def test_get_user_case_insensitive(self):
+        """ Doctest .. http:get:: /people/{username} """
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/people/%s' % 'MESSI', "", oauth2Header(username))
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
 

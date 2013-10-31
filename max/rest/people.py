@@ -62,7 +62,7 @@ def addOwnUser(context, request):
 
         Creates a the own system user.
     """
-    username = request.matchdict['username']
+    username = request.matchdict['username'].lower()
     rest_params = {'username': username}
 
     # Initialize a User object from the request
