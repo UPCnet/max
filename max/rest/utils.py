@@ -155,6 +155,15 @@ def searchParams(request):
                 retags.append(retag)
         params['tags'] = retags
 
+    context_tags = request.params.getall('context_tags')
+    if context_tags:
+        retags = []
+        for tag in context_tags:
+            retag = re.sub(r'\s*(\w+)\s*', r'\1', tag, re.UNICODE)
+            if retag:
+                retags.append(retag)
+        params['context_tags'] = retags
+
     twitter_enabled = request.params.get('twitter_enabled')
     if twitter_enabled:
         params['twitter_enabled'] = twitter_enabled
