@@ -202,6 +202,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.put('/contexts/%s/tags' % url_hash, json.dumps(['prova']), oauth2Header(test_manager), status=200)
         self.assertEqual(res.json, ['Assignatura', 'prova'])
 
+    def test_update_context_tags_updates_existing_activites_tags(self):
+        from hashlib import sha1
+        from .mockers import create_context, subscribe_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.testapp.put('/contexts/%s/tags' % url_hash, json.dumps(['prova']), oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % url_hash, "", oauth2Header(username), status=200)
+        self.assertEqual(res.json[0]['contexts'][0]['tags'], ['Assignatura', 'prova'])
+
+    def test_update_context_tags_updates_existing_subscription_tags(self):
+        from hashlib import sha1
+        from .mockers import create_context, subscribe_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.testapp.put('/contexts/%s/tags' % url_hash, json.dumps(['prova']), oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username), status=200)
+        self.assertEqual(res.json['subscribedTo'][0]['tags'], ['Assignatura', 'prova'])
+
     def test_clear_context_tags(self):
         from hashlib import sha1
         from .mockers import create_context

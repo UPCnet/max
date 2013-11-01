@@ -116,6 +116,7 @@ def ModifyContext(context, request):
     properties = maxcontext.getMutablePropertiesFromRequest(request)
     maxcontext.modifyContext(properties)
     maxcontext.updateUsersSubscriptions()
+    maxcontext.updateContextActivities()
     handler = JSONResourceEntity(maxcontext.flatten())
     return handler.buildResponse()
 
@@ -258,6 +259,8 @@ def clearContextTags(context, request):
     context = contexts[chash]
     context.tags = []
     context.save()
+    context.updateContextActivities(force_update=True)
+    context.updateUsersSubscriptions(force_update=True)
     handler = JSONResourceRoot([])
     return handler.buildResponse()
 
@@ -284,6 +287,8 @@ def updateContextTags(context, request):
     context.tags.extend(tags)
     context.tags = list(set(context.tags))
     context.save()
+    context.updateContextActivities(force_update=True)
+    context.updateUsersSubscriptions(force_update=True)
     handler = JSONResourceRoot(context.tags)
     return handler.buildResponse()
 
@@ -305,4 +310,6 @@ def removeContextTag(context, request):
         raise ObjectNotFound('This context has no tag "{}"'.format(tag))
 
     context.save()
+    context.updateContextActivities(force_update=True)
+    context.updateUsersSubscriptions(force_update=True)
     return HTTPNoContent()

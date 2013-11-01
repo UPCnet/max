@@ -224,6 +224,7 @@ def ModifyContext(context, request):
     properties = conversation.getMutablePropertiesFromRequest(request)
     conversation.modifyContext(properties)
     conversation.updateUsersSubscriptions()
+    conversation.updateContextActivities()
     handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()
 

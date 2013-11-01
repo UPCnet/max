@@ -98,28 +98,52 @@ class BaseContext(MADBase):
 
         return list(set(user_permissions))
 
-    def updateUsersSubscriptions(self):
+    def updateContextActivities(self, force_update=False):
         """
-            Updates fields with changes.
+            Updates context's activities with changes of the original context
             Now only updates displayName and permissions
+            Updates will only occur if the fields changed, to force the update, set force_update=True
+        """
+        updatable_fields = ['displayName', 'tags']
+        has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
+
+        if has_updatable_fields or force_update:
+            criteria = {'contexts.{}'.format(self.unique.lstrip('_')): self.getIdentifier()}
+            updates = {}
+
+            if self.field_changed('displayName') or force_update:
+                updates.update({'contexts.$.displayName': self.displayName})
+
+            if self.field_changed('tags') or force_update:
+                updates.update({'contexts.$.tags': self.tags})
+
+            combined_updates = {'$set': updates}
+
+            self.mdb_collection.database[self.activity_storage].update(criteria, combined_updates)
+
+    def updateUsersSubscriptions(self, force_update=False):
+        """
+            Updates users subscriptions with changes of the original context.
+            Now only updates displayName and permissions and tags
+            Updates will only occur if the fields changed, to force the update, set force_update=True
         """
         updatable_fields = ['permissions', 'displayName', 'tags']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
-        if has_updatable_fields:
+        if has_updatable_fields or force_update:
             for user in self.subscribedUsers():
                 user_object = User()
                 user_object.fromObject(user)
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 
-                if self.field_changed('displayName'):
+                if self.field_changed('displayName') or force_update:
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
 
-                if self.field_changed('tags'):
+                if self.field_changed('tags') or force_update:
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.tags})
 
-                if self.field_changed('permissions'):
+                if self.field_changed('permissions') or force_update:
                     subscription = user_object.getSubscription(self)
                     _vetos = subscription.get('_vetos', [])
                     _grants = subscription.get('_grants', [])
