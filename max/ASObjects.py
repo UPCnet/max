@@ -40,6 +40,7 @@ class Note(ASObject):
     def __init__(self, data, creating=True):
         """
         """
+        self.creating = creating
         self.data = data
         if creating:
             self.processFields()
@@ -51,7 +52,7 @@ class Note(ASObject):
         self.update(self.data)
 
     def setKeywords(self):
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        self['_keywords'] = findKeywords(self.data['content'])
 
 
 class Comment(ASObject):
@@ -71,6 +72,7 @@ class Comment(ASObject):
     def __init__(self, data, creating=True):
         """
         """
+        self.creating = creating
         self.data = data
         if creating:
             self.processFields()
@@ -82,7 +84,7 @@ class Comment(ASObject):
         self.update(self.data)
 
     def setKeywords(self):
-        self.data['_keywords'] = findKeywords(self.data['content'])
+        self['_keywords'] = findKeywords(self.data['content'])
 
 
 class Conversation(ASObject):

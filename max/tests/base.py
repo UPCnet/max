@@ -1,4 +1,5 @@
 import json
+import pymongo
 
 from pyramid.threadlocal import get_current_request
 
@@ -159,3 +160,14 @@ class MaxTestBase(object):
         """
         res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, chash), {}, oauth2Header(username), status=expect)
         return res
+
+    def exec_mongo_query(self, collection, method, query, action={}):
+        conn = pymongo.MongoClient('mongodb://localhost:27017')
+        db = conn['tests']
+        mongo_method = getattr(db[collection], method)
+        if method == 'find':
+            return [a for a in mongo_method(query)]
+        else:
+            return mongo_method(query, action)
+
+

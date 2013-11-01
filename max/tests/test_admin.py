@@ -206,3 +206,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/contexts', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
 
         self.assertEqual(len(res.json), 1)
+
+    def test_maintenance_keywords(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username, displayName='Lionel messi')
+        self.create_activity(username, user_status)
+
+        # Hard modify keywords directly on mongodb to simulate bad keywords
+        activities = self.exec_mongo_query('activity', 'find', {})
+        activity = activities[0]
+        del activity['_keywords']
+        activity['object']['_keywords'] = []
+        self.exec_mongo_query('activity', 'update', {'_id': activities[0]['_id']}, activity)
+
+        self.testapp.post('/admin/maintenance/keywords', "", oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/activities/%s' % activity['_id'], "", oauth2Header(username), status=200)
+
+        expected_keywords = [u'canvi', u'creaci\xf3', u'estatus', u'lionel', u'messi', u'testejant']
+        response_keywords = res.json['keywords']
+        response_keywords.sort()
+        self.assertListEqual(expected_keywords, response_keywords)
