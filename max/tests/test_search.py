@@ -48,8 +48,33 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = self.create_activity(username, user_status_context).json
         res = self.testapp.post('/activities/%s/comments' % str(activity['id']), json.dumps(user_comment), oauth2Header(username2), status=201)
         res = self.testapp.get('/activities/%s' % str(activity['id']), json.dumps({}), oauth2Header(username), status=200)
-        expected_keywords = [u'hernandez', u'comentari', u'estatus', u'una', u'messi', u'xavi', u'creaci\xf3', u'testejant', u'canvi', u'activitat', u'nou', u'lionel']
-        self.assertListEqual(res.json['object']['keywords'], expected_keywords)
+        expected_keywords = [u'activitat', u'canvi', u'comentari', u'creaci\xf3', u'estatus', u'hernandez', u'lionel', u'messi', u'nou', u'testejant', u'una', u'xavi']
+        response_keywords = res.json['keywords']
+        response_keywords.sort()
+        self.assertListEqual(response_keywords, expected_keywords)
+
+    def test_activities_keyword_generation_after_comment_delete(self):
+        """
+            test that the keywords supplied by a comment disappers from activity when deleting the comment
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context, user_comment
+
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username, displayName="Lionel Messi")
+        self.create_user(username2, displayName="Xavi Hernandez")
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity = self.create_activity(username, user_status_context).json
+        res = self.testapp.post('/activities/%s/comments' % str(activity['id']), json.dumps(user_comment), oauth2Header(username2), status=201)
+        comment_id = res.json['id']
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity['id']), comment_id), "", oauth2Header(username2), status=204)
+        res = self.testapp.get('/activities/%s' % str(activity['id']), json.dumps({}), oauth2Header(username), status=200)
+        expected_keywords = [u'canvi', u'creaci\xf3', u'estatus', u'lionel', u'messi', u'testejant']
+        response_keywords = res.json['keywords']
+        response_keywords.sort()
+        self.assertListEqual(response_keywords, expected_keywords)
 
     def test_activities_hashtag_generation(self):
         """

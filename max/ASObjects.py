@@ -47,8 +47,11 @@ class Note(ASObject):
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
-            self.data['_keywords'] = findKeywords(self.data['content'])
+            self.setKeywords()
         self.update(self.data)
+
+    def setKeywords(self):
+        self.data['_keywords'] = findKeywords(self.data['content'])
 
 
 class Comment(ASObject):
@@ -75,8 +78,11 @@ class Comment(ASObject):
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
-            self.data['_keywords'] = findKeywords(self.data['content'])
+            self.setKeywords()
         self.update(self.data)
+
+    def setKeywords(self):
+        self.data['_keywords'] = findKeywords(self.data['content'])
 
 
 class Conversation(ASObject):

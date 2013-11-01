@@ -65,6 +65,7 @@ RESTRICTED_RESOURCES = {
     'admin_security': {'route': '/admin/security'},
     'admin_security_role': {'route': '/admin/security/roles/{role}'},
     'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}'},
+    'maintenance_keywords': {'route': '/admin/maintenance/keywords'}
 }
 
 AUTHENTICATION_RESOURCES = {

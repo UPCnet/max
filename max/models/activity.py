@@ -17,6 +17,7 @@ class BaseActivity(MADBase):
     schema = {'_id':         dict(required=0),
               '_creator':    dict(required=0),
               '_owner':      dict(required=0),
+              '_keywords':   dict(required=0, default=[]),
               'objectType':  dict(required=0, default='activity'),
               'actor':       dict(required=1),
               'verb':        dict(required=1),
@@ -74,13 +75,6 @@ class BaseActivity(MADBase):
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
 
-        #Append actor as username if object has keywords and actor is a Person
-        if ob['object'].get('_keywords', None):
-            if isPerson:
-                ob['object']['_keywords'].append(self.data['actor']['username'])
-                ob['object']['_keywords'].extend(self.data['actor']['username'].split('.'))
-                ob['object']['_keywords'].extend(self.data['actor'].get('displayName', '').lower().split())
-                ob['object']['_keywords'] = list(set(ob['object']['_keywords']))
         if isPerson and 'contexts' in self.data:
             # When a person posts an activity it can be targeted
             # to multiple contexts. here we construct the basic info
@@ -113,6 +107,9 @@ class BaseActivity(MADBase):
                 properties[key] = default
         self.update(properties)
 
+        if self.verb in ['post']:
+            self.setKeywords()
+
     def modifyActivity(self, properties):
         """Update the Activity object with the given properties"""
 
@@ -122,6 +119,26 @@ class BaseActivity(MADBase):
     def get_comment(self, commentid):
         comments = [comment for comment in self.replies if comment['id'] == commentid]
         return comments[0] if comments is not [] else False
+
+    def setKeywords(self):
+        #Append actor as username if object has keywords and actor is a Person
+        self['_keywords'] = []
+        self['_keywords'].extend(self.object.get('_keywords', []))
+        if self.actor['objectType'] == 'person':
+            self['_keywords'].append(self.actor['username'])
+            self['_keywords'].extend(self.actor['username'].split('.'))
+            self['_keywords'].extend(self.actor.get('displayName', '').lower().split())
+
+        # Add keywords from comment objects
+        replies = self.get('replies', [])
+        for comment in replies:
+            self['_keywords'].extend(comment.get('_keywords', []))
+            self['_keywords'].append(comment['actor']['username'])
+            self['_keywords'].extend(comment['actor']['username'].split('.'))
+            self['_keywords'].extend(comment['actor'].get('displayName', '').lower().split())
+
+        # delete duplicates
+        self['_keywords'] = list(set(self['_keywords']))
 
     def addComment(self, comment):
         """
@@ -135,13 +152,7 @@ class BaseActivity(MADBase):
                 del comment['actor'][fieldname]
 
         self.add_to_list('replies', comment, allow_duplicates=True)
-
-        activity_keywords = self.object.setdefault('_keywords', [])
-        activity_keywords.extend(comment.get('_keywords', []))
-        activity_keywords.append(comment['actor']['username'])
-        activity_keywords.extend(comment['actor']['username'].split('.'))
-        activity_keywords.extend(comment['actor'].get('displayName', '').lower().split())
-        self.object['_keywords'] = list(set(activity_keywords))
+        self.setKeywords()
 
         activity_hashtags = self.object.setdefault('_hashtags', [])
         activity_hashtags.extend(comment.get('_hashtags', []))
@@ -154,7 +165,10 @@ class BaseActivity(MADBase):
         """
         """
         self.delete_from_list('replies', {'id': commentid})
-        # XXX TODO Update activity hastags and keywords
+        self.replies = [comment for comment in self.replies if comment['id'] != commentid]
+        self.setKeywords()
+        self.save()
+        # XXX TODO Update hastags
 
 
 class Activity(BaseActivity):

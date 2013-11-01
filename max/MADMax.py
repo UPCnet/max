@@ -92,7 +92,7 @@ class MADMaxCollection(object):
 
         if keywords:
             # Filter the query to only objects containing certain keywords
-            keywords_query = {'object._keywords': {'$all': keywords}}
+            keywords_query = {'_keywords': {'$all': keywords}}
             query.update(keywords_query)
 
         if username:
