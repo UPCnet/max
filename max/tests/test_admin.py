@@ -20,6 +20,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.drop_collection('conversations')
+        self.app.registry.max_store.drop_collection('messages')
         self.app.registry.max_store.security.insert(test_default_security)
         self.app.registry.max_security = test_default_security
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
@@ -259,3 +261,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
         self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
         self.assertListEqual(res.json[0]['contexts'][0]['tags'], ['Assignatura', 'new tag'])
+
+    def test_maintenance_conversations(self):
+        from .mockers import message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+
+        #Hard modify conversation directly on mongo to simulate changed permissions, displayName and tags
+        conversations = self.exec_mongo_query('conversations', 'find', {})
+        conversation = conversations[0]
+        conversation['permissions']['write'] = 'restricted'
+        conversation['displayName'] = 'Changed Name'
+        conversation['participants'] = ['messi', 'xavi', 'iniesta']
+        self.exec_mongo_query('conversations', 'update', {'_id': conversation['_id']}, conversation)
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        #Check user subscription is updated
+        res = self.testapp.get('/people/{}'.format(sender), "", oauth2Header(sender), status=200)
+        self.assertEqual(res.json['talkingIn'][0]['displayName'], 'Changed Name')
+        self.assertListEqual(res.json['talkingIn'][0]['participants'], ['messi', 'xavi', 'iniesta'])
+        self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe'])
+        conversation_id = res.json['talkingIn'][0]['id']
+
+        #Check user activity is updated
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(sender), status=200)
+        self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
+        self.assertListEqual(res.json[0]['contexts'][0]['participants'], ['messi', 'xavi', 'iniesta'])
