@@ -102,6 +102,19 @@ class User(MADBase):
         subscription = flatten(subscription, squash=fields_to_squash)
         return subscription
 
+    def updateConversationParticipants(self, force_update=False):
+        """
+            Updates participants list in user's subscriptions to conversations with updates in the original user
+            Now only updates displayName
+            Updates will only occur if the fields changed, to force the update, set force_update=True
+        """
+        updatable_fields = ['displayName']
+        has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
+
+        if has_updatable_fields or force_update:
+            if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
+                self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}})
+
     def grantPermission(self, subscription, permission):
         """
         Grant a permission persistently, so a change in the context permissions defaults doesn't

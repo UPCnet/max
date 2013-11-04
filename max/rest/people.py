@@ -168,6 +168,7 @@ def ModifyUser(context, request):
     actor = request.actor
     properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
     actor.modifyUser(properties)
+    actor.updateConversationParticipants()
     handler = JSONResourceEntity(actor.flatten())
     return handler.buildResponse()
 
