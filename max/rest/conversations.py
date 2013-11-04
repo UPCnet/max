@@ -38,6 +38,13 @@ def getConversations(context, request):
         query = {'objectType': 'message',
                  'contexts.id': conversation['id']
                  }
+
+        # In two people conversations, force displayName to the displayName of
+        # the partner in the conversation
+        if len(conversation['participants']) == 2:
+            partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
+            conversation['displayName'] = partner["displayName"]
+
         messages = mmdb.messages.search(query, flatten=1)
         lastMessage = messages[-1]
         conversation['lastMessage'] = {'published': lastMessage['published'],
