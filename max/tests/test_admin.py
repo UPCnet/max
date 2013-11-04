@@ -227,3 +227,35 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         response_keywords = res.json['keywords']
         response_keywords.sort()
         self.assertListEqual(expected_keywords, response_keywords)
+
+    def test_maintenance_subscriptions(self):
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+        from hashlib import sha1
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        chash = sha1(create_context['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+
+        #Hard modify context directly on mongo to simulate changed permissions, displayName and tags
+        contexts = self.exec_mongo_query('contexts', 'find', {'hash': chash})
+        context = contexts[0]
+        context['permissions']['write'] = 'restricted'
+        context['displayName'] = 'Changed Name'
+        context['tags'].append('new tag')
+        self.exec_mongo_query('contexts', 'update', {'_id': context['_id']}, context)
+        self.testapp.post('/admin/maintenance/subscriptions', "", oauth2Header(test_manager), status=200)
+
+        #Check user subscription is updated
+        res = self.testapp.get('/people/{}'.format(username), "", oauth2Header(username), status=200)
+        self.assertEqual(res.json['subscribedTo'][0]['displayName'], 'Changed Name')
+        self.assertListEqual(res.json['subscribedTo'][0]['tags'], ['Assignatura', 'new tag'])
+        self.assertListEqual(res.json['subscribedTo'][0]['permissions'], ['read'])
+
+        #Check user activity is updated
+        res = self.testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
+        self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
+        self.assertListEqual(res.json[0]['contexts'][0]['tags'], ['Assignatura', 'new tag'])

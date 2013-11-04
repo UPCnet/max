@@ -46,11 +46,11 @@ def rebuildSubscriptions(context, request):
     existing_contexts = {}
     contexts = mmdb.contexts.dump()
     for context in contexts:
-        context.updateUserSubscriptions()
-        context.updateContextActivities()
+        context.updateUsersSubscriptions(force_update=True)
+        context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
-    users = mmdb.users.find({'subscribedTo': {'$exists': True, '$size': {'$gt': 0}}})
+    users = mmdb.users.search({'subscribedTo': {'$exists': True, '$size': {'$gt': 0}}})
     for user in users:
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
