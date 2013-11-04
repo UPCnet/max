@@ -83,7 +83,7 @@ class BaseContext(MADBase):
         return subscription
 
     def subscription_permissions(self, base=[]):
-        user_permissions = base
+        user_permissions = list(base)
         if self.permissions.get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) in ['subscribed', 'public']:
             user_permissions.append('read')
         if self.permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
