@@ -29,7 +29,7 @@ def getConversations(context, request):
          Return all conversations depending on the actor requester
     """
     mmdb = MADMaxDB(context.db)
-    query = {'participants': request.actor['username'],
+    query = {'participants.username': request.actor['username'],
              'objectType': 'conversation',
              }
 
@@ -64,33 +64,45 @@ def postMessage2Conversation(context, request):
     ctxts = data.get('contexts', [])
     if len(ctxts) == 0:
         raise ValidationError('Empty contexts parameter')
-    if len(ctxts[0].get('participants', [])) == 0:
+
+    request_participants = ctxts[0].get('participants', [])
+    if len(request_participants) == 0:
         raise ValidationError('Empty participants parameter')
+    if len(request_participants) != len(list(set(request_participants))):
+        raise ValidationError('One or more users duplicated in participants list')
+    if not request.actor.username in request_participants:
+        raise ValidationError('Actor must be part of the participants list.')
 
-    #Loop trough all participants, if there's one that doesn't exists, an exception will raise
-    #This check is to avoid any conversation creation if there's any invalid participant
+    # Loop trough all participants, if there's one that doesn't exists, an exception will raise
+    # This check is to avoid any conversation creation if there's any invalid participant
+    # Also store the definitive list that will be saved in participants field
 
+    participants = {}
     users = MADMaxCollection(context.db.users, query_key='username')
-    for participant in ctxts[0]['participants']:
+    for participant in request_participants:
         user = users[participant]
+        participants[participant] = user
+
     # If there are only two participants in the conversation, try to get an existing conversation
     # Otherwise, assume is a group conversation and create a new one
     current_conversation = None
-    if len(ctxts[0]['participants']) == 2:
+    if len(request_participants) == 2:
         contexts = MADMaxCollection(context.db.conversations)
-        participants_query = [
-            {'participants': {'$in': [ctxts[0]['participants'][0], ]}},
-            {'participants': {'$in': [ctxts[0]['participants'][1], ]}},
-        ]
-        conversations = contexts.search({'objectType': 'conversation', '$and': participants_query})
-        conversations = [a for a in conversations if len(a.participants) == 2]
+        conversations = contexts.search({
+            'objectType': 'conversation',
+            'participants': {
+                '$size': 2},
+            'participants.username': {
+                '$all': request_participants}
+            }
+        )
         if conversations:
             current_conversation = conversations[0]
 
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
         conversation_params = dict(actor=request.actor,
-                                   participants=ctxts[0]['participants'],
+                                   participants=[participant.flatten(preserve=['displayName', 'objectType', 'username']) for participant in participants.values()],
                                    permissions={'read': 'subscribed',
                                                 'write': 'subscribed',
                                                 'subscribe': 'restricted',
@@ -101,16 +113,13 @@ def postMessage2Conversation(context, request):
         newconversation = Conversation()
         newconversation.fromRequest(request, rest_params=conversation_params)
 
-        if not request.actor.username in newconversation['participants']:
-            raise ValidationError('Actor must be part of the participants list.')
-
         # New conversation
         contextid = newconversation.insert()
         newconversation['_id'] = contextid
 
         # Subscribe everyone,
         for user in newconversation['participants']:
-            db_user = users[user]
+            db_user = participants[user['username']]
             db_user.addSubscription(newconversation)
             # Initialize a Subscription Activity
             rest_params = {'actor': db_user,
@@ -192,12 +201,11 @@ def getConversation(context, request):
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
+    # In two people conversations, force displayName to the displayName of
+    # the partner in the conversation
     if len(conversation.participants) == 2:
-        participants = list(conversation.participants)
-        participants.remove(request.actor.username)
-        users = MADMaxCollection(context.db.users, query_key='username')
-        partner = users[participants[0]]
-        conversation.displayName = partner.displayName
+        partner = [user for user in conversation.participants if user["username"] != request.actor.username][0]
+        conversation.displayName = partner["displayName"]
 
     handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()
@@ -265,8 +273,7 @@ def addMessage(context, request):
 @requirePersonActor(force_own=False)
 def joinConversation(context, request):
     """
-         /people/{username}/conversations/{id}/participants
-         Adds a participant to a conversation
+         /people/{username}/conversations/{id}
     """
     actor = request.actor
     cid = request.matchdict['id']
@@ -296,7 +303,7 @@ def joinConversation(context, request):
             raise Unauthorized('User {0} cannot subscribe himself to to this context'.format(actor['username']))
 
         actor.addSubscription(conversation)
-        conversation.participants.append(actor.username)
+        conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
         conversation.save()
 
         # If user wasn't created, 201 will show that the subscription has just been added
@@ -345,7 +352,7 @@ def leaveConversation(context, request):
         raise Unauthorized('Only conversation owner can force participants out')
 
     actor.removeSubscription(found_context)
-    found_context.participants.remove(actor.username)
+    found_context.participants = [user for user in found_context.participants if user['username'] != actor.username]
     found_context.save()
     return HTTPNoContent()
 

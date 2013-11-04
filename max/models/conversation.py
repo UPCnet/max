@@ -19,4 +19,4 @@ class Conversation(BaseContext):
         super(Conversation, self).buildObject()
 
         #Set displayName only if it's not specified
-        self['displayName'] = self.get('displayName', ', '.join(self.participants))
+        self['displayName'] = self.get('displayName', ', '.join([a['username'] for a in self.participants]))

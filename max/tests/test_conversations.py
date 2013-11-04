@@ -38,12 +38,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
-        result = json.loads(res.text)
 
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
-        self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
-        self.assertEqual(result.get("objectType", None), "message")
-        self.assertEqual(result.get("object", None).get("objectType", None), "note")
+        self.assertEqual(res.json["contexts"][0]["participants"][0]["username"], sender)
+        self.assertEqual(res.json["contexts"][0]["participants"][1]["username"], recipient)
+        self.assertEqual(res.json["contexts"][0]["objectType"], "conversation")
+        self.assertEqual(res.json["objectType"], "message")
+        self.assertEqual(res.json["object"]["objectType"], "note")
 
     def test_post_message_to_conversation_to_oneself(self):
         """ doctest .. http:post:: /conversations """
@@ -86,17 +86,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/conversations', json.dumps(invalid_message_without_sender), oauth2Header(sender), status=400)
 
-    def test_post_message_to_conversation_with_sender_repeated(self):
-        """
-        """
-        from .mockers import invalid_message_sender_repeated
-        sender = 'messi'
-        recipient = 'xavi'
-        self.create_user(sender)
-        self.create_user(recipient)
-
-        self.testapp.post('/conversations', json.dumps(invalid_message_sender_repeated), oauth2Header(sender), status=400)
-
     def test_post_message_to_conversation_does_not_exists_yet_with_wrong_message_type(self):
         """ doctest .. http:post:: /conversations
             TO check that a failed 2-people conversation creation succeds after a failed first attempt
@@ -124,7 +113,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         conversation = self.app.registry.max_store.conversations.find_one()
         permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
-        self.assertEqual(conversation.get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(conversation.get("participants", None)[0]['username'], sender)
+        self.assertEqual(conversation.get("participants", None)[1]['username'], recipient)
         self.assertEqual(conversation.get("objectType", None), "conversation")
         self.assertEqual(conversation.get("permissions", None), permissions)
         self.assertEqual(str(conversation.get("_id", '')), cid)
@@ -183,7 +173,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[0]['username'], sender)
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
 
@@ -203,7 +194,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[0]['username'], sender)
+        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
 
@@ -263,7 +255,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None), sorted([sender, recipient]))
+        self.assertEqual(result.get("contexts", None)[0].get("participants", None)[0]['username'], sender)
+        self.assertEqual(result.get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result.get("objectType", None), "message")
         self.assertEqual(result.get("object", None).get("objectType", None), "note")
@@ -522,7 +515,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 2)
-        self.assertNotIn(recipient2, res.json['participants'])
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertNotIn(recipient2, participant_usernames)
 
     def test_conversation_owner_cannot_leave_conversation(self):
         """
@@ -646,7 +640,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=204)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 2)
-        self.assertNotIn(recipient2, res.json['participants'])
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertNotIn(recipient2, participant_usernames)
 
     def test_non_conversation_owner_kicks_user(self):
         """
