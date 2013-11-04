@@ -191,7 +191,7 @@ class User(MADBase):
         temp_context = ContextClass()
         temp_context.fromObject(context)
         for subscription in self[temp_context.user_subscription_storage]:
-            if subscription[temp_context.unique.lstrip('_')] == temp_context[temp_context.unique]:
+            if subscription[temp_context.unique.lstrip('_')] == str(temp_context[temp_context.unique]):
                 return subscription
 
     def addUserDevice(self, platform, token):
