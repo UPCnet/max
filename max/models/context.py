@@ -111,11 +111,14 @@ class BaseContext(MADBase):
             criteria = {'contexts.{}'.format(self.unique.lstrip('_')): self.getIdentifier()}
             updates = {}
 
-            if self.field_changed('displayName') or force_update:
+            if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
                 updates.update({'contexts.$.displayName': self.displayName})
 
-            if self.field_changed('tags') or force_update:
+            if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
                 updates.update({'contexts.$.tags': self.tags})
+
+            if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
+                updates.update({'contexts.$.participants': self.participants})
 
             combined_updates = {'$set': updates}
 
@@ -127,7 +130,7 @@ class BaseContext(MADBase):
             Now only updates displayName and permissions and tags
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
-        updatable_fields = ['permissions', 'displayName', 'tags']
+        updatable_fields = ['permissions', 'displayName', 'tags', 'participants']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
         if has_updatable_fields or force_update:
@@ -137,13 +140,16 @@ class BaseContext(MADBase):
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 
-                if self.field_changed('displayName') or force_update:
+                if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
 
-                if self.field_changed('tags') or force_update:
+                if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.tags})
 
-                if self.field_changed('permissions') or force_update:
+                if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
+                    updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
+
+                if 'permissions' in self.schema.keys() and (self.field_changed('permissions') or force_update):
                     subscription = user_object.getSubscription(self)
                     _vetos = subscription.get('_vetos', [])
                     _grants = subscription.get('_grants', [])
