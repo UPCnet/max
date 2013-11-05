@@ -106,10 +106,17 @@ def rebuildConversationSubscriptions(context, request):
         conversation.updateContextActivities(force_update=True)
         existing_conversations[conversation['_id']] = conversation
 
+        # if we found an ancient plain username list, we migrate it
+        if False not in [isinstance(a, str) for a in conversation['participants']]:
+            conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
+            conversation.save()
+
     users = mmdb.users.search({'talkingIn': {'$exists': True, '$size': {'$gt': 0}}})
     for user in users:
         for subscription in user.get('talkingIn', []):
             if subscription['id'] not in existing_conversations:
                 user.unsubscribe(existing_conversations[subscription['id']])
+            else:
+                user.updateConversationParticipants(force_update=True)
     handler = JSONResourceRoot([])
     return handler.buildResponse()
