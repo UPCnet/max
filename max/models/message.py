@@ -44,7 +44,7 @@ class Message(BaseActivity):
                 subscription = dict(self.data['actor'].getSubscription(cobject))
 
                 #Clean innecessary fields
-                non_needed_subscription_fields = ['tags', 'published', 'permissions']
+                non_needed_subscription_fields = ['tags', 'published', 'permissions', 'participants']
                 for fieldname in non_needed_subscription_fields:
                     if fieldname in subscription:
                         del subscription[fieldname]

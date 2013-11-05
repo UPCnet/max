@@ -77,7 +77,7 @@ def rebuildSubscriptions(context, request):
         context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
-    users = mmdb.users.search({'subscribedTo': {'$exists': True, '$size': {'$gt': 0}}})
+    users = mmdb.users.search({'subscribedTo.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
@@ -104,19 +104,24 @@ def rebuildConversationSubscriptions(context, request):
     for conversation in conversations:
         conversation.updateUsersSubscriptions(force_update=True)
         conversation.updateContextActivities(force_update=True)
-        existing_conversations[conversation['_id']] = conversation
 
         # if we found an ancient plain username list, we migrate it
-        if False not in [isinstance(a, str) for a in conversation['participants']]:
+        if True not in [isinstance(a, dict) for a in conversation['participants']]:
             conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
             conversation.save()
 
-    users = mmdb.users.search({'talkingIn': {'$exists': True, '$size': {'$gt': 0}}})
+        existing_conversations[str(conversation['_id'])] = conversation
+
+    users = mmdb.users.search({'talkingIn.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('talkingIn', []):
             if subscription['id'] not in existing_conversations:
                 user.unsubscribe(existing_conversations[subscription['id']])
             else:
-                user.updateConversationParticipants(force_update=True)
+                #if subscription has an ancient plain username list, update and save it
+                if True not in [isinstance(a, dict) for a in subscription['participants']]:
+                    subscription['participants'] = existing_conversations[subscription['id']]['participants']
+        user.updateConversationParticipants(force_update=True)
+        user.save()
     handler = JSONResourceRoot([])
     return handler.buildResponse()

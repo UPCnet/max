@@ -301,16 +301,29 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         conversation['displayName'] = 'Changed Name'
         conversation['participants'] = ['messi', 'xavi', 'iniesta']
         self.exec_mongo_query('conversations', 'update', {'_id': conversation['_id']}, conversation)
+
+        # Put a displayName on the user
+        users = self.exec_mongo_query('users', 'find', {'username': 'messi'})
+        user = users[0]
+        user['displayName'] = 'Lionel Messi'
+        self.exec_mongo_query('users', 'update', {'_id': user['_id']}, user)
+
         self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
 
         #Check user subscription is updated
         res = self.testapp.get('/people/{}'.format(sender), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json['talkingIn'][0]['displayName'], 'Changed Name')
-        self.assertListEqual(res.json['talkingIn'][0]['participants'], ['messi', 'xavi', 'iniesta'])
+        self.assertEqual(res.json['talkingIn'][0]['participants'][0]['username'], 'messi')
+        self.assertEqual(res.json['talkingIn'][0]['participants'][1]['username'], 'xavi')
+        self.assertEqual(res.json['talkingIn'][0]['participants'][2]['username'], 'iniesta')
         self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe'])
         conversation_id = res.json['talkingIn'][0]['id']
+
+        #Check context participants are updated
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), "", oauth2Header(sender), status=200)
+        self.assertEqual(res.json['participants'][0]['displayName'], 'Lionel Messi')
 
         #Check user activity is updated
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
-        self.assertListEqual(res.json[0]['contexts'][0]['participants'], ['messi', 'xavi', 'iniesta'])
+

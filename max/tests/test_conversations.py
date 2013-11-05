@@ -39,8 +39,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
-        self.assertEqual(res.json["contexts"][0]["participants"][0]["username"], sender)
-        self.assertEqual(res.json["contexts"][0]["participants"][1]["username"], recipient)
         self.assertEqual(res.json["contexts"][0]["objectType"], "conversation")
         self.assertEqual(res.json["objectType"], "message")
         self.assertEqual(res.json["object"]["objectType"], "note")
@@ -173,8 +171,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[0]['username'], sender)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
 
@@ -194,8 +190,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[0]['username'], sender)
-        self.assertEqual(result[0].get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
 
@@ -255,8 +249,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         result = json.loads(res.text)
 
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None)[0]['username'], sender)
-        self.assertEqual(result.get("contexts", None)[0].get("participants", None)[1]['username'], recipient)
         self.assertEqual(result.get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result.get("objectType", None), "message")
         self.assertEqual(result.get("object", None).get("objectType", None), "note")
