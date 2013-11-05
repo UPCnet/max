@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -54,10 +56,24 @@ def addAdminUserActivity(context, request):
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
-    # New User
-    code = 201
-    activity_oid = newactivity.insert()
-    newactivity['_id'] = activity_oid
+    # Search if there's any activity from the same user with
+    # the same actor in the last minute
+    mmdb = MADMaxDB(context.db)
+    query = {
+        'actor.username': request.actor.username,
+        'object.content': newactivity['object']['content'],
+        'published': {'$gt': newactivity.published - timedelta(minutes=1)}
+        }
+    duplicated = mmdb.activity.search(query)
+
+    if duplicated:
+        code = 200
+        newactivity = duplicated[0]
+    else:
+        # New User
+        code = 201
+        activity_oid = newactivity.insert()
+        newactivity['_id'] = activity_oid
 
     handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()
@@ -80,9 +96,23 @@ def addAdminContextActivity(context, request):
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
 
-    code = 201
-    activity_oid = newactivity.insert()
-    newactivity['_id'] = activity_oid
+    # Search if there's any activity from the same user with
+    # the same actor in the last minute
+    mmdb = MADMaxDB(context.db)
+    query = {
+        'actor.url': request.actor.url,
+        'object.content': newactivity['object']['content'],
+        'published': {'$gt': newactivity.published - timedelta(minutes=1)}
+        }
+    duplicated = mmdb.activity.search(query)
+
+    if duplicated:
+        code = 200
+        newactivity = duplicated[0]
+    else:
+        code = 201
+        activity_oid = newactivity.insert()
+        newactivity['_id'] = activity_oid
 
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()

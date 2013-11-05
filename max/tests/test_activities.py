@@ -237,6 +237,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['creator'], test_manager)
         self.assertEqual(res.json['owner'], username)
 
+    def test_create_activity_check_not_duplicate_activity(self):
+        """
+            Given a admin user
+            When I post an activity in the name of someone else
+            And I try to post the same content twice in less than a minute
+            Then the activity is posted only once
+        """
+        from .mockers import user_status as activity
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=201)
+        self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=200)
+
+    def test_create_activity_as_context_check_not_duplicated_activity(self):
+        """
+            Given a admin user
+            When I post an activity in the name of a context
+            And I try to post the same content twice in less than a minute
+            Then the activity is posted only once
+        """
+        from .mockers import user_status_as_context
+        from .mockers import create_context
+        from hashlib import sha1
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_as_context), oauth2Header(test_manager), status=201)
+        self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_as_context), oauth2Header(test_manager), status=200)
+
     def test_create_activity_as_context_check_ownership(self):
         """
             Given a admin user
