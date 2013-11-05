@@ -74,10 +74,10 @@ def addConversationExchange(conversation):
             'conversation': conversation.getIdentifier()
         }
 
-        for username in conversation.participants:
-            if username != conversation._owner:
+        for user in conversation.participants:
+            if user['username'] != conversation._owner:
                 channel.basic_publish(
                     exchange='new',
-                    routing_key=username,
+                    routing_key=user['username'],
                     body=json.dumps(message)
                 )
