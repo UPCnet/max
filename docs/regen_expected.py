@@ -53,13 +53,13 @@ for filename in files:
         def replace(matchobj):
             replacements = {
                 'id': '519b00000000000000000000',
-                'commented': '2000-01-01T00:01:00Z',
                 'published': '2000-01-01T00:01:00Z',
                 'last_login': '2000-01-01T00:01:00Z',
+                'lastComment': '519b00000000000000000002'
             }
             return '"{}": "{}"'.format(matchobj.groups()[0], replacements[matchobj.groups()[0]])
 
-        cleaned = re.sub(r'[\"\'](id|commented|published|last_login)[\"\']\s*:\s*[\"\'](.*?)[\"\']', replace, newjson)
+        cleaned = re.sub(r'[\"\'](id|published|last_login|lastComment)[\"\']\s*:\s*[\"\'](.*?)[\"\']', replace, newjson)
         cleaned = re.sub(r'(.*?) *\n', r'\1\n', cleaned)  # Remove trailing spaces
         newapirest += '\n{}\n'.format(cleaned)
         last = int(expected)

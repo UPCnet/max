@@ -382,12 +382,13 @@ Subscripcions
                     "url": "http://atenea.upc.edu",
                     "objectType": "context"
                 },
+                "lastComment": "519b00000000000000000002",
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
                     "objectType": "person"
                 },
-                "commented": "2000-01-01T00:01:00Z",
+                "keywords": [],
                 "verb": "subscribe",
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
@@ -489,12 +490,12 @@ que a partir de llavors, no el pot perdre exepte per eliminació explícita.
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                "objectType": "context",
                 "permissions": [
                     "read",
                     "write",
                     "unsubscribe"
-                ],
-                "objectType": "context"
+                ]
             }
 
         .. -> expected
@@ -653,9 +654,12 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
-                        "url": "http://atenea.upc.edu",
                         "twitterHashtag": "assignatura1",
                         "displayName": "Atenea",
+                        "tags": [
+                            "Assignatura"
+                        ],
+                        "url": "http://atenea.upc.edu",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }
@@ -664,13 +668,13 @@ Activitats
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "objectType": "note"
                 },
+                "lastComment": "519b00000000000000000002",
                 "replies": [],
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
                     "objectType": "person"
                 },
-                "commented": "2000-01-01T00:01:00Z",
                 "verb": "post",
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
@@ -733,24 +737,13 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
-                        "twitterHashtag": "assignatura1",
-                        "displayName": "Atenea",
-                        "creator": "test_manager",
                         "url": "http://atenea.upc.edu",
+                        "displayName": "Atenea",
                         "tags": [
                             "Assignatura"
                         ],
-                        "published": "2000-01-01T00:01:00Z",
-                        "owner": "test_manager",
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                        "objectType": "context",
-                        "id": "519b00000000000000000000",
-                        "permissions": {
-                            "read": "public",
-                            "write": "public",
-                            "invite": "public",
-                            "subscribe": "public"
-                        }
+                        "objectType": "context"
                     }
                 ],
                 "object": {
@@ -764,14 +757,21 @@ Activitats
                     ],
                     "objectType": "note"
                 },
+                "lastComment": "519b00000000000000000002",
                 "replies": [],
                 "actor": {
                     "url": "http://atenea.upc.edu",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "displayName": "Atenea",
-                    "objectType": "uri"
+                    "objectType": "context"
                 },
-                "commented": "2000-01-01T00:01:00Z",
+                "keywords": [
+                    "canvi",
+                    "creaci\u00f3",
+                    "estatus",
+                    "testejant",
+                    "context"
+                ],
                 "verb": "post",
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",

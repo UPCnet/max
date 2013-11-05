@@ -89,7 +89,13 @@ class BaseActivity(MADBase):
         if isContext:
             # When a context posts an activity it can be posted only
             # to itself, so add it directly
-                ob['contexts'] = [self.data['actor'], ]
+            posted_context = dict(self.data['actor'])
+            non_needed_context_fields = ['published', 'permissions', '_id', '_owner', '_creator', 'twitterHashtag']
+            for fieldname in non_needed_context_fields:
+                if fieldname in posted_context:
+                    del posted_context[fieldname]
+
+            ob['contexts'] = [posted_context, ]
         self.update(ob)
 
         # Set defaults
