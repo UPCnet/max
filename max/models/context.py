@@ -122,7 +122,7 @@ class BaseContext(MADBase):
 
             combined_updates = {'$set': updates}
 
-            self.mdb_collection.database[self.activity_storage].update(criteria, combined_updates)
+            self.mdb_collection.database[self.activity_storage].update(criteria, combined_updates, multi=True)
 
     def updateUsersSubscriptions(self, force_update=False):
         """
@@ -171,7 +171,7 @@ class BaseContext(MADBase):
                     updates.update({'{}.$.permissions'.format(self.user_subscription_storage): new_permissions})
 
                 combined_updates = {'$set': updates}
-                self.mdb_collection.database.users.update(criteria, combined_updates)
+                self.mdb_collection.database.users.update(criteria, combined_updates, multi=True)
 
     def removeUserSubscriptions(self, users_to_delete=[]):
         """

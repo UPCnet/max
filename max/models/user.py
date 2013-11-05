@@ -113,7 +113,7 @@ class User(MADBase):
 
         if has_updatable_fields or force_update:
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
-                self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}})
+                self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
 
     def grantPermission(self, subscription, permission):
         """
