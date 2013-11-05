@@ -54,6 +54,7 @@ class MADMaxCollection(object):
                 tags: A list of tags to filter contexts
                 object_tags: A list of tags to filter context activities
                 twitter_enabled: Boolean for returning objects Twitter attributes
+                sort_order: whether to sort by activities or comments published date
         """
 
         #Extract known params from kwargs
@@ -67,6 +68,7 @@ class MADMaxCollection(object):
         tags = kwargs.get('tags', None)
         context_tags = kwargs.get('context_tags', None)
         twitter_enabled = kwargs.get('twitter_enabled', None)
+        sort_order = kwargs.get('sort_order', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -75,9 +77,13 @@ class MADMaxCollection(object):
             offset = None
 
         if offset:
+            sortBy_field = {
+                'activities': '_id',
+                'comments': 'lastComment',
+            }
             # Filter the query to return objects created later or earlier than the one
             # represented by offset (offset not included)
-            query.update({'_id': {condition: offset}})
+            query.update({sortBy_field[sort_order]: {condition: offset}})
 
         if hashtag:
             # Filter the query to only objects containing certain hashtags

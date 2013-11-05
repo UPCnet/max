@@ -103,6 +103,9 @@ def searchParams(request):
         Raises InvalidSearchParams on bad param values
     """
     params = {}
+
+    params['sort_order'] = request.params.get('sortBy', 'activities')
+
     limit = request.params.get('limit', 10)
     try:
         limit = int(limit)

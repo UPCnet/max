@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from bson import ObjectId
 from hashlib import sha1
 
 from max.MADObjects import MADBase
@@ -23,15 +24,11 @@ class BaseActivity(MADBase):
               'verb':        dict(required=1),
               'object':      dict(required=1),
               'published':   dict(required=0),
-              'commented':   dict(required=0),
+              'lastComment': dict(required=0),
               'contexts':    dict(required=0),
               'replies':     dict(required=0, default=[]),
               'generator':   dict(required=0, default=None),
               }
-
-    def setDates(self):
-        super(BaseActivity, self).setDates()
-        self['commented'] = datetime.datetime.utcnow()
 
     def getOwner(self, request):
         """
@@ -157,7 +154,7 @@ class BaseActivity(MADBase):
         activity_hashtags = self.object.setdefault('_hashtags', [])
         activity_hashtags.extend(comment.get('_hashtags', []))
         self.object['_hashtags'] = list(set(activity_hashtags))
-        self.commented = comment['published']
+        self.lastComment = ObjectId(comment['id'])
 
         self.save()
 
@@ -180,6 +177,11 @@ class Activity(BaseActivity):
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['deletable'] = dict(required=0)
+
+    def _on_saving_object(self, oid):
+        if not hasattr(self, 'lastComment'):
+            self.lastComment = oid
+            self.save()
 
     def _on_create_custom_validations(self):
         """

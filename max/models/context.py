@@ -274,6 +274,6 @@ class Context(BaseContext):
 
         self.save()
 
-    def _on_saving_object(self):
+    def _on_saving_object(self, oid):
         if self.field_changed('twitterUsername'):
             restartTweety()

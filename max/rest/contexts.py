@@ -58,7 +58,7 @@ def getContextAuthors(context, request):
 
     sortBy_fields = {
         'activities': '_id',
-        'comments': 'commented',
+        'comments': 'lastComment',
     }
     sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
 

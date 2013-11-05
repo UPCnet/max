@@ -54,7 +54,7 @@ def getUserTimeline(context, request):
 
     sortBy_fields = {
         'activities': '_id',
-        'comments': 'commented',
+        'comments': 'lastComment',
     }
     sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
     activities = mmdb.activity.search(query, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
@@ -82,7 +82,7 @@ def getUserTimelineAuthors(context, request):
 
     sortBy_fields = {
         'activities': '_id',
-        'comments': 'commented',
+        'comments': 'lastComment',
     }
     sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
 

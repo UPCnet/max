@@ -424,17 +424,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context, create_context
         from .mockers import context_query
 
-        from time import sleep
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         activity_0_id = self.create_activity(username, user_status_context).json['id']
-        sleep(1)
         activity_1_id = self.create_activity(username, user_status_context).json['id']
-        sleep(1)
         activity_2_id = self.create_activity(username, user_status_context).json['id']
-        sleep(1)
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
@@ -707,20 +703,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Then the in the comment-sorted timeline, the commented activity becomes the first
         """
         from .mockers import user_status, user_comment
-        from time import sleep
         username = 'messi'
         self.create_user(username)
-
         activity_ids = []
         # Create 7 activities to overpass limit of 5
         for i in range(7):
             activity_ids.append(self.create_activity(username, user_status).json['id'])
-        sleep(1)
         res = self.testapp.post('/activities/%s/comments' % str(activity_ids[0]), json.dumps(user_comment), oauth2Header(username), status=201)
-
         # Get first 5 results
         res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5' % username, "", oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 5)
+
         self.assertEqual(res.json[0].get('id', None), activity_ids[0])
         self.assertEqual(res.json[1].get('id', None), activity_ids[6])
         self.assertEqual(res.json[2].get('id', None), activity_ids[5])
@@ -728,15 +721,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json[4].get('id', None), activity_ids[3])
 
         # get next 2 results
-        import ipdb;ipdb.set_trace()
         res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5&before=%s' % (username, activity_ids[3]), "", oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 2)
-        # self.assertEqual(res.json[0].get('id', None), activity_ids[0])
-        # self.assertEqual(res.json[1].get('id', None), activity_ids[2])
-        # self.assertEqual(res.json[2].get('id', None), activity_ids[1])
+
         self.assertEqual(res.json[0].get('id', None), activity_ids[2])
         self.assertEqual(res.json[1].get('id', None), activity_ids[1])
-
 
     def test_timeline_order_sorted_by_activity_publish_date(self):
         """

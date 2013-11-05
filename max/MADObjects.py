@@ -246,7 +246,7 @@ class MADBase(MADDict):
     def _post_init_from_object(self, source):
         return True
 
-    def _on_saving_object(self):
+    def _on_saving_object(self, oid):
         return True
 
     def fromObject(self, source, collection=None):
@@ -278,15 +278,16 @@ class MADBase(MADDict):
             Inserts the item into his defined collection and returns its _id
         """
         oid = self.mdb_collection.insert(self)
-        self._on_saving_object()
+        self._on_saving_object(oid)
         return str(oid)
 
     def save(self):
         """
             Updates itself to the database
         """
-        self.mdb_collection.save(self)
-        self._on_saving_object()
+        oid = self.mdb_collection.save(self)
+        self._on_saving_object(oid)
+        return str(oid)
 
     def delete(self):
         """
