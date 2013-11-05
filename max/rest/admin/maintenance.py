@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
+from bson import ObjectId
 
 from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
@@ -24,6 +25,32 @@ def rebuildKeywords(context, request):
     for activity in activities:
         activity.object.setKeywords()
         activity.setKeywords()
+        activity.save()
+
+    handler = JSONResourceRoot([])
+    return handler.buildResponse()
+
+
+@view_config(route_name='maintenance_dates', request_method='POST')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def rebuildDates(context, request):
+    """
+         /maintenance/dates
+
+         Rebuild dates of activities
+         Now currently sets the lastComment id field
+
+    """
+    mmdb = MADMaxDB(context.db)
+    activities = mmdb.activity.dump()
+    for activity in activities:
+        # Remove ancient commented field
+        if 'commented' in activity:
+            del activity['commented']
+        if activity.get('replies', []):
+            activity['lastComment'] = ObjectId(activity['replies'][-1]['id'])
         activity.save()
 
     handler = JSONResourceRoot([])

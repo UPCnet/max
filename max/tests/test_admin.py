@@ -230,6 +230,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         response_keywords.sort()
         self.assertListEqual(expected_keywords, response_keywords)
 
+    def test_maintenance_dates(self):
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        self.create_user(username, displayName='Lionel messi')
+        res = self.create_activity(username, user_status)
+        self.testapp.post('/activities/%s/comments' % str(res.json['id']), json.dumps(user_comment), oauth2Header(username), status=201)
+        res = self.testapp.post('/activities/%s/comments' % str(res.json['id']), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        # Hard modify keywords directly on mongodb to simulate bad keywords
+        activities = self.exec_mongo_query('activity', 'find', {'verb': 'post'})
+        activity = activities[0]
+
+        #simulate ancient commented field with wrong date
+        activity['commented'] = activity['published']
+        del activity['lastComment']
+        self.exec_mongo_query('activity', 'update', {'_id': activities[0]['_id']}, activity)
+
+        self.testapp.post('/admin/maintenance/dates', "", oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/activities/%s' % activity['_id'], "", oauth2Header(username), status=200)
+
+        self.assertEqual(res.json['lastComment'], res.json['replies'][-1]['id'])
+
     def test_maintenance_subscriptions(self):
         from .mockers import create_context
         from .mockers import subscribe_context, user_status_context
