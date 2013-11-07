@@ -1,11 +1,36 @@
 CHANGELOG
 =========
 
-3.5.5 (unreleased)
+3.5.5 (2013-11-07)
 ------------------
 
-- Nothing changed yet.
-
+* Updated documentation report [Carles Bruguera]
+* Clean contexts stored in activities posted by context [Carles Bruguera]
+* Enhance maintenance conversations to rebuild participants [Carles Bruguera]
+* Maintenance endpoint : rebuild last comment dates [Carles Bruguera]
+* Add missing multi=True to batch update operations [Carles Bruguera]
+* Refactor way of storing last comment to fix bug in sort by comment [Carles Bruguera]
+* Activities posted in last minute with same content and same actor will be discarded if actor is impersonated [Carles Bruguera]
+* Fix test to catch bug in last-comment-sorting [Carles Bruguera]
+* Return partner's displayName as conversation displayname [Carles Bruguera]
+* Update conversation's participants displayName on change [Carles Bruguera]
+* Refactor conversation participants [Carles Bruguera]
+* Make field hold a list of user objects instead of a list of usernames [Carles Bruguera]
+* Add maintenance endpoint to rebuild conversation subscriptions [Carles Bruguera]
+* Update only fields defined in schema [Carles Bruguera]
+* Add maintenance endpoint to rebuild subscriptions [Carles Bruguera]
+* Fix bug that could give unwanted permissions sometimes [Carles Bruguera]
+* Maintenance endpoint for user subscriptions to contexts [Carles Bruguera]
+* Make context updates update all activities context references [Carles Bruguera]
+* Make context tag updates update user's subscriptions [Carles Bruguera]
+* Make context tag updates update activity's context references [Carles Bruguera]
+* Add maintenance endpoint to rebuild activity keywords [Carles Bruguera]
+* Store global activity keywords in a separate field [Carles Bruguera]
+* Delete comment keywords on comment deletion [Carles Bruguera]
+* Unify keyword generation [Carles Bruguera]
+* case-insensitive usernames [Carles Bruguera]
+* Allow tags field in activities [Carles Bruguera]
+* filter activity queries by context_tags [Carles Bruguera]
 
 3.5.4 (2013-10-29)
 ------------------
