@@ -54,7 +54,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
         image_url = user.profile_image_url_https
 
         if image_url:
-            req = requests.get(image_url)
+            req = requests.get(image_url, verify=False)
             if req.status_code == 200:
                 open(filename, 'w').write(req.content)
                 exit_status = True
