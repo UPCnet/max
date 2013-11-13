@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
-
+from max.models import Context, Conversation
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 
@@ -21,7 +21,7 @@ def rebuildKeywords(context, request):
 
     """
     mmdb = MADMaxDB(context.db)
-    activities = mmdb.activity.dump()
+    activities = mmdb.activity.search({'verb': 'post'})
     for activity in activities:
         activity.object.setKeywords()
         activity.setKeywords()
@@ -44,7 +44,7 @@ def rebuildDates(context, request):
 
     """
     mmdb = MADMaxDB(context.db)
-    activities = mmdb.activity.dump()
+    activities = mmdb.activity.search({'verb': 'post'})
     for activity in activities:
         # Remove ancient commented field
         if 'commented' in activity:
@@ -69,19 +69,21 @@ def rebuildSubscriptions(context, request):
 
     """
     mmdb = MADMaxDB(context.db)
-
     existing_contexts = {}
     contexts = mmdb.contexts.dump()
-    for context in contexts:
+    for num, context in enumerate(contexts):
         context.updateUsersSubscriptions(force_update=True)
         context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
     users = mmdb.users.search({'subscribedTo.0': {'$exists': True}})
-    for user in users:
+    for num, user in enumerate(users):
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
-                user.unsubscribe(existing_contexts[subscription['hash']])
+                print user.username, subscription["displayName"]
+                fake_deleted_context = Context()
+                fake_deleted_context.fromObject(subscription)
+                user.removeSubscription(fake_deleted_context)
     handler = JSONResourceRoot([])
     return handler.buildResponse()
 
@@ -98,7 +100,6 @@ def rebuildConversationSubscriptions(context, request):
 
     """
     mmdb = MADMaxDB(context.db)
-
     existing_conversations = {}
     conversations = mmdb.conversations.dump()
     for conversation in conversations:
@@ -116,7 +117,9 @@ def rebuildConversationSubscriptions(context, request):
     for user in users:
         for subscription in user.get('talkingIn', []):
             if subscription['id'] not in existing_conversations:
-                user.unsubscribe(existing_conversations[subscription['id']])
+                fake_deleted_conversation = Conversation()
+                fake_deleted_conversation.fromObject(subscription)
+                user.removeSubscription(fake_deleted_conversation)
             else:
                 #if subscription has an ancient plain username list, update and save it
                 if True not in [isinstance(a, dict) for a in subscription['participants']]:
