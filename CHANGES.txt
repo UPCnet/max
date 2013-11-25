@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-3.5.6 (unreleased)
+3.5.6 (2013-11-25)
 ------------------
 
-- Nothing changed yet.
-
+* Tune maintenance endpoints [Carles Bruguera]
+* Ignore ssl errors [Carles Bruguera]
 
 3.5.5 (2013-11-07)
 ------------------
