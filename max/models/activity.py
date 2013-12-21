@@ -183,6 +183,8 @@ class Activity(BaseActivity):
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['deletable'] = dict(required=0)
+    schema['likes'] = dict(required=0, default=[])
+    schema['favorites'] = dict(required=0, default=[])
 
     def _on_saving_object(self, oid):
         if not hasattr(self, 'lastComment'):
