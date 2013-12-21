@@ -57,7 +57,7 @@ def getUserTimeline(context, request):
         'comments': 'lastComment',
     }
     sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-    activities = mmdb.activity.search(query, sort=sort_order, flatten=1, keep_private_fields=False, **searchParams(request))
+    activities = mmdb.activity.search(query, sort=sort_order, flatten=1, squash=['favorites', 'likes'], keep_private_fields=False, **searchParams(request))
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()

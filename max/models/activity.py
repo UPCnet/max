@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import datetime
 from bson import ObjectId
 from hashlib import sha1
 
@@ -183,6 +182,8 @@ class Activity(BaseActivity):
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['deletable'] = dict(required=0)
+    schema['liked'] = dict(required=0)
+    schema['favorited'] = dict(required=0)
     schema['likes'] = dict(required=0, default=[])
     schema['favorites'] = dict(required=0, default=[])
 
@@ -223,6 +224,8 @@ class Activity(BaseActivity):
         """
             * Set the deletable flag on the object. If user is the owner don't check anything else,
             otherwhise, check if user has permissions to delete activities on that context
+
+            * Set the liked and favorited flags on the object, with the number of each marks
         """
         if self.request.actor is not None:
             # Execute only if we have a actor in the request. I we don't have a actor
@@ -241,3 +244,54 @@ class Activity(BaseActivity):
             # Mark the comments with the deletable flag too
             for comment in self.get('replies', []):
                 comment['deletable'] = self['deletable'] or self.request.actor[actor_id_field] == comment['actor']['username']
+
+            self['favorited'] = len(self.get('favorites', []))
+            self['liked'] = len(self.get('likes', []))
+
+    def add_favorite_from(self, actor):
+        """
+            Adds a favorite mark from somebody to an activity
+        """
+        prepared_actor = {
+            actor.unique: actor.get(actor.unique),
+            'objectType': actor.objectType
+        }
+        self.add_to_list('favorites', prepared_actor, allow_duplicates=False)
+        self.save()
+
+    def add_like_from(self, actor):
+        """
+            Adds a like mark from somebody to an activity
+        """
+        prepared_actor = {
+            actor.unique: actor.get(actor.unique),
+            'objectType': actor.objectType
+        }
+        self.add_to_list('likes', prepared_actor, allow_duplicates=False)
+        self.save()
+
+    def delete_favorite_from(self, actor):
+        """
+            Deletes the favorite mark from somebody from an activity
+        """
+        self.delete_from_list('favorites', {actor.unique: actor.get(actor.unique)})
+        self.favorites = [favorite for favorite in self.favorites if favorite[actor.unique] != actor[actor.unique]]
+
+    def delete_like_from(self, actor):
+        """
+            Deletes the like mark from somebody from an activity
+        """
+        self.delete_from_list('likes', {actor.unique: actor.get(actor.unique)})
+        self.likes = [like for like in self.likes if like[actor.unique] != actor[actor.unique]]
+
+    def has_like_from(self, actor):
+        """
+            Checks if the activity is already liked by this actor
+        """
+        return [like_actor for like_actor in self.get('likes', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]
+
+    def has_favorite_from(self, actor):
+        """
+            Checks if the activity is already favorited by this actor
+        """
+        return [like_actor for like_actor in self.get('favorites', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]

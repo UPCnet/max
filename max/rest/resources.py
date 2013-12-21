@@ -42,13 +42,13 @@ PUBLIC_RESOURCES = {
     'participants': {'route': '/conversations/{id}/participants'},
     'participant': {'route': '/conversations/{id}/participant'},
 
-    # MAX 3.6
+    # MAX 3.6
     'likes': {'route': '/activities/{activity}/likes'},
     'like': {'route': '/activities/{activity}/likes/{username}'},
     'user_likes': {'route': '/people/{username}/likes'},
     'favorites': {'route': '/activities/{activity}/favorites'},
     'favorite': {'route': '/activities/{activity}/favorites/{username}'},
-    'user_favorites': {'route': '/activities/{activity}/favorites'},
+    'user_favorites': {'route': '/people/{username}/favorites'},
 
 
     # MAX 4.0

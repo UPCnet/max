@@ -128,3 +128,19 @@ class Person(ASObject):
               'displayName': dict(required=0),
               'objectType':  dict(required=1),
               }
+
+
+class Activity(ASObject):
+    """
+        An Max Activity Object
+    """
+    data = {}
+    objectType = 'Activity'
+    schema = {'_id':         dict(),
+              'objectType':  dict(required=1),
+              'likes':       dict(),
+              'liked':       dict(),
+              'favorites':   dict(),
+              'favorited':   dict()
+
+              }
