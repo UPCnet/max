@@ -163,28 +163,6 @@ class BaseActivity(MADBase):
 
         self.save()
 
-    def add_favorite_from(self, actor):
-        """
-            Adds a favorite mark from somebody to an activity
-        """
-        prepared_actor = {
-            actor.unique: actor.get(actor.unique),
-            'objectType': actor.objectType
-        }
-        self.add_to_list('favorites', prepared_actor, allow_duplicates=False)
-        self.save()
-
-    def add_like_from(self, actor):
-        """
-            Adds a like mark from somebody to an activity
-        """
-        prepared_actor = {
-            actor.unique: actor.get(actor.unique),
-            'objectType': actor.objectType
-        }
-        self.add_to_list('likes', prepared_actor, allow_duplicates=False)
-        self.save()
-
     def delete_comment(self, commentid):
         """
         """
@@ -193,20 +171,6 @@ class BaseActivity(MADBase):
         self.setKeywords()
         self.save()
         # XXX TODO Update hastags
-
-    def delete_favorite_from(self, actor):
-        """
-            Deletes the favorite mark from somebody from an activity
-        """
-        self.delete_from_list('favorites', {actor.unique: actor.get(actor.unique)})
-        self.save()
-
-    def delete_like_from(self, actor):
-        """
-            Deletes the like mark from somebody from an activity
-        """
-        self.delete_from_list('likes', {actor.unique: actor.get(actor.unique)})
-        self.save()
 
 
 class Activity(BaseActivity):
