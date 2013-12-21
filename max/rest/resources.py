@@ -42,13 +42,19 @@ PUBLIC_RESOURCES = {
     'participants': {'route': '/conversations/{id}/participants'},
     'participant': {'route': '/conversations/{id}/participant'},
 
+    # MAX 3.6
+    'likes': {'route': '/activities/{activity}/likes'},
+    'like': {'route': '/activities/{activity}/likes/{username}'},
+    'user_likes': {'route': '/people/{username}/likes'},
+    'favorites': {'route': '/activities/{activity}/favorites'},
+    'favorite': {'route': '/activities/{activity}/favorites/{username}'},
+    'user_favorites': {'route': '/activities/{activity}/favorites'},
+
+
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},
-    'user_likes': {'route': '/people/{username}/likes'},
     'follows': {'route': '/people/{username}/follows'},
     'follow': {'route': '/people/{username}/follows/{followedUsername}'},
-    'likes': {'route': '/activities/{activity}/likes'},
-    'like': {'route': '/activities/{activity}/likes/{likeId}'},
     'shares': {'route': '/activities/{activity}/shares'},
     'share': {'route': '/activities/{activity}/shares/{shareId}'},
 
