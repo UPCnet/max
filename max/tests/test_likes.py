@@ -49,10 +49,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
 
         self.assertEqual(res.json['object']['likes'][0]['username'], username_not_me)
-        self.assertEqual(res.json['object']['liked'], 1)
+        self.assertEqual(res.json['object']['liked'], True)
 
         self.assertEqual(activity.json['likes'][0]['username'], username_not_me)
-        self.assertEqual(activity.json['liked'], 1)
+        self.assertEqual(activity.json['liked'], False)
 
     def test_like_already_liked_activity(self):
         """
@@ -77,7 +77,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username_not_me), status=200)
 
         self.assertEqual(res.json['object']['likes'][0]['username'], username_not_me)
-        self.assertEqual(res.json['object']['liked'], 1)
+        self.assertEqual(res.json['object']['liked'], True)
 
     def test_unlike_activity(self):
         """
@@ -102,10 +102,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
 
         self.assertEqual(res.json['object']['likes'], [])
-        self.assertEqual(res.json['object']['liked'], 0)
+        self.assertEqual(res.json['object']['liked'], False)
 
         self.assertEqual(activity.json['likes'], [])
-        self.assertEqual(activity.json['liked'], 0)
+        self.assertEqual(activity.json['liked'], False)
 
     def test_like_activity_by_various(self):
         """
@@ -131,7 +131,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['likes'][0]['username'], username_not_me)
         self.assertEqual(res.json['object']['likes'][1]['username'], username)
-        self.assertEqual(res.json['object']['liked'], 2)
+        self.assertEqual(res.json['object']['liked'], True)
 
     def test_unlike_activity_get_other_likes(self):
         """
@@ -159,4 +159,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.delete('/activities/%s/likes/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=200)
 
         self.assertEqual(res.json['object']['likes'][0]['username'], username)
-        self.assertEqual(res.json['object']['liked'], 1)
+        self.assertEqual(res.json['object']['liked'], False)

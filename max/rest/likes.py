@@ -72,7 +72,7 @@ def like(context, request):
         refering_activity.add_like_from(request.actor)
 
     newactivity['object']['likes'] = refering_activity['likes']  # Return the current likes of the activity
-    newactivity['object']['liked'] = len(refering_activity.get('likes', []))  # Return the current liked count of the activity
+    newactivity['object']['liked'] = refering_activity.has_like_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
@@ -113,7 +113,7 @@ def unlike(context, request):
 
     found_activity.delete_like_from(request.actor)
 
-    newactivity['object']['liked'] = len(found_activity.get('likes', []))
     newactivity['object']['likes'] = found_activity['likes']
+    newactivity['object']['liked'] = found_activity.has_like_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
     return handler.buildResponse()

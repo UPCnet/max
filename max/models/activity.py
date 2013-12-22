@@ -245,8 +245,8 @@ class Activity(BaseActivity):
             for comment in self.get('replies', []):
                 comment['deletable'] = self['deletable'] or self.request.actor[actor_id_field] == comment['actor']['username']
 
-            self['favorited'] = len(self.get('favorites', []))
-            self['liked'] = len(self.get('likes', []))
+            self['favorited'] = self.has_favorite_from(self.request.actor)
+            self['liked'] = self.has_like_from(self.request.actor)
 
     def add_favorite_from(self, actor):
         """
@@ -288,10 +288,12 @@ class Activity(BaseActivity):
         """
             Checks if the activity is already liked by this actor
         """
-        return [like_actor for like_actor in self.get('likes', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]
+        actor_liked = [like_actor for like_actor in self.get('likes', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]
+        return True if actor_liked else False
 
     def has_favorite_from(self, actor):
         """
             Checks if the activity is already favorited by this actor
         """
-        return [like_actor for like_actor in self.get('favorites', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]
+        actor_favorited = [like_actor for like_actor in self.get('favorites', []) if like_actor.get(actor.unique, None) == actor[actor.unique]]
+        return True if actor_favorited else False

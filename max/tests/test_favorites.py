@@ -45,15 +45,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         res = self.create_activity(username, user_status_context)
         activity_id = res.json['id']
-        res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username_not_me))
-
+        res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username_not_me), status=201)
         activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
-        self.assertEqual(res.json['object']['favorited'], 1)
+        self.assertEqual(res.json['object']['favorited'], True)
 
         self.assertEqual(activity.json['favorites'][0]['username'], username_not_me)
-        self.assertEqual(activity.json['favorited'], 1)
+        self.assertEqual(activity.json['favorited'], False)
 
     def test_favorite_already_favorited_activity(self):
         """
@@ -78,7 +77,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username_not_me), status=200)
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
-        self.assertEqual(res.json['object']['favorited'], 1)
+        self.assertEqual(res.json['object']['favorited'], True)
 
     def test_unfavorite_activity(self):
         """
@@ -103,10 +102,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
 
         self.assertEqual(res.json['object']['favorites'], [])
-        self.assertEqual(res.json['object']['favorited'], 0)
+        self.assertEqual(res.json['object']['favorited'], False)
 
         self.assertEqual(activity.json['favorites'], [])
-        self.assertEqual(activity.json['favorited'], 0)
+        self.assertEqual(activity.json['favorited'], False)
 
     def test_favorite_activity_by_various(self):
         """
@@ -132,7 +131,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
         self.assertEqual(res.json['object']['favorites'][1]['username'], username)
-        self.assertEqual(res.json['object']['favorited'], 2)
+        self.assertEqual(res.json['object']['favorited'], True)
 
     def test_unfavorite_activity_get_other_favorites(self):
         """
@@ -160,4 +159,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.delete('/activities/%s/favorites/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=200)
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username)
-        self.assertEqual(res.json['object']['favorited'], 1)
+        self.assertEqual(res.json['object']['favorited'], False)
