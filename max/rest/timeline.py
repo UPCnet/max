@@ -105,7 +105,7 @@ def getUserTimelineAuthors(context, request):
     actor = request.actor
     mmdb = MADMaxDB(context.db)
 
-    query = timelineQuery(mmdb, actor)
+    query = timelineQuery(actor)
 
     sortBy_fields = {
         'activities': '_id',
