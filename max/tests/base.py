@@ -117,6 +117,10 @@ class MaxTestBase(object):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
+    def like_activity(self, username, activity_id):
+        res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=201)
+        return res
+
     def create_context(self, context, permissions=None, expect=201):
         default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(context)

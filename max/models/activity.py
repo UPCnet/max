@@ -185,7 +185,9 @@ class Activity(BaseActivity):
     schema['liked'] = dict(required=0)
     schema['favorited'] = dict(required=0)
     schema['likes'] = dict(required=0, default=[])
+    schema['likesCount'] = dict(required=0, default=0)
     schema['favorites'] = dict(required=0, default=[])
+    schema['favoritesCount'] = dict(required=0, default=0)
 
     def _on_saving_object(self, oid):
         if not hasattr(self, 'lastComment'):
@@ -257,6 +259,7 @@ class Activity(BaseActivity):
             'objectType': actor.objectType
         }
         self.add_to_list('favorites', prepared_actor, allow_duplicates=False)
+        self.favoritesCount = len(self.favorites)
         self.save()
 
     def add_like_from(self, actor):
@@ -268,6 +271,7 @@ class Activity(BaseActivity):
             'objectType': actor.objectType
         }
         self.add_to_list('likes', prepared_actor, allow_duplicates=False)
+        self.likesCount = len(self.likes)
         self.save()
 
     def delete_favorite_from(self, actor):
@@ -276,6 +280,8 @@ class Activity(BaseActivity):
         """
         self.delete_from_list('favorites', {actor.unique: actor.get(actor.unique)})
         self.favorites = [favorite for favorite in self.favorites if favorite[actor.unique] != actor[actor.unique]]
+        self.favoritesCount = len(self.favorites)
+        self.save()
 
     def delete_like_from(self, actor):
         """
@@ -283,6 +289,8 @@ class Activity(BaseActivity):
         """
         self.delete_from_list('likes', {actor.unique: actor.get(actor.unique)})
         self.likes = [like for like in self.likes if like[actor.unique] != actor[actor.unique]]
+        self.likesCount = len(self.likes)
+        self.save()
 
     def has_like_from(self, actor):
         """

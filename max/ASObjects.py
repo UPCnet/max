@@ -140,7 +140,8 @@ class Activity(ASObject):
               'objectType':  dict(required=1),
               'likes':       dict(),
               'liked':       dict(),
+              'likesCount':  dict(),
               'favorites':   dict(),
-              'favorited':   dict()
-
+              'favorited':   dict(),
+              'favoritesCount':  dict()
               }

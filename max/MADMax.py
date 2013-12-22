@@ -69,6 +69,7 @@ class MADMaxCollection(object):
         context_tags = kwargs.get('context_tags', None)
         twitter_enabled = kwargs.get('twitter_enabled', None)
         sort_order = kwargs.get('sort_order', None)
+        offset_override = kwargs.get('offset', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -80,10 +81,12 @@ class MADMaxCollection(object):
             sortBy_field = {
                 'activities': '_id',
                 'comments': 'lastComment',
+                'likes': 'likesCount'
             }
             # Filter the query to return objects created later or earlier than the one
-            # represented by offset (offset not included)
-            query.update({sortBy_field[sort_order]: {condition: offset}})
+            # represented by offset (offset not included). Take the overridden offse if provided
+            query_offset = offset_override if offset_override is not None else offset
+            query.update({sortBy_field[sort_order]: {condition: query_offset}})
 
         if hashtag:
             # Filter the query to only objects containing certain hashtags

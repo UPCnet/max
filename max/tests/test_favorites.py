@@ -50,9 +50,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
         self.assertEqual(res.json['object']['favorited'], True)
+        self.assertEqual(res.json['object']['favoritesCount'], 1)
 
         self.assertEqual(activity.json['favorites'][0]['username'], username_not_me)
         self.assertEqual(activity.json['favorited'], False)
+        self.assertEqual(activity.json['favoritesCount'], 1)
 
     def test_favorite_already_favorited_activity(self):
         """
@@ -78,6 +80,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
         self.assertEqual(res.json['object']['favorited'], True)
+        self.assertEqual(res.json['object']['favoritesCount'], 1)
 
     def test_unfavorite_activity(self):
         """
@@ -103,9 +106,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['favorites'], [])
         self.assertEqual(res.json['object']['favorited'], False)
+        self.assertEqual(res.json['object']['favoritesCount'], 0)
 
         self.assertEqual(activity.json['favorites'], [])
         self.assertEqual(activity.json['favorited'], False)
+        self.assertEqual(activity.json['favoritesCount'], 0)
 
     def test_favorite_activity_by_various(self):
         """
@@ -132,6 +137,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['object']['favorites'][0]['username'], username_not_me)
         self.assertEqual(res.json['object']['favorites'][1]['username'], username)
         self.assertEqual(res.json['object']['favorited'], True)
+        self.assertEqual(res.json['object']['favoritesCount'], 2)
 
     def test_unfavorite_activity_get_other_favorites(self):
         """
@@ -160,3 +166,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.json['object']['favorites'][0]['username'], username)
         self.assertEqual(res.json['object']['favorited'], False)
+        self.assertEqual(res.json['object']['favoritesCount'], 1)
