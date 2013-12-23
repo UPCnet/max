@@ -117,6 +117,7 @@ def getActivities(context, request):
         sortBy_fields = {
             'activities': '_id',
             'comments': 'lastComment',
+            'likes': 'likesCount'
         }
         sort_type = request.params.get('sortBy', 'activities')
         sort_order = sortBy_fields[sort_type]
