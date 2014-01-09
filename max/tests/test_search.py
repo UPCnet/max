@@ -222,3 +222,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.get('/people?after=0', '', oauth2Header(username), status=400)
         self.testapp.get('/people?before=0', '', oauth2Header(username), status=400)
         self.testapp.get('/people?before={0}&after={0}'.format(fake_id), '', oauth2Header(username), status=400)
+
+    def test_context_timeline_favorites_search(self):
+        """
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        username2 = 'xavi'
+        self.create_user(username2)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+        activity1_id = res.json['id']
+        self.create_activity(username, user_status_context)
+        res = self.create_activity(username2, user_status_context)
+        activity3_id = res.json['id']
+        self.create_activity(username2, user_status_context)
+
+        self.favorite_activity(username, activity1_id)
+        self.favorite_activity(username, activity3_id)
+
+        res = self.testapp.get('/people/%s/timeline?favorites=true' % (username), '', oauth2Header(username), status=200)
+        self.assertEqual(len(res.json), 2)
+        self.assertEqual(res.json[0]['id'], activity3_id)
+        self.assertEqual(res.json[1]['id'], activity1_id)

@@ -117,8 +117,12 @@ class MaxTestBase(object):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
         return res
 
-    def like_activity(self, username, activity_id):
-        res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=201)
+    def like_activity(self, username, activity_id, expect=201):
+        res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=expect)
+        return res
+
+    def favorite_activity(self, username, activity_id, expect=201):
+        res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username), status=expect)
         return res
 
     def create_context(self, context, permissions=None, expect=201):

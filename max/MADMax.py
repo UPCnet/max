@@ -78,6 +78,9 @@ class MADMaxCollection(object):
         else:
             offset = None
 
+        if sort_order == 'likes':
+            query.update({'likesCount': {'$gt': 0}})
+
         if offset:
             sortBy_field = {
                 'activities': '_id',

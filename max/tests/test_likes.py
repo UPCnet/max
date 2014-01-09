@@ -196,8 +196,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json[0]['likesCount'], 9)
         self.assertEqual(res.json[0]['id'], activities[0])
 
-        self.assertEqual(res.json[9]['likesCount'], 0)
-        self.assertEqual(res.json[9]['id'], activities[9])
+        self.assertEqual(len(res.json), 9)
 
     def test_timeline_by_likes_paginated(self):
         """
