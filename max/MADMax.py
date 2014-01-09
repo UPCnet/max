@@ -64,6 +64,7 @@ class MADMaxCollection(object):
         hashtag = kwargs.get('hashtag', None)
         keywords = kwargs.get('keywords', None)
         actor = kwargs.get('actor', None)
+        favorites = kwargs.get('favorites', None)
         username = kwargs.get('username', None)
         tags = kwargs.get('tags', None)
         context_tags = kwargs.get('context_tags', None)
@@ -98,6 +99,11 @@ class MADMaxCollection(object):
             # Filter the query to only objects containing certain hashtags
             username_query = {'actor.username': actor}
             query.update(username_query)
+
+        if favorites:
+            # filter the query to only objectes favorited by the requesting actor
+            favorites_query = {'favorites.username': favorites}
+            query.update(favorites_query)
 
         if keywords:
             # Filter the query to only objects containing certain keywords

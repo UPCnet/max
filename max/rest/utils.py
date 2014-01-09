@@ -5,6 +5,7 @@ from datetime import datetime
 from rfc3339 import rfc3339
 from max.exceptions import InvalidSearchParams, Unauthorized
 from pyramid.threadlocal import get_current_registry
+from pyramid.settings import asbool
 
 from bson.objectid import ObjectId
 
@@ -157,6 +158,11 @@ def searchParams(request):
             if retag:
                 retags.append(retag)
         params['tags'] = retags
+
+    favorites = request.params.get('favorites')
+    if asbool(favorites):
+        params['favorites'] = request.actor.username
+
 
     context_tags = request.params.getall('context_tags')
     if context_tags:
