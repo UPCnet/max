@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-3.5.7 (unreleased)
-------------------
+3.6 (2014-01-20)
+----------------
 
-- Nothing changed yet.
-
+* Implement like/unlike favorite/unfavorite [Carles Bruguera]
+* Implement favorites and most liked views and filters  [Carles Bruguera]
 
 3.5.6 (2013-11-25)
 ------------------
