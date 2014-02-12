@@ -2,6 +2,8 @@
 from max.MADObjects import MADBase
 import datetime
 from max.rest.utils import getMaxModelByObjectType, flatten
+from pyramid.settings import asbool
+
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
 
@@ -212,3 +214,38 @@ class User(MADBase):
 
     def deleteUserDevice(self, platform, token):
         self.delete_from_list(platform + PLATFORM_FIELD_SUFFIX, token)
+
+    def isAllowedToSee(self, user):
+        """
+        VIP People can see everyting
+        NON VIP People can only see people with a common subscription, EXCLUDING VIP people
+        the restricted mode setting overrides everything
+        """
+
+        # I we're not in restricted mode, i can see everybody
+        if not asbool(self.request.registry.max_settings.get('max_restricted_user_visibility_mode', False)):
+            return True
+
+        vip_user_list = self.request.registry.max_security.get('roles', {}).get('VIP', [])
+        i_am_vip = self['username'] in vip_user_list
+    
+        # VIP people can see everybody
+        if i_am_vip:
+            return True
+
+        # I'm not a vip, so i should not see vips
+        user_is_vip = user['username'] in vip_user_list
+        if user_is_vip:
+            return False
+
+
+        my_subcriptions = set([subscription['hash'] for subscription in self.subscribedTo])
+        user_subcriptions = set([subscription['hash'] for subscription in user['subscribedTo']])
+        have_subscriptions_in_common = my_subcriptions.intersection(user_subcriptions)
+
+        # I'm not a vip, but we share one subscription (at least)
+        if have_subscriptions_in_common:
+            return True
+
+        # I'm not a vip neither is the user, so we sould'nt see each other    
+        return False

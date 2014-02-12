@@ -12,7 +12,7 @@ from max.exceptions import ObjectNotFound
 from max.oauth2 import oauth2
 from max.MADMax import MADMaxDB
 from max.models import User
-from max.rest.utils import searchParams
+from max.rest.utils import searchParams, flatten
 from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
@@ -32,9 +32,12 @@ def getUsers(context, request):
     """
     mmdb = MADMaxDB(context.db)
     query = {}
-    users = mmdb.users.search(query, show_fields=["username", "displayName", "objectType"], sort="username", flatten=1, **searchParams(request))
+    users = mmdb.users.search(query, show_fields=["username", "displayName", "objectType", 'subscribedTo'], sort="username", flatten=0, **searchParams(request))
 
-    handler = JSONResourceRoot(users)
+    # Filter user results
+
+    users = [user for user in users if request.actor.isAllowedToSee(user)]
+    handler = JSONResourceRoot(flatten(users, squash=['subscribedTo']))
     return handler.buildResponse()
 
 

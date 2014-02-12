@@ -88,6 +88,8 @@ def postMessage2Conversation(context, request):
     users = MADMaxCollection(context.db.users, query_key='username')
     for participant in request_participants:
         user = users[participant]
+        if request.actor.username != user['username'] and not request.actor.isAllowedToSee(user):
+            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(request.actor.username, user['username']))
         participants[participant] = user
 
     # If there are only two participants in the conversation, try to get an existing conversation
@@ -307,7 +309,12 @@ def joinConversation(context, request):
         if conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted' and \
                 conversation._owner != request.creator:
 
-            raise Unauthorized('User {0} cannot subscribe himself to to this context'.format(actor['username']))
+            raise Unauthorized('User {0} cannot subscribe people to this conversation'.format(actor['username']))
+
+        users = MADMaxCollection(context.db.users, query_key='username')
+        creator = users[request.creator]
+        if not creator.isAllowedToSee(actor):
+            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(creator.username, actor.username))
 
         actor.addSubscription(conversation)
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
