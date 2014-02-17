@@ -228,24 +228,26 @@ class User(MADBase):
 
         vip_user_list = self.request.registry.max_security.get('roles', {}).get('VIP', [])
         i_am_vip = self['username'] in vip_user_list
-    
-        # VIP people can see everybody
-        if i_am_vip:
-            return True
-
-        # I'm not a vip, so i should not see vips
         user_is_vip = user['username'] in vip_user_list
-        if user_is_vip:
-            return False
 
+        # I'm not a vip, so i should not see vips,
+        # regardless of the subscriptions we share
+        if not i_am_vip and user_is_vip:
+            return False
 
         my_subcriptions = set([subscription['hash'] for subscription in self.subscribedTo])
         user_subcriptions = set([subscription['hash'] for subscription in user['subscribedTo']])
         have_subscriptions_in_common = my_subcriptions.intersection(user_subcriptions)
 
-        # I'm not a vip, but we share one subscription (at least)
+        # If we reach here,  maybe:
+        #  - I am a vip and user is vip too
+        #  - I amb a vip and user isn't
+        #  - I am not a vip neither is the user
+        # In any of the cases, users MUST share at
+        # least one subscription to see each other
+
         if have_subscriptions_in_common:
             return True
 
-        # I'm not a vip neither is the user, so we sould'nt see each other    
+        # We are in restricted mode without shared contexts with the user
         return False
