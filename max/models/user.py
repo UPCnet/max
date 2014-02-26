@@ -217,22 +217,20 @@ class User(MADBase):
 
     def isAllowedToSee(self, user):
         """
-        VIP People can see everyting
-        NON VIP People can only see people with a common subscription, EXCLUDING VIP people
-        the restricted mode setting overrides everything
+        NonVisible People can see Visible and NonVisible people
+        Visible People only can see Visible People
+        If the restricted mode is on, a shared context is neeed plus the latter affirmations
         """
 
-        # I we're not in restricted mode, i can see everybody
-        if not asbool(self.request.registry.max_settings.get('max_restricted_user_visibility_mode', False)):
-            return True
+        in_restricted_visibility_mode = asbool(self.request.registry.max_settings.get('max_restricted_user_visibility_mode', False))
 
-        vip_user_list = self.request.registry.max_security.get('roles', {}).get('VIP', [])
-        i_am_vip = self['username'] in vip_user_list
-        user_is_vip = user['username'] in vip_user_list
+        non_visible_user_list = self.request.registry.max_security.get('roles', {}).get('NonVisible', [])
+        i_am_visible = self['username'] not in non_visible_user_list
+        user_is_visible = user['username'] not in non_visible_user_list
 
-        # I'm not a vip, so i should not see vips,
+        # I'm a visible person, so i should not see NonVisible persons,
         # regardless of the subscriptions we share
-        if not i_am_vip and user_is_vip:
+        if i_am_visible and not user_is_visible:
             return False
 
         my_subcriptions = set([subscription['hash'] for subscription in self.subscribedTo])
@@ -240,13 +238,15 @@ class User(MADBase):
         have_subscriptions_in_common = my_subcriptions.intersection(user_subcriptions)
 
         # If we reach here,  maybe:
-        #  - I am a vip and user is vip too
-        #  - I amb a vip and user isn't
-        #  - I am not a vip neither is the user
-        # In any of the cases, users MUST share at
-        # least one subscription to see each other
+        #  - I am NonVisible and user NonVisible too
+        #  - I amb NonVisible and user is visible
+        #  - I am visible and so is the user
+        # In any of the cases,
+        # if restricted visibility is ON users MUST share at
+        # least one subscription to see each other otherwise
+        # they can see everybody
 
-        if have_subscriptions_in_common:
+        if have_subscriptions_in_common or not in_restricted_visibility_mode:
             return True
 
         # We are in restricted mode without shared contexts with the user

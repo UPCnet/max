@@ -23,7 +23,7 @@ DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='pub
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
-ALLOWED_ROLES = ['Manager', 'VIP']
+ALLOWED_ROLES = ['Manager', 'NonVisible']
 
 
 class RestrictedPredicate(object):
