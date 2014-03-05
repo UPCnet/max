@@ -72,7 +72,8 @@ def addActivityComment(context, request):
         'object': {
             'inReplyTo': [{
                 '_id': ObjectId(activityid),
-                'objectType': refering_activity.object['objectType']
+                'objectType': refering_activity.object['objectType'],
+                'contexts': []
             }]
         }
     }
@@ -80,6 +81,11 @@ def addActivityComment(context, request):
     # Initialize a Activity object from the request
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
+
+    refering_activity_contexts = refering_activity.get('contexts', [])
+    if len(refering_activity_contexts) > 0:
+        context_hashes = [ctxt['hash'] for ctxt in refering_activity_contexts]
+        newactivity['object']['inReplyTo'][0]['contexts'] = context_hashes
 
     code = 201
     newactivity_oid = newactivity.insert()

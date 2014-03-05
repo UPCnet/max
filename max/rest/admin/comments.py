@@ -13,6 +13,7 @@ from max.exceptions import ObjectNotFound
 @view_config(route_name='comments', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
 def getGlobalComments(context, request):
     """
     """
@@ -20,6 +21,29 @@ def getGlobalComments(context, request):
     is_head = request.method == 'HEAD'
     activities = mmdb.activity.search({'verb': 'comment'}, flatten=1, count=is_head, **searchParams(request))
     handler = JSONResourceRoot(activities, stats=is_head)
+    return handler.buildResponse()
+
+
+@view_config(route_name='context_comments', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def getContextComments(context, request):
+    """
+    """
+    mmdb = MADMaxDB(context.db)
+    is_head = request.method == 'HEAD'
+    chash = request.matchdict['hash']
+
+    query = {
+        'verb': 'comment',
+        'object.inReplyTo.contexts': {
+            '$in': [chash]
+        }
+    }
+
+    comments = mmdb.activity.search(query, flatten=1, count=is_head, **searchParams(request))
+    handler = JSONResourceRoot(comments, stats=is_head)
     return handler.buildResponse()
 
 

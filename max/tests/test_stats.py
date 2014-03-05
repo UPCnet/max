@@ -118,6 +118,41 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.head('/activities/comments', oauth2Header(test_manager), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_context_comments_stats(self):
+        from .mockers import user_status_context
+        from .mockers import create_context
+        from .mockers import subscribe_context
+
+        from .mockers import user_status_contextA
+        from .mockers import create_contextA
+        from .mockers import subscribe_contextA
+
+        from .mockers import user_comment
+        from hashlib import sha1
+
+        username = 'messi'
+        self.create_user(test_manager)
+        self.create_user(username)
+        self.create_context(create_context)
+        self.create_context(create_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        # These 2 comments MUST NOT be present on the results
+        for i in range(2):
+            res = self.create_activity(username, user_status_contextA)
+            self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
+
+        for i in range(11):
+            res = self.create_activity(username, user_status_context)
+            self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.head('/contexts/%s/comments' % url_hash, oauth2Header(test_manager), status=200)
+
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
+
     def test_timeline_authors(self):
         """
             As a plain user
