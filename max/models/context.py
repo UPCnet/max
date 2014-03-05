@@ -18,14 +18,14 @@ class BaseContext(MADBase):
               '_creator':           dict(required=0),
               '_owner':             dict(required=0),
               'objectType':         dict(required=0, default='context'),
-              'displayName':        dict(operations_mutable=1),
+              'displayName':        dict(editable=['Owner', 'Manager']),
               'published':          dict(),
               'permissions':        dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
                                                   'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
                                                   'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
                                                   'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
                                                   },
-                                         operations_mutable=1
+                                         editable=['Owner', 'Manager']
                                          ),
               }
 
@@ -211,15 +211,15 @@ class Context(BaseContext):
     schema['hash'] = dict()
     schema['url'] = dict(required=1)
     schema['tags'] = dict(default=[])
-    schema['twitterHashtag'] = dict(operations_mutable=1,
+    schema['twitterHashtag'] = dict(editable=['Owner', 'Manager'],
                                     formatters=['stripHash'],
                                     validators=['isValidHashtag'],
                                     )
-    schema['twitterUsername'] = dict(operations_mutable=1,
+    schema['twitterUsername'] = dict(editable=['Owner', 'Manager'],
                                      formatters=['stripTwitterUsername'],
                                      validators=['isValidTwitterUsername'],
                                      )
-    schema['twitterUsernameId'] = dict(operations_mutable=1)
+    schema['twitterUsernameId'] = dict(editable=['Owner', 'Manager'])
 
     def alreadyExists(self):
         """

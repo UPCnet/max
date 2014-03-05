@@ -265,12 +265,20 @@ class MADBase(MADDict):
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
 
-    def getMutablePropertiesFromRequest(self, request, mutable_permission='operations_mutable'):
+    def getMutablePropertiesFromRequest(self, request):
         """
+            Get the mutable properties base on the user's current roles
         """
         params = extractPostData(request)
-        allowed_fields = [fieldName for fieldName in self.schema if self.schema[fieldName].get(mutable_permission, 0)]
-        properties = {fieldName: params.get(fieldName) for fieldName in allowed_fields if params.get(fieldName, None) is not None}
+
+        def get_allowed_fields():
+            for fieldName in self.schema:
+                required_roles = set(self.schema[fieldName].get('editable', []))
+                user_matched_roles = required_roles.intersection(set(request.actor.roles))
+                if user_matched_roles:
+                    yield fieldName
+
+        properties = {fieldName: params.get(fieldName) for fieldName in get_allowed_fields() if params.get(fieldName, None) is not None}
         return properties
 
     def insert(self):

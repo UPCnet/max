@@ -98,6 +98,7 @@ def addContext(context, request):
 
 @view_config(route_name='context', request_method='PUT', restricted='Manager')
 @MaxResponse
+@requirePersonActor(force_own=False, exists=True)
 @oauth2(['widgetcli'])
 def ModifyContext(context, request):
     """

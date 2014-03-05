@@ -201,6 +201,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_get_context_twitter_enabled(self):
         from .mockers import create_context, create_contextA
+        self.create_user(test_manager)
         self.create_context(create_context)
         self.create_context(create_contextA)
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})

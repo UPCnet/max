@@ -162,6 +162,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ doctest .. http:put:: /contexts/{hash} """
         from hashlib import sha1
         from .mockers import create_context
+
+        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=200)
@@ -171,12 +173,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_modify_inexistent_context(self):
         """ doctest .. http:put:: /contexts/{hash} """
+
+        self.create_user(test_manager)
         url_hash = '0000000000000'
         self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=404)
 
     def test_modify_context_with_twitter_username(self):
         from hashlib import sha1
         from .mockers import create_context
+
+        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"}), oauth2Header(test_manager), status=200)
@@ -247,6 +253,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_modify_context_displayName_updates_subscription(self):
         from hashlib import sha1
         from .mockers import create_context, subscribe_context
+
+        self.create_user(test_manager)
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted'))
@@ -259,6 +267,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_modify_context_unsetting_property(self):
         from hashlib import sha1
         from .mockers import create_context
+
+        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})

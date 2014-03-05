@@ -32,6 +32,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             on receiving a twitter @username and #hashtag containing extra chars (@,# and trailing/leading whitespace)
         """
         from .mockers import create_context_full
+
+        self.create_user(test_manager)
         new_context = dict(create_context_full)
         new_context['twitterUsername'] = '@%s ' % create_context_full['twitterUsername']
         new_context['twitterHashtag'] = '  #%s' % create_context_full['twitterHashtag']
@@ -46,6 +48,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         from .mockers import create_context_full
         from hashlib import sha1
+
+        self.create_user(test_manager)
         res = self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet", "twitterHashtag": "#atenea"}), oauth2Header(test_manager), status=200)

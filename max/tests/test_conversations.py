@@ -758,6 +758,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             The conversation displayName changes
         """
         from .mockers import group_message as creation_message
+
+        self.create_user(test_manager)
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'

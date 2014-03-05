@@ -223,6 +223,7 @@ def getConversation(context, request):
 @view_config(route_name='conversation', request_method='PUT')
 @MaxResponse
 @oauth2(['widgetcli'])
+@requirePersonActor
 def ModifyContext(context, request):
     """
         /conversation/{id}

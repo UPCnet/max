@@ -14,24 +14,35 @@ class User(MADBase):
     """
     collection = 'users'
     unique = 'username'
-    schema = {'_id':          dict(),
-              '_creator':     dict(required=0),
-              '_owner':       dict(required=0),
-              'objectType':   dict(required=0, default='person'),
-              'username':     dict(required=1),
-              'displayName':  dict(user_mutable=1),
-              'last_login':   dict(),
-              'following':    dict(default=[]),
+    schema = {'_id': dict(),
+              '_creator': dict(required=0),
+              '_owner': dict(required=0),
+              'objectType': dict(required=0, default='person'),
+              'username': dict(required=1),
+              'displayName': dict(editable=['Owner', 'Manager']),
+              'last_login': dict(),
+              'following': dict(default=[]),
               'subscribedTo': dict(default=[]),
-              'talkingIn':    dict(default=[]),
-              'published':    dict(),
-              'twitterUsername':    dict(user_mutable=1,
-                                         formatters=['stripTwitterUsername'],
-                                         validators=['isValidTwitterUsername']
-                                         ),
-              'iosDevices':     dict(default=[]),
+              'talkingIn': dict(default=[]),
+              'published': dict(),
+              'twitterUsername': dict(editable=['Owner', 'Manager'],
+                                      formatters=['stripTwitterUsername'],
+                                      validators=['isValidTwitterUsername']
+                                      ),
+              'iosDevices': dict(default=[]),
               'androidDevices': dict(default=[]),
               }
+
+    def getOwner(self, request):
+        """
+            Overrides the getOwner method to set the
+            current user object as owner instead of the creator
+            Oneself will be always owner of oneself
+        """
+        if hasattr(self, 'username'):
+            return self.username
+
+        return self.data.get('username', request.creator)
 
     def buildObject(self):
         """
@@ -251,3 +262,11 @@ class User(MADBase):
 
         # We are in restricted mode without shared contexts with the user
         return False
+
+    @property
+    def roles(self):
+        security = self.request.registry.max_security
+        user_roles = [role for role, users in security.get("roles", {}).items() if self.username in users]
+        if self._owner == self.username:
+            user_roles.append('Owner')
+        return user_roles
