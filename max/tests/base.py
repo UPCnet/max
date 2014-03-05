@@ -42,7 +42,7 @@ def mock_get(self, *args, **kwargs):  # pragma: no cover
     if args[0].lower() == 'http://api.twitter.com/1/users/show.json?screen_name=maxupcnet':
         result = '{"id_str":"526326641", "profile_image_url_https": "https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png"}'
         return mock_requests_obj(text=result, status_code=200)
-    elif args[0] == 'https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png':
+    elif args[0].endswith('logo_MAX_color_normal.png'):
         request = get_current_request()
         if request.headers.get('SIMULATE_TWITTER_FAIL', False):
             return mock_requests_obj(text='', status_code=500)
