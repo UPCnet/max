@@ -113,11 +113,22 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
 
-    def test_get_users_by_query(self):
+    def test_get_users_by_query_on_username(self):
         """ Doctest .. http:get:: /people """
         username = 'messi'
         self.create_user(username)
         res = self.testapp.get('/people', json.dumps({"username": username}), oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('username', ''), username)
+        self.assertEqual(len(result[0].keys()), 4)  # Check how many fields each result has
+
+    def test_get_users_by_query_on_displayName(self):
+        """ Doctest .. http:get:: /people """
+        username = 'messi'
+        self.create_user(username, displayName='Lionel Messi')
+        res = self.testapp.get('/people', json.dumps({"username": 'lionel'}), oauth2Header(username), status=200)
         result = json.loads(res.text)
 
         self.assertEqual(len(result), 1)

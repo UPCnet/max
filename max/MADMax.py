@@ -115,7 +115,12 @@ class MADMaxCollection(object):
 
         if username:
             # Filter the query to only objects containing certain hashtags
-            username_query = {"username": {"$regex": username, "$options": "i", }}
+            username_query = {
+                "$or": [
+                    {"username": {"$regex": username, "$options": "i", }},
+                    {"displayName": {"$regex": username, "$options": "i", }}
+                ]
+            }
             query.update(username_query)
 
         if tags:
@@ -131,8 +136,8 @@ class MADMaxCollection(object):
         if twitter_enabled:
             # Filter the query to only objects (contexts) containing a certain
             # twitter_hashtag
-            twe_query = {"$or":
-                [
+            twe_query = {
+                "$or": [
                     {"twitterUsername": {"$exists": True}},
                     {"twitterHashtag": {"$exists": True}},
                 ]
