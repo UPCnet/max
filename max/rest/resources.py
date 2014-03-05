@@ -2,6 +2,7 @@ PUBLIC_RESOURCES = {
     'users': {'route': '/people'},
     'user': {'route': '/people/{username}'},
     'avatar': {'route': '/people/{username}/avatar'},
+    'avatar_sizes': {'route': '/people/{username}/avatar/{size}'},
     'user_activities': {'route': '/people/{username}/activities'},
     'user_device': {'route': '/people/{username}/device/{platform}/{token}'},
 

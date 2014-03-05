@@ -90,16 +90,38 @@ def addOwnUser(context, request):
 
 
 @view_config(route_name='avatar', request_method='GET')
+@view_config(route_name='avatar_sizes', request_method='GET')
 def getUserAvatar(context, request):
     """
         /people/{username}/avatar
 
         Returns user avatar. Public endpoint.
     """
+
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
-    filename = username if os.path.exists(os.path.join(AVATAR_FOLDER, '{}.png'.format(username))) else 'missing'
-    data = open(os.path.join(AVATAR_FOLDER, '{}.png'.format(filename))).read()
+
+    def exists(filename):
+        return os.path.exists(os.path.join(AVATAR_FOLDER, filename))
+
+    named_size = request.matchdict.get('size', None)
+    filename = 'missing.png'
+
+    # Check if the named size exists, otherwise fallback to normal size checks
+    if named_size:
+        named_size_image_filename = '{}-{}.png'.format(username, named_size)
+        if exists(named_size_image_filename):
+            filename = named_size_image_filename
+        else:
+            named_size = None
+
+    # Check if normal size exists, otherwise, fallback to
+    # previously setted missing avatar image filename
+    normal_filename = '{}.png'.format(username)
+    if named_size is None and exists(normal_filename):
+        filename = '{}.png'.format(username)
+
+    data = open(os.path.join(AVATAR_FOLDER, filename)).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/png'
     return image

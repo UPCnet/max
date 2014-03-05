@@ -50,6 +50,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('image', res.content_type)
         self.assertEqual(len(image), len(res.body))
 
+    def test_get_user_avatar_large(self):
+        """
+        """
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.get('/people/%s/avatar/%s' % (username, 'large'), '', {}, status=200)
+        self.assertIn('image', res.content_type)
+        self.assertEqual(len(image), len(res.body))
+
     def test_get_context_twitter_download_avatar(self):
         """
         """
