@@ -187,7 +187,7 @@ class MADBase(MADDict):
         specifications by subclassing it and providing an schema with the required fields,
         and a structure builder function 'buildObject'
     """
-
+    default_field_visibility = ['Authenticated']
     unique = ''
     collection = ''
     mdb_collection = None
@@ -274,7 +274,7 @@ class MADBase(MADDict):
         def get_allowed_fields():
             for fieldName in self.schema:
                 required_roles = set(self.schema[fieldName].get('editable', []))
-                user_matched_roles = required_roles.intersection(set(request.actor.roles))
+                user_matched_roles = required_roles.intersection(set(self.authenticated_user_roles))
                 if user_matched_roles:
                     yield fieldName
 
@@ -372,7 +372,30 @@ class MADBase(MADDict):
             Also removes fields starting with underscore _fieldname
         """
         dd = dict(self)
-        return flatten(dd, **kwargs)
+        return_dict = flatten(dd, **kwargs)
+        visible_fields = self.getVisibleFields()
+        for field, value in return_dict.items():
+            if field not in visible_fields and field != 'objectType':
+                del return_dict[field]
+        return return_dict
+
+    @property
+    def authenticated_user_roles(self):
+        user_roles = self.request.roles
+        has_owner = hasattr(self, '_owner')
+        if has_owner:
+            if self.request.creator == self._owner:
+                user_roles.append('Owner')
+        return user_roles
+
+    def getVisibleFields(self):
+        fields = []
+        for fieldName in self.schema:
+            required_roles = set(self.schema[fieldName].get('visible', self.default_field_visibility))
+            user_matched_roles = required_roles.intersection(set(self.authenticated_user_roles))
+            if user_matched_roles:
+                fields.append(fieldName.lstrip('_'))
+        return fields
 
     def getObjectWrapper(self, objType):
         """

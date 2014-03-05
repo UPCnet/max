@@ -6,11 +6,13 @@ from max.exceptions import ObjectNotFound, ValidationError
 from max.resources import loadMAXSecurity
 from max.decorators import MaxResponse
 from max.MADMax import MADMaxDB
+from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceRoot
 
 
-@view_config(route_name='admin_security', request_method='GET')
+@view_config(route_name='admin_security', request_method='GET', restricted="Manager")
 @MaxResponse
+@oauth2(['widgetcli'])
 def getSecurity(context, request):
     """
          /admin/security
@@ -30,6 +32,7 @@ def getSecurity(context, request):
 
 @view_config(route_name='admin_security_role_user', request_method='POST', restricted="Manager")
 @MaxResponse
+@oauth2(['widgetcli'])
 def add_user_to_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}
@@ -61,6 +64,7 @@ def add_user_to_role(context, request):
 
 @view_config(route_name='admin_security_role_user', request_method='DELETE', restricted="Manager")
 @MaxResponse
+@oauth2(['widgetcli'])
 def remove_user_from_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}

@@ -12,23 +12,35 @@ class User(MADBase):
     """
         An activitystrea.ms User object representation
     """
+    default_field_visibility = ['Owner', 'Manager']
     collection = 'users'
     unique = 'username'
     schema = {'_id': dict(),
               '_creator': dict(required=0),
               '_owner': dict(required=0),
-              'objectType': dict(required=0, default='person'),
-              'username': dict(required=1),
-              'displayName': dict(editable=['Owner', 'Manager']),
+              'objectType': dict(
+                  required=0,
+                  default='person'
+              ),
+              'username': dict(
+                  required=1,
+                  visible=['Owner', 'Manager', 'Authenticated']
+              ),
+              'displayName': dict(
+                  editable=['Owner', 'Manager'],
+                  visible=['Owner', 'Manager', 'Authenticated']
+              ),
               'last_login': dict(),
               'following': dict(default=[]),
               'subscribedTo': dict(default=[]),
               'talkingIn': dict(default=[]),
               'published': dict(),
-              'twitterUsername': dict(editable=['Owner', 'Manager'],
-                                      formatters=['stripTwitterUsername'],
-                                      validators=['isValidTwitterUsername']
-                                      ),
+              'twitterUsername': dict(
+                  editable=['Owner', 'Manager'],
+                  visible=['Owner', 'Manager', 'Authenticated'],
+                  formatters=['stripTwitterUsername'],
+                  validators=['isValidTwitterUsername']
+              ),
               'iosDevices': dict(default=[]),
               'androidDevices': dict(default=[]),
               }
@@ -263,10 +275,3 @@ class User(MADBase):
         # We are in restricted mode without shared contexts with the user
         return False
 
-    @property
-    def roles(self):
-        security = self.request.registry.max_security
-        user_roles = [role for role, users in security.get("roles", {}).items() if self.username in users]
-        if self._owner == self.username:
-            user_roles.append('Owner')
-        return user_roles

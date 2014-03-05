@@ -44,7 +44,7 @@ def getUsers(context, request):
 @view_config(route_name='user', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
-@requirePersonActor
+@requirePersonActor(force_own=False)
 def getUser(context, request):
     """
         /people/{username}

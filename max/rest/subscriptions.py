@@ -26,7 +26,7 @@ def getUserSubscriptions(context, request):
     """
     mmdb = MADMaxDB(context.db)
     query = {'username': request.actor['username']}
-    users = mmdb.users.search(query, show_fields=["username", "subscribedTo"], flatten=1, **searchParams(request))
+    users = mmdb.users.search(query, preserve=["username", "subscribedTo"], flatten=1, **searchParams(request))
 
     handler = JSONResourceRoot(users[0]['subscribedTo'])
     return handler.buildResponse()

@@ -81,9 +81,29 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """ Doctest .. http:get:: /people/{username} """
         username = 'messi'
         self.create_user(username)
-        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('username', None), 'messi')
+        self.assertIn('username', result)
+        self.assertIn('displayName', result)
+        self.assertIn('objectType', result)
+        self.assertGreater(len(result.keys()), 3)
+
+    def test_get_user_as_someone_else(self):
+        """ Doctest .. http:get:: /people/{username} """
+        username = 'messi'
+        usernamenotme = 'xavi'
+
+        self.create_user(username)
+        self.create_user(usernamenotme)
+
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(usernamenotme), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('username', None), 'messi')
+        self.assertIn('username', result)
+        self.assertIn('displayName', result)
+        self.assertIn('objectType', result)
+        self.assertEqual(len(result.keys()), 3)
 
     def test_get_user_case_insensitive(self):
         """ Doctest .. http:get:: /people/{username} """
@@ -103,15 +123,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].get('username', ''), username)
         self.assertEqual(len(result[0].keys()), 4)  # Check how many fields each result has
-
-    def test_get_user_not_me(self):
-        username = 'messi'
-        username_not_me = 'xavi'
-        self.create_user(username)
-        self.create_user(username_not_me)
-        res = self.testapp.get('/people/%s' % username_not_me, "", oauth2Header(username), status=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_non_existent_user(self):
         username = 'messi'

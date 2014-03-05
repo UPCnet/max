@@ -78,7 +78,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
 
     def test_get_security(self):
-        res = self.testapp.get('/admin/security', "", status=200)
+        res = self.testapp.get('/admin/security', "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].get('roles', None).get('Manager')[0], 'test_manager')

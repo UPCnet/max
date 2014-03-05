@@ -51,7 +51,13 @@ def oauth2(allowed_scopes=[]):
                 def getCreator(request):
                     return username
 
+                def getRoles(request):
+                    security = request.registry.max_security
+                    user_roles = [role for role, users in security.get("roles", {}).items() if username in users]
+                    return user_roles + ['Authenticated']
+
                 request.set_property(getCreator, name='creator', reify=True)
+                request.set_property(getRoles, name='roles', reify=True)
 
                 return view_function(*args, **kw)
             else:
