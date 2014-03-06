@@ -340,6 +340,40 @@ def joinConversation(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='conversation_owner', request_method='PUT')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
+def trasnferConversationOwnership(context, request):
+    """
+    """
+    actor = request.actor
+    mmdb = MADMaxDB(context.db)
+    cid = request.matchdict.get('id', None)
+    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+
+    if subscription is None:
+        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
+
+    found_context = mmdb.conversations[cid]
+    auth_user_is_conversation_owner = found_context._owner == request.creator
+
+    if not auth_user_is_conversation_owner:
+        raise Unauthorized('Only conversation owner can transfer conversation ownership')
+
+    # Check if the targeted new owner is on the conversation
+    request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+
+    if subscription is None:
+        raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
+
+    found_context._owner = request.actor.username
+    found_context.save()
+
+    handler = JSONResourceEntity(found_context.flatten())
+    return handler.buildResponse()
+
+
 @view_config(route_name='user_conversation', request_method='DELETE')
 @MaxResponse
 @oauth2(['widgetcli'])

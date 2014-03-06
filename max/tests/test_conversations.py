@@ -532,6 +532,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.delete('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=403)
 
+    def test_conversation_owner_transfers_ownership(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When i try to transfer the ownership to someone
+            That someone becomes the owner
+            And i'm now able to leave the conversation
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        res = self.testapp.put('/conversations/{}/owner'.format(conversation_id), json.dumps({'actor': {'username': recipient}}), oauth2Header(sender), status=200)
+        self.assertEqual(res.json['owner'], recipient)
+
+        res = self.testapp.delete('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=204)
+
     def test_non_conversation_participant_cannot_leave_conversation(self):
         """
             Given a plain user
