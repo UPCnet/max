@@ -73,6 +73,7 @@ RESTRICTED_RESOURCES = {
     'admin_security': {'route': '/admin/security'},
     'admin_security_role': {'route': '/admin/security/roles/{role}'},
     'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}'},
+    'admin_security_users': {'route': '/admin/security/users'},
     'maintenance_keywords': {'route': '/admin/maintenance/keywords'},
     'maintenance_dates': {'route': '/admin/maintenance/dates'},
     'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions'},

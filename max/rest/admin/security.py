@@ -30,6 +30,34 @@ def getSecurity(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='admin_security_users', request_method='GET', restricted="Manager")
+@MaxResponse
+@oauth2(['widgetcli'])
+def getSecurityUsers(context, request):
+    """
+         /admin/security/users
+
+         Expose the current MAX security roles and its members, grouped by  users
+
+         It's intended to be a protected by IP endpoint as we do not want
+         eavesdroping on this information
+    """
+    mmdb = MADMaxDB(context.db)
+    query = {}
+    security = mmdb.security.search(query, flatten=1)
+
+    users = {}
+    for role in ALLOWED_ROLES:
+        for username in security[0]['roles'].get(role, []):
+            users.setdefault(username, {})
+            users[username][role] = True
+
+    user_roles = [{'username': username, 'roles': [{'name': role, 'active': user_roles.get(role, False)} for role in ALLOWED_ROLES]} for username, user_roles in users.items()]
+
+    handler = JSONResourceRoot(user_roles)
+    return handler.buildResponse()
+
+
 @view_config(route_name='admin_security_role_user', request_method='POST', restricted="Manager")
 @MaxResponse
 @oauth2(['widgetcli'])
