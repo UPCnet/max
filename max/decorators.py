@@ -54,7 +54,7 @@ def requirePersonActor(exists=True, force_own=True):
                 username = uri_username.lower()
 
             # If we have a username in a POST body, take it
-            if request.method == 'POST':
+            if request.method in ['POST', 'PUT']:
                 post_username = getUsernameFromPOSTBody(request)
                 if post_username:
                     username = post_username.lower()
