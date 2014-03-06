@@ -39,6 +39,24 @@ def deleteUser(context, request):
     return HTTPNoContent()
 
 
+@view_config(route_name='user', request_method='PUT', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False)
+def ModifyUser(context, request):
+    """
+        /people/{username}
+
+        Modifies any user
+    """
+    actor = request.actor
+    properties = actor.getMutablePropertiesFromRequest(request, mutable_permission="user_mutable")
+    actor.modifyUser(properties)
+    actor.updateConversationParticipants()
+    handler = JSONResourceEntity(actor.flatten())
+    return handler.buildResponse()
+
+
 @view_config(route_name='user', request_method='POST', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
