@@ -116,19 +116,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=404)
 
     def test_security_add_user_to_role_check_security_reloaded(self):
-        username = 'messi'
-        self.create_user(username)
-        self.testapp.get('/activities', "", oauth2Header(username), status=404)
-        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
-        self.testapp.get('/activities', "", oauth2Header(username), status=200)
+        test_manager2 = 'messi'
+        self.create_user(test_manager2)
+        self.testapp.get('/activities', "", oauth2Header(test_manager2), status=404)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=201)
+        self.testapp.get('/activities', "", oauth2Header(test_manager2), status=200)
 
     def test_security_remove_user_from_role_check_security_reloaded(self):
-        username = 'messi'
-        self.create_user(username)
-        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
-        self.testapp.get('/activities', "", oauth2Header(username), status=200)
-        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=200)
-        self.testapp.get('/activities', "", oauth2Header(username), status=404)
+        test_manager2 = 'messi'
+        self.create_user(test_manager2)
+        self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=201)
+        self.testapp.get('/activities', "", oauth2Header(test_manager2), status=200)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=200)
+        self.testapp.get('/activities', "", oauth2Header(test_manager2), status=404)
 
     def test_get_other_activities(self):
         from .mockers import user_status_context

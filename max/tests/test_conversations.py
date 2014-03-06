@@ -956,7 +956,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.get('/conversations/{}/tokens'.format(conversation_id), json.dumps(message), oauth2Header(test_manager), status=200)
+        res = self.testapp.get('/conversations/%s/tokens' % (conversation_id), json.dumps(message), oauth2Header(test_manager), status=200)
         self.assertEqual(res.json[0]['platform'], u'iOS')
         self.assertEqual(res.json[0]['token'], u'12345678901234567890123456789012')
         self.assertEqual(res.json[0]['username'], u'xavi')

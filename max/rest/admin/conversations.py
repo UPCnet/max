@@ -8,7 +8,7 @@ from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceRoot
 
 
-@view_config(route_name='pushtokens', request_method='GET')
+@view_config(route_name='pushtokens', request_method='GET', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
 def getPushTokensForConversation(context, request):
