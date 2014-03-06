@@ -130,7 +130,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
+                "owner": "messi",
                 "twitterUsername": "messi10oficial",
                 "id": "519b00000000000000000000",
                 "objectType": "person"
@@ -232,7 +232,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
+                "owner": "messi",
                 "twitterUsername": "messi10oficial",
                 "id": "519b00000000000000000000",
                 "objectType": "person"
@@ -310,7 +310,7 @@ Operacions sobre el recurs *usuari* del sistema.
                 "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
+                "owner": "messi",
                 "twitterUsername": "messi10oficial",
                 "id": "519b00000000000000000000",
                 "objectType": "person"
@@ -399,7 +399,7 @@ llistar-les com crear-ne de noves.
             {
                 "generator": null,
                 "creator": "messi",
-                "replies": [],
+                "favoritesCount": 0,
                 "object": {
                     "content": "Testejant la creaci\u00f3 d'un canvi d'estatus",
                     "objectType": "note"
@@ -410,9 +410,13 @@ llistar-les com crear-ne de noves.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "verb": "post",
                 "published": "2000-01-01T00:01:00Z",
+                "verb": "post",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -501,20 +505,24 @@ l'usuari ha estat previament subscrit a aquest context.
                         "objectType": "context"
                     }
                 ],
+                "favoritesCount": 0,
                 "object": {
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "objectType": "note"
                 },
                 "lastComment": "519b00000000000000000002",
-                "replies": [],
                 "actor": {
                     "username": "messi",
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
-                "verb": "post",
                 "published": "2000-01-01T00:01:00Z",
+                "verb": "post",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -548,6 +556,8 @@ l'usuari ha estat previament subscrit a aquest context.
 
             [
                 {
+                    "favorited": false,
+                    "liked": false,
                     "generator": null,
                     "contexts": [
                         {
@@ -560,26 +570,32 @@ l'usuari ha estat previament subscrit a aquest context.
                             ]
                         }
                     ],
+                    "favoritesCount": 0,
                     "object": {
                         "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                         "objectType": "note"
                     },
                     "lastComment": "519b00000000000000000002",
-                    "replies": [],
                     "actor": {
                         "username": "messi",
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
-                    "deletable": true,
                     "published": "2000-01-01T00:01:00Z",
+                    "verb": "post",
+                    "likes": [],
+                    "favorites": [],
+                    "replies": [],
+                    "deletable": true,
+                    "objectType": "activity",
                     "id": "519b00000000000000000000",
-                    "objectType": "activity"
+                    "likesCount": 0
                 },
                 {
+                    "favorited": false,
+                    "liked": false,
                     "generator": null,
-                    "replies": [],
+                    "favoritesCount": 0,
                     "object": {
                         "content": "Testejant la creaci\u00f3 d'un canvi d'estatus",
                         "objectType": "note"
@@ -590,11 +606,15 @@ l'usuari ha estat previament subscrit a aquest context.
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
-                    "deletable": true,
                     "published": "2000-01-01T00:01:00Z",
+                    "verb": "post",
+                    "likes": [],
+                    "favorites": [],
+                    "replies": [],
+                    "deletable": true,
+                    "objectType": "activity",
                     "id": "519b00000000000000000000",
-                    "objectType": "activity"
+                    "likesCount": 0
                 }
             ]
 
@@ -665,6 +685,8 @@ concret.
 
             [
                 {
+                    "favorited": false,
+                    "liked": false,
                     "generator": null,
                     "contexts": [
                         {
@@ -677,22 +699,26 @@ concret.
                             ]
                         }
                     ],
+                    "favoritesCount": 0,
                     "object": {
                         "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                         "objectType": "note"
                     },
                     "lastComment": "519b00000000000000000002",
-                    "replies": [],
                     "actor": {
                         "username": "messi",
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
-                    "deletable": true,
                     "published": "2000-01-01T00:01:00Z",
+                    "verb": "post",
+                    "likes": [],
+                    "favorites": [],
+                    "replies": [],
+                    "deletable": true,
+                    "objectType": "activity",
                     "id": "519b00000000000000000000",
-                    "objectType": "activity"
+                    "likesCount": 0
                 }
             ]
 
@@ -738,6 +764,8 @@ indirectament.
 
             [
                 {
+                    "favorited": false,
+                    "liked": false,
                     "generator": null,
                     "contexts": [
                         {
@@ -750,26 +778,32 @@ indirectament.
                             ]
                         }
                     ],
+                    "favoritesCount": 0,
                     "object": {
                         "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                         "objectType": "note"
                     },
                     "lastComment": "519b00000000000000000002",
-                    "replies": [],
                     "actor": {
                         "username": "messi",
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
-                    "deletable": true,
                     "published": "2000-01-01T00:01:00Z",
+                    "verb": "post",
+                    "likes": [],
+                    "favorites": [],
+                    "replies": [],
+                    "deletable": true,
+                    "objectType": "activity",
                     "id": "519b00000000000000000000",
-                    "objectType": "activity"
+                    "likesCount": 0
                 },
                 {
+                    "favorited": false,
+                    "liked": false,
                     "generator": null,
-                    "replies": [],
+                    "favoritesCount": 0,
                     "object": {
                         "content": "Testejant la creaci\u00f3 d'un canvi d'estatus",
                         "objectType": "note"
@@ -780,11 +814,15 @@ indirectament.
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
-                    "deletable": true,
                     "published": "2000-01-01T00:01:00Z",
+                    "verb": "post",
+                    "likes": [],
+                    "favorites": [],
+                    "replies": [],
+                    "deletable": true,
+                    "objectType": "activity",
                     "id": "519b00000000000000000000",
-                    "objectType": "activity"
+                    "likesCount": 0
                 }
             ]
 
@@ -840,11 +878,12 @@ Representa el conjunt de comentaris fets a una activitat.
             {
                 "generator": null,
                 "creator": "messi",
-                "replies": [],
+                "favoritesCount": 0,
                 "object": {
                     "content": "[C] Testejant un comentari nou a una activitat",
                     "inReplyTo": [
                         {
+                            "contexts": [],
                             "id": "519b00000000000000000000",
                             "objectType": "note"
                         }
@@ -864,10 +903,14 @@ Representa el conjunt de comentaris fets a una activitat.
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
+                "published": "2000-01-01T00:01:00Z",
                 "keywords": [],
                 "verb": "comment",
-                "published": "2000-01-01T00:01:00Z",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -1031,7 +1074,7 @@ Subscripcions
             {
                 "generator": null,
                 "creator": "messi",
-                "replies": [],
+                "favoritesCount": 0,
                 "object": {
                     "url": "http://atenea.upc.edu/A",
                     "objectType": "context"
@@ -1042,10 +1085,14 @@ Subscripcions
                     "displayName": "Lionel Messi",
                     "objectType": "person"
                 },
+                "published": "2000-01-01T00:01:00Z",
                 "keywords": [],
                 "verb": "subscribe",
-                "published": "2000-01-01T00:01:00Z",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -1607,7 +1654,7 @@ Aquests són els serveis associats.
             {
                 "generator": null,
                 "creator": "messi",
-                "replies": [],
+                "favoritesCount": 0,
                 "object": {
                     "participants": [
                         {
@@ -1635,10 +1682,14 @@ Aquests són els serveis associats.
                     "displayName": "nouusuari",
                     "objectType": "person"
                 },
+                "published": "2000-01-01T00:01:00Z",
                 "keywords": [],
                 "verb": "subscribe",
-                "published": "2000-01-01T00:01:00Z",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "nouusuari",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }

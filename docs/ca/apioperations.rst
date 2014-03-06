@@ -10,11 +10,13 @@ cada servei.
 .. test fixtures
     >>> from httpretty import HTTPretty
     >>> import json
+    >>> utils = MaxTestBase(testapp)
     >>> HTTPretty.enable()
     >>> HTTPretty.register_uri(HTTPretty.POST, "http://localhost:8080/checktoken", body="", status=200)
     >>> from max.tests import test_manager
+    >>> utils.create_user(test_manager)
+    <201 Created application/json ...
     >>> username = "messi"
-    >>> utils = MaxTestBase(testapp)
 
 Usuaris
 -------
@@ -52,7 +54,7 @@ Usuaris
                 "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
-                "owner": "test_manager",
+                "owner": "messi",
                 "id": "519b00000000000000000000",
                 "objectType": "person"
             }
@@ -377,7 +379,7 @@ Subscripcions
             {
                 "generator": null,
                 "creator": "test_manager",
-                "replies": [],
+                "favoritesCount": 0,
                 "object": {
                     "url": "http://atenea.upc.edu",
                     "objectType": "context"
@@ -388,10 +390,14 @@ Subscripcions
                     "displayName": "messi",
                     "objectType": "person"
                 },
+                "published": "2000-01-01T00:01:00Z",
                 "keywords": [],
                 "verb": "subscribe",
-                "published": "2000-01-01T00:01:00Z",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -664,20 +670,24 @@ Activitats
                         "objectType": "context"
                     }
                 ],
+                "favoritesCount": 0,
                 "object": {
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "objectType": "note"
                 },
                 "lastComment": "519b00000000000000000002",
-                "replies": [],
                 "actor": {
                     "username": "messi",
                     "displayName": "messi",
                     "objectType": "person"
                 },
-                "verb": "post",
                 "published": "2000-01-01T00:01:00Z",
+                "verb": "post",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "messi",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
@@ -746,6 +756,7 @@ Activitats
                         "objectType": "context"
                     }
                 ],
+                "favoritesCount": 0,
                 "object": {
                     "content": "[A] Testejant la creaci\u00f3 d'un canvi d'estatus a un context",
                     "keywords": [
@@ -758,13 +769,13 @@ Activitats
                     "objectType": "note"
                 },
                 "lastComment": "519b00000000000000000002",
-                "replies": [],
                 "actor": {
                     "url": "http://atenea.upc.edu",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "displayName": "Atenea",
                     "objectType": "context"
                 },
+                "published": "2000-01-01T00:01:00Z",
                 "keywords": [
                     "canvi",
                     "creaci\u00f3",
@@ -773,8 +784,11 @@ Activitats
                     "context"
                 ],
                 "verb": "post",
-                "published": "2000-01-01T00:01:00Z",
+                "likes": [],
+                "favorites": [],
+                "replies": [],
                 "owner": "test_manager",
+                "likesCount": 0,
                 "id": "519b00000000000000000000",
                 "objectType": "activity"
             }
