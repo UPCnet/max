@@ -78,7 +78,8 @@ RESTRICTED_RESOURCES = {
     'maintenance_keywords': {'route': '/admin/maintenance/keywords'},
     'maintenance_dates': {'route': '/admin/maintenance/dates'},
     'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions'},
-    'maintenance_conversations': {'route': '/admin/maintenance/conversations'}
+    'maintenance_conversations': {'route': '/admin/maintenance/conversations'},
+    'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}'},
 }
 
 AUTHENTICATION_RESOURCES = {
