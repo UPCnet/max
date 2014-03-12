@@ -178,6 +178,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         url_hash = '0000000000000'
         self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=404)
 
+    @unittest.skipUnless(os.environ.get('Twitter', False), 'Skipping due to lack of Twitter config')
     def test_modify_context_with_twitter_username(self):
         from hashlib import sha1
         from .mockers import create_context

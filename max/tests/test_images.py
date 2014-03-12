@@ -102,6 +102,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('image', res.content_type)
         self.assertEqual(len(image), len(res.body))
 
+    @unittest.skipUnless(os.environ.get('Twitter', False), 'Skipping due to lack of Twitter config')
     def test_get_context_twitter_avatar_redownload_previous(self):
         """
         """

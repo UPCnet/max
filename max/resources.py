@@ -2,6 +2,15 @@ from pyramid.security import Everyone, Allow, Authenticated
 
 from max import maxlogger
 
+DUMMY_CLOUD_API_DATA = {
+    "twitter": {
+        "consumer_secret": "",
+        "access_token": "",
+        "consumer_key": "",
+        "access_token_secret": ""
+    }
+}
+
 
 class Root(object):
     __parent__ = __name__ = None
@@ -33,6 +42,7 @@ def loadCloudAPISettings(registry):
         return cloudapis_settings
     else:
         maxlogger.info("No cloudapis info found. Please run initialization database script.")  #pragma: no cover
+        return DUMMY_CLOUD_API_DATA
 
 
 def loadMAXSecurity(registry):
