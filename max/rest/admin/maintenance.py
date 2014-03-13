@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from bson import ObjectId
+import logging
+import re
 
 from max.oauth2 import oauth2
 from max.decorators import MaxResponse, requirePersonActor
 from max.models import Context, Conversation
 from max.MADMax import MADMaxDB
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+
+logger = logging.getLogger('exceptions')
 
 
 @view_config(route_name='maintenance_keywords', request_method='POST')
@@ -127,4 +131,27 @@ def rebuildConversationSubscriptions(context, request):
         user.updateConversationParticipants(force_update=True)
         user.save()
     handler = JSONResourceRoot([])
+    return handler.buildResponse()
+
+
+@view_config(route_name='maintenance_exception', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def getException(context, request):
+    """
+         /maintenance/exceptions/{hash}
+
+         Get an exception from the log
+    """
+    ehash = request.matchdict['hash']
+    logfile = logger.handlers[0].baseFilename
+    date, http_request, traceback = re.search(r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash), open(logfile).read(), re.DOTALL).groups()
+
+    result = {
+        'date': date,
+        'request': http_request,
+        'traceback': traceback
+    }
+    handler = JSONResourceEntity(result)
     return handler.buildResponse()
