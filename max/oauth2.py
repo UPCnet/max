@@ -64,5 +64,6 @@ def oauth2(allowed_scopes=[]):
                 raise Unauthorized('Invalid token.')
 
         new_function.__doc__ = view_function.__doc__
+        new_function.__name__ = view_function.__name__
         return new_function
     return wrap

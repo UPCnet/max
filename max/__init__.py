@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import pymongo
-from copy import copy
-import operator
-
+from max import patches
 from pyramid.config import Configurator
 
-# logger has to be BEFORE the import of the following resources import
+# logger has to be instantiated BEFORE the import of the following resources import
 maxlogger = logging.getLogger('max')
 
 from max.resources import Root
@@ -18,34 +16,13 @@ from max.rest.resources import RESOURCES
 from pyramid_beaker import set_cache_regions_from_settings
 from pyramid.settings import asbool
 from max import debug
+from predicates import RestrictedPredicate
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
 ALLOWED_ROLES = ['Manager', 'NonVisible']
-
-
-class RestrictedPredicate(object):
-    def __init__(self, val, config):
-        self.val = val
-
-    def text(self):
-        return 'Restricted permissions to = %s' % (self.val,)
-
-    phash = text
-
-    def __call__(self, context, request):
-        # Extract the username and token from request headers
-        username = request.headers.get('X-Oauth-Username', '')
-        allowed_roles = copy(self.val)
-        if not isinstance(self.val, list):
-            allowed_roles = [self.val, ]
-        security = request.registry.max_security
-        user_has_roles = [username in security.get("roles").get(role) for role in allowed_roles]
-        user_is_allowed = reduce(operator.and_, user_has_roles, True)
-
-        return user_is_allowed
 
 
 def main(global_config, **settings):

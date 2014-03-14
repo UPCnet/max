@@ -82,7 +82,13 @@ def requirePersonActor(exists=True, force_own=True):
             return view_function(*args, **kw)
 
         new_function.__doc__ = view_function.__doc__
+        new_function.__name__ = view_function.__name__
         return new_function
+    try:
+        wrap.__name__ = wrap.func_closure[1].cell_contents.__name__
+        wrap.__doc__ = wrap.func_closure[1].cell_contents.__doc__
+    except:
+        pass
     if type(exists) == type(wrap):
         return wrap(exists)
     return wrap
@@ -127,7 +133,13 @@ def requireContextActor(exists=True):
             return view_function(*args, **kw)
 
         new_function.__doc__ = view_function.__doc__
+        new_function.__name__ = view_function.__name__
         return new_function
+    try:
+        wrap.__name__ = wrap.func_closure[1].cell_contents.__name__
+        wrap.__doc__ = wrap.func_closure[1].cell_contents.__doc__
+    except:
+        pass
     if type(exists) == type(wrap):
         return wrap(exists)
     return wrap
@@ -242,4 +254,7 @@ def MaxResponse(fun):
             route_cache_settings = RESOURCES.get(request.matched_route.name, {}).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
             response.headers.update({'Cache-Control': route_cache_settings})
             return response
+    replacement.__name__ = fun.__name__
+    replacement.__doc__ = fun.__doc__
+
     return replacement

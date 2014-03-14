@@ -1,57 +1,59 @@
 PUBLIC_RESOURCES = {
-    'users': {'route': '/people'},
-    'user': {'route': '/people/{username}'},
-    'avatar': {'route': '/people/{username}/avatar'},
-    'avatar_sizes': {'route': '/people/{username}/avatar/{size}'},
-    'user_activities': {'route': '/people/{username}/activities'},
-    'user_device': {'route': '/people/{username}/device/{platform}/{token}'},
+    'endpoints': {'route': '/endpoints'},
 
-    'activities': {'route': '/activities'},
-    'comments': {'route': '/activities/comments'},
-    'activity': {'route': '/activities/{activity}'},
-    'timeline': {'route': '/people/{username}/timeline'},
-    'timeline_authors': {'route': '/people/{username}/timeline/authors'},
+    'users': {'route': '/people', 'category': 'User', 'name': 'Users'},
+    'user': {'route': '/people/{username}', 'category': 'User', 'name': 'User'},
+    'avatar': {'route': '/people/{username}/avatar', 'category': 'User', 'name': 'User avatar'},
+    'avatar_sizes': {'route': '/people/{username}/avatar/{size}', 'category': 'User', 'name': 'User avatar sizes'},
+    'user_activities': {'route': '/people/{username}/activities', 'category': 'Activities', 'name': 'User activities'},
+    'user_device': {'route': '/people/{username}/device/{platform}/{token}', 'category': 'User', 'name': 'User device tokens'},
 
-    'activity_comments': {'route': '/activities/{activity}/comments'},
-    'activity_comment': {'route': '/activities/{activity}/comments/{comment}'},
+    'activities': {'route': '/activities', 'category': 'Activities'},
+    'comments': {'route': '/activities/comments', 'category': 'Comments'},
+    'activity': {'route': '/activities/{activity}', 'category': 'Activities'},
+    'timeline': {'route': '/people/{username}/timeline', 'category': 'Activities'},
+    'timeline_authors': {'route': '/people/{username}/timeline/authors', 'category': 'Activities'},
 
-    'subscriptions': {'route': '/people/{username}/subscriptions'},
-    'subscription': {'route': '/people/{username}/subscriptions/{hash}'},
+    'activity_comments': {'route': '/activities/{activity}/comments', 'category': 'Comments'},
+    'activity_comment': {'route': '/activities/{activity}/comments/{comment}', 'category': 'Comments'},
 
-    'user_conversations': {'route': '/people/{username}/conversations'},
-    'user_conversation': {'route': '/people/{username}/conversations/{id}'},
+    'subscriptions': {'route': '/people/{username}/subscriptions', 'category': 'Subscriptions'},
+    'subscription': {'route': '/people/{username}/subscriptions/{hash}', 'category': 'Subscriptions'},
 
-    'contexts': {'route': '/contexts'},
-    'context': {'route': '/contexts/{hash}'},
-    'context_avatar': {'route': '/contexts/{hash}/avatar'},
-    'public_contexts': {'route': '/contexts/public'},
-    'context_user_permissions_defaults': {'route': '/contexts/{hash}/permissions/{username}/defaults'},
-    'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}'},
-    'context_activities': {'route': '/contexts/{hash}/activities'},
-    'context_comments': {'route': '/contexts/{hash}/comments'},
-    'context_activities_authors': {'route': '/contexts/{hash}/activities/authors'},
-    'context_subscriptions': {'route': '/contexts/{hash}/subscriptions'},
-    'context_tags': {'route': '/contexts/{hash}/tags'},
-    'context_tag': {'route': '/contexts/{hash}/tags/{tag}'},
+    'user_conversations': {'route': '/people/{username}/conversations', 'category': 'Conversations'},
+    'user_conversation': {'route': '/people/{username}/conversations/{id}', 'category': 'Conversations'},
+
+    'contexts': {'route': '/contexts', 'category': 'Contexts'},
+    'context': {'route': '/contexts/{hash}', 'category': 'Contexts'},
+    'context_avatar': {'route': '/contexts/{hash}/avatar', 'category': 'Contexts'},
+    'public_contexts': {'route': '/contexts/public', 'category': 'Contexts'},
+    'context_user_permissions_defaults': {'route': '/contexts/{hash}/permissions/{username}/defaults', 'category': 'Contexts'},
+    'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}', 'category': 'Contexts'},
+    'context_activities': {'route': '/contexts/{hash}/activities', 'category': 'Activities'},
+    'context_comments': {'route': '/contexts/{hash}/comments', 'category': 'Comments'},
+    'context_activities_authors': {'route': '/contexts/{hash}/activities/authors', 'category': 'Activities'},
+    'context_subscriptions': {'route': '/contexts/{hash}/subscriptions', 'category': 'Contexts'},
+    'context_tags': {'route': '/contexts/{hash}/tags', 'category': 'Contexts'},
+    'context_tag': {'route': '/contexts/{hash}/tags/{tag}', 'category': 'Contexts'},
 
     # MAX 3.0
-    'conversations': {'route': '/conversations'},
-    'conversation': {'route': '/conversations/{id}'},
-    'conversation_owner': {'route': '/conversations/{id}/owner'},
-    'conversation_avatar': {'route': '/conversations/{id}/avatar'},
-    'pushtokens': {'route': '/conversations/{id}/tokens'},
-    'messages': {'route': '/conversations/{id}/messages'},
-    'message': {'route': '/conversations/{id}/messages/{activity}'},
-    'participants': {'route': '/conversations/{id}/participants'},
-    'participant': {'route': '/conversations/{id}/participant'},
+    'conversations': {'route': '/conversations', 'category': 'Conversations'},
+    'conversation': {'route': '/conversations/{id}', 'category': 'Conversations'},
+    'conversation_owner': {'route': '/conversations/{id}/owner', 'category': 'Conversations'},
+    'conversation_avatar': {'route': '/conversations/{id}/avatar', 'category': 'Conversations'},
+    'pushtokens': {'route': '/conversations/{id}/tokens', 'category': 'Conversations'},
+    'messages': {'route': '/conversations/{id}/messages', 'category': 'Conversations'},
+    'message': {'route': '/conversations/{id}/messages/{activity}', 'category': 'Conversations'},
+    'participants': {'route': '/conversations/{id}/participants', 'category': 'Conversations'},
+    'participant': {'route': '/conversations/{id}/participant', 'category': 'Conversations'},
 
     # MAX 3.6
-    'likes': {'route': '/activities/{activity}/likes'},
-    'like': {'route': '/activities/{activity}/likes/{username}'},
-    'user_likes': {'route': '/people/{username}/likes'},
-    'favorites': {'route': '/activities/{activity}/favorites'},
-    'favorite': {'route': '/activities/{activity}/favorites/{username}'},
-    'user_favorites': {'route': '/people/{username}/favorites'},
+    'likes': {'route': '/activities/{activity}/likes', 'category': 'Activities'},
+    'like': {'route': '/activities/{activity}/likes/{username}', 'category': 'Activities'},
+    'user_likes': {'route': '/people/{username}/likes', 'category': 'User', 'name': 'User liked activity'},
+    'favorites': {'route': '/activities/{activity}/favorites', 'category': 'Activities'},
+    'favorite': {'route': '/activities/{activity}/favorites/{username}', 'category': 'Activities'},
+    'user_favorites': {'route': '/people/{username}/favorites', 'category': 'User', 'name': 'User favorited activities'},
 
 
     # MAX 4.0
@@ -71,24 +73,17 @@ PUBLIC_RESOURCES = {
 
 RESTRICTED_RESOURCES = {
 
-    'admin_security': {'route': '/admin/security'},
-    'admin_security_role': {'route': '/admin/security/roles/{role}'},
-    'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}'},
-    'admin_security_users': {'route': '/admin/security/users'},
-    'maintenance_keywords': {'route': '/admin/maintenance/keywords'},
-    'maintenance_dates': {'route': '/admin/maintenance/dates'},
-    'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions'},
-    'maintenance_conversations': {'route': '/admin/maintenance/conversations'},
-    'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}'},
-}
-
-AUTHENTICATION_RESOURCES = {
-    'auth_user': {'route': '/auth/user'},
-    'auth_vhost': {'route': '/auth/vhost'},
-    'auth_resource': {'route': '/auth/resource'},
+    'admin_security': {'route': '/admin/security', 'category': 'Management'},
+    'admin_security_role': {'route': '/admin/security/roles/{role}', 'category': 'Management'},
+    'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}', 'category': 'Management'},
+    'admin_security_users': {'route': '/admin/security/users', 'category': 'Management'},
+    'maintenance_keywords': {'route': '/admin/maintenance/keywords', 'category': 'Management'},
+    'maintenance_dates': {'route': '/admin/maintenance/dates', 'category': 'Management'},
+    'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions', 'category': 'Management'},
+    'maintenance_conversations': {'route': '/admin/maintenance/conversations', 'category': 'Management'},
+    'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}', 'category': 'Management'},
 }
 
 RESOURCES = {}
 RESOURCES.update(PUBLIC_RESOURCES)
 RESOURCES.update(RESTRICTED_RESOURCES)
-RESOURCES.update(AUTHENTICATION_RESOURCES)
