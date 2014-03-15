@@ -38,16 +38,8 @@ class myPyramidLayer(Layer):
         self.patched_post.start()
         self.server = http.StopableWSGIServer.create(self.app, port=8080)
 
-        os.chdir(conf_dir + '/../../../max.ui.js')
-        Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-        self.httpd = ThreadedTCPServer(("", STATIC_HTTP_PORT), Handler)
-        sserver_thread = threading.Thread(target=self.httpd.serve_forever)
-        sserver_thread.daemon = True
-        sserver_thread.start()
-        import ipdb;ipdb.set_trace()
     def tearDown(self):
         self.server.shutdown()
-        self.httpd.shutdown()
 
 PYRAMIDROBOTLAYER = myPyramidLayer()
 
