@@ -11,6 +11,7 @@ from max.exceptions import ObjectNotFound, Unauthorized, Forbidden
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
 
+import re
 
 @view_config(route_name='user_activities', request_method='GET')
 @MaxResponse
