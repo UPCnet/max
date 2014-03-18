@@ -187,7 +187,7 @@ def catch_exception(request, e):
     if isinstance(e, ConnectionFailure):
         return JSONHTTPInternalServerError(error=dict(objectType='error', error='DatabaseConnectionError', error_description='Please try again later.'))
     elif isinstance(e, InvalidId):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidId.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidId.__name__, error_description=e.message))
     elif isinstance(e, ObjectNotSupported):
         return JSONHTTPBadRequest(error=dict(objectType='error', error=ObjectNotSupported.__name__, error_description=e.value))
     elif isinstance(e, ObjectNotFound):
