@@ -36,7 +36,7 @@ class myPyramidLayer(Layer):
         self.app.registry.max_store.security.insert(test_default_security)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
-        self.server = http.StopableWSGIServer.create(self.app, port=8080)
+        self.server = http.StopableWSGIServer.create(self.app, port=9090)
 
     def tearDown(self):
         self.server.shutdown()
