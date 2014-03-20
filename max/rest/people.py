@@ -33,11 +33,12 @@ def getUsers(context, request):
     mmdb = MADMaxDB(context.db)
     query = {}
     users = mmdb.users.search(query, show_fields=["username", "displayName", "objectType", 'subscribedTo'], sort="username", flatten=0, **searchParams(request))
+    remaining = users.remaining
 
     # Filter user results
 
     users = [user for user in users if request.actor.isAllowedToSee(user)]
-    handler = JSONResourceRoot(flatten(users, squash=['subscribedTo']))
+    handler = JSONResourceRoot(flatten(users, squash=['subscribedTo']), remaining=remaining)
     return handler.buildResponse()
 
 

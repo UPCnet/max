@@ -10,12 +10,13 @@ class ResourceRoot(object):
     """
     response_content_type = 'application/text'
 
-    def __init__(self, data, status_code=200, stats=False):
+    def __init__(self, data, status_code=200, stats=False, remaining=False):
         """
         """
         self.data = data
         self.status_code = status_code
         self.stats = stats
+        self.remaining = remaining
         self.headers = {}
 
     def wrap(self):
@@ -51,6 +52,9 @@ class JSONResourceRoot(ResourceRoot):
             self.headers['X-totalItems'] = str(self.data)
         else:
             response_payload = json.dumps(self.wrap())
+
+        if self.remaining:
+            self.headers['X-Has-Remaining-Items'] = 1
 
         return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
 

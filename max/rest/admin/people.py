@@ -19,7 +19,7 @@ def getUsers(context, request):
     """
     mmdb = MADMaxDB(context.db)
     users = mmdb.users.search({}, flatten=1, **searchParams(request))
-    handler = JSONResourceRoot(users)
+    handler = JSONResourceRoot(users, remaining=users.remaining)
     return handler.buildResponse()
 
 

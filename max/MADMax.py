@@ -155,12 +155,27 @@ class MADMaxCollection(object):
         if sort:
             cursor = cursor.sort(sort, sort_dir)
         if limit:
-            cursor = cursor.limit(limit)
+            cursor = cursor.limit(limit + 1)
 
         # Unpack the lazy cursor,
         # Wrap the result in its Mad Class,
         # and flattens it if specified
-        return [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
+
+        class ResultsWrapper(list):
+            """
+            """
+            remaining = False
+
+        result_wrapper = ResultsWrapper()
+        results = [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
+
+        # If we queried for one more item than specified, return what was asked
+        result_wrapper.extend(results[:limit])
+        # If not exists that extra item we searched with limit +1
+        # It means that this query has no remaining items
+        result_wrapper.remaining = len(results) > limit
+
+        return result_wrapper
 
     def _getQuery(self, itemID):
         """
