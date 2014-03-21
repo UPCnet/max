@@ -69,9 +69,18 @@ def endpoints(context, request):
         }
 
         # Import the method implementing the endpoint to get the docstring
-        module_name = re.search(r'max/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.')
+        module_fqdn = re.search(r'max/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.')
+        module_namespace, module_name = re.search(r'(.*?)\.([^\.]+$)', module_fqdn).groups()
         method_name = view.action_info.src
-        method = getattr(sys.modules[module_name], method_name)
+        method = getattr(sys.modules[module_fqdn], method_name)
+        module = getattr(sys.modules[module_namespace], module_name)
+
+        is_head = False
+        if view['request_methods'] == 'GET':
+            code = open(module.__file__.rstrip('c')).read()
+            method_code = re.search(r'def\s+{}(.*?)(?:\n@|$)'.format(method_name), code, re.DOTALL)
+            if method_code:
+                is_head = re.search(r"request\.method\s+==\s+'HEAD'", method_code.groups()[0])
 
         resources_by_route.setdefault(route.name, resource_info)
         endpoint_description = re.match(r'^\s*(.*?)\s*(?:$|:query)', method.__doc__, re.MULTILINE).groups()[0]
@@ -84,11 +93,17 @@ def endpoints(context, request):
             'query_params': get_query_params(method)
         }
 
-        # Create method entry
-        resources_by_route[route.name]['methods'].setdefault(view['request_methods'], {})
+        # In case we found that the GET method has a HEAD version
+        # append HEAD in order to duplicate method info entry of GET as HEAD
+        methods = [view['request_methods']]
+        if view['request_methods'] == 'GET' and is_head:
+            methods.append('HEAD')
 
-        for role in roles:
-            resources_by_route[route.name]['methods'][view['request_methods']][role] = method_info
+        for req_method in methods:
+            # Create method entry
+            resources_by_route[route.name]['methods'].setdefault(req_method, {})
+            for role in roles:
+                resources_by_route[route.name]['methods'][req_method][role] = method_info
 
     handler = JSONResourceEntity(resources_by_route)
     return handler.buildResponse()
