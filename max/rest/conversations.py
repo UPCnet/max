@@ -2,7 +2,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
-from pymongo import ASCENDING
+from pymongo import ASCENDING, DESCENDING
 
 from max.exceptions import ValidationError, Unauthorized, Forbidden, ObjectNotFound
 from max.MADMax import MADMaxDB, MADMaxCollection
@@ -45,8 +45,8 @@ def getConversations(context, request):
             partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
             conversation['displayName'] = partner["displayName"]
 
-        messages = mmdb.messages.search(query, flatten=1)
-        lastMessage = messages[-1]
+        messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
+        lastMessage = messages[0]
         conversation['lastMessage'] = {'published': lastMessage['published'],
                                        'content': lastMessage['object']['content']
                                        }
