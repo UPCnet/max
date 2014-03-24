@@ -34,7 +34,8 @@ def messageNotification(message):
         username = message['actor']['username']
         displayName = message['actor']['displayName']
         text = message['object']['content']
-        message_id = message['_id']
+        message_id = message['id']
+        message_published = message['published']
 
         message = {
             'conversation': conversation_id,
@@ -42,7 +43,8 @@ def messageNotification(message):
             'username': username,
             'displayName': displayName,
             'messageID': message_id,
-            'server_id': maxserver_id
+            'server_id': maxserver_id,
+            'published': message_published
         }
         connection = pika.BlockingConnection(
             pika.URLParameters(rabbitmq_url)
