@@ -1,20 +1,28 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
+from max import CONVERSATION_PARTICIPANTS_LIMIT
+from max import DEFAULT_CONTEXT_PERMISSIONS
+from max.MADMax import MADMaxCollection
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import Forbidden
+from max.exceptions import ObjectNotFound
+from max.exceptions import Unauthorized
+from max.exceptions import ValidationError
+from max.models import Activity
+from max.models import Conversation
+from max.models import Message
+from max.oauth2 import oauth2
+from max.rabbitmq.notifications import addConversationExchange
+from max.rabbitmq.notifications import messageNotification
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.utils import extractPostData
+from max.rest.utils import searchParams, flatten
+from pymongo import DESCENDING
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
-from pymongo import ASCENDING, DESCENDING
-
-from max.exceptions import ValidationError, Unauthorized, Forbidden, ObjectNotFound
-from max.MADMax import MADMaxDB, MADMaxCollection
-from max.models import Message, Conversation, Activity
-from max.decorators import MaxResponse, requirePersonActor
-from max.oauth2 import oauth2
-from max import DEFAULT_CONTEXT_PERMISSIONS
-from max import CONVERSATION_PARTICIPANTS_LIMIT
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
-from max.rest.utils import extractPostData
-from max.rabbitmq.notifications import messageNotification
-from max.rabbitmq.notifications import addConversationExchange
+from pyramid.view import view_config
 
 import os
 
@@ -103,8 +111,8 @@ def postMessage2Conversation(context, request):
                 '$size': 2},
             'participants.username': {
                 '$all': request_participants}
-            }
-        )
+        })
+
         if conversations:
             current_conversation = conversations[0]
 
@@ -167,7 +175,7 @@ def postMessage2Conversation(context, request):
     newmessage['_id'] = message_oid
 
     addConversationExchange(current_conversation)
-    messageNotification(newmessage)
+    messageNotification(newmessage.flatten())
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
@@ -188,9 +196,9 @@ def getMessages(context, request):
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.id': cid}
-    messages = mmdb.messages.search(query, sort="published", sort_dir=ASCENDING, flatten=1, keep_private_fields=False)
-
-    handler = JSONResourceRoot(messages)
+    messages = mmdb.messages.search(query, sort="published", sort_dir=DESCENDING, keep_private_fields=False, **searchParams(request))
+    remaining = messages.remaining
+    handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
     return handler.buildResponse()
 
 
@@ -216,7 +224,23 @@ def getConversation(context, request):
         partner = [user for user in conversation.participants if user["username"] != request.actor.username][0]
         conversation.displayName = partner["displayName"]
 
-    handler = JSONResourceEntity(conversation.flatten())
+    # Fetch the last message of the conversation
+    mmdb = MADMaxDB(context.db)
+    conversation = conversation.flatten()
+
+    query = {
+        'objectType': 'message',
+        'contexts.id': conversation['id']
+    }
+
+    messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
+    lastMessage = messages[0]
+    conversation['lastMessage'] = {'published': lastMessage['published'],
+                                   'content': lastMessage['object']['content']
+                                   }
+    conversation['messages'] = len(messages)
+
+    handler = JSONResourceEntity(conversation)
     return handler.buildResponse()
 
 
@@ -271,7 +295,7 @@ def addMessage(context, request):
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
 
-    messageNotification(newmessage)
+    messageNotification(newmessage.flatten())
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
