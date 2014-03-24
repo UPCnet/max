@@ -265,6 +265,10 @@ class MADBase(MADDict):
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
 
+    def check_field_permission(self, fieldName, permission, default=None):
+        required_roles = set(self.schema[fieldName].get(permission, default))
+        return required_roles.intersection(set(self.authenticated_user_roles))
+
     def getMutablePropertiesFromRequest(self, request):
         """
             Get the mutable properties base on the user's current roles
@@ -273,9 +277,7 @@ class MADBase(MADDict):
 
         def get_allowed_fields():
             for fieldName in self.schema:
-                required_roles = set(self.schema[fieldName].get('editable', []))
-                user_matched_roles = required_roles.intersection(set(self.authenticated_user_roles))
-                if user_matched_roles:
+                if self.check_field_permission(fieldName, 'editable', default=[]):
                     yield fieldName
 
         properties = {fieldName: params.get(fieldName) for fieldName in get_allowed_fields() if params.get(fieldName, None) is not None}
@@ -391,9 +393,7 @@ class MADBase(MADDict):
     def getVisibleFields(self):
         fields = []
         for fieldName in self.schema:
-            required_roles = set(self.schema[fieldName].get('visible', self.default_field_visibility))
-            user_matched_roles = required_roles.intersection(set(self.authenticated_user_roles))
-            if user_matched_roles:
+            if self.check_field_permission(fieldName, 'visible', default=self.default_field_visibility):
                 fields.append(fieldName.lstrip('_'))
         return fields
 
