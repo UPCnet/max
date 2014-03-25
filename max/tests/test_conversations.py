@@ -513,6 +513,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 3)
 
+    def test_user_leaves_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am not the owner of the conversation
+            When i try to leave the conversation
+            Then I am no longer in the conversation
+            And the conversation is tagged as archive
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertIn('archive', res.json['tags'])
+        self.assertEqual(res.json['displayName'], recipient)
+
     def test_user_leaves_conversation(self):
         """
             Given a plain user
@@ -538,6 +563,71 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json['participants']), 2)
         participant_usernames = [user['username'] for user in res.json['participants']]
         self.assertNotIn(recipient2, participant_usernames)
+
+    def test_users_leaves_group_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When everyone except the owner leaves the conversation
+            Then only the owner remains in the conversation
+            And the conversation is tagged as archived
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 1)
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertNotIn(recipient2, participant_usernames)
+        self.assertNotIn(recipient, participant_usernames)
+        self.assertIn('archive', res.json['tags'])
+        self.assertIn('group', res.json['tags'])
+
+    def test_users_leaves_group_conversation_then_someone_rejoins(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am not the owner of the conversation
+            When everyone except the owner leaves the conversation
+            And then someone gets in again
+            The conversation is no longer tagges as archive
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
+
+        # User recipient1 rejoin
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertNotIn(recipient2, participant_usernames)
+        self.assertIn('group', res.json['tags'])
+        self.assertNotIn('archive', res.json['tags'])
 
     def test_conversation_owner_cannot_leave_conversation(self):
         """

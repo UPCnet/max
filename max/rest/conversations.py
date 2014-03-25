@@ -405,6 +405,11 @@ def joinConversation(context, request):
 
         actor.addSubscription(conversation)
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
+
+        # If we add anyone to a conversation,  we remove the archive tag, no matter how many participants have
+        if 'archive' in conversation.get('tags', []):
+            conversation.tags.remove('archive')
+
         conversation.save()
 
         # If user wasn't created, 201 will show that the subscription has just been added
@@ -495,9 +500,25 @@ def leaveConversation(context, request):
     if not auth_user_is_leaving and not auth_user_is_conversation_owner:
         raise Unauthorized('Only conversation owner can force participants out')
 
+    # Unsubscribe leaving participant ALWAYS
     actor.removeSubscription(found_context)
-    found_context.participants = [user for user in found_context.participants if user['username'] != actor.username]
-    found_context.save()
+
+    save_context = False
+    # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
+    if len(found_context.participants) >= 2 and 'group' in found_context.get('tags', []):
+        found_context.participants = [user for user in found_context.participants if user['username'] != actor.username]
+        save_context = True
+
+    # Tag conversations that will be left as 1 participant only as archived
+    if len(found_context.participants) == 2:
+        found_context.setdefault('tags', [])
+        if 'archive' not in found_context['tags']:
+            found_context['tags'].append('archive')
+            save_context = True
+
+    if save_context:
+        found_context.save()
+
     return HTTPNoContent()
 
 
