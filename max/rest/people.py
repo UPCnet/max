@@ -58,30 +58,27 @@ def getUser(context, request):
     # So we will only prepare the calculated conversations  (lastMessage & displayName)
     # if we have permission to view the talkingIn field
     if request.actor.check_field_permission('talkingIn', 'view'):
-        if 'talkingIn' in actor.keys():
-            mmdb = MADMaxDB(context.db)
-            for conversation in actor['talkingIn']:
-                query = {'objectType': 'message',
-                         'contexts.id': conversation['id']
-                         }
+        actor.setdefault('talkingIn', [])
+        mmdb = MADMaxDB(context.db)
+        for conversation in actor['talkingIn']:
+            query = {'objectType': 'message',
+                     'contexts.id': conversation['id']
+                     }
 
-                # In two people conversations, force displayName to the displayName of
-                # the partner in the conversation
-                if len(conversation['participants']) == 2:
-                    partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
-                    conversation['displayName'] = partner["displayName"]
+            # In two people conversations, force displayName to the displayName of
+            # the partner in the conversation
+            if len(conversation['participants']) == 2:
+                partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
+                conversation['displayName'] = partner["displayName"]
 
-                messages = mmdb.messages.search(query, flatten=1, sort="published", sort_dir=DESCENDING)
-                lastMessage = messages[0]
-                conversation['lastMessage'] = {'published': lastMessage['published'],
-                                               'content': lastMessage['object']['content']
-                                               }
-                conversation['messages'] = len(messages)
+            messages = mmdb.messages.search(query, flatten=1, sort="published", sort_dir=DESCENDING)
+            lastMessage = messages[0]
+            conversation['lastMessage'] = {'published': lastMessage['published'],
+                                           'content': lastMessage['object']['content']
+                                           }
+            conversation['messages'] = len(messages)
 
-            actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
-        else:
-            # Sensible default
-            actor['talkingIn'] = []
+        actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
     handler = JSONResourceEntity(actor)
     return handler.buildResponse()
