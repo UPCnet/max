@@ -49,7 +49,8 @@ def getConversations(context, request):
 
         # In two people conversations, force displayName to the displayName of
         # the partner in the conversation
-        if len(conversation['participants']) == 2:
+
+        if 'group' not in conversation.get('tags', []):
             partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
             conversation['displayName'] = partner["displayName"]
 
@@ -109,6 +110,7 @@ def postMessage2Conversation(context, request):
             'objectType': 'conversation',
             'participants': {
                 '$size': 2},
+            'tags': {'$not': {'$in': ['group']}},
             'participants.username': {
                 '$all': request_participants}
         })
@@ -186,7 +188,7 @@ def postMessage2Conversation(context, request):
 
     # In two people conversations, force displayName to the displayName of
     # the partner in the conversation
-    if len(current_conversation['participants']) == 2:
+    if 'group' not in current_conversation.get('tags', []):
         partner = [user for user in current_conversation['participants'] if user["username"] != request.actor.username][0]
         output_message['contexts'][0]['displayName'] = partner["displayName"]
 
@@ -238,7 +240,7 @@ def getUserConversationSubscription(context, request):
 
     # In two people conversations, force displayName to the displayName of
     # the partner in the conversation
-    if len(conversation['participants']) == 2:
+    if 'group' not in conversation.get('tags', []):
         partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
         conversation['displayName'] = partner["displayName"]
 
@@ -279,7 +281,7 @@ def getConversation(context, request):
 
     # In two people conversations, force displayName to the displayName of
     # the partner in the conversation
-    if len(conversation.participants) == 2:
+    if 'group' not in conversation.get('tags', []):
         partner = [user for user in conversation.participants if user["username"] != request.actor.username][0]
         conversation.displayName = partner["displayName"]
 
