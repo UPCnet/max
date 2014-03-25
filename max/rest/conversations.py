@@ -181,10 +181,18 @@ def postMessage2Conversation(context, request):
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
 
-    addConversationExchange(current_conversation)
-    messageNotification(newmessage.flatten())
+    output_message = newmessage.flatten()
 
-    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+    # In two people conversations, force displayName to the displayName of
+    # the partner in the conversation
+    if len(current_conversation['participants']) == 2:
+        partner = [user for user in current_conversation['participants'] if user["username"] != request.actor.username][0]
+        output_message['contexts'][0]['displayName'] = partner["displayName"]
+
+    addConversationExchange(current_conversation)
+    messageNotification(output_message)
+
+    handler = JSONResourceEntity(output_message, status_code=201)
     return handler.buildResponse()
 
 
