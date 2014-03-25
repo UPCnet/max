@@ -172,11 +172,11 @@ def postMessage2Conversation(context, request):
         current_conversation.delete()
         raise Catched
 
-    # Grant invite permission to the user creating the conversation, only if the conversation
+    # Grant subscribe permission to the user creating the conversation, only if the conversation
     # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
     # Will not be able to grow
     if len(current_conversation.participants) > 2:
-        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'invite')
+        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'subscribe')
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
@@ -374,7 +374,7 @@ def joinConversation(context, request):
     current_conversations = [a['id'] for a in actor.talkingIn]
     if cid in current_conversations:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
-        # post when user was susbcribed. This way in th return data we'll have the date of subscription
+        # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
         activities = MADMaxCollection(context.db.activity)
         query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
@@ -393,10 +393,10 @@ def joinConversation(context, request):
 
         authenticated_user_is_owner = conversation._owner == request.creator
         only_owner_can_subscribe = conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted'
-        authenticated_user_can_invite = 'invite' in creator.getSubscription(conversation)['permissions']
+        authenticated_user_can_subscribe = 'subscribe' in creator.getSubscription(conversation)['permissions']
         # The owner of the conversation must be the same as the request creator to subscribe people to restricted conversations
 
-        if only_owner_can_subscribe and (not authenticated_user_is_owner or not authenticated_user_can_invite):
+        if only_owner_can_subscribe and (not authenticated_user_is_owner or not authenticated_user_can_subscribe):
             raise Unauthorized('User {0} cannot subscribe people to this conversation'.format(actor['username']))
 
         if not creator.isAllowedToSee(actor):
@@ -452,8 +452,17 @@ def trasnferConversationOwnership(context, request):
     if subscription is None:
         raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
 
+    previous_owner_username = found_context._owner
     found_context._owner = request.actor.username
     found_context.save()
+
+    # Give hability to add new users to the new owner
+    request.actor.grantPermission(subscription, 'subscribe')
+
+    # Take off hability to add new users from the previpus owner
+    users = MADMaxCollection(context.db.users, query_key='username')
+    previous_owner = users[previous_owner_username]
+    previous_owner.revokePermission(subscription, 'subscribe')
 
     handler = JSONResourceEntity(found_context.flatten())
     return handler.buildResponse()
