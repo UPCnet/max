@@ -217,6 +217,49 @@ def getMessages(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='user_conversation', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def getUserConversationSubscription(context, request):
+    """
+         /people/{username}/conversations/{id}
+         Return Conversation subscription
+    """
+    if request.actor.username != request.creator:
+        raise Unauthorized('User {} is not allowed to view this conversation subscription'.format(request.actor.username))
+
+    cid = request.matchdict['id']
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
+        raise Unauthorized('User {} is not subscriped to any conversation with id {}'.format(request.actor.username, cid))
+
+    conversation = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+
+    # In two people conversations, force displayName to the displayName of
+    # the partner in the conversation
+    if len(conversation['participants']) == 2:
+        partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
+        conversation['displayName'] = partner["displayName"]
+
+    # Fetch the last message of the conversation
+    mmdb = MADMaxDB(context.db)
+
+    query = {
+        'objectType': 'message',
+        'contexts.id': conversation['id']
+    }
+
+    messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
+    lastMessage = messages[0]
+    conversation['lastMessage'] = {'published': lastMessage['published'],
+                                   'content': lastMessage['object']['content']
+                                   }
+    conversation['messages'] = len(messages)
+
+    handler = JSONResourceEntity(conversation)
+    return handler.buildResponse()
+
+
 @view_config(route_name='conversation', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
