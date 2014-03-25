@@ -173,15 +173,27 @@ class User(MADBase):
         subscription.setdefault('_vetos', [])
         subscription['_vetos'] = [vetted for vetted in subscription['_vetos'] if vetted != permission]
 
-        criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
+        # Get a dummy context from subscription to determine the fields to update
+        ContextClass = getMaxModelByObjectType(subscription['objectType'])
+        temp_context = ContextClass()
+        context_unique_field = temp_context.unique.lstrip('_')
+        temp_context.fromObject({
+            context_unique_field: subscription[context_unique_field],
+            'objectType': subscription['objectType']
+        })
+
+        context_storage_field = temp_context.user_subscription_storage
+        subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
+
+        criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # overwrite permissions
         what = {
             '$set': {
-                'subscribedTo.$.permissions': new_permissions,
-                'subscribedTo.$._grants': subscription['_grants'],
-                'subscribedTo.$._vetos': subscription['_vetos'],
+                '{}.$.permissions'.format(context_storage_field): new_permissions,
+                '{}.$._grants'.format(context_storage_field): subscription['_grants'],
+                '{}.$._vetos'.format(context_storage_field): subscription['_vetos'],
             }
         }
 
@@ -214,17 +226,31 @@ class User(MADBase):
         subscription.setdefault('_grants', [])
         subscription['_grants'] = [granted for granted in subscription['_grants'] if granted != permission]
 
-        criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
+        # Get a dummy context from subscription to determine the fields to update
+        ContextClass = getMaxModelByObjectType(subscription['objectType'])
+        temp_context = ContextClass()
+        context_unique_field = temp_context.unique.lstrip('_')
+        temp_context.fromObject({
+            context_unique_field: subscription[context_unique_field],
+            'objectType': subscription['objectType']
+        })
+
+        context_storage_field = temp_context.user_subscription_storage
+        subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
+
+        criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
          # overwrite permissions
+
         what = {
             '$set': {
-                'subscribedTo.$.permissions': new_permissions,
-                'subscribedTo.$._grants': subscription['_grants'],
-                'subscribedTo.$._vetos': subscription['_vetos'],
+                '{}.$.permissions'.format(context_storage_field): new_permissions,
+                '{}.$._grants'.format(context_storage_field): subscription['_grants'],
+                '{}.$._vetos'.format(context_storage_field): subscription['_vetos'],
             }
         }
+
         subscription['permissions'] = new_permissions
         fields_to_squash = ['published', 'owner', 'creator', 'tags', 'vetos', 'grants']
         subscription = flatten(subscription, squash=fields_to_squash)
