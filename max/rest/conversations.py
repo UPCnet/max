@@ -192,6 +192,9 @@ def postMessage2Conversation(context, request):
         partner = [user for user in current_conversation['participants'] if user["username"] != request.actor.username][0]
         output_message['contexts'][0]['displayName'] = partner["displayName"]
 
+    # Provide tag information for convenience
+    output_message['contexts'][0]['tags'] = current_conversation['tags']
+
     addConversationExchange(current_conversation)
     messageNotification(output_message)
 
