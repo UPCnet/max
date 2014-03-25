@@ -13,6 +13,7 @@ class Conversation(BaseContext):
     activity_storage = 'messages'
     schema = dict(BaseContext.schema)
     schema['participants'] = {'required': 1}
+    schema['tags'] = {'default': []}
     schema['objectType'] = {'default': 'conversation'}
 
     def buildObject(self):

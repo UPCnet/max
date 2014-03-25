@@ -119,6 +119,7 @@ def postMessage2Conversation(context, request):
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
         conversation_params = dict(actor=request.actor,
+                                   tags=['group'] if len(participants) > 2 else [],
                                    participants=[participant.flatten(preserve=['displayName', 'objectType', 'username']) for participant in participants.values()],
                                    permissions={'read': 'subscribed',
                                                 'write': 'subscribed',

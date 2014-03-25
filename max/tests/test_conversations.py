@@ -109,13 +109,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
-        conversation = self.app.registry.max_store.conversations.find_one()
+        resp = self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(sender), status=200)
         permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
-        self.assertEqual(conversation.get("participants", None)[0]['username'], sender)
-        self.assertEqual(conversation.get("participants", None)[1]['username'], recipient)
-        self.assertEqual(conversation.get("objectType", None), "conversation")
-        self.assertEqual(conversation.get("permissions", None), permissions)
-        self.assertEqual(str(conversation.get("_id", '')), cid)
+        self.assertEqual(resp.json.get("participants", None)[0]['username'], sender)
+        self.assertEqual(resp.json.get("participants", None)[1]['username'], recipient)
+        self.assertEqual(resp.json.get("objectType", None), "conversation")
+        self.assertEqual(resp.json.get("tags", None), [])
+        self.assertEqual(resp.json.get("permissions", None), permissions)
+        self.assertEqual(str(resp.json.get("id", '')), cid)
 
     def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2
@@ -275,6 +276,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient2)
         resp = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         self.assertEqual(resp.json['contexts'][0]['displayName'], creation_message['contexts'][0]['displayName'])
+
+        cid = resp.json['contexts'][0]['id']
+        resp = self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(sender), status=200)
+        self.assertEqual(resp.json.get("tags", None), ['group'])
 
     def test_post_message_to_inexistent_group_conversation_with_oneself_repeated(self):
         """
