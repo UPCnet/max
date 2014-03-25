@@ -405,6 +405,30 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 4)
 
+    def test_add_participant_to_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When i try to add a participant to a conversation
+            Then I get an error
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=401)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+
     def test_non_owner_add_participant_to_conversation(self):
         """
             Given a plain user

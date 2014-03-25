@@ -155,7 +155,8 @@ def postMessage2Conversation(context, request):
         current_conversation = newconversation
 
     # We have to re-get the actor, in order to have the subscription updated
-    message_params = {'actor': users[request.actor['username']],
+    updated_user = users[request.actor['username']]
+    message_params = {'actor': updated_user,
                       'contexts': [{'objectType': 'conversation',
                                     'id': current_conversation.getIdentifier()
                                     }],
@@ -170,6 +171,12 @@ def postMessage2Conversation(context, request):
         current_conversation.removeUserSubscriptions()
         current_conversation.delete()
         raise Catched
+
+    # Grant invite permission to the user creating the conversation, only if the conversation
+    # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
+    # Will not be able to grow
+    if len(current_conversation.participants) > 2:
+        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'invite')
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
@@ -330,14 +337,17 @@ def joinConversation(context, request):
         if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
-        # The owner of the conversation must be the same as the request creator to subscribe people to restricted conversations
-        if conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted' and \
-                conversation._owner != request.creator:
-
-            raise Unauthorized('User {0} cannot subscribe people to this conversation'.format(actor['username']))
-
         users = MADMaxCollection(context.db.users, query_key='username')
         creator = users[request.creator]
+
+        authenticated_user_is_owner = conversation._owner == request.creator
+        only_owner_can_subscribe = conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted'
+        authenticated_user_can_invite = 'invite' in creator.getSubscription(conversation)['permissions']
+        # The owner of the conversation must be the same as the request creator to subscribe people to restricted conversations
+
+        if only_owner_can_subscribe and (not authenticated_user_is_owner or not authenticated_user_can_invite):
+            raise Unauthorized('User {0} cannot subscribe people to this conversation'.format(actor['username']))
+
         if not creator.isAllowedToSee(actor):
             raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(creator.username, actor.username))
 
