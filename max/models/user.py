@@ -12,38 +12,48 @@ class User(MADBase):
     """
         An activitystrea.ms User object representation
     """
-    default_field_visibility = ['Owner', 'Manager']
+    default_field_view_roles = ['Owner', 'Manager']
     collection = 'users'
     unique = 'username'
-    schema = {'_id': dict(),
-              '_creator': dict(required=0),
-              '_owner': dict(required=0),
-              'objectType': dict(
-                  required=0,
-                  default='person'
-              ),
-              'username': dict(
-                  required=1,
-                  visible=['Owner', 'Manager', 'Authenticated']
-              ),
-              'displayName': dict(
-                  editable=['Owner', 'Manager'],
-                  visible=['Owner', 'Manager', 'Authenticated']
-              ),
-              'last_login': dict(),
-              'following': dict(default=[]),
-              'subscribedTo': dict(default=[]),
-              'talkingIn': dict(default=[]),
-              'published': dict(),
-              'twitterUsername': dict(
-                  editable=['Owner', 'Manager'],
-                  visible=['Owner', 'Manager', 'Authenticated'],
-                  formatters=['stripTwitterUsername'],
-                  validators=['isValidTwitterUsername']
-              ),
-              'iosDevices': dict(default=[]),
-              'androidDevices': dict(default=[]),
-              }
+    schema = {
+        '_id': {},
+        '_creator': {},
+        '_owner': {},
+        'objectType': {
+            'default': 'person'
+        },
+        'username': {
+            'required': 1,
+            'view': ['Owner', 'Manager', 'Authenticated']
+        },
+        'displayName': {
+            'edit': ['Owner', 'Manager'],
+            'view': ['Owner', 'Manager', 'Authenticated']
+        },
+        'last_login': {},
+        'following': {
+            'default': []
+        },
+        'subscribedTo': {
+            'default': []
+        },
+        'talkingIn': {
+            'default': []
+        },
+        'published': {},
+        'twitterUsername': {
+            'edit': ['Owner', 'Manager'],
+            'view': ['Owner', 'Manager', 'Authenticated'],
+            'formatters': ['stripTwitterUsername'],
+            'validators': ['isValidTwitterUsername']
+        },
+        'iosDevices': {
+            'default': []
+        },
+        'androidDevices': {
+            'default': []
+        },
+    }
 
     def getOwner(self, request):
         """

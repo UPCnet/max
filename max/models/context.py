@@ -14,20 +14,27 @@ class BaseContext(MADBase):
     """
     unique = '_id'
     uniqueMethod = None
-    schema = {'_id':                dict(),
-              '_creator':           dict(required=0),
-              '_owner':             dict(required=0),
-              'objectType':         dict(required=0, default='context'),
-              'displayName':        dict(editable=['Owner', 'Manager']),
-              'published':          dict(),
-              'permissions':        dict(default={'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
-                                                  'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
-                                                  'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
-                                                  'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
-                                                  },
-                                         editable=['Owner', 'Manager']
-                                         ),
-              }
+    schema = {
+        '_id': {},
+        '_creator': {},
+        '_owner': {},
+        'objectType': {
+            'default': 'context'
+        },
+        'displayName': {
+            'edit': ['Owner', 'Manager']
+        },
+        'published': {},
+        'permissions': {
+            'default': {
+                'read': DEFAULT_CONTEXT_PERMISSIONS['read'],
+                'write': DEFAULT_CONTEXT_PERMISSIONS['write'],
+                'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
+                'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
+            },
+            'edit': ['Owner', 'Manager']
+        }
+    }
 
     def getIdentifier(self):
         return str(self[self.unique])
@@ -208,18 +215,22 @@ class Context(BaseContext):
     user_subscription_storage = 'subscribedTo'
     activity_storage = 'activity'
     schema = dict(BaseContext.schema)
-    schema['hash'] = dict()
-    schema['url'] = dict(required=1)
-    schema['tags'] = dict(default=[])
-    schema['twitterHashtag'] = dict(editable=['Owner', 'Manager'],
-                                    formatters=['stripHash'],
-                                    validators=['isValidHashtag'],
-                                    )
-    schema['twitterUsername'] = dict(editable=['Owner', 'Manager'],
-                                     formatters=['stripTwitterUsername'],
-                                     validators=['isValidTwitterUsername'],
-                                     )
-    schema['twitterUsernameId'] = dict(editable=['Owner', 'Manager'])
+    schema['hash'] = {}
+    schema['url'] = {'required': 1}
+    schema['tags'] = {'default': []}
+    schema['twitterHashtag'] = {
+        'edit': ['Owner', 'Manager'],
+        'formatters': ['stripHash'],
+        'validators': ['isValidHashtag'],
+    }
+    schema['twitterUsername'] = {
+        'edit': ['Owner', 'Manager'],
+        'formatters': ['stripTwitterUsername'],
+        'validators': ['isValidTwitterUsername'],
+    }
+    schema['twitterUsernameId'] = {
+        'edit': ['Owner', 'Manager']
+    }
 
     def alreadyExists(self):
         """

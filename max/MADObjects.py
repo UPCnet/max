@@ -187,7 +187,8 @@ class MADBase(MADDict):
         specifications by subclassing it and providing an schema with the required fields,
         and a structure builder function 'buildObject'
     """
-    default_field_visibility = ['Authenticated']
+    default_field_view_roles = ['Authenticated']
+    default_field_edit_roles = ['Manager', 'Owner']
     unique = ''
     collection = ''
     mdb_collection = None
@@ -264,24 +265,6 @@ class MADBase(MADDict):
             self.update(obj)
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
-
-    def check_field_permission(self, fieldName, permission, default=None):
-        required_roles = set(self.schema[fieldName].get(permission, default))
-        return required_roles.intersection(set(self.authenticated_user_roles))
-
-    def getMutablePropertiesFromRequest(self, request):
-        """
-            Get the mutable properties base on the user's current roles
-        """
-        params = extractPostData(request)
-
-        def get_allowed_fields():
-            for fieldName in self.schema:
-                if self.check_field_permission(fieldName, 'editable', default=[]):
-                    yield fieldName
-
-        properties = {fieldName: params.get(fieldName) for fieldName in get_allowed_fields() if params.get(fieldName, None) is not None}
-        return properties
 
     def insert(self):
         """
@@ -375,27 +358,11 @@ class MADBase(MADDict):
         """
         dd = dict(self)
         return_dict = flatten(dd, **kwargs)
-        visible_fields = self.getVisibleFields()
+        visible_fields = self.get_visible_fields()
         for field, value in return_dict.items():
             if field not in visible_fields and field != 'objectType':
                 del return_dict[field]
         return return_dict
-
-    @property
-    def authenticated_user_roles(self):
-        user_roles = self.request.roles
-        has_owner = hasattr(self, '_owner')
-        if has_owner:
-            if self.request.creator == self._owner:
-                user_roles.append('Owner')
-        return user_roles
-
-    def getVisibleFields(self):
-        fields = []
-        for fieldName in self.schema:
-            if self.check_field_permission(fieldName, 'visible', default=self.default_field_visibility):
-                fields.append(fieldName.lstrip('_'))
-        return fields
 
     def getObjectWrapper(self, objType):
         """
@@ -417,3 +384,57 @@ class MADBase(MADDict):
         self.data = fields
         self.processFields(updating=True)
         self.update(fields)
+
+    #
+    # Security Related methods and properties
+    #
+
+    @property
+    def authenticated_user_roles(self):
+        """
+            Returns the roles assigned the the current authenticated user
+        """
+        user_roles = self.request.roles
+        has_owner = hasattr(self, '_owner')
+        if has_owner:
+            if self.request.creator == self._owner:
+                user_roles.append('Owner')
+        return user_roles
+
+    def check_field_permission(self, fieldName, permission):
+        """
+            Returns a list containing the current authenticated user roles
+            that matches any of the field allowed roles for a particular field
+        """
+        default = getattr(self, 'default_field_{}_roles'.format(permission))
+        required_roles = set(self.schema[fieldName].get(permission, default))
+        return required_roles.intersection(set(self.authenticated_user_roles))
+
+    def get_visible_fields(self):
+        """
+            Returns the real fieldname (without leading _) that
+            the current authenticated user has permission to see
+        """
+        fields = []
+        for fieldName in self.schema:
+            if self.check_field_permission(fieldName, 'view'):
+                fields.append(fieldName.lstrip('_'))
+        return fields
+
+    def get_editable_fields(self):
+        """
+            Returns the real fieldname (without leading _) on which
+            the current authenticated userhas permission to edit
+        """
+        for fieldName in self.schema:
+            if self.check_field_permission(fieldName, 'edit'):
+                yield fieldName.lstrip('_')
+
+    def getMutablePropertiesFromRequest(self, request):
+        """
+            Get the mutable properties base on the user's current roles
+        """
+        params = extractPostData(request)
+
+        properties = {fieldName: params.get(fieldName) for fieldName in self.get_editable_fields() if params.get(fieldName, None) is not None}
+        return properties

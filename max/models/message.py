@@ -12,7 +12,7 @@ class Message(BaseActivity):
     context_collection = 'conversations'
     unique = '_id'
     schema = dict(BaseActivity.schema)
-    schema['objectType'] = dict(default='message')
+    schema['objectType'] = {'default': 'message'}
 
     def buildObject(self):
         """

@@ -8,5 +8,7 @@ class Security(MADBase):
     """
     collection = 'security'
     unique = '_id'
-    schema = {'_id':         dict(required=0),
-              'roles':        dict(required=0)}
+    schema = {
+        '_id': {},
+        'roles': {}
+    }

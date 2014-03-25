@@ -14,20 +14,35 @@ class BaseActivity(MADBase):
         An activitystrea.ms Activity object representation
     """
     unique = '_id'
-    schema = {'_id':         dict(required=0),
-              '_creator':    dict(required=0),
-              '_owner':      dict(required=0),
-              '_keywords':   dict(required=0, default=[]),
-              'objectType':  dict(required=0, default='activity'),
-              'actor':       dict(required=1),
-              'verb':        dict(required=1),
-              'object':      dict(required=1),
-              'published':   dict(required=0),
-              'lastComment': dict(required=0),
-              'contexts':    dict(required=0),
-              'replies':     dict(required=0, default=[]),
-              'generator':   dict(required=0, default=None),
-              }
+    schema = {
+        '_id': {},
+        '_creator': {},
+        '_owner': {},
+        '_keywords': {
+            'default': []
+        },
+        'objectType': {
+            'default': 'activity'
+        },
+        'actor': {
+            'required': 1
+        },
+        'verb': {
+            'required': 1
+        },
+        'object': {
+            'required': 1
+        },
+        'published': {},
+        'lastComment': {},
+        'contexts': {},
+        'replies': {
+            'default': []
+        },
+        'generator': {
+            'default': None
+        },
+    }
 
     def getOwner(self, request):
         """
@@ -181,13 +196,13 @@ class Activity(BaseActivity):
     context_collection = 'contexts'
     unique = '_id'
     schema = dict(BaseActivity.schema)
-    schema['deletable'] = dict(required=0)
-    schema['liked'] = dict(required=0)
-    schema['favorited'] = dict(required=0)
-    schema['likes'] = dict(required=0, default=[])
-    schema['likesCount'] = dict(required=0, default=0)
-    schema['favorites'] = dict(required=0, default=[])
-    schema['favoritesCount'] = dict(required=0, default=0)
+    schema['deletable'] = {}
+    schema['liked'] = {}
+    schema['favorited'] = {}
+    schema['likes'] = {'default': []}
+    schema['likesCount'] = {'default': 0}
+    schema['favorites'] = {'default': []}
+    schema['favoritesCount'] = {'default': 0}
 
     def _on_saving_object(self, oid):
         if not hasattr(self, 'lastComment'):

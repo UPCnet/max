@@ -57,7 +57,7 @@ def getUser(context, request):
     # Flattened actor will contain only the visible fields for the current user
     # So we will only prepare the calculated conversations  (lastMessage & displayName)
     # if we have permission to view the talkingIn field
-    if request.actor.check_field_permission('talkingIn', 'visible', request.actor.default_field_visibility):
+    if request.actor.check_field_permission('talkingIn', 'view'):
         if 'talkingIn' in actor.keys():
             mmdb = MADMaxDB(context.db)
             for conversation in actor['talkingIn']:

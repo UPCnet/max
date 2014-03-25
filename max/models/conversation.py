@@ -12,8 +12,8 @@ class Conversation(BaseContext):
     user_subscription_storage = 'talkingIn'
     activity_storage = 'messages'
     schema = dict(BaseContext.schema)
-    schema['participants'] = dict(required=1)
-    schema['objectType'] = dict(default='conversation')
+    schema['participants'] = {'required': 1}
+    schema['objectType'] = {'default': 'conversation'}
 
     def buildObject(self):
         super(Conversation, self).buildObject()
