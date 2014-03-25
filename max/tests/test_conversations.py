@@ -1038,7 +1038,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And a conversation between me and another user
             And that conversation previously was a three user conversation with a displayName
             When I read the conversation details
-            The displayName is the displayName of the remaining participant
+            The displayName is preserved
         """
         from .mockers import group_message as creation_message
         sender = 'messi'
@@ -1054,9 +1054,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(sender), status=204)
 
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
-        self.assertEqual(res.json['displayName'], 'La Shakira')
+        self.assertEqual(res.json['displayName'], creation_message['contexts'][0]['displayName'])
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient2), status=200)
-        self.assertEqual(res.json['displayName'], 'Leo Messi')
+        self.assertEqual(res.json['displayName'], creation_message['contexts'][0]['displayName'])
 
     def test_get_pushtokens_for_given_conversations(self):
         """ doctest .. http:get:: /conversations/{id}/tokens """
