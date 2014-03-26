@@ -71,7 +71,7 @@ def getUser(context, request):
                 partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
                 conversation['displayName'] = partner["displayName"]
 
-            messages = mmdb.messages.search(query, flatten=1, sort="published", sort_dir=DESCENDING)
+            messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
             lastMessage = messages[0]
             conversation['lastMessage'] = {'published': lastMessage['published'],
                                            'content': lastMessage['object']['content']

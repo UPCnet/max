@@ -193,7 +193,7 @@ def postMessage2Conversation(context, request):
         output_message['contexts'][0]['displayName'] = partner["displayName"]
 
     # Provide tag information for convenience
-    output_message['contexts'][0]['tags'] = current_conversation['tags']
+    output_message['contexts'][0]['tags'] = current_conversation.get('tags', [])
 
     addConversationExchange(current_conversation)
     messageNotification(output_message)
