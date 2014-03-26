@@ -37,12 +37,20 @@ def getConversations(context, request):
          Return all conversations depending on the actor requester
     """
     mmdb = MADMaxDB(context.db)
+
+    # List subscribed conversations, and use it to make the query
+    # This way we can filter 2-people conversations that have been archived
+    subscribed_conversations = [subscription.get('id') for subscription in request.actor.get('talkingIn', [])]
+
     query = {'participants.username': request.actor['username'],
              'objectType': 'conversation',
+             'id': {'$in': subscribed_conversations}
              }
 
     conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=True)
+
     for conversation in conversations:
+
         query = {'objectType': 'message',
                  'contexts.id': conversation['id']
                  }
@@ -59,7 +67,7 @@ def getConversations(context, request):
         conversation['lastMessage'] = {'published': lastMessage['published'],
                                        'content': lastMessage['object']['content']
                                        }
-        conversation['messages'] = len(messages)
+        conversation['messages'] = 0
 
     handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['lastMessage']['published']))
     return handler.buildResponse()
@@ -260,7 +268,7 @@ def getUserConversationSubscription(context, request):
     conversation['lastMessage'] = {'published': lastMessage['published'],
                                    'content': lastMessage['object']['content']
                                    }
-    conversation['messages'] = len(messages)
+    conversation['messages'] = 0
 
     handler = JSONResourceEntity(conversation)
     return handler.buildResponse()
@@ -302,7 +310,7 @@ def getConversation(context, request):
     conversation['lastMessage'] = {'published': lastMessage['published'],
                                    'content': lastMessage['object']['content']
                                    }
-    conversation['messages'] = len(messages)
+    conversation['messages'] = 0
 
     handler = JSONResourceEntity(conversation)
     return handler.buildResponse()

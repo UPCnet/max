@@ -76,7 +76,7 @@ def getUser(context, request):
             conversation['lastMessage'] = {'published': lastMessage['published'],
                                            'content': lastMessage['object']['content']
                                            }
-            conversation['messages'] = len(messages)
+            conversation['messages'] = 0
 
         actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
