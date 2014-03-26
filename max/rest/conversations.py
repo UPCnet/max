@@ -23,6 +23,7 @@ from pymongo import DESCENDING
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 from pyramid.view import view_config
+from bson import ObjectId
 
 import os
 
@@ -40,7 +41,7 @@ def getConversations(context, request):
 
     # List subscribed conversations, and use it to make the query
     # This way we can filter 2-people conversations that have been archived
-    subscribed_conversations = [subscription.get('id') for subscription in request.actor.get('talkingIn', [])]
+    subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
 
     query = {'participants.username': request.actor['username'],
              'objectType': 'conversation',
