@@ -44,7 +44,7 @@ def getConversations(context, request):
 
     query = {'participants.username': request.actor['username'],
              'objectType': 'conversation',
-             'id': {'$in': subscribed_conversations}
+             '_id': {'$in': subscribed_conversations}
              }
 
     conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=True)
