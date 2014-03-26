@@ -406,7 +406,10 @@ class MADBase(MADDict):
             Returns a list containing the current authenticated user roles
             that matches any of the field allowed roles for a particular field
         """
-        default = getattr(self, 'default_field_{}_roles'.format(permission))
+        try:
+            default = getattr(self, 'default_field_{}_roles'.format(permission))
+        except KeyError:
+            return []
         required_roles = set(self.schema[fieldName].get(permission, default))
         return required_roles.intersection(set(self.authenticated_user_roles))
 
