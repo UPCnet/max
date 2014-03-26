@@ -124,6 +124,7 @@ def rebuildConversationSubscriptions(context, request):
                 fake_deleted_conversation = Conversation()
                 fake_deleted_conversation.fromObject(subscription)
                 user.removeSubscription(fake_deleted_conversation)
+                user['talkingIn'] = [a for a in user['talkingIn'] if a['id'] != subscription['id']]
             else:
                 #if subscription has an ancient plain username list, update and save it
                 if True not in [isinstance(a, dict) for a in subscription['participants']]:
