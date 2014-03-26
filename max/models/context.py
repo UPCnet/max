@@ -122,7 +122,7 @@ class BaseContext(MADBase):
                 updates.update({'contexts.$.displayName': self.displayName})
 
             if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
-                updates.update({'contexts.$.tags': self.tags})
+                updates.update({'contexts.$.tags': self.get('tags')})
 
             if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
                 updates.update({'contexts.$.participants': self.participants})
@@ -151,7 +151,7 @@ class BaseContext(MADBase):
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
 
                 if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
-                    updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.tags})
+                    updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.get('tags', [])})
 
                 if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
                     updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
