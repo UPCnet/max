@@ -1,6 +1,4 @@
 PUBLIC_RESOURCES = {
-    'endpoints': {'route': '/endpoints'},
-
     'users': {'route': '/people', 'category': 'User', 'name': 'Users'},
     'user': {'route': '/people/{username}', 'category': 'User', 'name': 'User'},
     'avatar': {'route': '/people/{username}/avatar', 'category': 'User', 'name': 'User avatar'},
@@ -71,6 +69,12 @@ PUBLIC_RESOURCES = {
 
 }
 
+INFO_RESOURCES = {
+    'info': {'route': '/info', 'category': 'Management'},
+    'info_endpoints': {'route': '/info/endpoints', 'category': 'Management'},
+    'info_settings': {'route': '/info/settings', 'category': 'Management'},
+}
+
 RESTRICTED_RESOURCES = {
 
     'admin_security': {'route': '/admin/security', 'category': 'Management'},
@@ -87,3 +91,4 @@ RESTRICTED_RESOURCES = {
 RESOURCES = {}
 RESOURCES.update(PUBLIC_RESOURCES)
 RESOURCES.update(RESTRICTED_RESOURCES)
+RESOURCES.update(INFO_RESOURCES)

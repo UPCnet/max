@@ -7,7 +7,7 @@ import sys
 import json
 
 
-@view_config(route_name='endpoints', request_method='GET')
+@view_config(route_name='info_endpoints', request_method='GET')
 def endpoints(context, request):
     """
     """
@@ -23,7 +23,7 @@ def endpoints(context, request):
             if related:
                 route = related[0].get('object', None)
                 if route is not None:
-                    if route.name in RESOURCES and route.name != 'endpoints':
+                    if route.name in RESOURCES and route.name != 'info_endpoints':
                         view_settings = view['introspectable']
                         yield view_settings, route
 
