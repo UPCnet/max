@@ -71,7 +71,7 @@ PUBLIC_RESOURCES = {
 
 INFO_RESOURCES = {
     'info': {'route': '/info', 'category': 'Management'},
-    'info_endpoints': {'route': '/info/endpoints', 'category': 'Management'},
+    'info_api': {'route': '/info/api', 'category': 'Management'},
     'info_settings': {'route': '/info/settings', 'category': 'Management'},
 }
 
