@@ -1,8 +1,8 @@
 PUBLIC_RESOURCES = {
     'users': {'route': '/people', 'category': 'User', 'name': 'Users'},
     'user': {'route': '/people/{username}', 'category': 'User', 'name': 'User'},
-    'avatar': {'route': '/people/{username}/avatar', 'category': 'User', 'name': 'User avatar'},
-    'avatar_sizes': {'route': '/people/{username}/avatar/{size}', 'category': 'User', 'name': 'User avatar sizes'},
+    'avatar': {'route': '/people/{username}/avatar', 'filesystem': True, 'category': 'User', 'name': 'User avatar'},
+    'avatar_sizes': {'route': '/people/{username}/avatar/{size}', 'filesystem': True, 'category': 'User', 'name': 'User avatar sizes'},
     'user_activities': {'route': '/people/{username}/activities', 'category': 'Activities', 'name': 'User activities'},
     'user_device': {'route': '/people/{username}/device/{platform}/{token}', 'category': 'User', 'name': 'User device tokens'},
 
@@ -23,7 +23,7 @@ PUBLIC_RESOURCES = {
 
     'contexts': {'route': '/contexts', 'category': 'Contexts', 'name': 'Contexts'},
     'context': {'route': '/contexts/{hash}', 'category': 'Contexts', 'name': 'Context'},
-    'context_avatar': {'route': '/contexts/{hash}/avatar', 'category': 'Contexts', 'name': 'Context avatar'},
+    'context_avatar': {'route': '/contexts/{hash}/avatar', 'filesystem': True, 'category': 'Contexts', 'name': 'Context avatar'},
     'public_contexts': {'route': '/contexts/public', 'category': 'Contexts', 'name': 'Public contexts'},
     'context_user_permissions_defaults': {'route': '/contexts/{hash}/permissions/{username}/defaults', 'category': 'Contexts', 'name': 'Context permissions defaults'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}', 'category': 'Contexts', 'name': 'Context permission'},
@@ -38,7 +38,7 @@ PUBLIC_RESOURCES = {
     'conversations': {'route': '/conversations', 'category': 'Conversations', 'name': 'Conversations'},
     'conversation': {'route': '/conversations/{id}', 'category': 'Conversations', 'name': 'Conversation'},
     'conversation_owner': {'route': '/conversations/{id}/owner', 'category': 'Conversations', 'name': 'Conversation owner'},
-    'conversation_avatar': {'route': '/conversations/{id}/avatar', 'category': 'Conversations', 'name': 'Conversation avatar'},
+    'conversation_avatar': {'route': '/conversations/{id}/avatar', 'filesystem': True, 'category': 'Conversations', 'name': 'Conversation avatar'},
     'pushtokens': {'route': '/conversations/{id}/tokens', 'category': 'Conversations', 'name': 'Conversation tokens'},
     'messages': {'route': '/conversations/{id}/messages', 'category': 'Conversations', 'name': 'Conversation mesages'},
     'message': {'route': '/conversations/{id}/messages/{activity}', 'category': 'Conversations', 'name': 'Conversation message'},

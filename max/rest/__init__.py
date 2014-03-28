@@ -63,6 +63,7 @@ def endpoints(context, request):
             'route': route.pattern,
             'id': route.name,
             'name': RESOURCES[route.name].get('name', route.name),
+            'filesystem': RESOURCES[route.name].get('filesystem', False),
             'url': RESOURCES[route.name].get('route'),
             'category': RESOURCES[route.name].get('category', 'Uncategorized'),
             'methods': {},
