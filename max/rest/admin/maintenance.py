@@ -113,7 +113,13 @@ def rebuildConversationSubscriptions(context, request):
         # if we found an ancient plain username list, we migrate it
         if True not in [isinstance(a, dict) for a in conversation['participants']]:
             conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
-            conversation.save()
+
+        conversation['tags'] = {}
+        if len(conversation['participants']) < 2:
+            conversation['tags'].append('archive')
+        if len(conversation['participants']) > 2:
+            conversation['tags'].append('group')
+        conversation.save()
 
         existing_conversations[str(conversation['_id'])] = conversation
 
