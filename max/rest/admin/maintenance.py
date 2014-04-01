@@ -114,7 +114,7 @@ def rebuildConversationSubscriptions(context, request):
         if True not in [isinstance(a, dict) for a in conversation['participants']]:
             conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
 
-        conversation['tags'] = {}
+        conversation['tags'] = []
         if len(conversation['participants']) < 2:
             conversation['tags'].append('archive')
         if len(conversation['participants']) > 2:
