@@ -115,10 +115,18 @@ def rebuildConversationSubscriptions(context, request):
             conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
 
         conversation['tags'] = []
+        # If we have less than two participants, we'll treat this conversation
+        # as an archived group conversation
         if len(conversation['participants']) < 2:
             conversation['tags'].append('archive')
+            conversation['tags'].append('group')
+        # Conversations od 2+ get the group tag
         if len(conversation['participants']) > 2:
             conversation['tags'].append('group')
+
+        # all the other conversations of 2, get no tag so will be
+        # treated as two people conversations
+
         conversation.save()
 
         existing_conversations[str(conversation['_id'])] = conversation
