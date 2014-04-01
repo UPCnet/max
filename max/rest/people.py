@@ -67,7 +67,7 @@ def getUser(context, request):
 
             # In two people conversations, force displayName to the displayName of
             # the partner in the conversation
-            if len(conversation['participants']) == 2:
+            if 'group' not in conversation.get('tags', []):
                 partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
                 conversation['displayName'] = partner["displayName"]
 
