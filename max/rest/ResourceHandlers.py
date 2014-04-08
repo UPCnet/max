@@ -54,7 +54,7 @@ class JSONResourceRoot(ResourceRoot):
             response_payload = json.dumps(self.wrap())
 
         if self.remaining:
-            self.headers['X-Has-Remaining-Items'] = 1
+            self.headers['X-Has-Remaining-Items'] = '1'
 
         return super(JSONResourceRoot, self).buildResponse(payload=response_payload)
 
