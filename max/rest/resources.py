@@ -20,6 +20,7 @@ PUBLIC_RESOURCES = {
 
     'user_conversations': {'route': '/people/{username}/conversations', 'category': 'Conversations', 'name': 'User conversations'},
     'user_conversation': {'route': '/people/{username}/conversations/{id}', 'category': 'Conversations', 'name': 'User conversation'},
+    'user_conversation_messages': {'route': '/people/{username}/conversations/{id}/messages', 'category': 'Conversations', 'name': 'User conversation messages'},
 
     'contexts': {'route': '/contexts', 'category': 'Contexts', 'name': 'Contexts'},
     'context': {'route': '/contexts/{hash}', 'category': 'Contexts', 'name': 'Context'},

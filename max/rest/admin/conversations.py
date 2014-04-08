@@ -3,9 +3,10 @@ from pyramid.view import view_config
 from max.rest.utils import searchParams
 
 from max.MADMax import MADMaxDB, MADMaxCollection
-from max.decorators import MaxResponse
+from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.models import Message
 
 
 @view_config(route_name='pushtokens', request_method='GET', restricted='Manager')
@@ -33,4 +34,32 @@ def getPushTokensForConversation(context, request):
             result.append(dict(token=adevice, platform='android', username=user.get('username')))
 
     handler = JSONResourceRoot(result)
+    return handler.buildResponse()
+
+
+@view_config(route_name='user_conversation_messages', request_method='POST')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=True)
+def addMessage(context, request):
+    """
+         /people/{username}/conversations/{id}/messages
+         Post a message to 1 (one) existing conversation
+    """
+    cid = request.matchdict['id']
+    message_params = {'actor': request.actor,
+                      'verb': 'post',
+                      'contexts': [{'objectType': 'conversation',
+                                    'id': cid
+                                    }]
+                      }
+
+    # Initialize a Message (Activity) object from the request
+    newmessage = Message()
+    newmessage.fromRequest(request, rest_params=message_params)
+
+    message_oid = newmessage.insert()
+    newmessage['_id'] = message_oid
+
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()

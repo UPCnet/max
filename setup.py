@@ -22,7 +22,8 @@ requires = [
     'bleach',
     'pika',
     'Pillow',
-    'pyramid_robot'
+    'pyramid_robot',
+    'maxcarrot'
 ]
 
 test_requires = ['WebTest', 'mock']

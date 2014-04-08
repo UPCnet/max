@@ -15,6 +15,7 @@ from max.models import User
 from max.rest.utils import searchParams, flatten
 from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rabbitmq.notifications import addUser
 
 from PIL import Image
 
@@ -115,6 +116,7 @@ def addOwnUser(context, request):
         userid = newuser.insert()
         newuser['_id'] = userid
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
+    addUser(username)
     return handler.buildResponse()
 
 

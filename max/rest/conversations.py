@@ -14,7 +14,6 @@ from max.models import Conversation
 from max.models import Message
 from max.oauth2 import oauth2
 from max.rabbitmq.notifications import addConversationExchange
-from max.rabbitmq.notifications import messageNotification
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
@@ -205,7 +204,6 @@ def postMessage2Conversation(context, request):
     output_message['contexts'][0]['tags'] = current_conversation.get('tags', [])
 
     addConversationExchange(current_conversation)
-    messageNotification(output_message)
 
     handler = JSONResourceEntity(output_message, status_code=201)
     return handler.buildResponse()
@@ -367,8 +365,6 @@ def addMessage(context, request):
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
-
-    messageNotification(newmessage.flatten())
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()

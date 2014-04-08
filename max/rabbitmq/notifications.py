@@ -6,6 +6,9 @@ import pika
 import json
 import datetime
 
+from maxcarrot import RabbitServer
+from maxcarrot.message import RabbitMessage
+
 
 def restartTweety():
     settings = getMAXSettings(get_current_request())
@@ -23,63 +26,36 @@ def restartTweety():
             body=restart_request_time)
 
 
-def messageNotification(message):
+def addUser(username):
     settings = getMAXSettings(get_current_request())
     rabbitmq_url = settings.get('max_rabbitmq', None)
-    maxserver_id = settings.get('max_server_id', '')
 
-    # If talk server is not defined, then we assume that we are on tests
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
     if rabbitmq_url:
-        conversation_id = message['contexts'][0]['id']
-        username = message['actor']['username']
-        displayName = message['actor']['displayName']
-        text = message['object']['content']
-        message_id = message['id']
-        message_published = message['published']
-
-        message = {
-            'conversation': conversation_id,
-            'message': text,
-            'username': username,
-            'displayName': displayName,
-            'messageID': message_id,
-            'server_id': maxserver_id,
-            'published': message_published
-        }
-        connection = pika.BlockingConnection(
-            pika.URLParameters(rabbitmq_url)
-        )
-        channel = connection.channel()
-        channel.basic_publish(
-            exchange=conversation_id,
-            routing_key='',
-            body=json.dumps(message)
-        )
+        server = RabbitServer(rabbitmq_url)
+        server.create_user(username)
 
 
 def addConversationExchange(conversation):
-    settings = getMAXSettings(get_current_request())
+    request = get_current_request()
+    settings = getMAXSettings(request)
     rabbitmq_url = settings.get('max_rabbitmq', None)
-    # If pika_parameters is not defined, then we assume that we are on tests
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
     if rabbitmq_url:
-        connection = pika.BlockingConnection(
-            pika.URLParameters(rabbitmq_url)
-        )
-        channel = connection.channel()
-        channel.exchange_declare(exchange=conversation.getIdentifier(),
-                                 durable=True,
-                                 type='fanout')
-        # For binding push feature
-        channel.queue_bind(exchange=conversation.getIdentifier(), queue="push")
+        server = RabbitServer(rabbitmq_url)
+        conversation_id = conversation.getIdentifier()
+        participants_usernames = [user['username'] for user in conversation['participants']]
+        server.conversations.create(conversation_id, users=participants_usernames)
 
-        message = {
-            'conversation': conversation.getIdentifier()
-        }
+        # Send a conversation creation notification to rabbit
+        message = RabbitMessage()
+        message.prepare(settings['max_message_defaults'])
+        message.update({
+            "user": request.actor.username,
+            "action": "add",
+            "object": "conversation",
+            "data": {}
+        })
+        server.send('conversations', json.dumps(message.packed), routing_key=conversation_id)
 
-        for user in conversation.participants:
-            if user['username'] != conversation._owner:
-                channel.basic_publish(
-                    exchange='new',
-                    routing_key=user['username'],
-                    body=json.dumps(message)
-                )

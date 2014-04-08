@@ -1,6 +1,7 @@
 from pyramid.security import Everyone, Allow, Authenticated
 
 from max import maxlogger
+from max.version import __version__
 
 DUMMY_CLOUD_API_DATA = {
     "twitter": {
@@ -33,6 +34,11 @@ def getMAXSettings(request):
 
 def loadMAXSettings(settings, config):
     max_ini_settings = {key.replace('max.', 'max_'): settings[key] for key in settings.keys() if 'max' in key}
+    max_ini_settings['max_message_defaults'] = {
+        "source": "max",
+        "domain": max_ini_settings.get('max_server_id', ''),
+        "version": __version__,
+    }
     return max_ini_settings
 
 
