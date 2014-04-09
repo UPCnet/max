@@ -34,6 +34,7 @@ def addUser(username):
     if rabbitmq_url:
         server = RabbitServer(rabbitmq_url)
         server.create_user(username)
+        server.disconnect()
 
 
 def addConversationExchange(conversation):
@@ -58,4 +59,4 @@ def addConversationExchange(conversation):
             "data": {}
         })
         server.send('conversations', json.dumps(message.packed), routing_key=conversation_id)
-
+        server.disconnect()

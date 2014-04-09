@@ -210,9 +210,9 @@ def catch_exception(request, e):
         return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.value))
 
     # JSON decode error????
-    elif isinstance(e, ValueError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
-    # This code will only raise if a non-tested thing appear
+    # elif isinstance(e, ValueError):
+    #     return JSONHTTPBadRequest(error=dict(objectType='error', error='JSONDecodeError', error_description='Invalid JSON data found on requests body'))
+    # # This code will only raise if a non-tested thing appear
     # So, as the tests will not ever see this, we exlcude it from coverage
     else:  # pragma: no cover
         error = traceback.format_exc()
