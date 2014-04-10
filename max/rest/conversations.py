@@ -363,8 +363,17 @@ def addMessage(context, request):
     newmessage = Message()
     newmessage.fromRequest(request, rest_params=message_params)
 
-    message_oid = newmessage.insert()
-    newmessage['_id'] = message_oid
+    if newmessage['object']['objectType'] == u'image' or \
+       newmessage['object']['objectType'] == u'file':
+        # Extract the file before saving object
+        message_file = newmessage.extract_file_from_activity()
+        message_oid = newmessage.insert()
+        newmessage['_id'] = ObjectId(message_oid)
+        newmessage.process_file(request, message_file)
+        newmessage.save()
+    else:
+        message_oid = newmessage.insert()
+        newmessage['_id'] = message_oid
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()

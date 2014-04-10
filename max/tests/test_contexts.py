@@ -528,3 +528,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
 
         self.assertEqual(result[0].get('username', ''), 'messi')
+
+    def test_create_context_with_upload_url(self):
+        """ """
+        from .mockers import create_context_with_uploadurl
+        new_context = dict(create_context_with_uploadurl)
+        res = self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=201)
+        self.assertTrue(res.json.get('uploadURL'))

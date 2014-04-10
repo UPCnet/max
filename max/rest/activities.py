@@ -2,6 +2,8 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
 
+from bson import ObjectId
+
 from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.decorators import MaxResponse, requirePersonActor
@@ -12,6 +14,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
 
 import re
+
 
 @view_config(route_name='user_activities', request_method='GET')
 @MaxResponse
@@ -61,8 +64,17 @@ def addUserActivity(context, request):
 
     # New activity
     code = 201
-    activity_oid = newactivity.insert()
-    newactivity['_id'] = activity_oid
+    if newactivity['object']['objectType'] == u'image' or \
+       newactivity['object']['objectType'] == u'file':
+        # Extract the file before saving object
+        activity_file = newactivity.extract_file_from_activity()
+        activity_oid = newactivity.insert()
+        newactivity['_id'] = ObjectId(activity_oid)
+        newactivity.process_file(request, activity_file)
+        newactivity.save()
+    else:
+        activity_oid = newactivity.insert()
+        newactivity['_id'] = activity_oid
 
     handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()

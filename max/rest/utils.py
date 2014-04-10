@@ -382,7 +382,18 @@ def shortenURL(url):
 
 
 def extractPostData(request):
-    if request.body:
+    if 'multipart/form-data' in request.content_type:
+        try:
+            json_data = json.loads(request.params.get('json_data'), object_hook=json_util.object_hook)
+            if 'image' in json_data['object']:
+                json_data['object']['image']['data'] = request.params.get('image')
+
+            if 'file' in json_data['object']:
+                json_data['object']['file']['data'] = request.params.get('file')
+        except:
+            json_data = {}
+
+    elif not 'multipart/form-data' in request.content_type and request.body:
         # Usually look for JSON encoded body, catch the case it does not contain
         # valid JSON data, e.g when uploading a file
         try:

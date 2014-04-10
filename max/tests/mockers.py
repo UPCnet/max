@@ -48,6 +48,13 @@ create_context = {
     'tags': ['Assignatura']
 }
 
+create_context_with_uploadurl = {
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
+    'tags': ['Community'],
+    'uploadURL': 'http://localhost:8181/upload'
+}
+
 create_context_deletable_activities = {
 
     'url': 'http://atenea.upc.edu',
@@ -143,6 +150,14 @@ subscribe_contextB = {
     "object": {
         "objectType": "context",
         "url": create_contextB['url'],
+    }
+}
+
+# Revisat i actualitzat
+subscribe_context_with_uploadurl = {
+    "object": {
+        "objectType": "context",
+        "url": create_context_with_uploadurl['url'],
     }
 }
 
@@ -298,6 +313,21 @@ message = {
     }
 }
 
+message_with_image = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "image",
+        "content": "Nos espera una gran temporada, no es cierto?",
+        "image": {
+            "mimetype": "image/png",
+        }
+    }
+}
+
 message_oneself = {
     "contexts": [
         {"objectType": "conversation",
@@ -431,6 +461,65 @@ group_message_duplicated = {
          "participants": ["messi", "xavi", "messi"],
          "displayName": "Pelotudos"
          }]
+}
+
+# An user creates an activity image
+user_image_activity = {
+    "object": {
+        "objectType": "image",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "image": {
+            "mimetype": "image/png",
+        }
+    },
+}
+
+# An user creates an activity image with a context
+user_image_activity_with_context = {
+    "contexts": [
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'context'
+         }
+    ],
+    "object": {
+        "objectType": "image",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "image": {
+            "mimetype": "image/png",
+        }
+    },
+}
+
+# An user creates an activity image with a context
+user_image_activity_with_context_with_uploadurl = {
+    "contexts": [
+        {'url': subscribe_context_with_uploadurl['object']['url'],
+         'objectType': 'context'
+         }
+    ],
+    "object": {
+        "objectType": "image",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "image": {
+            "mimetype": "image/png",
+        }
+    },
+}
+
+# An user creates an activity image with a context and uploadURL
+user_image_activity_with_context = {
+    "contexts": [
+        {'url': subscribe_context['object']['url'],
+         'objectType': 'context'
+         }
+    ],
+    "object": {
+        "objectType": "image",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "image": {
+            "mimetype": "image/png",
+        }
+    },
 }
 
 # For revision, not implemented yet

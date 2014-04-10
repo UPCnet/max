@@ -103,7 +103,6 @@ class MADDict(dict):
 
             Returns a list of empty fields for future actions
         """
-
         for fieldname in self.schema:
             # Check required
             if self.schema.get(fieldname).get('required', 0):
@@ -216,7 +215,6 @@ class MADBase(MADDict):
         return request.creator
 
     def fromRequest(self, request, rest_params={}):
-
         self.data.update(extractPostData(request))
         self.data.update(rest_params)
 

@@ -7,6 +7,14 @@ from max.MADMax import MADMaxCollection
 from max.models.user import User
 from max.models.context import Context
 from max.rest.utils import canWriteInContexts, hasPermission
+from max.rest.utils import getMaxModelByObjectType
+
+from PIL import Image
+
+import json
+import re
+import requests
+import os
 
 
 class BaseActivity(MADBase):
@@ -186,6 +194,82 @@ class BaseActivity(MADBase):
         self.setKeywords()
         self.save()
         # XXX TODO Update hastags
+
+    def extract_file_from_activity(self):
+        if self['object'].get('image', False):
+            file_type = 'image'
+        else:
+            file_type = 'file'
+
+        file_activity = self['object'][file_type]['data']
+
+        del self['object'][file_type]['data']
+
+        return file_activity
+
+    def process_file(self, request, activity_file):
+        """
+            Process file and save it into the database
+        """
+        base_path = request.registry.settings.get('file_repository')
+        uploadURL = ''
+        if self['object'].get('image', False):
+            file_type = 'image'
+            endpoint_name = 'fullimage'
+            endpoint_thumb = 'thumb'
+        else:
+            file_type = 'file'
+            endpoint_name = 'download'
+            endpoint_thumb = ''
+
+        # Look if the activity belongs to an specific context
+        if self.get('contexts', False):
+            # Look if we need to upload to an external URL
+            if self.get('contexts')[0]['objectType'] == 'context':
+                context = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
+                context.fromDatabase(self.get('contexts')[0]['hash'])
+                uploadURL = context.get('uploadURL', '')
+            else:
+                context = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
+                context.fromDatabase(ObjectId(self.get('contexts')[0]['id']))
+                uploadURL = context.get('uploadURL', '')
+
+        if uploadURL:
+            headers = {'X-Oauth-Scope': request.headers.get('X-Oauth-Scope'),
+                       'X-Oauth-Username': request.headers.get('X-Oauth-Username'),
+                       'X-Oauth-Token': request.headers.get('X-Oauth-Token')
+                       }
+            # Todo: Make sure that the mimetype is correctly or even informed
+            # Use magic or imghdr libraries for that
+            files = {'image': (activity_file.filename, activity_file.file, activity_file.type)}
+            res = requests.post(uploadURL, headers=headers, files=files)
+            if res.status_code == 201:
+                response = json.loads(res.text)
+                self['object'][file_type]['fullURL'] = response.get('uploadURL', '')
+                if endpoint_thumb:
+                    self['object'][file_type]['thumbURL'] = response.get('thumbURL', '')
+
+        else:
+            # We have a conversation or an activity with no related context
+            # or a context with no community which we should save localy
+            dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', str(self['_id'])).groups())
+            filename = dirs.pop()
+            path = base_path + '/' + '/'.join(dirs)
+            os.makedirs(path)
+
+            r_file = open(path + '/' + filename, 'w')
+            r_file.write(activity_file.file.read())
+            r_file.close()
+
+            self['object'][file_type]['fullURL'] = '/activities/{}/{}'.format(str(self['_id']), endpoint_name)
+            if endpoint_thumb:
+                # Generate thumbnail
+                activity_file.file.seek(0)
+                thumb = Image.open(activity_file.file)
+                thumb.thumbnail((400, 400), Image.ANTIALIAS)
+                thumb.save(path + '/' + filename + ".thumbnail", "JPEG")
+
+                self['object'][file_type]['thumbURL'] = '/activities/{}/{}'.format(str(self['_id']), endpoint_thumb)
 
 
 class Activity(BaseActivity):
