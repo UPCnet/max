@@ -60,6 +60,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'/activities/{}/fullimage'.format(response[0]['id']))
         self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'/activities/{}/thumb'.format(response[0]['id']))
 
+    def test_create_file_activity(self):
+        """
+            Given a plain user
+            When I post a file activity
+            And I am authenticated as myself
+            Then the file activity is created correctly
+        """
+        from .mockers import user_file_activity as activity
+        username = 'messi'
+        self.create_user(username)
+        thefile = open(os.path.join(os.path.dirname(__file__), "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
+        self.assertEqual(res.status_code, 201)
+
+        res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
+        response = res.json
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'/activities/{}/download'.format(response[0]['id']))
+
     def test_create_image_activity_with_context(self):
         """
             Given a plain user
@@ -85,6 +106,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'/activities/{}/fullimage'.format(response[0]['id']))
         self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'/activities/{}/thumb'.format(response[0]['id']))
+
+    def test_create_file_activity_with_context(self):
+        """
+            Given a plain user
+            When I post an file activity to a context with no uploadURL
+            And I am authenticated as myself
+            Then the file activity is created correctly
+        """
+        from .mockers import user_file_activity_with_context as activity
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
+        files = [('file', 'avatar.png', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
+        self.assertEqual(res.status_code, 201)
+
+        res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
+        response = res.json
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'/activities/{}/download'.format(response[0]['id']))
 
     def test_create_image_activity_with_context_with_uploadurl(self):
         """
@@ -112,6 +158,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'http://localhost:8181/theimage')
         self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'http://localhost:8181/theimage/thumb')
 
+    def test_create_file_activity_with_context_with_uploadurl(self):
+        """
+            Given a plain user
+            When I post an file activity to a context with uploadURL
+            And I am authenticated as myself
+            Then the file activity is created correctly
+        """
+        from .mockers import user_file_activity_with_context_with_uploadurl as activity
+        from .mockers import subscribe_context_with_uploadurl, create_context_with_uploadurl
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context_with_uploadurl)
+        self.admin_subscribe_user_to_context(username, subscribe_context_with_uploadurl)
+
+        thefile = open(os.path.join(os.path.dirname(__file__), "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
+        self.assertEqual(res.status_code, 201)
+
+        res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
+        response = res.json
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'http://localhost:8181/theimage')
+
     def test_post_message_with_image_to_an_already_existing_conversation(self):
         from .mockers import message, message_with_image
         sender = 'messi'
@@ -135,3 +206,52 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get("objectType", None), "message")
         self.assertEqual(result[1]['object'].get('image').get('fullURL'), u'/activities/{}/fullimage'.format(result[1]['id']))
         self.assertEqual(result[1]['object'].get('image').get('thumbURL'), u'/activities/{}/thumb'.format(result[1]['id']))
+
+    def test_post_message_with_file_to_an_already_existing_conversation(self):
+        from .mockers import message, message_with_file
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        thefile = open(os.path.join(os.path.dirname(__file__), "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_file)), oauth2Header(sender), upload_files=files, status=201)
+
+        res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(sender), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
+        self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
+        self.assertEqual(result[0].get("objectType", None), "message")
+        self.assertEqual(result[1]['object'].get('file').get('fullURL'), u'/activities/{}/download'.format(result[1]['id']))
+
+    def test_get_image_activity_file_with_context(self):
+        """
+            Given a plain user
+            When I post an image activity to a context with no uploadURL
+            And I am authenticated as myself
+            Then the image activity is created correctly
+        """
+        from .mockers import user_image_activity_with_context as activity
+        from .mockers import subscribe_context, create_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
+        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+
+        res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
+        self.assertEqual(res.status_code, 201)
+
+        res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
+        response = res.json
+        self.assertEqual(res.status_code, 200)
+
+        res = self.testapp.get('/activities/{}/fullimage'.format(response[0]['id']), '', oauth2Header(username))

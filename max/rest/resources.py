@@ -53,7 +53,9 @@ PUBLIC_RESOURCES = {
     'favorites': {'route': '/activities/{activity}/favorites', 'category': 'Activities'},
     'favorite': {'route': '/activities/{activity}/favorites/{username}', 'category': 'Activities'},
     'user_favorites': {'route': '/people/{username}/favorites', 'category': 'User', 'name': 'User favorited activities'},
-
+    'fullimage': {'route': '/activities/{activity}/fullimage', 'category': 'Activities'},
+    'thumbnail': {'route': '/activities/{activity}/thumbnail', 'category': 'Activities'},
+    'download': {'route': '/activities/{activity}/download', 'category': 'Activities'},
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},

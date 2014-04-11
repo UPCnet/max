@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
+from pyramid.response import Response
 
 from bson import ObjectId
 
@@ -13,6 +14,7 @@ from max.exceptions import ObjectNotFound, Unauthorized, Forbidden
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
 
+import os
 import re
 
 
@@ -220,3 +222,53 @@ def modifyActivity(context, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover
+
+
+@view_config(route_name='fullimage', request_method='GET')
+@view_config(route_name='download', request_method='GET')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def getActivityImageOrFile(context, request):
+    """
+        /activities/{activity}/fullimage
+        /activities/{activity}/download
+
+        Returns an image or file from local repository.
+    """
+    mmdb = MADMaxDB(context.db)
+    activity_id = request.matchdict.get('activity', '')
+
+    try:
+        found_activity = mmdb.activity[activity_id]
+    except:
+        raise ObjectNotFound("There's no activity with id: %s" % activity_id)
+
+    readable_contexts_urls = [a['url'] for a in request.actor['subscribedTo'] if 'read' in a['permissions']]
+
+    can_read = False
+    for context in found_activity['contexts']:
+        if context['url'] in readable_contexts_urls:
+            can_read = True
+
+    if not can_read:
+        raise Unauthorized("You are not allowed to read this activity: %s" % activity_id)
+
+    base_path = request.registry.settings.get('file_repository')
+
+    def get_full_file_path(activity_id):
+        dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', activity_id).groups())
+        filename = dirs.pop()
+        return base_path + '/' + '/'.join(dirs), filename
+
+    def exists(path, filename):
+        return os.path.exists(os.path.join(path, filename))
+
+    path, filename = get_full_file_path(activity_id)
+
+    if exists(path, filename):
+        data = open(os.path.join(path, filename)).read()
+        image = Response(data, status_int=200)
+        # TODO: Look if mimetype is setted, and if otherwise, treat it conveniently
+        image.content_type = found_activity['object'][found_activity['object']['objectType']]['mimetype']
+        return image

@@ -452,7 +452,7 @@ def canWriteInContexts(actor, contexts):
 
 
 def canReadContext(actor, url):
-    """
+    """ DEPRECATED
     """
     # If no context filter defined, write/read is always allowed
     if url == []:

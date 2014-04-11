@@ -152,7 +152,6 @@ class Image(Note):
         An activitystrea.ms Image Object
     """
     schema = dict(Note.schema)
-    schema['fullImage'] = dict()
     schema['image'] = dict()
 
 
@@ -161,5 +160,4 @@ class File(Note):
         An activitystrea.ms File Object
     """
     schema = dict(Note.schema)
-    schema['url'] = dict()
-    # schema['data'] = dict()
+    schema['file'] = dict()

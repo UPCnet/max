@@ -328,6 +328,21 @@ message_with_image = {
     }
 }
 
+message_with_file = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi", "xavi"],
+         }
+    ],
+    "object": {
+        "objectType": "file",
+        "content": "Nos espera una gran temporada, no es cierto?",
+        "file": {
+            "mimetype": "application/pdf",
+        }
+    }
+}
+
 message_oneself = {
     "contexts": [
         {"objectType": "conversation",
@@ -490,7 +505,7 @@ user_image_activity_with_context = {
     },
 }
 
-# An user creates an activity image with a context
+# An user creates an activity image with a context and uploadURL
 user_image_activity_with_context_with_uploadurl = {
     "contexts": [
         {'url': subscribe_context_with_uploadurl['object']['url'],
@@ -506,18 +521,45 @@ user_image_activity_with_context_with_uploadurl = {
     },
 }
 
-# An user creates an activity image with a context and uploadURL
-user_image_activity_with_context = {
+# An user creates an activity file
+user_file_activity = {
+    "object": {
+        "objectType": "file",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "file": {
+            "mimetype": "application/pdf",
+        }
+    },
+}
+
+# An user creates an activity file with a context
+user_file_activity_with_context = {
     "contexts": [
         {'url': subscribe_context['object']['url'],
          'objectType': 'context'
          }
     ],
     "object": {
-        "objectType": "image",
+        "objectType": "file",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "image": {
-            "mimetype": "image/png",
+        "file": {
+            "mimetype": "application/pdf",
+        }
+    },
+}
+
+# An user creates an activity file with a context and uploadURL
+user_file_activity_with_context_with_uploadurl = {
+    "contexts": [
+        {'url': subscribe_context_with_uploadurl['object']['url'],
+         'objectType': 'context'
+         }
+    ],
+    "object": {
+        "objectType": "file",
+        "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
+        "file": {
+            "mimetype": "application/pdf",
         }
     },
 }
