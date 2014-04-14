@@ -1276,9 +1276,12 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "xavi",
+                        "objectType": "conversation",
+                        "displayName": "messi, xavi, neymar",
                         "id": "519b00000000000000000000",
-                        "objectType": "conversation"
+                        "tags": [
+                            "group"
+                        ]
                     }
                 ],
                 "object": {
@@ -1343,6 +1346,7 @@ Aquests són els serveis associats.
             [
                 {
                     "generator": null,
+                    "creator": "messi",
                     "contexts": [
                         {
                             "displayName": "messi, xavi, neymar",
@@ -1352,16 +1356,27 @@ Aquests són els serveis associats.
                     ],
                     "object": {
                         "content": "Nos espera una gran temporada, no es cierto?",
+                        "keywords": [
+                            "nos",
+                            "espera",
+                            "una",
+                            "gran",
+                            "temporada",
+                            "cierto",
+                            "messi"
+                        ],
                         "objectType": "note"
                     },
-                    "replies": [],
                     "actor": {
                         "username": "messi",
                         "displayName": "Lionel Messi",
                         "objectType": "person"
                     },
-                    "verb": "post",
                     "published": "2000-01-01T00:01:00Z",
+                    "keywords": [],
+                    "verb": "post",
+                    "replies": [],
+                    "owner": "messi",
                     "id": "519b00000000000000000000",
                     "objectType": "message"
                 }
@@ -1398,7 +1413,10 @@ Aquests són els serveis associats.
                 {
                     "displayName": "messi, xavi, neymar",
                     "creator": "messi",
-                    "messages": 1,
+                    "tags": [
+                        "group"
+                    ],
+                    "messages": 0,
                     "participants": [
                         {
                             "username": "messi",
@@ -1408,6 +1426,11 @@ Aquests són els serveis associats.
                         {
                             "username": "xavi",
                             "displayName": "xavi",
+                            "objectType": "person"
+                        },
+                        {
+                            "username": "neymar",
+                            "displayName": "Neymar JR",
                             "objectType": "person"
                         }
                     ],
@@ -1459,8 +1482,12 @@ Aquests són els serveis associats.
         .. code-block:: python
 
             {
-                "displayName": "xavi",
+                "displayName": "messi, xavi, neymar",
                 "creator": "messi",
+                "tags": [
+                    "group"
+                ],
+                "messages": 0,
                 "participants": [
                     {
                         "username": "messi",
@@ -1471,8 +1498,17 @@ Aquests són els serveis associats.
                         "username": "xavi",
                         "displayName": "xavi",
                         "objectType": "person"
+                    },
+                    {
+                        "username": "neymar",
+                        "displayName": "Neymar JR",
+                        "objectType": "person"
                     }
                 ],
+                "lastMessage": {
+                    "content": "Nos espera una gran temporada, no es cierto?",
+                    "published": "2000-01-01T00:01:00Z"
+                },
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
                 "permissions": {
@@ -1522,8 +1558,12 @@ Aquests són els serveis associats.
         .. code-block:: python
 
             {
-                "displayName": "xavi",
+                "displayName": "messi, xavi, neymar",
                 "creator": "messi",
+                "tags": [
+                    "group"
+                ],
+                "messages": 0,
                 "participants": [
                     {
                         "username": "messi",
@@ -1534,8 +1574,17 @@ Aquests són els serveis associats.
                         "username": "xavi",
                         "displayName": "xavi",
                         "objectType": "person"
+                    },
+                    {
+                        "username": "neymar",
+                        "displayName": "Neymar JR",
+                        "objectType": "person"
                     }
                 ],
+                "lastMessage": {
+                    "content": "Nos espera una gran temporada, no es cierto?",
+                    "published": "2000-01-01T00:01:00Z"
+                },
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "messi",
                 "permissions": {
@@ -1593,6 +1642,10 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
+                        "vetos": [],
+                        "grants": [
+                            "subscribe"
+                        ],
                         "displayName": "messi, xavi, neymar",
                         "id": "519b00000000000000000000",
                         "objectType": "conversation"
@@ -1668,6 +1721,11 @@ Aquests són els serveis associats.
                         {
                             "username": "xavi",
                             "displayName": "xavi",
+                            "objectType": "person"
+                        },
+                        {
+                            "username": "neymar",
+                            "displayName": "Neymar JR",
                             "objectType": "person"
                         },
                         {
