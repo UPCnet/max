@@ -1256,7 +1256,7 @@ Aquests són els serveis associats.
                 "contexts": [
                     {
                         "objectType":"conversation",
-                        "participants": ["messi", "xavi"]
+                        "participants": ["messi", "xavi", "neymar"]
                     }
                 ],
                 "object": {
@@ -1315,7 +1315,7 @@ Aquests són els serveis associats.
             <201 Created application/json ...
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
-            >>> response.json.get('contexts')[0].get('displayName') == username2
+            >>> response.json.get('contexts')[0].get('displayName') == u'messi, xavi, neymar'
             True
             >>> conversation_id = response.json.get('contexts')[0].get('id')
 
@@ -1345,7 +1345,7 @@ Aquests són els serveis associats.
                     "generator": null,
                     "contexts": [
                         {
-                            "displayName": "messi, xavi",
+                            "displayName": "messi, xavi, neymar",
                             "id": "519b00000000000000000000",
                             "objectType": "conversation"
                         }
@@ -1368,6 +1368,7 @@ Aquests són els serveis associats.
             ]
 
         .. -> expected
+
             >>> expected = json.loads(expected)
             >>> response = testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(username), status=200)
             >>> response
@@ -1395,7 +1396,7 @@ Aquests són els serveis associats.
 
             [
                 {
-                    "displayName": "xavi",
+                    "displayName": "messi, xavi, neymar",
                     "creator": "messi",
                     "messages": 1,
                     "participants": [
@@ -1429,6 +1430,7 @@ Aquests són els serveis associats.
             ]
 
         .. -> expected
+
             >>> response = testapp.get('/conversations', "", oauth2Header(username), status=200)
             >>> response
             <200 OK application/json ...
@@ -1591,7 +1593,7 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
+                        "displayName": "messi, xavi, neymar",
                         "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
@@ -1620,6 +1622,7 @@ Aquests són els serveis associats.
             }
 
         .. -> expected
+
             >>> expected = json.loads(expected)
             >>> response = testapp.post('/conversations/{}/messages'.format(conversation_id), payload, oauth2Header(username), status=201)
             >>> response
@@ -1705,16 +1708,20 @@ Aquests són els serveis associats.
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
 
-        Retorna un codi HTTP 201 (created) amb la subscripció, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari.
-        Si sobrepassem el límit obtindrem un HTTP 403 (Forbidden)
+        Retorna un codi HTTP 201 (created) amb la subscripció, o un HTTP 401
+        (Unauthorized) si l'usuari no és el propietari. Si sobrepassem el límit
+        d'usuaris o intentem subscriure un usuari addicional a una conversa de
+        dues persones, obtindrem un HTTP 403 (Forbidden)
 
 .. http:delete:: /people/{username}/conversations/{id}
 
-    Treu un usuari d'una conversa. Ho pot fer qualsevol participant de la conversa excepte el propietari.
+    Treu un usuari d'una conversa. Ho pot fer qualsevol participant de la
+    conversa excepte el propietari.
 
     :query username: (REST) L'usuari que es vol afegir a la conversa
-    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la resposta al crear una conversa nova,
-        o en la llista de converses d'un usuari.
+    :query id: (REST) L'identificador d'una conversa. el podem obtenir en la
+        resposta al crear una conversa nova, o en la llista de converses d'un
+        usuari.
 
     **Exemple de petició**
 
@@ -1722,7 +1729,8 @@ Aquests són els serveis associats.
 
     **Resposta esperada**:
 
-        Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401 (Unauthorized) si l'usuari no és el propietari
+        Retorna un codi HTTP 204 (deleted) amb el cos buit, o un HTTP 401
+        (Unauthorized) si l'usuari no és el propietari
 
         .. actual test
             >>> resp = testapp.delete('/people/{}/conversations/{}'.format('nouusuari', conversation_id), "", oauth2Header(username), status=204)
