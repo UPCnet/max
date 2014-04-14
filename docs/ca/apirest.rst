@@ -1276,7 +1276,7 @@ Aquests són els serveis associats.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "displayName": "messi, xavi",
+                        "displayName": "xavi",
                         "id": "519b00000000000000000000",
                         "objectType": "conversation"
                     }
