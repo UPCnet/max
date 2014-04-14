@@ -408,6 +408,9 @@ def joinConversation(context, request):
         if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
+        if 'group' not in conversation.get('tags', []):
+            raise Forbidden('This is not a group conversation, so anyone else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))            
+
         users = MADMaxCollection(context.db.users, query_key='username')
         creator = users[request.creator]
 

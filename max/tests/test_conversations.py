@@ -430,7 +430,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=401)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=403)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 2)
 
