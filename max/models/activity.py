@@ -215,11 +215,11 @@ class BaseActivity(MADBase):
         uploadURL = ''
         if self['object'].get('image', False):
             file_type = 'image'
-            endpoint_name = 'fullimage'
-            endpoint_thumb = 'thumb'
+            endpoint_name = 'image/full'
+            endpoint_thumb = 'image/thumb'
         else:
             file_type = 'file'
-            endpoint_name = 'download'
+            endpoint_name = 'file/download'
             endpoint_thumb = ''
 
         # Look if the activity belongs to an specific context

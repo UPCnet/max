@@ -224,15 +224,19 @@ def modifyActivity(context, request):
     return HTTPNotImplemented()  # pragma: no cover
 
 
-@view_config(route_name='fullimage', request_method='GET')
-@view_config(route_name='download', request_method='GET')
+@view_config(route_name='image', request_method='GET')
+@view_config(route_name='image_full', request_method='GET')
+@view_config(route_name='image_thumbnail', request_method='GET')
+@view_config(route_name='file_download', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
 def getActivityImageOrFile(context, request):
     """
-        /activities/{activity}/fullimage
-        /activities/{activity}/download
+        /activities/{activity}/image
+        /activities/{activity}/image/full
+        /activities/{activity}/image/thumb
+        /activities/{activity}/file/download
 
         Returns an image or file from local repository.
     """
@@ -256,19 +260,20 @@ def getActivityImageOrFile(context, request):
 
     base_path = request.registry.settings.get('file_repository')
 
-    def get_full_file_path(activity_id):
-        dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', activity_id).groups())
-        filename = dirs.pop()
-        return base_path + '/' + '/'.join(dirs), filename
+    dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', activity_id).groups())
+    filename = dirs.pop()
+    # If the matched route is 'image_thumbnail' then return the thumbnail
+    if request.matched_route.name == 'image_thumbnail':
+        filename = filename + '.thumbnail'
 
-    def exists(path, filename):
-        return os.path.exists(os.path.join(path, filename))
+    path = base_path + '/' + '/'.join(dirs)
 
-    path, filename = get_full_file_path(activity_id)
-
-    if exists(path, filename):
+    if os.path.exists(os.path.join(path, filename)):
         data = open(os.path.join(path, filename)).read()
         image = Response(data, status_int=200)
         # TODO: Look if mimetype is setted, and if otherwise, treat it conveniently
-        image.content_type = found_activity['object'][found_activity['object']['objectType']]['mimetype']
+        if request.matched_route.name == 'image_thumbnail':
+            image.content_type = u'image/jpeg'
+        else:
+            image.content_type = found_activity['object'][found_activity['object']['objectType']]['mimetype']
         return image
