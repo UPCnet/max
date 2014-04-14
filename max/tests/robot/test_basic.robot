@@ -10,8 +10,8 @@ Suite Teardown  Suite Teardown
 *** Test Cases ***
 
 Scenario: Test Hello View
-     When I go to  ${APP_URL}/hello/Victor
-     Then Page Should Contain  Hello Victor!
+     When I go to  ${APP_URL}
+     Then Page Should Contain  I am a max server
 
 *** Keywords ***
 

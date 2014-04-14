@@ -369,17 +369,36 @@ llistar-les com crear-ne de noves.
     Genera una activitat en el sistema. Els objectes d'aquesta activitat són els
     especificats en el protocol activitystrea.ms.
 
+    Estan suportats els tipus ``objectType`` *note*, *image* i *file* (aquests
+    dos últims a partir de la versió de MAX 4.0). Les peticions de creació dels
+    ``objectType`` *image* i *file* han d'estar codificades de manera diferent a
+    totes les demés peticions ja que hi ha involucrada la pujada d'un fitxer.
+    Aquesta petició te fer-se mitjançant multipart/form-data amb les capçaleres
+    corresponents d'oAuth. Aquesta petició ha de complir dos requeriments:
+
+        * La petició ha de contindre un camp form-data anomenat json_data
+          codificat amb JSON amb el camp body que passariem si la petició fos
+          'application/json'.
+        * La petició ha de contindre un camp form-data anomenat igual que el
+          ``objectType`` al qual es refereix amb la informació (estàndar form-
+          data amb el nom del fitxer, el binari i el content_type) del fitxer que
+          volem pujar.
+
     :query username: (REST) Nom de l'usuari que crea l'activitat
     :query contexts: (Opcional) Per fer que una activitat estigui associada a un
         context determinat fa falta que enviem una llista d'objectes *context*
         (sota la clau ``contexts``) (ja que teòricament, podem fer que
         l'activitat estigui associada a varis contexts a l'hora), indicant com a
         ``objectType`` el tipus ``uri`` i les dades del context com a l'exemple.
-    :query object: (Requerit) Per ara només suportat el tipus ``objectType``
-        *note*. Ha de contindre les claus ``objectType`` i ``content`` el qual
-        pot tractar-se d'un camp codificat amb HTML, amb tags restringits.
+    :query object: (Requerit) Estan suportats els tipus ``objectType`` *note*,
+        *image* i *file* (aquests dos últims a partir de la versió de MAX 4.0).
+        Ha de contindre les claus ``objectType`` i ``content`` el qual pot
+        tractar-se d'un camp codificat amb HTML, amb alguns tags restringits. En
+        el cas de tractar-se d'un ``objectType`` *image* o *file*, també ha de
+        contindre el camp ``mimetype`` amb el content_type del fitxer que estem
+        pujant.
 
-    **Exemple de petició**
+    **Exemple de petició (*note*)**
 
         .. code-block:: python
 
@@ -431,9 +450,41 @@ llistar-les com crear-ne de noves.
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
 
+    **Exemple de petició (*image*)**
+
+        .. code-block:: python
+
+            {
+                "object": {
+                    "objectType": "image",
+                    "content": "Testejant la creació d'un canvi d'estat amb imatge",
+                    "image": {
+                        "mimetype": "image/png",
+                    }
+                }
+            }
+
+    **Exemple de petició (*file*)**
+
+        .. code-block:: python
+
+            {
+                "object": {
+                    "objectType": "file",
+                    "content": "Testejant la creació d'un canvi d'estat amb fitxer",
+                    "file": {
+                        "mimetype": "application/pdf",
+                    }
+                }
+            }
+
     Success
 
-        Retorna un objecte del tipus ``Activity``.
+        Retorna un objecte del tipus ``Activity``. En el cas de tractar-se d'un
+        ``objectType`` del tipus *image* o *file* retorna un camp ``fullURL``
+        amb la URL corresponent a la imatge o el fitxer. Addicionalment, si es
+        tracta d'un ``objectType`` *imatge* torna un altre camp ``thumbURL`` que
+        fa referència a la URL de la miniatura de la imatge.
 
     Error
 
@@ -450,13 +501,13 @@ llistar-les com crear-ne de noves.
                 {"error_description": "Unknown user: messi", "error": "UnknownUserError"}
 
     Tipus d'activitat suportats:
-     * *note* (estatus d'usuari)
+     * *note* (estat d'usuari)
+     * *image* (estat d'usuari amb una imatge)
+     * *file* (estat d'usuari amb un fitxer)
 
     Tipus d'activitat projectats:
-     * *File*
      * *Event*
      * *Bookmark*
-     * *Image*
      * *Video*
      * *Question*
 

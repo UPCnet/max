@@ -37,6 +37,7 @@ class myPyramidLayer(Layer):
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.server = http.StopableWSGIServer.create(self.app, port=9090)
+        os.environ['APP_PORT'] = '9090'
 
     def tearDown(self):
         self.server.shutdown()
