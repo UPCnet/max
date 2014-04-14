@@ -1315,7 +1315,7 @@ Aquests són els serveis associats.
             <201 Created application/json ...
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
-            >>> response.json.get('contexts')[0].get('displayName') == expected.get('contexts')[0].get('displayName')
+            >>> response.json.get('contexts')[0].get('displayName') == username2
             True
             >>> conversation_id = response.json.get('contexts')[0].get('id')
 
