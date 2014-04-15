@@ -39,6 +39,6 @@ def getMaxSettings(context, request):
         Returns all max server settings
     """
     max_settings = request.registry.settings
-    settings = {key: value for key, value in max_settings.items() if re.match('^(max|mongodb)', key)}
+    settings = {key: value for key, value in max_settings.items() if re.match('^(max|mongodb|cache|oauth)', key)}
     handler = JSONResourceEntity(settings)
     return handler.buildResponse()

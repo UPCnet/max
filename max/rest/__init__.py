@@ -70,7 +70,7 @@ def endpoints(context, request):
         }
 
         # Import the method implementing the endpoint to get the docstring
-        module_fqdn = re.search(r'max/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.')
+        module_fqdn = re.search(r'(?:max|\.egg)/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.') 
         module_namespace, module_name = re.search(r'(.*?)\.([^\.]+$)', module_fqdn).groups()
         method_name = view.action_info.src
         method = getattr(sys.modules[module_fqdn], method_name)
