@@ -1,11 +1,66 @@
 CHANGELOG
 =========
 
-3.6.1 (unreleased)
+4.0.0 (2014-04-15)
 ------------------
 
-- Nothing changed yet.
-
+* Update documentation [Victor Fernandez de Alba]
+* Raise Forbidden on joining a two-user conversation [Carles Bruguera]
+* Upload files and images to remote context / locally feature [Victor Fernandez de Alba]
+* Add admin endpoint to post messsages as arbitrary user [Carles Bruguera]
+* Create user exchanges on user creation [Carles Bruguera]
+* Disable message Notifications [Carles Bruguera]
+* Refactor conversation creation notifications with rabbitpy [Carles Bruguera]
+* Allow add people to conversations based on susbcribe permission [Carles Bruguera]
+* Distinguish group and archived conversations by tags [Carles Bruguera]
+* Add api export endpoint
+* Add maxserver info endpoint
+* Fetch only the last message on conversations[Carles Bruguera]
+* Add GPL License [Victor Fernandez de Alba]
+* Return [] when an unknown permission asked [Carles Bruguera]
+* Provide tag information on create conv. response [Carles Bruguera]
+* Fix text: conversations 3>2 preserves displayName [Carles Bruguera]
+* Exclude group conversations from search [Carles Bruguera]
+* Tag and untag as archived conversation when needed [Carles Bruguera]
+* Added endpoint to get user chat subscription [Carles Bruguera]
+* Set correct displayName on conv. creation [Carles Bruguera]
+* Fix grant and revoke user methods, make generic [Carles Bruguera]
+* Tidy up schema definitions and security methods [Carles Bruguera]
+* Added last message to getConversation [Carles Bruguera]
+* Added remaining items header to getMessages [Carles Bruguera]
+* Add limiting of results on getMessages [Carles Bruguera]
+* List HEAD requests [Carles Bruguera]
+* Add remaining search items to headers [Carles Bruguera]
+* Change port for Jenkins [Victor Fernandez de Alba]
+* Add robot tests [Victor Fernandez de Alba]
+* Fix signature of decorated functions [Carles Bruguera]
+* Patch venusian to get the real function name [Carles Bruguera]
+* Remove unused  auth resources [Carles Bruguera]
+* Add endpoint to recover exception logs [Carles Bruguera]
+* Add skip tests conditions in case Twitter API involved. [Victor Fernandez de Alba]
+* Add dummy load of cloudAPIs data. [Victor Fernandez de Alba]
+* More ownership transfer tests [Carles Bruguera]
+* Endpoint to transfer ownership [Carles Bruguera]
+* Look for username in PUT requests too [Carles Bruguera]
+* Add an endpoint to get roles grouped by user [Carles Bruguera]
+* Adapt to new mutable method [Carles Bruguera]
+* Allow admin modify any user profile [Carles Bruguera]
+* Extend username filter to use also displayName [Carles Bruguera]
+* Add context comments count endpoint [Carles Bruguera]
+* Downloading of named avatar sizes [Carles Bruguera]
+* Add roles of the authenticated user to the request [Carles Bruguera]
+* Add roles over the current object in the models [Carles Bruguera]
+* Make field visibility role-based [Carles Bruguera]
+* Fix twitter avatar download mocker [Carles Bruguera]
+* Refactor mutable properties getter using roles [Carles Bruguera]
+* Rename VIP as NonVisible [Carles Bruguera]
+* Allow NonVisible feature with restricted_visibility disabled [Carles Bruguera]
+* Refactor tests to match the increased combinations [Carles Bruguera]
+* Vip mode doesn't give visibility over subscription [Carles Bruguera]
+* Add to user a method to check visibility to other user [Carles Bruguera]
+* Modify user listing and conversation creation and joining with user visibility checks [Carles Bruguera]
+* test [Carles Bruguera]
+* Add test base and config settings for vip mode [Carles Bruguera]
 
 3.6 (2014-01-20)
 ----------------
