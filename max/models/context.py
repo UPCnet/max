@@ -154,6 +154,9 @@ class BaseContext(MADBase):
                 if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.get('tags', [])})
 
+                if 'notifications' in self.schema.keys() and (self.field_changed('notifications') or force_update):
+                    updates.update({'{}.$.notifications'.format(self.user_subscription_storage): self.get('notifications', [])})
+
                 if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
                     updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
 
