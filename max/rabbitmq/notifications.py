@@ -6,8 +6,8 @@ import pika
 import json
 import datetime
 
-from maxcarrot import RabbitServer
-from maxcarrot.message import RabbitMessage
+from maxcarrot import RabbitClient
+from maxcarrot import RabbitMessage
 
 
 def restartTweety():
@@ -32,8 +32,57 @@ def addUser(username):
 
     # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
     if rabbitmq_url:
-        server = RabbitServer(rabbitmq_url)
+        server = RabbitClient(rabbitmq_url)
         server.create_user(username)
+        server.disconnect()
+
+
+def bindUserToContext(context, username):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = context.getIdentifier()
+        server.activity.bind_user(context_id, username)
+        server.disconnect()
+
+
+def unbindUserFromContext(context, username):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = context.getIdentifier()
+        server.activity.unbind_user(context_id, username)
+        server.disconnect()
+
+
+def notifyContextActivity(activity):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        # Send a conversation creation notification to rabbit
+        message = RabbitMessage()
+        message.prepare(settings['max_message_defaults'])
+        message.update({
+            "user": request.actor.username,
+            "action": "add",
+            "object": "activity",
+            "data": {
+                'text': activity['object']['content']
+            }
+        })
+        server.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
         server.disconnect()
 
 
@@ -44,7 +93,7 @@ def addConversationExchange(conversation):
 
     # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
     if rabbitmq_url:
-        server = RabbitServer(rabbitmq_url)
+        server = RabbitClient(rabbitmq_url)
         conversation_id = conversation.getIdentifier()
         participants_usernames = [user['username'] for user in conversation['participants']]
         server.conversations.create(conversation_id, users=participants_usernames)

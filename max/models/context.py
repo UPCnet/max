@@ -231,6 +231,11 @@ class Context(BaseContext):
     schema['twitterUsernameId'] = {
         'edit': ['Owner', 'Manager']
     }
+    schema['notifications'] = {
+        'edit': ['Owner', 'Manager'],
+        'default': False
+    }
+
     schema['uploadURL'] = {}
 
     def alreadyExists(self):

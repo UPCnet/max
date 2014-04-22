@@ -12,6 +12,7 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.exceptions import ObjectNotFound
 from max.rest.utils import searchParams
+from max.rabbitmq.notifications import notifyContextActivity
 
 
 @view_config(route_name='user_activities', request_method='GET', restricted=['Manager'])
@@ -74,6 +75,12 @@ def addAdminUserActivity(context, request):
         code = 201
         activity_oid = newactivity.insert()
         newactivity['_id'] = activity_oid
+
+    # notify activity if the activity is from a context
+    # with enabled notifications
+
+    if newactivity.get('contexts', [{}])[0].get('notifications', False):
+        notifyContextActivity(newactivity)
 
     handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()

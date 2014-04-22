@@ -3,6 +3,7 @@ from max.MADObjects import MADBase
 import datetime
 from max.rest.utils import getMaxModelByObjectType, flatten
 from pyramid.settings import asbool
+from max.rabbitmq.notifications import bindUserToContext, unbindUserFromContext
 
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
@@ -95,16 +96,18 @@ class User(MADBase):
 
     def addSubscription(self, context):
         """
-            Adds a comment to an existing activity
+            Subscribes the user to the context
         """
         subscription = context.prepareUserSubscription()
         self.add_to_list(context.user_subscription_storage, subscription, safe=False)
+        bindUserToContext(context, self.username)
 
     def removeSubscription(self, context):
         """
-            Adds a comment to an existing activity
+            Unsubscribes the user from the context
         """
         self.delete_from_list(context.user_subscription_storage, {context.unique.lstrip('_'): context.getIdentifier()})
+        unbindUserFromContext(context, self.username)
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""

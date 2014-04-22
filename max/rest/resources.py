@@ -29,6 +29,7 @@ PUBLIC_RESOURCES = {
     'context_user_permissions_defaults': {'route': '/contexts/{hash}/permissions/{username}/defaults', 'category': 'Contexts', 'name': 'Context permissions defaults'},
     'context_user_permission': {'route': '/contexts/{hash}/permissions/{username}/{permission}', 'category': 'Contexts', 'name': 'Context permission'},
     'context_activities': {'route': '/contexts/{hash}/activities', 'category': 'Activities', 'name': 'Context activities'},
+    'context_push_tokens': {'route': '/contexts/{hash}/tokens', 'category': 'Contexts', 'name': 'Context tokens'},
     'context_comments': {'route': '/contexts/{hash}/comments', 'category': 'Comments', 'name': 'Context comments'},
     'context_activities_authors': {'route': '/contexts/{hash}/activities/authors', 'category': 'Activities', 'name': 'Context authors'},
     'context_subscriptions': {'route': '/contexts/{hash}/subscriptions', 'category': 'Contexts', 'name': 'Users subscribed to context'},

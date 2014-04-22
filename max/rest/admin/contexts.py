@@ -314,3 +314,29 @@ def removeContextTag(context, request):
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
     return HTTPNoContent()
+
+
+@view_config(route_name='context_push_tokens', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+def getPushTokensForContext(context, request):
+    """
+         /contexts/{hash}/tokens
+         Return all relevant tokens for a given context
+    """
+
+    cid = request.matchdict['hash']
+    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    ctxt = contexts[cid]
+
+    users = ctxt.subscribedUsers()
+
+    result = []
+    for user in users:
+        for idevice in user.get('iosDevices', []):
+            result.append(dict(token=idevice, platform='iOS', username=user.get('username')))
+        for adevice in user.get('androidDevices', []):
+            result.append(dict(token=adevice, platform='android', username=user.get('username')))
+
+    handler = JSONResourceRoot(result)
+    return handler.buildResponse()
