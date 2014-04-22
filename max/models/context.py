@@ -138,7 +138,7 @@ class BaseContext(MADBase):
             Now only updates displayName and permissions and tags
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
-        updatable_fields = ['permissions', 'displayName', 'tags', 'participants']
+        updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
         if has_updatable_fields or force_update:
@@ -155,7 +155,7 @@ class BaseContext(MADBase):
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.get('tags', [])})
 
                 if 'notifications' in self.schema.keys() and (self.field_changed('notifications') or force_update):
-                    updates.update({'{}.$.notifications'.format(self.user_subscription_storage): self.get('notifications', [])})
+                    updates.update({'{}.$.notifications'.format(self.user_subscription_storage): self.get('notifications', False)})
 
                 if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
                     updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
