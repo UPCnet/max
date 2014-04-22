@@ -293,10 +293,10 @@ class Context(BaseContext):
         # someone changed notifications settings for this context
         if 'notifications' in properties:
             if self.get('notifications', False):
-                for user in self.subscribedusers():
+                for user in self.subscribedUsers():
                     bindUserToContext(self, user['username'])
             else:
-                for user in self.subscribedusers():
+                for user in self.subscribedUsers():
                     unbindUserFromContext(self, user['username'])
 
         self.save()
