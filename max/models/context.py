@@ -6,6 +6,7 @@ from max.models.user import User
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.rabbitmq.notifications import restartTweety
 from hashlib import sha1
+from max.rabbitmq.notifications import bindUserToContext, unbindUserFromContext
 
 
 class BaseContext(MADBase):
@@ -288,6 +289,15 @@ class Context(BaseContext):
 
         if self.get('twitterUsername', None) is None and self.get('twitterUsernameId', None) is not None:
             del self['twitterUsernameId']
+
+        # someone changed notifications settings for this context
+        if 'notifications' in properties:
+            if self.get('notifications', False):
+                for user in self.subscribedusers():
+                    bindUserToContext(self, user['username'])
+            else:
+                for user in self.subscribedusers():
+                    unbindUserFromContext(self, user['username'])
 
         self.save()
 
