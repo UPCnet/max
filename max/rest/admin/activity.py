@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNoContent
+from bson import ObjectId
 
 from max.models import Activity
 from max.oauth2 import oauth2
@@ -10,7 +11,6 @@ from max.decorators import MaxResponse, requirePersonActor, requireContextActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.exceptions import ObjectNotFound
 from max.rest.utils import searchParams
 from max.rabbitmq.notifications import notifyContextActivity
 
@@ -64,17 +64,27 @@ def addAdminUserActivity(context, request):
         'actor.username': request.actor.username,
         'object.content': newactivity['object']['content'],
         'published': {'$gt': newactivity.published - timedelta(minutes=1)}
-        }
+    }
+
     duplicated = mmdb.activity.search(query)
 
     if duplicated:
         code = 200
         newactivity = duplicated[0]
     else:
-        # New User
+        # New activity
         code = 201
-        activity_oid = newactivity.insert()
-        newactivity['_id'] = activity_oid
+        if newactivity['object']['objectType'] == u'image' or \
+           newactivity['object']['objectType'] == u'file':
+            # Extract the file before saving object
+            activity_file = newactivity.extract_file_from_activity()
+            activity_oid = newactivity.insert()
+            newactivity['_id'] = ObjectId(activity_oid)
+            newactivity.process_file(request, activity_file)
+            newactivity.save()
+        else:
+            activity_oid = newactivity.insert()
+            newactivity['_id'] = activity_oid
 
     # notify activity if the activity is from a context
     # with enabled notifications

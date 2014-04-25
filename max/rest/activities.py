@@ -255,12 +255,17 @@ def getActivityImageOrFile(context, request):
     except:
         raise ObjectNotFound("There's no activity with id: %s" % activity_id)
 
-    readable_contexts_urls = [a['url'] for a in request.actor['subscribedTo'] if 'read' in a['permissions']]
+    if found_activity.get('contexts', []):
+        readable_contexts_urls = [a['url'] for a in request.actor['subscribedTo'] if 'read' in a['permissions']]
 
-    can_read = False
-    for context in found_activity['contexts']:
-        if context['url'] in readable_contexts_urls:
-            can_read = True
+        can_read = False
+        for context in found_activity['contexts']:
+            if context['url'] in readable_contexts_urls:
+                can_read = True
+    else:
+        # Sure ??? Do we have to check if the activity is ours, or from a followed user?
+        # Try to unify this criteria with the criteria used in geting the timeline activities
+        can_read = True
 
     if not can_read:
         raise Unauthorized("You are not allowed to read this activity: %s" % activity_id)
@@ -280,7 +285,7 @@ def getActivityImageOrFile(context, request):
         image = Response(data, status_int=200)
         # TODO: Look if mimetype is setted, and if otherwise, treat it conveniently
         if request.matched_route.name == 'image_thumbnail':
-            image.content_type = u'image/jpeg'
+            image.content_type = 'image/jpeg'
         else:
-            image.content_type = found_activity['object'][found_activity['object']['objectType']]['mimetype']
+            image.content_type = str(found_activity['object'][found_activity['object']['objectType']]['mimetype'])
         return image
