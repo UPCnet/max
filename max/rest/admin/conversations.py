@@ -7,6 +7,7 @@ from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.models import Message
+from bson import ObjectId
 
 
 @view_config(route_name='pushtokens', request_method='GET', restricted='Manager')
@@ -58,8 +59,17 @@ def addMessage(context, request):
     newmessage = Message()
     newmessage.fromRequest(request, rest_params=message_params)
 
-    message_oid = newmessage.insert()
-    newmessage['_id'] = message_oid
+    if newmessage['object']['objectType'] == u'image' or \
+       newmessage['object']['objectType'] == u'file':
+        # Extract the file before saving object
+        message_file = newmessage.extract_file_from_activity()
+        message_oid = newmessage.insert()
+        newmessage['_id'] = ObjectId(message_oid)
+        newmessage.process_file(request, message_file)
+        newmessage.save()
+    else:
+        message_oid = newmessage.insert()
+        newmessage['_id'] = message_oid
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
