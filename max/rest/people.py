@@ -75,9 +75,15 @@ def getUser(context, request):
             messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
             lastMessage = messages[0]
             conversation['lastMessage'] = {'published': lastMessage['published'],
-                                           'content': lastMessage['object']['content']
-                                           }
-            conversation['messages'] = 0
+                                           'content': lastMessage['object'].get('content', ''),
+                                           'objectType': lastMessage['object']['objectType']
+                                          }
+            if lastMessage['object']['objectType'] in ['file', 'image']:
+                lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
+                if lastMessage['object']['objectType'] ==  'image':
+                    lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
+            
+        conversation['messages'] = 0
 
         actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
