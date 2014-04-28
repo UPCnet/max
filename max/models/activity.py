@@ -196,15 +196,8 @@ class BaseActivity(MADBase):
         # XXX TODO Update hastags
 
     def extract_file_from_activity(self):
-        if self['object'].get('image', False):
-            file_type = 'image'
-        else:
-            file_type = 'file'
-
-        file_activity = self['object'][file_type]['data']
-
-        del self['object'][file_type]['data']
-
+        file_activity = self['object']['file']
+        del self['object']['file']
         return file_activity
 
     def process_file(self, request, activity_file):
@@ -213,15 +206,7 @@ class BaseActivity(MADBase):
         """
         base_path = request.registry.settings.get('file_repository')
         uploadURL = ''
-        if self['object'].get('image', False):
-            file_type = 'image'
-            endpoint_name = 'image/full'
-            endpoint_thumb = 'image/thumb'
-        else:
-            file_type = 'file'
-            endpoint_name = 'file/download'
-            endpoint_thumb = ''
-
+        file_type = self['object'].get('objectType', 'file').lower()
         # Look if the activity belongs to an specific context
         if self.get('contexts', False):
             # Look if we need to upload to an external URL
@@ -245,9 +230,9 @@ class BaseActivity(MADBase):
             res = requests.post(uploadURL, headers=headers, files=files)
             if res.status_code == 201:
                 response = json.loads(res.text)
-                self['object'][file_type]['fullURL'] = response.get('uploadURL', '')
-                if endpoint_thumb:
-                    self['object'][file_type]['thumbURL'] = response.get('thumbURL', '')
+                self['object']['fullURL'] = response.get('uploadURL', '')
+                if file_type == 'image':
+                    self['object']['thumbURL'] = response.get('thumbURL', '')
 
         else:
             # We have a conversation or an activity with no related context
@@ -261,15 +246,17 @@ class BaseActivity(MADBase):
             r_file.write(activity_file.file.read())
             r_file.close()
 
-            self['object'][file_type]['fullURL'] = '/activities/{}/{}'.format(str(self['_id']), endpoint_name)
-            if endpoint_thumb:
+            full_endpoint_name = 'image/full' if file_type == 'image' else 'file/download'
+            self['object']['fullURL'] = '/{}/{}/{}'.format(self.resource_root, str(self['_id']), full_endpoint_name)
+
+            if file_type == 'image':
                 # Generate thumbnail
                 activity_file.file.seek(0)
                 thumb = Image.open(activity_file.file)
                 thumb.thumbnail((400, 400), Image.ANTIALIAS)
-                thumb.save(path + '/' + filename + ".thumbnail", "JPEG")
+                thumb.save(path + '/' + filename + ".thumb", "JPEG")
 
-                self['object'][file_type]['thumbURL'] = '/activities/{}/{}'.format(str(self['_id']), endpoint_thumb)
+                self['object']['thumbURL'] = '/{}/{}/image/thumb'.format(self.resource_root, str(self['_id']))
 
 
 class Activity(BaseActivity):
@@ -278,6 +265,7 @@ class Activity(BaseActivity):
     """
     collection = 'activity'
     context_collection = 'contexts'
+    resource_root = 'activities'
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['deletable'] = {}

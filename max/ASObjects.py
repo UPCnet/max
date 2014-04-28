@@ -123,11 +123,18 @@ class Person(ASObject):
     """
     data = {}
     objectType = 'Person'
-    schema = {'_id':         dict(),
-              'username':    dict(required=1),
-              'displayName': dict(required=0),
-              'objectType':  dict(required=1),
-              }
+    schema = {
+        '_id': {},
+        'username': {
+            'required': 1
+        },
+        'displayName': {
+            'required': 0
+        },
+        'objectType': {
+            'required': 1
+        },
+    }
 
 
 class Activity(ASObject):
@@ -136,30 +143,44 @@ class Activity(ASObject):
     """
     data = {}
     objectType = 'Activity'
-    schema = {'_id':         dict(),
-              'objectType':  dict(required=1),
-              'likes':       dict(),
-              'liked':       dict(),
-              'likesCount':  dict(),
-              'favorites':   dict(),
-              'favorited':   dict(),
-              'favoritesCount':  dict()
-              }
-
-
-class Image(Note):
-    """
-        An activitystrea.ms Image Object
-    """
-    schema = dict(Note.schema)
-    schema['image'] = dict()
-    schema['content']['required'] = 0
+    schema = {
+        '_id': {},
+        'objectType': {
+            'required': 1
+        },
+        'likes': {},
+        'liked': {},
+        'likesCount': {},
+        'favorites': {},
+        'favorited': {},
+        'favoritesCount': {},
+    }
 
 
 class File(Note):
     """
         An activitystrea.ms File Object
     """
+
+    def __init__(self, data, creating=True):
+        """
+        """
+        self.data = data
+        self.processFields()
+        self.update(data)
+
+    objectType = 'File'
     schema = dict(Note.schema)
-    schema['file'] = dict()
     schema['content']['required'] = 0
+    schema['file'] = dict()
+    schema['mimetype'] = dict()
+    schema['fullURL'] = dict()
+
+
+class Image(File):
+    """
+        An activitystrea.ms Image Object
+    """
+    objectType = 'Image'
+    schema = dict(File.schema)
+    schema['thumbURL'] = dict()

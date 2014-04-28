@@ -49,7 +49,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
         self.assertEqual(res.status_code, 201)
@@ -57,8 +57,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'/activities/{}/image/full'.format(response[0]['id']))
-        self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'/activities/{}/image/thumb'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('fullURL'), u'/activities/{}/image/full'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('thumbURL'), u'/activities/{}/image/thumb'.format(response[0]['id']))
 
     def test_create_file_activity(self):
         """
@@ -79,7 +79,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'/activities/{}/file/download'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('fullURL'), u'/activities/{}/file/download'.format(response[0]['id']))
 
     def test_create_image_activity_with_context(self):
         """
@@ -96,7 +96,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
         self.assertEqual(res.status_code, 201)
@@ -104,8 +104,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'/activities/{}/image/full'.format(response[0]['id']))
-        self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'/activities/{}/image/thumb'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('fullURL'), u'/activities/{}/image/full'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('thumbURL'), u'/activities/{}/image/thumb'.format(response[0]['id']))
 
     def test_create_file_activity_with_context(self):
         """
@@ -130,7 +130,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'/activities/{}/file/download'.format(response[0]['id']))
+        self.assertEqual(response[0]['object'].get('fullURL'), u'/activities/{}/file/download'.format(response[0]['id']))
 
     def test_create_image_activity_with_context_with_uploadurl(self):
         """
@@ -147,7 +147,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context_with_uploadurl)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
         self.assertEqual(res.status_code, 201)
@@ -155,8 +155,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('image').get('fullURL'), u'http://localhost:8181/theimage')
-        self.assertEqual(response[0]['object'].get('image').get('thumbURL'), u'http://localhost:8181/theimage/thumb')
+        self.assertEqual(response[0]['object'].get('fullURL'), u'http://localhost:8181/theimage')
+        self.assertEqual(response[0]['object'].get('thumbURL'), u'http://localhost:8181/theimage/thumb')
 
     def test_create_file_activity_with_context_with_uploadurl(self):
         """
@@ -181,7 +181,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username))
         response = res.json
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(response[0]['object'].get('file').get('fullURL'), u'http://localhost:8181/theimage')
+        self.assertEqual(response[0]['object'].get('fullURL'), u'http://localhost:8181/theimage')
 
     def test_post_message_with_image_to_an_already_existing_conversation(self):
         from .mockers import message, message_with_image
@@ -191,7 +191,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
@@ -204,8 +204,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
-        self.assertEqual(result[1]['object'].get('image').get('fullURL'), u'/activities/{}/image/full'.format(result[1]['id']))
-        self.assertEqual(result[1]['object'].get('image').get('thumbURL'), u'/activities/{}/image/thumb'.format(result[1]['id']))
+        self.assertEqual(result[1]['object'].get('fullURL'), u'/messages/{}/image/full'.format(result[1]['id']))
+        self.assertEqual(result[1]['object'].get('thumbURL'), u'/messages/{}/image/thumb'.format(result[1]['id']))
 
     def test_post_message_with_file_to_an_already_existing_conversation(self):
         from .mockers import message, message_with_file
@@ -228,7 +228,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get("contexts", None)[0].get("id", None), cid)
         self.assertEqual(result[0].get("contexts", None)[0].get("objectType", None), "conversation")
         self.assertEqual(result[0].get("objectType", None), "message")
-        self.assertEqual(result[1]['object'].get('file').get('fullURL'), u'/activities/{}/file/download'.format(result[1]['id']))
+        self.assertEqual(result[1]['object'].get('fullURL'), u'/messages/{}/file/download'.format(result[1]['id']))
 
     def test_get_image_activity_file_with_context(self):
         """
@@ -245,7 +245,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
         self.assertEqual(res.status_code, 201)
@@ -254,8 +254,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         response = res.json
         self.assertEqual(res.status_code, 200)
 
-        res = self.testapp.get('/activities/{}/image/full'.format(response[0]['id']), '', oauth2Header(username))
-        self.assertEqual(res.status_code, 200)
+        res = self.testapp.get('/activities/{}/image/full'.format(response[0]['id']), '', oauth2Header(username), status=200)
         self.assertEqual(len(res.body), 20492)
         self.assertEqual(res.content_type, u'image/png')
 
@@ -284,8 +283,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         response = res.json
         self.assertEqual(res.status_code, 200)
 
-        res = self.testapp.get('/activities/{}/file/download'.format(response[0]['id']), '', oauth2Header(username))
-        self.assertEqual(res.status_code, 200)
+        res = self.testapp.get('/activities/{}/file/download'.format(response[0]['id']), '', oauth2Header(username), status=200)
+
         self.assertEqual(len(res.body), 34981)
         self.assertEqual(res.content_type, u'application/pdf')
 
@@ -332,7 +331,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "avatar.png"), "rb")
-        files = [('image', 'avatar.png', thefile.read(), 'image/png')]
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files)
         self.assertEqual(res.status_code, 201)
@@ -341,7 +340,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         response = res.json
         self.assertEqual(res.status_code, 200)
 
-        res = self.testapp.get('/activities/{}/image/thumb'.format(response[0]['id']), '', oauth2Header(username))
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(res.body), 2966)
+        res = self.testapp.get('/activities/{}/image/thumb'.format(response[0]['id']), '', oauth2Header(username), status=200)
+
+        # Give a margin of size of 10 bytes, sometimes readed image
+        # size differs by two bytes, who knows why ...
+        self.assertLessEqual(abs(len(res.body) - 2966), 10)
+
         self.assertEqual(res.content_type, u'image/jpeg')

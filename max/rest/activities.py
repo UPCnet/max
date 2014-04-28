@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
+from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent, HTTPGone
 from pyramid.response import Response
 
 from bson import ObjectId
@@ -231,10 +231,12 @@ def modifyActivity(context, request):
     return HTTPNotImplemented()  # pragma: no cover
 
 
-@view_config(route_name='image', request_method='GET')
-@view_config(route_name='image_full', request_method='GET')
-@view_config(route_name='image_thumbnail', request_method='GET')
-@view_config(route_name='file_download', request_method='GET')
+@view_config(route_name='activity_image', request_method='GET')
+@view_config(route_name='activity_image_sizes', request_method='GET')
+@view_config(route_name='activity_file_download', request_method='GET')
+@view_config(route_name='message_image', request_method='GET')
+@view_config(route_name='message_image_sizes', request_method='GET')
+@view_config(route_name='message_file_download', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
@@ -248,12 +250,14 @@ def getActivityImageOrFile(context, request):
         Returns an image or file from local repository.
     """
     mmdb = MADMaxDB(context.db)
-    activity_id = request.matchdict.get('activity', '')
+    resource_identifier = re.search(r'^/\w+/\{(\w+)\}.*$', request.matched_route.path).groups()[0]
+    activity_id = request.matchdict.get(resource_identifier, '')
 
-    try:
-        found_activity = mmdb.activity[activity_id]
-    except:
-        raise ObjectNotFound("There's no activity with id: %s" % activity_id)
+    # Full images get no extension
+    file_size = request.matchdict.get('size', 'full')
+    file_extension = '.{}'.format(file_size) if file_size != 'full' else ''
+
+    found_activity = mmdb.activity[activity_id]
 
     if found_activity.get('contexts', []):
         readable_contexts_urls = [a['url'] for a in request.actor['subscribedTo'] if 'read' in a['permissions']]
@@ -273,10 +277,7 @@ def getActivityImageOrFile(context, request):
     base_path = request.registry.settings.get('file_repository')
 
     dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', activity_id).groups())
-    filename = dirs.pop()
-    # If the matched route is 'image_thumbnail' then return the thumbnail
-    if request.matched_route.name == 'image_thumbnail':
-        filename = filename + '.thumbnail'
+    filename = dirs.pop() + file_extension
 
     path = base_path + '/' + '/'.join(dirs)
 
@@ -284,8 +285,7 @@ def getActivityImageOrFile(context, request):
         data = open(os.path.join(path, filename)).read()
         image = Response(data, status_int=200)
         # TODO: Look if mimetype is setted, and if otherwise, treat it conveniently
-        if request.matched_route.name == 'image_thumbnail':
-            image.content_type = 'image/jpeg'
-        else:
-            image.content_type = str(found_activity['object'][found_activity['object']['objectType']]['mimetype'])
+        image.content_type = 'image/jpeg' if file_size != 'full' else str(found_activity['object'].get('mimetype', 'image/jpeg'))
         return image
+
+    return HTTPGone()

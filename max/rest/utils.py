@@ -385,11 +385,8 @@ def extractPostData(request):
     if 'multipart/form-data' in request.content_type:
         try:
             json_data = json.loads(request.params.get('json_data'), object_hook=json_util.object_hook)
-            if 'image' in json_data['object']:
-                json_data['object']['image']['data'] = request.params.get('image')
-
-            if 'file' in json_data['object']:
-                json_data['object']['file']['data'] = request.params.get('file')
+            if json_data.get('object', {}).get('objectType', '') in ['file', 'image']:
+                json_data['object']['file'] = request.params.get('file')
         except:
             json_data = {}
 

@@ -6,6 +6,7 @@ import datetime
 from pyramid.threadlocal import get_current_request
 import sys
 from copy import deepcopy
+from cgi import FieldStorage
 
 
 class MADDict(dict):
@@ -86,6 +87,8 @@ class MADDict(dict):
             return data != []
         if isinstance(data, dict):
             return data != {}
+        if isinstance(data, FieldStorage):
+            return True
         else:
             if data:
                 return True

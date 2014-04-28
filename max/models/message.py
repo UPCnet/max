@@ -10,6 +10,7 @@ class Message(BaseActivity):
     """
     collection = 'messages'
     context_collection = 'conversations'
+    resource_root = 'messages'
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['objectType'] = {'default': 'message'}

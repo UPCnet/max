@@ -54,10 +54,14 @@ PUBLIC_RESOURCES = {
     'favorites': {'route': '/activities/{activity}/favorites', 'category': 'Activities'},
     'favorite': {'route': '/activities/{activity}/favorites/{username}', 'category': 'Activities'},
     'user_favorites': {'route': '/people/{username}/favorites', 'category': 'User', 'name': 'User favorited activities'},
-    'image': {'route': '/activities/{activity}/image', 'category': 'Activities'},
-    'image_full': {'route': '/activities/{activity}/image/full', 'category': 'Activities'},
-    'image_thumbnail': {'route': '/activities/{activity}/image/thumb', 'category': 'Activities'},
-    'file_download': {'route': '/activities/{activity}/file/download', 'category': 'Activities'},
+
+    'activity_image': {'route': '/activities/{activity}/image', 'category': 'Activities'},
+    'activity_image_sizes': {'route': '/activities/{activity}/image/{size}', 'category': 'Activities'},
+    'activity_file_download': {'route': '/activities/{activity}/file/download', 'category': 'Activities'},
+
+    'message_image': {'route': '/messages/{id}/image', 'category': 'Messages'},
+    'message_image_sizes': {'route': '/messages/{id}/image/{size}', 'category': 'Messages'},
+    'message_file_download': {'route': '/messages/{id}/file/download', 'category': 'Messages'},
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},
