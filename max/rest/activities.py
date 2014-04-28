@@ -234,37 +234,32 @@ def modifyActivity(context, request):
 @view_config(route_name='activity_image', request_method='GET')
 @view_config(route_name='activity_image_sizes', request_method='GET')
 @view_config(route_name='activity_file_download', request_method='GET')
-@view_config(route_name='message_image', request_method='GET')
-@view_config(route_name='message_image_sizes', request_method='GET')
-@view_config(route_name='message_file_download', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
 def getActivityImageOrFile(context, request):
     """
-        /activities/{activity}/image
-        /activities/{activity}/image/full
-        /activities/{activity}/image/thumb
-        /activities/{activity}/file/download
-
         Returns an image or file from local repository.
     """
     mmdb = MADMaxDB(context.db)
-    resource_identifier = re.search(r'^/\w+/\{(\w+)\}.*$', request.matched_route.path).groups()[0]
+    resource_root, resource_identifier = re.search(r'^/(\w+)/\{(\w+)\}.*$', request.matched_route.path).groups()
     activity_id = request.matchdict.get(resource_identifier, '')
+    collection = mmdb.activity
+    collection_item_storage = 'subscribedTo'
+    collection_item_key = 'url'
 
     # Full images get no extension
     file_size = request.matchdict.get('size', 'full')
     file_extension = '.{}'.format(file_size) if file_size != 'full' else ''
 
-    found_activity = mmdb.activity[activity_id]
+    found_activity = collection[activity_id]
 
     if found_activity.get('contexts', []):
-        readable_contexts_urls = [a['url'] for a in request.actor['subscribedTo'] if 'read' in a['permissions']]
+        readable_contexts_urls = [a[collection_item_key] for a in request.actor[collection_item_storage] if 'read' in a['permissions']]
 
         can_read = False
         for context in found_activity['contexts']:
-            if context['url'] in readable_contexts_urls:
+            if context[collection_item_key] in readable_contexts_urls:
                 can_read = True
     else:
         # Sure ??? Do we have to check if the activity is ours, or from a followed user?

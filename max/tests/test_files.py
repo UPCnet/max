@@ -207,6 +207,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[1]['object'].get('fullURL'), u'/messages/{}/image/full'.format(result[1]['id']))
         self.assertEqual(result[1]['object'].get('thumbURL'), u'/messages/{}/image/thumb'.format(result[1]['id']))
 
+        full_url = result[1]['object'].get('fullURL')
+        res = self.testapp.get(full_url, '', oauth2Header(sender), status=200)
+
     def test_post_message_with_file_to_an_already_existing_conversation(self):
         from .mockers import message, message_with_file
         sender = 'messi'
