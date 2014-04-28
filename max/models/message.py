@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
 from max.models.activity import BaseActivity
+from max.models.conversation import Conversation
 from max.rest.utils import canWriteInContexts
 
 
@@ -10,6 +11,7 @@ class Message(BaseActivity):
     """
     collection = 'messages'
     context_collection = 'conversations'
+    context_class = Conversation
     resource_root = 'messages'
     unique = '_id'
     schema = dict(BaseActivity.schema)

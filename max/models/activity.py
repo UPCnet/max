@@ -5,6 +5,7 @@ from hashlib import sha1
 from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.models.user import User
+from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.rest.utils import canWriteInContexts, hasPermission
 from max.rest.utils import getMaxModelByObjectType
@@ -200,6 +201,91 @@ class BaseActivity(MADBase):
         del self['object']['file']
         return file_activity
 
+    def getBlob(self, extension=''):
+        """
+        """
+        base_path = self.request.registry.settings.get('file_repository')
+        separator = '.' if extension else ''
+
+        dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', str(self._id)).groups())
+        filename = dirs.pop() + separator + extension
+
+        path = base_path + '/' + '/'.join(dirs)
+
+        if os.path.exists(os.path.join(path, filename)):
+            data = open(os.path.join(path, filename)).read()
+            return data
+        return None
+
+    def getFile(self):
+        """
+            Gets the image associated to this message, if the message is of type file
+            And the image exists
+        """
+        if self.object['objectType'] != 'file':
+            return None
+
+        collection_item_storage = self.context_class.user_subscription_storage
+        collection_item_key = self.context_class.unique.lstrip('_')
+
+        if self.get('contexts', []):
+            readable_contexts_urls = [a[collection_item_key] for a in self.request.actor[collection_item_storage] if 'read' in a['permissions']]
+
+            can_read = False
+            for context in self['contexts']:
+                if context[collection_item_key] in readable_contexts_urls:
+                    can_read = True
+        else:
+            # Sure ??? Do we have to check if the activity is ours, or from a followed user?
+            # Try to unify this criteria with the criteria used in geting the timeline activities
+            can_read = True
+
+        if not can_read:
+            raise Unauthorized("You are not allowed to read this activity: %s" % str(self._id))
+
+        image_file = self.getBlob()
+
+        if image_file is None:
+            return None, None
+        else:
+            return image_file, str(self['object'].get('mimetype', 'image/jpeg'))
+
+    def getImage(self, size):
+        """
+            Gets the image associated to this message, if the message is of type image
+            And the image exists
+        """
+        if self.object['objectType'] != 'image':
+            return None
+
+        collection_item_storage = self.context_class.user_subscription_storage
+        collection_item_key = self.context_class.unique.lstrip('_')
+
+        file_extension = size if size != 'full' else ''
+
+        if self.get('contexts', []):
+            readable_contexts_urls = [a[collection_item_key] for a in self.request.actor[collection_item_storage] if 'read' in a['permissions']]
+
+            can_read = False
+            for context in self['contexts']:
+                if context[collection_item_key] in readable_contexts_urls:
+                    can_read = True
+        else:
+            # Sure ??? Do we have to check if the activity is ours, or from a followed user?
+            # Try to unify this criteria with the criteria used in geting the timeline activities
+            can_read = True
+
+        if not can_read:
+            raise Unauthorized("You are not allowed to read this activity: %s" % str(self._id))
+
+        image_file = self.getBlob(extension=file_extension)
+
+        if image_file is None:
+            return None, None
+        else:
+            content_type = 'image/jpeg' if size != 'full' else str(self['object'].get('mimetype', 'image/jpeg'))
+            return image_file, content_type
+
     def process_file(self, request, activity_file):
         """
             Process file and save it into the database
@@ -265,6 +351,7 @@ class Activity(BaseActivity):
     """
     collection = 'activity'
     context_collection = 'contexts'
+    context_class = Context
     resource_root = 'activities'
     unique = '_id'
     schema = dict(BaseActivity.schema)
