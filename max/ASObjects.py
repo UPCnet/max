@@ -153,6 +153,7 @@ class Image(Note):
     """
     schema = dict(Note.schema)
     schema['image'] = dict()
+    schema['content']['required'] = 0
 
 
 class File(Note):
@@ -161,3 +162,4 @@ class File(Note):
     """
     schema = dict(Note.schema)
     schema['file'] = dict()
+    schema['content']['required'] = 0
