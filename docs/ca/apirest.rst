@@ -379,8 +379,10 @@ llistar-les com crear-ne de noves.
           codificat amb JSON amb el camp body que passariem si la petició fos
           'application/json'.
         * La petició ha de contindre un camp form-data anomenat igual que el
-          ``file`` el qual contindrpa la informació del fitxer que volem pujar: nom del fitxer, les dades binaries de l'arxiu i el content_type. (Veure un exemple de petició més avall). Les peticions per
-          arxius i imatges es fan igual, només canvia el objectType informat a dins les dades json.
+          ``file`` el qual contindrpa la informació del fitxer que volem pujar:
+          nom del fitxer, les dades binaries de l'arxiu i el content_type. (Veure
+          un exemple de petició més avall). Les peticions per arxius i imatges es
+          fan igual, només canvia el objectType informat a dins les dades json.
 
     :query username: (REST) Nom de l'usuari que crea l'activitat
     :query contexts: (Opcional) Per fer que una activitat estigui associada a un
