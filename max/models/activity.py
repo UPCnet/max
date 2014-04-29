@@ -344,9 +344,14 @@ class BaseActivity(MADBase):
 
                 self['object']['thumbURL'] = '/{}/{}/image/thumb'.format(self.resource_root, str(self['_id']))
         self['object']['mimetype'] = activity_file.headers.getheader('content-type', '')
-        filename = re.search(r'filename="(.*?)"', activity_file.headers.getheader('content-disposition', '')).groups()
-        if filename:
-            self['object']['filename'] = filename
+
+        # If there's a user-provided filename, preserve it
+        if 'filename' not in self['object']:
+            # Try to get filename from content disposition
+            filename = re.search(r'filename="(.*?)"', activity_file.headers.getheader('content-disposition', '')).groups()
+            # Ignore empty filenames and "file" filenames (the latter coming from maxclient)
+            if filename and filename != 'file':
+                self['object']['filename'] = filename[0]
 
 
 class Activity(BaseActivity):
