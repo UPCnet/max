@@ -248,7 +248,7 @@ class BaseActivity(MADBase):
         if image_file is None:
             return None, None
         else:
-            return image_file, str(self['object'].get('mimetype', 'image/jpeg'))
+            return image_file, str(self['object'].get('mimetype', 'application/octet-stream'))
 
     def getImage(self, size):
         """
@@ -283,6 +283,7 @@ class BaseActivity(MADBase):
         if image_file is None:
             return None, None
         else:
+
             content_type = 'image/jpeg' if size != 'full' else str(self['object'].get('mimetype', 'image/jpeg'))
             return image_file, content_type
 
@@ -327,7 +328,6 @@ class BaseActivity(MADBase):
             filename = dirs.pop()
             path = base_path + '/' + '/'.join(dirs)
             os.makedirs(path)
-
             r_file = open(path + '/' + filename, 'w')
             r_file.write(activity_file.file.read())
             r_file.close()
@@ -343,6 +343,7 @@ class BaseActivity(MADBase):
                 thumb.save(path + '/' + filename + ".thumb", "JPEG")
 
                 self['object']['thumbURL'] = '/{}/{}/image/thumb'.format(self.resource_root, str(self['_id']))
+        self['object']['mimetype'] = activity_file.headers.getheader('content-type', '')
 
 
 class Activity(BaseActivity):

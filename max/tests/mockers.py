@@ -322,7 +322,6 @@ message_with_image = {
     "object": {
         "objectType": "image",
         "content": "Nos espera una gran temporada, no es cierto?",
-        "mimetype": "image/png",
     }
 }
 
@@ -335,7 +334,6 @@ message_with_file = {
     "object": {
         "objectType": "file",
         "content": "Nos espera una gran temporada, no es cierto?",
-        "mimetype": "application/pdf",
     }
 }
 
@@ -479,7 +477,6 @@ user_image_activity = {
     "object": {
         "objectType": "image",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "image/png",
     },
 }
 
@@ -493,7 +490,6 @@ user_image_activity_with_context = {
     "object": {
         "objectType": "image",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "image/png",
     },
 }
 
@@ -507,7 +503,6 @@ user_image_activity_with_context_with_uploadurl = {
     "object": {
         "objectType": "image",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "image/png",
     },
 }
 
@@ -516,7 +511,6 @@ user_file_activity = {
     "object": {
         "objectType": "file",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "application/pdf"
     },
 }
 
@@ -530,7 +524,6 @@ user_file_activity_with_context = {
     "object": {
         "objectType": "file",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "application/pdf"
     },
 }
 
@@ -544,7 +537,6 @@ user_file_activity_with_context_with_uploadurl = {
     "object": {
         "objectType": "file",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus amb imatge</p>",
-        "mimetype": "application/pdf"
     },
 }
 

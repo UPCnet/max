@@ -372,16 +372,15 @@ llistar-les com crear-ne de noves.
     dos últims a partir de la versió de MAX 4.0). Les peticions de creació dels
     ``objectType`` *image* i *file* han d'estar codificades de manera diferent a
     totes les demés peticions ja que hi ha involucrada la pujada d'un fitxer.
-    Aquesta petició te fer-se mitjançant multipart/form-data amb les capçaleres
+    Aquesta petició s'ha fer-se mitjançant multipart/form-data amb les capçaleres
     corresponents d'oAuth. Aquesta petició ha de complir dos requeriments:
 
         * La petició ha de contindre un camp form-data anomenat json_data
           codificat amb JSON amb el camp body que passariem si la petició fos
           'application/json'.
         * La petició ha de contindre un camp form-data anomenat igual que el
-          ``objectType`` al qual es refereix amb la informació (estàndar form-
-          data amb el nom del fitxer, el binari i el content_type) del fitxer que
-          volem pujar.
+          ``file`` el qual contindrpa la informació del fitxer que volem pujar: nom del fitxer, les dades binaries de l'arxiu i el content_type. (Veure un exemple de petició més avall). Les peticions per
+          arxius i imatges es fan igual, només canvia el objectType informat a dins les dades json.
 
     :query username: (REST) Nom de l'usuari que crea l'activitat
     :query contexts: (Opcional) Per fer que una activitat estigui associada a un
@@ -394,8 +393,9 @@ llistar-les com crear-ne de noves.
         Ha de contindre les claus ``objectType`` i ``content`` el qual pot
         tractar-se d'un camp codificat amb HTML, amb alguns tags restringits. En
         el cas de tractar-se d'un ``objectType`` *image* o *file*, també ha de
-        contindre el camp ``mimetype`` amb el content_type del fitxer que estem
-        pujant.
+        contenir el camp ``mimetype`` amb el tipus de fitxer que estem
+        pujant, per exemple ``image/png``.
+
 
     **Exemple de petició (*note*)**
 
@@ -449,33 +449,35 @@ llistar-les com crear-ne de noves.
             >>> response.json.get('object').get('objectType') == expected.get('object').get('objectType')
             True
 
-    **Exemple de petició (*image*)**
+    **Exemple de petició multipart-data (*image*)**
 
-        .. code-block:: python
+        .. code-block:: guess
 
-            {
+
+            Content-Type: multipart/form-data; boundary=bf3e91c00129415ea5337490b8f9921a
+
+            --bf3e91c00129415ea5337490b8f9921a
+            Content-Disposition: form-data; name="json_data"
+
+           {
                 "object": {
                     "objectType": "image",
                     "content": "Testejant la creació d'un canvi d'estat amb imatge",
-                    "image": {
-                        "mimetype": "image/png",
-                    }
+                    "mimetype": "image/png",
                 }
             }
 
-    **Exemple de petició (*file*)**
+            --bf3e91c00129415ea5337490b8f9921a
+            Content-Disposition: form-data; name="file"; filename="avatar.png"
+            Content-Type: image/png
 
-        .. code-block:: python
+            <Dades binaries del fitxer>
+            --bf3e91c00129415ea5337490b8f9921a--
 
-            {
-                "object": {
-                    "objectType": "file",
-                    "content": "Testejant la creació d'un canvi d'estat amb fitxer",
-                    "file": {
-                        "mimetype": "application/pdf",
-                    }
-                }
-            }
+
+    **Resposta esperada**:
+
+        Imatge binaria
 
     Success
 
