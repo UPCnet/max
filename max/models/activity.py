@@ -346,7 +346,7 @@ class BaseActivity(MADBase):
         self['object']['mimetype'] = activity_file.headers.getheader('content-type', '')
         filename = re.search(r'filename="(.*?)"', activity_file.headers.getheader('content-disposition', '')).groups()
         if filename:
-            self['object']['mimetype'] = filename
+            self['object']['filename'] = filename
 
 
 class Activity(BaseActivity):
