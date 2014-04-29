@@ -3,11 +3,24 @@
 
 def post_tunneling_factory(handler, registry):
     def post_tunneling_tween(request):
-        overriden_method = request.headers.get('X-HTTP-Method-Override', None)
-        is_valid_overriden_method = overriden_method in ['DELETE', 'PUT']
+        headers = dict(request.headers)
+        original_body = request.body
+        # Look for header in post-data if not found in headers
+        overriden_method = headers.get('X-HTTP-Method-Override', request.params.get('X-HTTP-Method-Override', None))
+        is_valid_overriden_method = overriden_method in ['DELETE', 'PUT', 'GET']
         is_POST_request = request.method.upper() == 'POST'
         if is_POST_request and is_valid_overriden_method:
+            # If it's an overriden GET pass over the authentication data in the post body
+            # to the headers, before overriding the method, after this, post data will be lost
+            if overriden_method == 'GET':
+                request.headers.setdefault('X-Oauth-Token', request.params.get('X-Oauth-Token', ''))
+                request.headers.setdefault('X-Oauth-Username', request.params.get('X-Oauth-Username', ''))
+                request.headers.setdefault('X-Oauth-Scope', request.params.get('X-Oauth-Scope', ''))
+
             request.method = overriden_method
+
+        # Restore uncorrupted body
+        request.body = original_body
         response = handler(request)
         return response
     return post_tunneling_tween
