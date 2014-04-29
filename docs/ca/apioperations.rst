@@ -122,6 +122,7 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
+                "notifications": false,
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
@@ -178,6 +179,7 @@ Contexts
                     "tags": [
                         "Assignatura"
                     ],
+                    "notifications": false,
                     "published": "2000-01-01T00:01:00Z",
                     "owner": "test_manager",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
@@ -237,6 +239,7 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
+                "notifications": false,
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
@@ -287,6 +290,7 @@ Contexts
                 "tags": [
                     "Assignatura"
                 ],
+                "notifications": false,
                 "published": "2000-01-01T00:01:00Z",
                 "owner": "test_manager",
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
@@ -495,13 +499,14 @@ que a partir de llavors, no el pot perdre exepte per eliminació explícita.
                 "twitterHashtag": "assignatura1",
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
+                "notifications": false,
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
-                "objectType": "context",
                 "permissions": [
                     "read",
                     "write",
                     "unsubscribe"
-                ]
+                ],
+                "objectType": "context"
             }
 
         .. -> expected
@@ -537,6 +542,7 @@ que a partir de llavors, no el pot perdre exepte per eliminació explícita.
                 "twitterHashtag": "assignatura1",
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
+                "notifications": false,
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "permissions": [
                     "read",
@@ -585,6 +591,7 @@ que a partir de llavors, no el pot perdre exepte per eliminació explícita.
                 "twitterHashtag": "assignatura1",
                 "displayName": "Atenea",
                 "url": "http://atenea.upc.edu",
+                "notifications": false,
                 "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                 "permissions": [
                     "read",
@@ -666,6 +673,7 @@ Activitats
                             "Assignatura"
                         ],
                         "url": "http://atenea.upc.edu",
+                        "notifications": false,
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }
@@ -747,11 +755,12 @@ Activitats
                 "creator": "test_manager",
                 "contexts": [
                     {
-                        "url": "http://atenea.upc.edu",
                         "displayName": "Atenea",
                         "tags": [
                             "Assignatura"
                         ],
+                        "url": "http://atenea.upc.edu",
+                        "notifications": false,
                         "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }

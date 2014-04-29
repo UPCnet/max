@@ -222,18 +222,17 @@ Operacions sobre el recurs *usuari* del sistema.
         .. code-block:: python
 
             {
-                "username": "messi",
+                "username": "neymar",
                 "iosDevices": [],
-                "displayName": "Lionel Messi",
+                "displayName": "Neymar JR",
                 "talkingIn": [],
-                "creator": "test_manager",
+                "creator": "neymar",
                 "androidDevices": [],
                 "following": [],
                 "subscribedTo": [],
                 "last_login": "2000-01-01T00:01:00Z",
                 "published": "2000-01-01T00:01:00Z",
-                "owner": "messi",
-                "twitterUsername": "messi10oficial",
+                "owner": "neymar",
                 "id": "519b00000000000000000000",
                 "objectType": "person"
             }
@@ -547,12 +546,13 @@ l'usuari ha estat previament subscrit a aquest context.
                 "creator": "messi",
                 "contexts": [
                     {
-                        "url": "http://atenea.upc.edu",
-                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                        "displayName": "Atenea",
                         "tags": [
                             "Assignatura"
                         ],
-                        "displayName": "Atenea",
+                        "url": "http://atenea.upc.edu",
+                        "notifications": false,
+                        "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                         "objectType": "context"
                     }
                 ],
@@ -612,13 +612,14 @@ l'usuari ha estat previament subscrit a aquest context.
                     "generator": null,
                     "contexts": [
                         {
-                            "url": "http://atenea.upc.edu",
                             "displayName": "Atenea",
-                            "objectType": "context",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "tags": [
                                 "Assignatura"
-                            ]
+                            ],
+                            "url": "http://atenea.upc.edu",
+                            "notifications": false,
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "objectType": "context"
                         }
                     ],
                     "favoritesCount": 0,
@@ -741,13 +742,14 @@ concret.
                     "generator": null,
                     "contexts": [
                         {
-                            "url": "http://atenea.upc.edu",
                             "displayName": "Atenea",
-                            "objectType": "context",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "tags": [
                                 "Assignatura"
-                            ]
+                            ],
+                            "url": "http://atenea.upc.edu",
+                            "notifications": false,
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "objectType": "context"
                         }
                     ],
                     "favoritesCount": 0,
@@ -820,13 +822,14 @@ indirectament.
                     "generator": null,
                     "contexts": [
                         {
-                            "url": "http://atenea.upc.edu",
                             "displayName": "Atenea",
-                            "objectType": "context",
-                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                             "tags": [
                                 "Assignatura"
-                            ]
+                            ],
+                            "url": "http://atenea.upc.edu",
+                            "notifications": false,
+                            "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
+                            "objectType": "context"
                         }
                     ],
                     "favoritesCount": 0,
@@ -1049,6 +1052,7 @@ Subscripcions
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu",
+                    "notifications": false,
                     "published": "2000-01-01T00:01:00Z",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "permissions": {
@@ -1066,6 +1070,7 @@ Subscripcions
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu/A",
+                    "notifications": false,
                     "published": "2000-01-01T00:01:00Z",
                     "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                     "permissions": {
@@ -1193,6 +1198,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu",
+                    "notifications": false,
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "objectType": "context",
                     "permissions": [
@@ -1208,6 +1214,7 @@ Representa el conjunt de contextes als quals esta subscrit un usuari.
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu/A",
+                    "notifications": false,
                     "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                     "objectType": "context",
                     "permissions": [
@@ -1487,7 +1494,8 @@ Aquests són els serveis associats.
                     ],
                     "lastMessage": {
                         "content": "Nos espera una gran temporada, no es cierto?",
-                        "published": "2000-01-01T00:01:00Z"
+                        "published": "2000-01-01T00:01:00Z",
+                        "objectType": "note"
                     },
                     "published": "2000-01-01T00:01:00Z",
                     "owner": "messi",
@@ -1895,6 +1903,7 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu",
+                    "notifications": false,
                     "published": "2000-01-01T00:01:00Z",
                     "hash": "e6847aed3105e85ae603c56eb2790ce85e212997",
                     "permissions": {
@@ -1912,6 +1921,7 @@ que són accessibles per usuaris normals estàn documentats aquí
                         "Assignatura"
                     ],
                     "url": "http://atenea.upc.edu/A",
+                    "notifications": false,
                     "published": "2000-01-01T00:01:00Z",
                     "hash": "90c8f28a7867fbad7a2359c6427ae8798a37ff07",
                     "permissions": {
