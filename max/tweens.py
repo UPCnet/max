@@ -3,10 +3,9 @@
 
 def post_tunneling_factory(handler, registry):
     def post_tunneling_tween(request):
-        headers = dict(request.headers)
         original_body = request.body
         # Look for header in post-data if not found in headers
-        overriden_method = headers.get('X-HTTP-Method-Override', request.params.get('X-HTTP-Method-Override', None))
+        overriden_method = request.headers.get('X-HTTP-Method-Override', None)  # request.params.get('X-HTTP-Method-Override', None))
         is_valid_overriden_method = overriden_method in ['DELETE', 'PUT', 'GET']
         is_POST_request = request.method.upper() == 'POST'
         if is_POST_request and is_valid_overriden_method:
