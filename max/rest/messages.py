@@ -7,6 +7,7 @@ from bson import ObjectId
 from max.models import Message
 from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
+from base64 import b64encode
 
 
 @view_config(route_name='message_image', request_method='GET')
@@ -27,6 +28,10 @@ def getMessageImageAttachment(context, request):
     image, mimetype = message.getImage(size=file_size)
 
     if image is not None:
+        if request.headers.get('content-type', '') == 'application/base64':
+            image = b64encode(image)
+            mimetype = 'application/base64'
+
         response = Response(image, status_int=200)
         response.content_type = mimetype
     else:
@@ -43,16 +48,17 @@ def getMessageFileAttachment(context, request):
     """
         Returns file from local repository.
     """
-
-    activity_id = request.matchdict.get('id', '')
+    message_id = request.matchdict.get('id', '')
     message = Message()
-    message.fromDatabase(ObjectId(activity_id))
+    message.fromDatabase(ObjectId(message_id))
 
     file_data, mimetype = message.getFile()
 
     if file_data is not None:
         response = Response(file_data, status_int=200)
         response.content_type = mimetype
+        filename = message['object'].get('filename', message_id)
+        response.headers.add('Content-Disposition', 'attachment; filename={}'.format(filename))
     else:
         response = HTTPGone()
 

@@ -173,6 +173,7 @@ class File(Note):
     schema = dict(Note.schema)
     schema['content']['required'] = 0
     schema['file'] = dict()
+    schema['filename'] = dict()
     schema['mimetype'] = dict()
     schema['fullURL'] = dict()
 

@@ -15,7 +15,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
 from max.rabbitmq.notifications import notifyContextActivity
 
-import os
+from base64 import b64encode
 import re
 
 
@@ -249,6 +249,10 @@ def getActivityImageAttachment(context, request):
     image, mimetype = message.getImage(size=file_size)
 
     if image is not None:
+        if request.headers.get('content-type', '') == 'application/base64':
+            image = b64encode(image)
+            mimetype = 'application/base64'
+
         response = Response(image, status_int=200)
         response.content_type = mimetype
     else:
@@ -266,14 +270,16 @@ def getActivityFileAttachment(context, request):
         Returns file from local repository.
     """
     activity_id = request.matchdict.get('activity', '')
-    message = Activity()
-    message.fromDatabase(ObjectId(activity_id))
+    activity = Activity()
+    activity.fromDatabase(ObjectId(activity_id))
 
-    file_data, mimetype = message.getFile()
+    file_data, mimetype = activity.getFile()
 
     if file_data is not None:
         response = Response(file_data, status_int=200)
         response.content_type = mimetype
+        filename = activity['object'].get('filename', activity_id)
+        response.headers.add('Content-Disposition', 'attachment; filename={}'.format(filename))
     else:
         response = HTTPGone()
 

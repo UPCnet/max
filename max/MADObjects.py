@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.rest.utils import extractPostData, flatten, RUDict
-from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, ValidationError
+from max.exceptions import MissingField, ObjectNotSupported, DuplicatedItemError, ValidationError, ObjectNotFound
 from bson import ObjectId
 import datetime
 from pyramid.threadlocal import get_current_request
@@ -266,6 +266,8 @@ class MADBase(MADDict):
             self.update(obj)
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
+#        else:
+#            raise ObjectNotFound('Object with {} {} not found on database'.format(self.unique, str()))
 
     def insert(self):
         """
