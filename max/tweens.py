@@ -1,8 +1,32 @@
+from max.exceptions import JSONHTTPPreconditionFailed
 # -*- coding: utf-8 -*-
+
+
+def compatibility_checker_factory(handler, registry):
+    def compatibility_checker_tween(request):
+        print 'compat'
+        requested_compat_id = str(request.headers.get('X-Max-Compat-ID', None))
+        if requested_compat_id is None:
+            response = handler(request)
+            return response
+
+        expected_compat_id = str(request.registry.settings.get('max.compat_id'))
+        if expected_compat_id == requested_compat_id:
+            response = handler(request)
+            return response
+        else:
+            return JSONHTTPPreconditionFailed(
+                error=dict(
+                    objectType='error',
+                    error="CompatibilityIDMismatch",
+                    expected_compat_id=expected_compat_id,
+                    error_description='X-Max-Compat-ID header value mismatch, {} was expected'.format(expected_compat_id)))
+    return compatibility_checker_tween
 
 
 def post_tunneling_factory(handler, registry):
     def post_tunneling_tween(request):
+        print 'post'
         original_body = request.body
         # Look for header in post-data if not found in headers
         overriden_method = request.headers.get('X-HTTP-Method-Override', request.params.get('X-HTTP-Method-Override', None))

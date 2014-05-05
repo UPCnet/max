@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-from pyramid.httpexceptions import HTTPUnauthorized, HTTPBadRequest, HTTPNotImplemented, HTTPNotFound, HTTPForbidden, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPInternalServerError
+from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.httpexceptions import HTTPPreconditionFailed
 from pyramid.response import Response
 
 import json
@@ -41,6 +47,13 @@ class JSONHTTPNotImplemented(HTTPNotImplemented):
 
 
 class JSONHTTPInternalServerError(HTTPInternalServerError):  # pragma: no cover
+
+    def __init__(self, error):
+        Response.__init__(self, json.dumps(error), status=self.code)
+        self.content_type = 'application/json'
+
+
+class JSONHTTPPreconditionFailed(HTTPPreconditionFailed):  # pragma: no cover
 
     def __init__(self, error):
         Response.__init__(self, json.dumps(error), status=self.code)

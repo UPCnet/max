@@ -33,7 +33,9 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=Root)
 
+    # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
     config.add_tween('max.tweens.post_tunneling_factory')
+    config.add_tween('max.tweens.compatibility_checker_factory')
 
     debug.setup(config, settings)
 
