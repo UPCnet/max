@@ -5,7 +5,7 @@ from max.exceptions import JSONHTTPPreconditionFailed
 def compatibility_checker_factory(handler, registry):
     def compatibility_checker_tween(request):
         print 'compat'
-        requested_compat_id = str(request.headers.get('X-Max-Compat-ID', None))
+        requested_compat_id = request.headers.get('X-Max-Compat-ID', None)
         if requested_compat_id is None:
             response = handler(request)
             return response
