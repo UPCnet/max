@@ -107,8 +107,6 @@ def rebuildConversationSubscriptions(context, request):
     existing_conversations = {}
     conversations = mmdb.conversations.dump()
     for conversation in conversations:
-        conversation.updateUsersSubscriptions(force_update=True)
-        conversation.updateContextActivities(force_update=True)
 
         # if we found an ancient plain username list, we migrate it
         if True not in [isinstance(a, dict) for a in conversation['participants']]:
@@ -128,6 +126,9 @@ def rebuildConversationSubscriptions(context, request):
         # treated as two people conversations
 
         conversation.save()
+
+        conversation.updateUsersSubscriptions(force_update=True)
+        conversation.updateContextActivities(force_update=True)
 
         existing_conversations[str(conversation['_id'])] = conversation
 

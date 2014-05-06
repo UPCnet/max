@@ -104,24 +104,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertListEqual(res.json[0]['contexts'][0]['tags'], ['Assignatura', 'new tag'])
 
     def test_maintenance_conversations(self):
-        from .mockers import message
+        from .mockers import group_message as message
 
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
-        #Hard modify conversation directly on mongo to simulate changed permissions, displayName and tags
+        #Hard modify group conversation directly on mongo to simulate changed permissions, displayName and tags
         conversations = self.exec_mongo_query('conversations', 'find', {})
         conversation = conversations[0]
         conversation['permissions']['write'] = 'restricted'
         conversation['displayName'] = 'Changed Name'
-        conversation['participants'] = ['messi', 'xavi', 'iniesta']
+        conversation['tags'] = []
+        conversation['participants'] = ['messi', 'xavi', 'shakira']  # Simulate ol'times structure
         self.exec_mongo_query('conversations', 'update', {'_id': conversation['_id']}, conversation)
 
-        # Put a displayName on the user
+        # Hard Put a displayName on a user
         users = self.exec_mongo_query('users', 'find', {'username': 'messi'})
         user = users[0]
         user['displayName'] = 'Lionel Messi'
@@ -134,8 +137,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['talkingIn'][0]['displayName'], 'Changed Name')
         self.assertEqual(res.json['talkingIn'][0]['participants'][0]['username'], 'messi')
         self.assertEqual(res.json['talkingIn'][0]['participants'][1]['username'], 'xavi')
-        self.assertEqual(res.json['talkingIn'][0]['participants'][2]['username'], 'iniesta')
-        self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe'])
+        self.assertEqual(res.json['talkingIn'][0]['participants'][2]['username'], 'shakira')
+        self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe', 'subscribe'])
+        self.assertListEqual(res.json['talkingIn'][0]['tags'], ['group'])
         conversation_id = res.json['talkingIn'][0]['id']
 
         #Check context participants are updated
