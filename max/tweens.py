@@ -18,7 +18,6 @@ def compatibility_checker_factory(handler, registry):
                 error=dict(
                     objectType='error',
                     error="CompatibilityIDMismatch",
-                    expected_compat_id=expected_compat_id,
                     error_description='X-Max-Compat-ID header value mismatch, {} was expected'.format(expected_compat_id)))
     return compatibility_checker_tween
 
