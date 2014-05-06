@@ -170,3 +170,23 @@ def getException(context, request):
     }
     handler = JSONResourceEntity(result)
     return handler.buildResponse()
+
+
+@view_config(route_name='maintenance_users', request_method='POST', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def rebuildUser(context, request):
+    """
+         Rebuilds user objects with defaults and consistency checks.
+         Currently checks that owner of the object must be the same user:
+    """
+    mmdb = MADMaxDB(context.db)
+    users = mmdb.users.dump()
+    for user in users:
+        if user._owner != user.username:
+            user._owner = user.username
+            user.save()
+
+    handler = JSONResourceRoot([])
+    return handler.buildResponse()

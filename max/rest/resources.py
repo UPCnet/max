@@ -94,6 +94,7 @@ RESTRICTED_RESOURCES = {
     'maintenance_dates': {'route': '/admin/maintenance/dates', 'category': 'Management'},
     'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions', 'category': 'Management'},
     'maintenance_conversations': {'route': '/admin/maintenance/conversations', 'category': 'Management'},
+    'maintenance_users': {'route': '/admin/maintenance/users', 'category': 'Management'},
     'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}', 'category': 'Management'},
 }
 

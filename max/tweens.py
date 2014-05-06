@@ -4,7 +4,6 @@ from max.exceptions import JSONHTTPPreconditionFailed
 
 def compatibility_checker_factory(handler, registry):
     def compatibility_checker_tween(request):
-        print 'compat'
         requested_compat_id = request.headers.get('X-Max-Compat-ID', None)
         if requested_compat_id is None:
             response = handler(request)
@@ -26,7 +25,6 @@ def compatibility_checker_factory(handler, registry):
 
 def post_tunneling_factory(handler, registry):
     def post_tunneling_tween(request):
-        print 'post'
         original_body = request.body
         # Look for header in post-data if not found in headers
         overriden_method = request.headers.get('X-HTTP-Method-Override', request.params.get('X-HTTP-Method-Override', None))
