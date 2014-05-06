@@ -209,3 +209,36 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/contexts', {"twitter_enabled": True}, oauth2Header(test_manager), status=200)
 
         self.assertEqual(len(res.json), 1)
+
+    def test_rename_context_url(self):
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+        from hashlib import sha1
+
+        username = 'messi'
+        self.create_user(test_manager)
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity = self.create_activity(username, user_status_context)
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"url": "http://new.url"}), oauth2Header(test_manager), status=200)
+
+        # Test context is updated
+        new_url_hash = sha1('http://new.url').hexdigest()
+        res = self.testapp.get('/contexts/%s' % new_url_hash, "", oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['url'], 'http://new.url')
+        self.assertEqual(res.json['hash'], new_url_hash)
+
+        # Test user subscription is updated
+        res = self.testapp.get('/people/%s' % username, "", oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['subscribedTo'][0]['url'], 'http://new.url')
+        self.assertEqual(res.json['subscribedTo'][0]['hash'], new_url_hash)
+
+        # Test user activity is updated
+        res = self.testapp.get('/activities/%s' % activity.json['id'], "", oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['contexts'][0]['url'], 'http://new.url')
+        self.assertEqual(res.json['contexts'][0]['hash'], new_url_hash)
+
+

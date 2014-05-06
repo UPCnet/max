@@ -69,7 +69,7 @@ def getConversations(context, request):
                                        'objectType': lastMessage['object']['objectType']
                                        }
 	if lastMessage['object']['objectType'] in ['file', 'image']:
-            lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '') 
+            lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
             if lastMessage['object']['objectType'] ==  'image':
                 lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
 
@@ -415,7 +415,7 @@ def joinConversation(context, request):
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         if 'group' not in conversation.get('tags', []):
-            raise Forbidden('This is not a group conversation, so anyone else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))            
+            raise Forbidden('This is not a group conversation, so anyone else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         users = MADMaxCollection(context.db.users, query_key='username')
         creator = users[request.creator]

@@ -112,7 +112,7 @@ class BaseContext(MADBase):
             Now only updates displayName and permissions
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
-        updatable_fields = ['displayName', 'tags']
+        updatable_fields = ['displayName', 'tags', 'url']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
         if has_updatable_fields or force_update:
@@ -128,6 +128,10 @@ class BaseContext(MADBase):
             if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
                 updates.update({'contexts.$.participants': self.participants})
 
+            if 'url' in self.schema.keys() and (self.field_changed('url') or force_update):
+                updates.update({'contexts.$.url': self.url})
+                updates.update({'contexts.$.hash': self.hash})
+
             combined_updates = {'$set': updates}
 
             self.mdb_collection.database[self.activity_storage].update(criteria, combined_updates, multi=True)
@@ -138,7 +142,7 @@ class BaseContext(MADBase):
             Now only updates displayName and permissions and tags
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
-        updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants']
+        updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants', 'url']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
 
         if has_updatable_fields or force_update:
@@ -147,6 +151,10 @@ class BaseContext(MADBase):
                 user_object.fromObject(user)
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
+
+                if 'url' in self.schema.keys() and (self.field_changed('url') or force_update):
+                    updates.update({'{}.$.url'.format(self.user_subscription_storage): self.url})
+                    updates.update({'{}.$.hash'.format(self.user_subscription_storage): self.hash})
 
                 if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
@@ -183,6 +191,8 @@ class BaseContext(MADBase):
 
                 combined_updates = {'$set': updates}
                 self.mdb_collection.database.users.update(criteria, combined_updates, multi=True)
+
+                self.save()
 
     def removeUserSubscriptions(self, users_to_delete=[]):
         """
@@ -268,7 +278,10 @@ class Context(BaseContext):
             self[self.unique] = self.getIdentifier()
 
     def getIdentifier(self):
-        return sha1(self['url']).hexdigest()
+        if 'url' in self.schema.keys() and self.field_changed('url'):
+            return self.old.get('hash', sha1(self['url']).hexdigest())
+        else:
+            return sha1(self['url']).hexdigest()
 
     def buildObject(self):
         super(Context, self).buildObject()
@@ -301,6 +314,9 @@ class Context(BaseContext):
             else:
                 for user in self.subscribedUsers():
                     unbindUserFromContext(self, user['username'])
+
+        if 'url' in properties:
+            self.hash = sha1(self.url).hexdigest()
 
         self.save()
 
