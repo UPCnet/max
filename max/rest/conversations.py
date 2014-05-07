@@ -271,7 +271,7 @@ def getUserConversationSubscription(context, request):
     messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
     lastMessage = messages[0]
     conversation['lastMessage'] = {'published': lastMessage['published'],
-                                   'content': lastMessage['object']['content']
+                                   'content': lastMessage['object'].get('content', '')
                                    }
     conversation['messages'] = 0
 
@@ -313,7 +313,7 @@ def getConversation(context, request):
     messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
     lastMessage = messages[0]
     conversation['lastMessage'] = {'published': lastMessage['published'],
-                                   'content': lastMessage['object']['content']
+                                   'content': lastMessage['object'].get('content', '')
                                    }
     conversation['messages'] = 0
 
