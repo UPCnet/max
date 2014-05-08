@@ -1,11 +1,51 @@
 CHANGELOG
 =========
 
-4.0.1 (unreleased)
+4.0.1 (2014-05-08)
 ------------------
 
-- Nothing changed yet.
-
+* Documentation [Carles Bruguera]
+* Do not expect content always [Carles Bruguera]
+* Don't always expect content on messages [Carles Bruguera]
+* Value not needed, already present in headers [Carles Bruguera]
+* Context url renaming with changes propagation [Carles Bruguera]
+* Fix maintenance subscriptions endopoint & test [Carles Bruguera]
+* Remove debug prints [Carles Bruguera]
+* Add maintenance users endpoint with test [Carles Bruguera]
+* Move maintenance tests to new file [Carles Bruguera]
+* Don't str a None please... [Carles Bruguera]
+* Add Tween to block calls to incompatible apps [Carles Bruguera]
+* Read filename from json first [Carles Bruguera]
+* Recover reading from post params [Carles Bruguera]
+* Fix typos and identation [Carles Bruguera]
+* Get header directly from request [Carles Bruguera]
+* base64 responses for image data [Carles Bruguera]
+* Get filename from uploaded file [Carles Bruguera]
+* Enable post-body auth and tunneled GET requests [Carles Bruguera]
+* Update docs [Carles Bruguera]
+* Use mimetype included in form content-type header [Carles Bruguera]
+* Update documentation [Carles Bruguera]
+* Updated expected responses: notification field [Carles Bruguera]
+* Move image and file retrieval common code to activity model [Carles Bruguera]
+* get message images in a different method [Carles Bruguera]
+* Last message may not contain text [Carles Bruguera]
+* Refactor file/image upload [Carles Bruguera]
+* Use a unique fieldname "file" to upload data [Carles Bruguera]
+* All content fields in one level [Carles Bruguera]
+* Generalize image sizes [Carles Bruguera]
+* Fix message images referencing [Carles Bruguera]
+* Note content not mandatory on images and files [Carles Bruguera]
+* Add image extractic to admin conversation messages [Carles Bruguera]
+* Add image extraction code for addAdminUserActivity [Carles Bruguera]
+* return content-type value as string [Carles Bruguera]
+* don't assume activity always has contexts [Carles Bruguera]
+* Include correct user data in notification [Carles Bruguera]
+* Allow notifications field [Carles Bruguera]
+* Include notifications in updatable user subscriptions data [Carles Bruguera]
+* Bad method name [Carles Bruguera]
+* Set/delete bindings on updating notification value [Carles Bruguera]
+* Add notifications for context activities [Carles Bruguera]
+* Change regex to match missing properties and egg [Carles Bruguera]
 
 4.0.0 (2014-04-15)
 ------------------
