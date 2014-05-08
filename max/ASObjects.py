@@ -44,7 +44,7 @@ class Note(ASObject):
         self.data = data
         if creating:
             self.processFields()
-            self.data['content'] = formatMessageEntities(self.data['content'])
+            self.data['content'] = formatMessageEntities(self.data.get('content', ''))
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
@@ -76,7 +76,7 @@ class Comment(ASObject):
         self.data = data
         if creating:
             self.processFields()
-            self.data['content'] = formatMessageEntities(self.data['content'])
+            self.data['content'] = formatMessageEntities(self.data.get('content', ''))
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
