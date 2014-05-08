@@ -55,13 +55,13 @@ PUBLIC_RESOURCES = {
     'favorite': {'route': '/activities/{activity}/favorites/{username}', 'category': 'Activities'},
     'user_favorites': {'route': '/people/{username}/favorites', 'category': 'User', 'name': 'User favorited activities'},
 
-    'activity_image': {'route': '/activities/{activity}/image', 'category': 'Activities'},
-    'activity_image_sizes': {'route': '/activities/{activity}/image/{size}', 'category': 'Activities'},
-    'activity_file_download': {'route': '/activities/{activity}/file/download', 'category': 'Activities'},
+    'activity_image': {'route': '/activities/{activity}/image', 'category': 'Activities', 'name': 'Image'},
+    'activity_image_sizes': {'route': '/activities/{activity}/image/{size}', 'category': 'Activities', 'name': 'Named size Image'},
+    'activity_file_download': {'route': '/activities/{activity}/file/download', 'category': 'Activities', 'name': 'File'},
 
-    'message_image': {'route': '/messages/{id}/image', 'category': 'Messages'},
-    'message_image_sizes': {'route': '/messages/{id}/image/{size}', 'category': 'Messages'},
-    'message_file_download': {'route': '/messages/{id}/file/download', 'category': 'Messages'},
+    'message_image': {'route': '/messages/{id}/image', 'category': 'Messages', 'name': 'Image'},
+    'message_image_sizes': {'route': '/messages/{id}/image/{size}', 'category': 'Messages', 'name': 'Named size Image'},
+    'message_file_download': {'route': '/messages/{id}/file/download', 'category': 'Messages', 'name': 'File'},
 
     # MAX 4.0
     'user_shares': {'route': '/people/{username}/shares'},
@@ -79,23 +79,23 @@ PUBLIC_RESOURCES = {
 }
 
 INFO_RESOURCES = {
-    'info': {'route': '/info', 'category': 'Management'},
-    'info_api': {'route': '/info/api', 'category': 'Management'},
-    'info_settings': {'route': '/info/settings', 'category': 'Management'},
+    'info': {'route': '/info', 'category': 'Management', 'name': 'Public settings'},
+    'info_api': {'route': '/info/api', 'category': 'Management', 'name': 'Api endpoints definition'},
+    'info_settings': {'route': '/info/settings', 'category': 'Management', 'name': 'Restricted settings'},
 }
 
 RESTRICTED_RESOURCES = {
 
-    'admin_security': {'route': '/admin/security', 'category': 'Management'},
-    'admin_security_role': {'route': '/admin/security/roles/{role}', 'category': 'Management'},
-    'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}', 'category': 'Management'},
-    'admin_security_users': {'route': '/admin/security/users', 'category': 'Management'},
-    'maintenance_keywords': {'route': '/admin/maintenance/keywords', 'category': 'Management'},
-    'maintenance_dates': {'route': '/admin/maintenance/dates', 'category': 'Management'},
-    'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions', 'category': 'Management'},
-    'maintenance_conversations': {'route': '/admin/maintenance/conversations', 'category': 'Management'},
-    'maintenance_users': {'route': '/admin/maintenance/users', 'category': 'Management'},
-    'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}', 'category': 'Management'},
+    'admin_security': {'route': '/admin/security', 'category': 'Management', 'name': 'Security settings'},
+    'admin_security_role': {'route': '/admin/security/roles/{role}', 'category': 'Management', 'name': 'Role users'},
+    'admin_security_role_user': {'route': '/admin/security/roles/{role}/users/{user}', 'category': 'Management', 'name': 'User role'},
+    'admin_security_users': {'route': '/admin/security/users', 'category': 'Management', 'name': 'Users with security'},
+    'maintenance_keywords': {'route': '/admin/maintenance/keywords', 'category': 'Management', 'name': 'Keywords maintenance'},
+    'maintenance_dates': {'route': '/admin/maintenance/dates', 'category': 'Management', 'name': 'Dates maintenance'},
+    'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions', 'category': 'Management', 'name': 'Subscriptions maintenance'},
+    'maintenance_conversations': {'route': '/admin/maintenance/conversations', 'category': 'Management', 'name': 'Conversations maintenance'},
+    'maintenance_users': {'route': '/admin/maintenance/users', 'category': 'Management', 'name': 'Users Maintenance'},
+    'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}', 'category': 'Management', 'name': 'Error Exception'},
 }
 
 RESOURCES = {}
