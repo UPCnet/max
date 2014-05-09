@@ -327,7 +327,8 @@ class BaseActivity(MADBase):
             dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', str(self['_id'])).groups())
             filename = dirs.pop()
             path = base_path + '/' + '/'.join(dirs)
-            os.makedirs(path)
+            if not os.path.exists(path):
+                os.makedirs(path)
             r_file = open(path + '/' + filename, 'w')
             r_file.write(activity_file.file.read())
             r_file.close()
