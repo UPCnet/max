@@ -95,6 +95,7 @@ RESTRICTED_RESOURCES = {
     'maintenance_subscriptions': {'route': '/admin/maintenance/subscriptions', 'category': 'Management', 'name': 'Subscriptions maintenance'},
     'maintenance_conversations': {'route': '/admin/maintenance/conversations', 'category': 'Management', 'name': 'Conversations maintenance'},
     'maintenance_users': {'route': '/admin/maintenance/users', 'category': 'Management', 'name': 'Users Maintenance'},
+    'maintenance_exceptions': {'route': '/admin/maintenance/exceptions', 'category': 'Management', 'name': 'Error Exception list'},
     'maintenance_exception': {'route': '/admin/maintenance/exceptions/{hash}', 'category': 'Management', 'name': 'Error Exception'},
 }
 

@@ -162,7 +162,8 @@ def getException(context, request):
     """
     ehash = request.matchdict['hash']
     logfile = logger.handlers[0].baseFilename
-    date, http_request, traceback = re.search(r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash), open(logfile).read(), re.DOTALL).groups()
+    regex = r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash)
+    date, http_request, traceback = re.search(regex, open(logfile).read(), re.DOTALL).groups()
 
     result = {
         'date': date,
@@ -170,6 +171,25 @@ def getException(context, request):
         'traceback': traceback
     }
     handler = JSONResourceEntity(result)
+    return handler.buildResponse()
+
+
+@view_config(route_name='maintenance_exceptions', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def getExceptions(context, request):
+    """
+         /maintenance/exceptions
+
+         Get exceptions list from the log
+    """
+    logfile = logger.handlers[0].baseFilename
+    regex = r'BEGIN EXCEPTION REPORT: (\w+)\nDATE: (.*?)\n'
+    matches = re.findall(regex, open(logfile).read(), re.DOTALL)
+    exceptions = [{'id': exception_id, 'date': exception_date} for exception_id, exception_date in matches]
+
+    handler = JSONResourceRoot(exceptions)
     return handler.buildResponse()
 
 
