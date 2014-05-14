@@ -220,7 +220,7 @@ def catch_exception(request, e):
         max_server = request.environ.get('HTTP_X_VIRTUAL_HOST_URI', '')
 
         error_description = 'Your error has been logged at {}/exceptions/{}. Please contact the system admin.'.format(max_server, sha1_hash)
-        if asbool(request.registry.settings.get('testing', False)):  # pragma: no cover
+        if asbool(request.registry.settings.get('testing', False)) or asbool(request.registry.settings.get('max.include_traceback_in_500_errors', False)):  # pragma: no cover
             error_description = 'An exception occurred. Below is the catched exception.\n\nSorry for the convenience.\n\n' + log.replace('\n', '\n    ')[:-4]
 
         return JSONHTTPInternalServerError(error=dict(objectType='error', error='ServerError', error_description=error_description))
