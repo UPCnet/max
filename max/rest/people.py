@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-from pymongo import DESCENDING
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 
-from max.exceptions import Unauthorized
 from max.exceptions import ValidationError
 from max.exceptions import ObjectNotFound
 from max.oauth2 import oauth2
@@ -53,42 +52,14 @@ def getUser(context, request):
 
         Return the required user object.
     """
-    actor = request.actor.flatten()
 
     # Flattened actor will contain only the visible fields for the current user
     # So we will only prepare the calculated conversations  (lastMessage & displayName)
     # if we have permission to view the talkingIn field
-    if request.actor.check_field_permission('talkingIn', 'view'):
-        actor.setdefault('talkingIn', [])
-        mmdb = MADMaxDB(context.db)
-        for conversation in actor['talkingIn']:
-            query = {'objectType': 'message',
-                     'contexts.id': conversation['id']
-                     }
 
-            # In two people conversations, force displayName to the displayName of
-            # the partner in the conversation
-            if 'group' not in conversation.get('tags', []):
-                partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
-                conversation['displayName'] = partner["displayName"]
+    actor_info = request.actor.getInfo()
 
-            messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
-            lastMessage = messages[0]
-            conversation['lastMessage'] = {
-                'published': lastMessage['published'],
-                'content': lastMessage['object'].get('content', ''),
-                'objectType': lastMessage['object']['objectType']
-            }
-            if lastMessage['object']['objectType'] in ['file', 'image']:
-                lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
-                if lastMessage['object']['objectType'] == 'image':
-                    lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
-
-            conversation['messages'] = 0
-
-        actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
-
-    handler = JSONResourceEntity(actor)
+    handler = JSONResourceEntity(actor_info)
     return handler.buildResponse()
 
 

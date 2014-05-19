@@ -3,7 +3,9 @@ from max.MADObjects import MADBase
 import datetime
 from max.rest.utils import getMaxModelByObjectType, flatten
 from pyramid.settings import asbool
+from pymongo import DESCENDING
 from max.rabbitmq.notifications import bindUserToContext, unbindUserFromContext
+from max.exceptions import Unauthorized
 
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
@@ -314,3 +316,38 @@ class User(MADBase):
         # We are in restricted mode without shared contexts with the user
         return False
 
+    def getInfo(self):
+        from max.MADMax import MADMaxDB
+
+        actor = self.flatten()
+        if self.check_field_permission('talkingIn', 'view'):
+            actor.setdefault('talkingIn', [])
+            mmdb = MADMaxDB(self.db)
+            for conversation in actor['talkingIn']:
+                query = {'objectType': 'message',
+                         'contexts.id': conversation['id']
+                         }
+
+                # In two people conversations, force displayName to the displayName of
+                # the partner in the conversation
+                if 'group' not in conversation.get('tags', []):
+                    partner = [user for user in conversation['participants'] if user["username"] != self.username][0]
+                    conversation['displayName'] = partner["displayName"]
+
+                messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
+                lastMessage = messages[0]
+                conversation['lastMessage'] = {
+                    'published': lastMessage['published'],
+                    'content': lastMessage['object'].get('content', ''),
+                    'objectType': lastMessage['object']['objectType']
+                }
+                if lastMessage['object']['objectType'] in ['file', 'image']:
+                    lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
+                    if lastMessage['object']['objectType'] == 'image':
+                        lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
+
+                conversation['messages'] = 0
+
+            actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
+
+        return actor
