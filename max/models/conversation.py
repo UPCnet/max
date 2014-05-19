@@ -21,3 +21,13 @@ class Conversation(BaseContext):
 
         #Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', ', '.join([a['username'] for a in self.participants]))
+
+    def realDisplayName(self, requester):
+        """
+            In two people conversations, force displayName to the displayName of
+            the partner in the conversation, based on who's requesting conversation information
+        """
+
+        if 'group' not in self.get('tags', []):
+            partner = [user for user in self['participants'] if user["username"] != requester.username][0]
+            return partner["displayName"]
