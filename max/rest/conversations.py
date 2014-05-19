@@ -68,9 +68,9 @@ def getConversations(context, request):
                                        'content': lastMessage['object'].get('content', ''),
                                        'objectType': lastMessage['object']['objectType']
                                        }
-	if lastMessage['object']['objectType'] in ['file', 'image']:
+        if lastMessage['object']['objectType'] in ['file', 'image']:
             lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
-            if lastMessage['object']['objectType'] ==  'image':
+            if lastMessage['object']['objectType'] == 'image':
                 lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
 
         conversation['messages'] = 0
