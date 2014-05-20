@@ -144,7 +144,6 @@ class BaseContext(MADBase):
         """
         updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants', 'url']
         has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
-
         if has_updatable_fields or force_update:
             for user in self.subscribedUsers():
                 user_object = User()
@@ -191,6 +190,18 @@ class BaseContext(MADBase):
 
                 combined_updates = {'$set': updates}
                 self.mdb_collection.database.users.update(criteria, combined_updates, multi=True)
+
+                # update original subscriptions related to this user when changing url
+                if self.field_changed('url'):
+                    self.field_changed('url')
+                    self.mdb_collection.database.activity.update(
+                        {'actor.username': user['username'], 'object.url': self.old['url']},
+                        {'$set': {
+                            'object.url': self.url,
+                            'object.hash': self.hash,
+                        }},
+                        multi=True
+                    )
 
                 self.save()
 

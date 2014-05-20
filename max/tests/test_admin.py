@@ -236,9 +236,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['subscribedTo'][0]['url'], 'http://new.url')
         self.assertEqual(res.json['subscribedTo'][0]['hash'], new_url_hash)
 
+        # Test user original subscription activity is updated
+        subscription_activity = self.exec_mongo_query('activity', 'find', {'object.hash': new_url_hash, 'object.url': "http://new.url", 'actor.username': username})
+        self.assertNotEqual(subscription_activity, [])
+        self.assertEqual(subscription_activity[0]['object']['hash'], new_url_hash)
+        self.assertEqual(subscription_activity[0]['object']['url'], 'http://new.url')
+
         # Test user activity is updated
         res = self.testapp.get('/activities/%s' % activity.json['id'], "", oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['contexts'][0]['url'], 'http://new.url')
         self.assertEqual(res.json['contexts'][0]['hash'], new_url_hash)
-
-
