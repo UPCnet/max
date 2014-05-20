@@ -47,35 +47,17 @@ def getConversations(context, request):
              '_id': {'$in': subscribed_conversations}
              }
 
-    conversations = mmdb.conversations.search(query, sort="published", flatten=1, keep_private_fields=True)
+    conversations = mmdb.conversations.search(query, sort="published")
 
+    conversations_info = []
     for conversation in conversations:
 
-        query = {'objectType': 'message',
-                 'contexts.id': conversation['id']
-                 }
+        conversation_info = conversation.getInfo(request.actor)
+        conversations_info.append(conversation_info)
 
-        # In two people conversations, force displayName to the displayName of
-        # the partner in the conversation
+    sorted_conversations = sorted(conversations_info, reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
-        if 'group' not in conversation.get('tags', []):
-            partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
-            conversation['displayName'] = partner["displayName"]
-
-        messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
-        lastMessage = messages[0]
-        conversation['lastMessage'] = {'published': lastMessage['published'],
-                                       'content': lastMessage['object'].get('content', ''),
-                                       'objectType': lastMessage['object']['objectType']
-                                       }
-        if lastMessage['object']['objectType'] in ['file', 'image']:
-            lastMessage['fullURL'] = lastMessage['object'].get('fullURL', '')
-            if lastMessage['object']['objectType'] == 'image':
-                lastMessage['thumbURL'] = lastMessage['object'].get('thumbURL', '')
-
-        conversation['messages'] = 0
-
-    handler = JSONResourceRoot(sorted(conversations, reverse=True, key=lambda conv: conv['lastMessage']['published']))
+    handler = JSONResourceRoot(sorted_conversations)
     return handler.buildResponse()
 
 
@@ -199,14 +181,7 @@ def postMessage2Conversation(context, request):
     newmessage['_id'] = message_oid
 
     output_message = newmessage.flatten()
-
-    # In two people conversations, force displayName to the displayName of
-    # the partner in the conversation
-    if 'group' not in current_conversation.get('tags', []):
-        partner = [user for user in current_conversation['participants'] if user["username"] != request.actor.username][0]
-        output_message['contexts'][0]['displayName'] = partner["displayName"]
-
-    # Provide tag information for convenience
+    output_message['contexts'][0]['displayName'] = current_conversation.realDisplayName(request.actor)
     output_message['contexts'][0]['tags'] = current_conversation.get('tags', [])
 
     addConversationExchange(current_conversation)
@@ -252,27 +227,13 @@ def getUserConversationSubscription(context, request):
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not subscriped to any conversation with id {}'.format(request.actor.username, cid))
 
-    conversation = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+    subscription = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+    conversation_object = Conversation()
+    conversation_object.fromObject(subscription)
 
-    # In two people conversations, force displayName to the displayName of
-    # the partner in the conversation
-    if 'group' not in conversation.get('tags', []):
-        partner = [user for user in conversation['participants'] if user["username"] != request.actor.username][0]
-        conversation['displayName'] = partner["displayName"]
-
-    # Fetch the last message of the conversation
-    mmdb = MADMaxDB(context.db)
-
-    query = {
-        'objectType': 'message',
-        'contexts.id': conversation['id']
-    }
-
-    messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
-    lastMessage = messages[0]
-    conversation['lastMessage'] = {'published': lastMessage['published'],
-                                   'content': lastMessage['object'].get('content', '')
-                                   }
+    conversation = dict(subscription)
+    conversation['displayName'] = conversation_object.realDisplayName(request.actor.username)
+    conversation['lastMessage'] = conversation_object.lastMessage()
     conversation['messages'] = 0
 
     handler = JSONResourceEntity(conversation)
@@ -289,35 +250,16 @@ def getConversation(context, request):
          Return Conversation
     """
     cid = request.matchdict['id']
+
     conversations = MADMaxCollection(context.db.conversations)
     conversation = conversations[cid]
 
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
-        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
+    subscribed_conversations = [subscription.get('id') for subscription in request.actor.get('talkingIn', [])]
 
-    # In two people conversations, force displayName to the displayName of
-    # the partner in the conversation
-    if 'group' not in conversation.get('tags', []):
-        partner = [user for user in conversation.participants if user["username"] != request.actor.username][0]
-        conversation.displayName = partner["displayName"]
+    if cid not in subscribed_conversations:
+        raise Unauthorized("You're not a participant in this conversation")
 
-    # Fetch the last message of the conversation
-    mmdb = MADMaxDB(context.db)
-    conversation = conversation.flatten()
-
-    query = {
-        'objectType': 'message',
-        'contexts.id': conversation['id']
-    }
-
-    messages = mmdb.messages.search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
-    lastMessage = messages[0]
-    conversation['lastMessage'] = {'published': lastMessage['published'],
-                                   'content': lastMessage['object'].get('content', '')
-                                   }
-    conversation['messages'] = 0
-
-    handler = JSONResourceEntity(conversation)
+    handler = JSONResourceEntity(conversation.getInfo(request.actor.username))
     return handler.buildResponse()
 
 
