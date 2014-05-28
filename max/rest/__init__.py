@@ -70,7 +70,7 @@ def endpoints(context, request):
         }
 
         # Import the method implementing the endpoint to get the docstring
-        module_fqdn = re.search(r'(?:max|\.egg)/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.') 
+        module_fqdn = re.search(r'(?:max|\.egg)/(max/.*)\.py$', view.action_info.file).groups()[0].replace('/', '.')
         module_namespace, module_name = re.search(r'(.*?)\.([^\.]+$)', module_fqdn).groups()
         method_name = view.action_info.src
         method = getattr(sys.modules[module_fqdn], method_name)
@@ -106,5 +106,38 @@ def endpoints(context, request):
             for role in roles:
                 resources_by_route[route.name]['methods'][req_method][role] = method_info
 
-    handler = JSONResourceEntity(resources_by_route)
+    if request.params.get('by_category'):
+        endpoints = resources_by_route
+        endpoints_by_category = {}
+
+        for route_name, route_info in endpoints.items():
+            endpoints_by_category.setdefault(route_info['category'], [])
+            endpoints_by_category[route_info['category']].append(route_info)
+
+        sorted_categories = endpoints_by_category.keys()
+        sorted_categories.sort()
+
+        categories = []
+        for category_name in sorted_categories:
+
+            routes = []
+            for route_info in endpoints_by_category[category_name]:
+                routes.append({
+                    'route_id': route_info['id'],
+                    'filesystem': route_info['filesystem'],
+                    'route_name': route_info['name'],
+                    'route_url': route_info['url'],
+                    'methods': route_info['methods']
+                })
+            category = {
+                'name': category_name,
+                'id': category_name.lower().replace(' ', '-'),
+                'resources': sorted(routes, key=lambda route: route['route_name'])
+            }
+            categories.append(category)
+
+        handler = JSONResourceEntity(categories)
+    else:
+        handler = JSONResourceEntity(resources_by_route)
+
     return handler.buildResponse()
