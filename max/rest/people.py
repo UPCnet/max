@@ -17,6 +17,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rabbitmq.notifications import addUser
 
 from PIL import Image
+from PIL import ImageOps
 
 
 @view_config(route_name='users', request_method='GET')
@@ -146,6 +147,8 @@ def postUserAvatar(context, request):
 
         Upload user avatar.
     """
+    AVATAR_SIZE = (48, 48)
+    MEDIUM_SIZE = (250, 250)
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     if not os.path.exists(AVATAR_FOLDER):
         os.mkdir(AVATAR_FOLDER)
@@ -166,20 +169,24 @@ def postUserAvatar(context, request):
     input_file.seek(0)
     image = Image.open(input_file)
 
-    if image.size[0] > 48:
-        image.thumbnail((48,9800), Image.ANTIALIAS)
-        image = image.transform((48,48), Image.EXTENT, (0, 0, 48, 48), Image.BICUBIC)
-    image.save(file_path)
+    avatar = ImageOps.fit(image, AVATAR_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
+    avatar.save(file_path)
+    # if image.size[0] > 48:
+    #     image.thumbnail((48,9800), Image.ANTIALIAS)
+    #     image = image.transform((48,48), Image.EXTENT, (0, 0, 48, 48), Image.BICUBIC)
+    # image.save(file_path)
 
     # Saving the large (176x176) avatar image in png format, resize if needed
     file_path = os.path.join(AVATAR_FOLDER, destination_large_filename)
     input_file.seek(0)
     image = Image.open(input_file)
 
-    if image.size[0] > 176:
-        image.thumbnail((176,9800), Image.ANTIALIAS)
-        image = image.transform((176,176), Image.EXTENT, (0, 0, 176, 176), Image.BICUBIC)
-    image.save(file_path)
+    medium = ImageOps.fit(image, MEDIUM_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
+    medium.save(file_path)
+    # if image.size[0] > 176:
+    #     image.thumbnail((176,9800), Image.ANTIALIAS)
+    #     image = image.transform((176,176), Image.EXTENT, (0, 0, 176, 176), Image.BICUBIC)
+    # image.save(file_path)
 
     # Use with files
     # with open(file_path, 'wb') as output_file:
