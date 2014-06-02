@@ -11,6 +11,7 @@ requires = [
     'pyramid',
     'pyramid_tm',
     'pyramid_debugtoolbar',
+    'pyramid_beaker',
     'osiris',
     'pymongo',
     'rfc3339',
