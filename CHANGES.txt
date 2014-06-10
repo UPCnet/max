@@ -1,11 +1,21 @@
 CHANGELOG
 =========
 
-4.0.2 (unreleased)
+4.0.2 (2014-06-10)
 ------------------
 
-- Nothing changed yet.
-
+* Missing dependency [Carles Bruguera]
+* Info endpoint by category for documentation [Victor Fernandez de Alba]
+* Update avatar generation [Victor Fernandez de Alba]
+* Move code used to show  conv. displayName to model [Carles Bruguera]
+* Move code used to show last Message to model [Carles Bruguera]
+* Fix change context url [Carles Bruguera]
+* Add method to determine effective displayName [Carles Bruguera]
+* Move user info construction to model [Carles Bruguera]
+* Fix tabs [Carles Bruguera]
+* Log exceptions oif configured in settings (for wsgi client) [Carles Bruguera]
+* Add exceptions list endpoint [Carles Bruguera]
+* Check if folder exists [Carles Bruguera]
 
 4.0.1 (2014-05-08)
 ------------------
