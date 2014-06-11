@@ -30,7 +30,7 @@ requires = [
 test_requires = ['WebTest', 'mock']
 
 setup(name='max',
-      version='4.0.3.dev0',
+      version='4.0.3',
       description='Activity Stream and Subscription Enhanced Engine (Motor d\'Activitat i subscripcions eXtes)',
       long_description=README + '\n\n' + CHANGES + '\n\n' + CONTRIBUTORS,
       classifiers=[
