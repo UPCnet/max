@@ -94,7 +94,10 @@ def getUrlHashFromURI(request):
 def getUsernameFromPOSTBody(request):
     """
     """
-    return extractPostData(request).get('actor', {}).get('username', None)
+    decoded_data = extractPostData(request).get('actor', {})
+    if isinstance(decoded_data, dict):
+        return decoded_data.get('username', None)
+    return None
 
 
 def searchParams(request):

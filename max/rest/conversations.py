@@ -52,7 +52,7 @@ def getConversations(context, request):
     conversations_info = []
     for conversation in conversations:
 
-        conversation_info = conversation.getInfo(request.actor)
+        conversation_info = conversation.getInfo(request.actor.username)
         conversations_info.append(conversation_info)
 
     sorted_conversations = sorted(conversations_info, reverse=True, key=lambda conv: conv['lastMessage']['published'])
