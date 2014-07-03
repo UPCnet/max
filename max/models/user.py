@@ -100,7 +100,8 @@ class User(MADBase):
         """
         subscription = context.prepareUserSubscription()
         self.add_to_list(context.user_subscription_storage, subscription, safe=False)
-        bindUserToContext(context, self.username)
+        if context.get('notifications', False):
+            bindUserToContext(context, self.username)
 
     def removeSubscription(self, context):
         """
