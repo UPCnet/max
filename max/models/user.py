@@ -276,6 +276,10 @@ class User(MADBase):
     def deleteUserDevice(self, platform, token):
         self.delete_from_list(platform + PLATFORM_FIELD_SUFFIX, token)
 
+    def deleteUserDevices(self, platform):
+        self[platform + PLATFORM_FIELD_SUFFIX] = []
+        self.save()
+
     def isAllowedToSee(self, user):
         """
         NonVisible People can see Visible and NonVisible people

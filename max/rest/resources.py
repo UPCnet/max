@@ -5,6 +5,8 @@ PUBLIC_RESOURCES = {
     'avatar_sizes': {'route': '/people/{username}/avatar/{size}', 'filesystem': True, 'category': 'User', 'name': 'User avatar sizes'},
     'user_activities': {'route': '/people/{username}/activities', 'category': 'Activities', 'name': 'User activities'},
     'user_device': {'route': '/people/{username}/device/{platform}/{token}', 'category': 'User', 'name': 'User device tokens'},
+    'user_platform_tokens': {'route': '/people/{username}/device/{platform}', 'category': 'User', 'name': 'User device tokens by platform'},
+
 
     'activities': {'route': '/activities', 'category': 'Activities', 'name': 'Activities'},
     'comments': {'route': '/activities/comments', 'category': 'Comments', 'name': 'Comments (Global)'},

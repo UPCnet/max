@@ -8,7 +8,7 @@ from max.decorators import MaxResponse, requirePersonActor
 from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
-from max.exceptions import ObjectNotFound
+from max.exceptions import ObjectNotFound, ValidationError
 from max.rabbitmq.notifications import addUser as addUserNotification
 
 
@@ -91,3 +91,22 @@ def addUser(context, request):
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     addUserNotification(username)
     return handler.buildResponse()
+
+
+@view_config(route_name='user_platform_tokens', request_method='DELETE', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(exists=False, force_own=False)
+def deleteUserDevicesByPlatform(context, request):
+    """ Delete an existing user device to the user's profile.
+    """
+    platform = request.matchdict['platform']
+    supported_platforms = ['ios', 'android']
+    if platform not in supported_platforms:
+        raise ValidationError('Not supported platform.')
+
+    actor = request.actor
+
+    actor.deleteUserDevices(platform)
+
+    return HTTPNoContent()
