@@ -172,7 +172,7 @@ def saveException(request, error):  # pragma: no cover
     entry = dict(
         traceback=error,
         time=time,
-        raw_request=request.as_string(),
+        raw_request=request.as_bytes(),
         matched_route=request.matched_route.name,
         matchdict=request.matchdict,
     )

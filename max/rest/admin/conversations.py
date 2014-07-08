@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPNoContent
 from max.rest.utils import searchParams
 
 from max.MADMax import MADMaxDB, MADMaxCollection
@@ -38,7 +39,7 @@ def getPushTokensForConversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_conversation_messages', request_method='POST')
+@view_config(route_name='user_conversation_messages', request_method='POST', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor(force_own=False, exists=True)
@@ -73,3 +74,18 @@ def addMessage(context, request):
 
     handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
+
+
+@view_config(route_name='conversations', request_method='DELETE', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=True)
+def deleteConversations(context, request):
+    """
+    Deletes ALL the conversations from ALL users in max
+    doing all the consequent unsubscriptions
+    """
+    conversations = MADMaxCollection(context.db.conversations)
+    for conversation in conversations.dump():
+        conversation.delete()
+    return HTTPNoContent()

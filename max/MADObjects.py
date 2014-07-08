@@ -285,11 +285,27 @@ class MADBase(MADDict):
         self._on_saving_object(oid)
         return str(oid)
 
+    def _before_delete(self):
+        """
+            Executed after an object removal
+            Override to provide custom behaviour on delete
+        """
+        pass
+
+    def _after_delete(self):
+        """
+            Executed after an object removal
+            Override to provide custom behaviour on delete
+        """
+        pass
+
     def delete(self):
         """
             Removes the object from the DB
         """
+        self._before_delete()
         self.mdb_collection.remove({'_id': ObjectId(self._id)})
+        self._after_delete()
 
     def add_to_list(self, field, obj, allow_duplicates=False, safe=True):
         """ NEW METHOD NOT TAKING ACCOUNT OF 'items' and 'total Items'

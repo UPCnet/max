@@ -63,6 +63,58 @@ def unbindUserFromContext(context, username):
         server.disconnect()
 
 
+def unbindContext(context):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = context.getIdentifier()
+        server.activity.delete(context_id)
+        server.disconnect()
+
+
+def bindUserToConversation(conversation, username):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = conversation.getIdentifier()
+        server.conversations.bind_user(context_id, username)
+        server.disconnect()
+
+
+def unbindUserFromConversation(conversation, username):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = conversation.getIdentifier()
+        server.conversations.unbind_user(context_id, username)
+        server.disconnect()
+
+
+def unbindConversation(conversation):
+    request = get_current_request()
+    settings = getMAXSettings(request)
+    rabbitmq_url = settings.get('max_rabbitmq', None)
+
+    # If rabbitmq_url is not defined, then we assume that we are on tests and do nothing
+    if rabbitmq_url:
+        server = RabbitClient(rabbitmq_url)
+        context_id = conversation.getIdentifier()
+        server.conversations.delete(context_id)
+        server.disconnect()
+
+
 def notifyContextActivity(activity):
     request = get_current_request()
     settings = getMAXSettings(request)
@@ -110,5 +162,5 @@ def addConversationExchange(conversation):
             "object": "conversation",
             "data": {}
         })
-        server.send('conversations', json.dumps(message.packed), routing_key=conversation_id)
+        server.send('conversations', json.dumps(message.packed), routing_key='{}.notifications'.format(conversation_id))
         server.disconnect()

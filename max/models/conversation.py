@@ -2,6 +2,7 @@
 from max.models.context import BaseContext
 from max.MADMax import MADMaxCollection
 from pymongo import DESCENDING
+from max.rabbitmq.notifications import bindUserToConversation, unbindUserFromConversation, unbindConversation
 
 
 class Conversation(BaseContext):
@@ -73,3 +74,22 @@ class Conversation(BaseContext):
             return partner["displayName"]
         else:
             return self['displayName']
+
+    def _after_subscription_add(self, username):
+        """
+            Creates rabbitmq bindings after new subscription
+        """
+        bindUserToConversation(self, username)
+
+    def _after_subscription_remove(self, username):
+        """
+            Removes rabbitmq bindings after new subscription
+        """
+        unbindUserFromConversation(self, username)
+
+    def _before_delete(self):
+        self.removeUserSubscriptions()
+        self.removeActivities(logical=False)
+
+    def _after_delete(self):
+        unbindConversation(self)

@@ -146,6 +146,29 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.delete('/people/%s' % username, '', oauth2Header(test_manager), status=204)
 
+    def test_delete_all_conversations(self):
+        from .mockers import group_message as message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(test_manager)
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+
+        self.testapp.delete('/conversations', '', oauth2Header(test_manager), status=204)
+
+        conversations = self.testapp.get('/conversations', '', oauth2Header(sender), status=200)
+        self.assertEqual(len(conversations.json), 0)
+
+        user_data = self.testapp.get('/people/{}'.format(sender), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(user_data.json['talkingIn']), 0)
+
     def test_delete_inexistent_user(self):
         username = 'messi'
         username2 = 'xavi'

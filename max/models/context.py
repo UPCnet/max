@@ -229,6 +229,20 @@ class BaseContext(MADBase):
         }
         activitydb.remove(which_to_delete, logical=logical)
 
+    def _after_subscription_add(self, username):
+        """
+            Executed after a user has been subscribed to this context
+            Override to add custom behaviour for each context type
+        """
+        pass
+
+    def _after_subscription_remove(self, username):
+        """
+            Executed after a user has been unsubscribed to this context
+            Override to add custom behaviour for each context type
+        """
+        pass
+
 
 class Context(BaseContext):
     """
@@ -334,3 +348,16 @@ class Context(BaseContext):
     def _on_saving_object(self, oid):
         if self.field_changed('twitterUsername'):
             restartTweety()
+
+    def _after_subscription_add(self, username):
+        """
+            Creates rabbitmq bindings after new subscription
+        """
+        if self.get('notifications', False):
+            bindUserToContext(self, username)
+
+    def _after_subscription_remove(self, username):
+        """
+            Removes rabbitmq bindings after new subscription
+        """
+        unbindUserFromContext(self, username)

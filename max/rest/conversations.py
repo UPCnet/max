@@ -166,8 +166,7 @@ def postMessage2Conversation(context, request):
     try:
         newmessage.fromRequest(request, rest_params=message_params)
     except Exception as Catched:
-        # In case we coulnd't post the message, rollback conversation and subscriptions
-        current_conversation.removeUserSubscriptions()
+        # In case we coulnd't post the message, rollback conversation creation
         current_conversation.delete()
         raise Catched
 
@@ -507,8 +506,6 @@ def DeleteConversation(context, request):
     if not auth_user_is_conversation_owner:
         raise Unauthorized('Only the owner can delete the conversation')
 
-    ctx.removeUserSubscriptions()
-    ctx.removeActivities(logical=False)
     ctx.delete()
     return HTTPNoContent()
 
