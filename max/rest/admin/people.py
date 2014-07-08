@@ -96,7 +96,7 @@ def addUser(context, request):
 @view_config(route_name='user_platform_tokens', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
-@requirePersonActor(exists=False, force_own=False)
+@requirePersonActor(exists=True, force_own=False)
 def deleteUserDevicesByPlatform(context, request):
     """ Delete an existing user device to the user's profile.
     """
