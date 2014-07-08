@@ -1,11 +1,17 @@
 CHANGELOG
 =========
 
-4.0.4 (unreleased)
+4.0.4 (2014-07-08)
 ------------------
 
-- Nothing changed yet.
-
+* Use real subscriptions to get conversation tokens [Carles Bruguera]
+* Fix method definition [Carles Bruguera]
+* Add endpoint to delete all tokens by platform [Carles Bruguera]
+* Endpoint to delete conversations from everybody [Carles Bruguera]
+* Added customizable events to delete subscribe and unubscribe [Carles Bruguera]
+* Update rabbitmq bindings on adding/deleting people to a conversation [Carles Bruguera]
+* Update venusian patch to be generic [Carles Bruguera]
+* Add bindings only to required contexts [Carles Bruguera]
 
 4.0.3 (2014-06-11)
 ------------------
