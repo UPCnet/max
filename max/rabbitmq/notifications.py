@@ -157,7 +157,10 @@ def addConversationExchange(conversation):
         message = RabbitMessage()
         message.prepare(settings['max_message_defaults'])
         message.update({
-            "user": request.actor.username,
+            "user": {
+                'username': request.actor.username,
+                'displayname': request.actor.displayName,
+            },
             "action": "add",
             "object": "conversation",
             "data": {}
