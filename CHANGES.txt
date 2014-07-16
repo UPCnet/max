@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.5 (unreleased)
+4.0.5 (2014-07-16)
 ------------------
 
-- Nothing changed yet.
-
+* Send username and displayname as dict [Carles Bruguera]
 
 4.0.4 (2014-07-08)
 ------------------
