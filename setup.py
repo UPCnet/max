@@ -8,26 +8,25 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 CONTRIBUTORS = open(os.path.join(here, 'CONTRIBUTORS.rst')).read()
 
 requires = [
+    'setuptools',
     'pyramid',
     'pyramid_tm',
     'pyramid_debugtoolbar',
     'pyramid_beaker',
-    'osiris',
     'pymongo',
     'rfc3339',
     'requests',
     'tweepy',
-    'beaker',
     'waitress',
     'Paste',
     'bleach',
     'pika',
     'Pillow',
-    'pyramid_robot',
     'maxcarrot'
 ]
 
-test_requires = ['WebTest', 'mock']
+test_requires = ['WebTest', 'mock', 'robotsuite', 'pyramid_robot']
+docs_requires = ['manuel', 'pygments', 'sphinx_bootstrap_theme']
 
 setup(name='max',
       version='4.0.6.dev0',
@@ -46,7 +45,7 @@ setup(name='max',
       packages=['max'],
       include_package_data=True,
       zip_safe=False,
-      install_requires=requires,
+      install_requires=requires + docs_requires,
       tests_require=requires + test_requires,
       test_suite="max.tests",
       extras_require={
