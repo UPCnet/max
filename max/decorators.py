@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden
-from max.exceptions import JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden, JSONHTTPInternalServerError
+from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden, ConnectionError
+from max.exceptions import JSONHTTPServiceUnavailable, JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden, JSONHTTPInternalServerError
 from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
 from max.resources import Root
@@ -208,6 +208,8 @@ def catch_exception(request, e):
         return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=e.value))
     elif isinstance(e, Forbidden):
         return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.value))
+    elif isinstance(e, ConnectionError):
+        return JSONHTTPServiceUnavailable(error=dict(objectType='error', error=ConnectionError.__name__, error_description=e.value))
 
     # JSON decode error????
     # elif isinstance(e, ValueError):

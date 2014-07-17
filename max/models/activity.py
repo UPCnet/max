@@ -9,7 +9,7 @@ from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.rest.utils import canWriteInContexts, hasPermission
 from max.rest.utils import getMaxModelByObjectType
-
+from max.rabbitmq import RabbitNotifications
 from PIL import Image
 
 import json
@@ -377,6 +377,14 @@ class Activity(BaseActivity):
         if not hasattr(self, 'lastComment'):
             self.lastComment = oid
             self.save()
+
+    def _on_insert(self, oid):
+        # notify activity if the activity is from a context
+        # with enabled notifications
+
+        if self.get('contexts', [{}])[0].get('notifications', False):
+            notifier = RabbitNotifications(self.request)
+            notifier.notify_context_activity(self)
 
     def _on_create_custom_validations(self):
         """

@@ -4,6 +4,7 @@ import datetime
 from max.rest.utils import getMaxModelByObjectType, flatten
 from pyramid.settings import asbool
 from max.rest.utils import getMaxModelByObjectType
+from max.rabbitmq import RabbitNotifications
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
 
@@ -333,3 +334,10 @@ class User(MADBase):
             actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
         return actor
+
+    def _on_insert_object(self, oid):
+        """
+            Create user exchanges just after user creation on the database
+        """
+        notifier = RabbitNotifications(self.request)
+        notifier.add_user(self.username)

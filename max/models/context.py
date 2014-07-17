@@ -4,9 +4,8 @@ from max.MADMax import MADMaxCollection
 from max.rest.utils import getUserIdFromTwitter
 from max.models.user import User
 from max import DEFAULT_CONTEXT_PERMISSIONS
-from max.rabbitmq.notifications import restartTweety
+from max.rabbitmq import RabbitNotifications
 from hashlib import sha1
-from max.rabbitmq.notifications import bindUserToContext, unbindUserFromContext
 
 
 class BaseContext(MADBase):
@@ -333,12 +332,13 @@ class Context(BaseContext):
 
         # someone changed notifications settings for this context
         if 'notifications' in properties:
+            notifier = RabbitNotifications(self.request)
             if self.get('notifications', False):
                 for user in self.subscribedUsers():
-                    bindUserToContext(self, user['username'])
+                    notifier.bind_user_to_context(self, user['username'])
             else:
                 for user in self.subscribedUsers():
-                    unbindUserFromContext(self, user['username'])
+                    notifier.unbind_user_from_context(self, user['username'])
 
         if 'url' in properties:
             self.hash = sha1(self.url).hexdigest()
@@ -347,17 +347,20 @@ class Context(BaseContext):
 
     def _on_saving_object(self, oid):
         if self.field_changed('twitterUsername'):
-            restartTweety()
+            notifier = RabbitNotifications(self.request)
+            notifier.restart_tweety()
 
     def _after_subscription_add(self, username):
         """
             Creates rabbitmq bindings after new subscription
         """
         if self.get('notifications', False):
-            bindUserToContext(self, username)
+            notifier = RabbitNotifications(self.request)
+            notifier.bind_user_to_context(self, username)
 
     def _after_subscription_remove(self, username):
         """
             Removes rabbitmq bindings after new subscription
         """
-        unbindUserFromContext(self, username)
+        notifier = RabbitNotifications(self.request)
+        notifier.unbind_user_from_context(self, username)

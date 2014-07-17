@@ -9,7 +9,6 @@ from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
 from max.exceptions import ObjectNotFound, ValidationError
-from max.rabbitmq.notifications import addUser as addUserNotification
 
 
 @view_config(route_name='users', request_method='GET', restricted='Manager')
@@ -89,7 +88,6 @@ def addUser(context, request):
         userid = newuser.insert()
         newuser['_id'] = userid
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
-    addUserNotification(username)
     return handler.buildResponse()
 
 

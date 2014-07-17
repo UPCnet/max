@@ -13,7 +13,6 @@ from max.exceptions import ObjectNotFound, Unauthorized, Forbidden
 
 from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 from max.rest.utils import searchParams
-from max.rabbitmq.notifications import notifyContextActivity
 
 from base64 import b64encode
 import re
@@ -78,12 +77,6 @@ def addUserActivity(context, request):
     else:
         activity_oid = newactivity.insert()
         newactivity['_id'] = activity_oid
-
-    # notify activity if the activity is from a context
-    # with enabled notifications
-
-    if newactivity.get('contexts', [{}])[0].get('notifications', False):
-        notifyContextActivity(newactivity)
 
     handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()

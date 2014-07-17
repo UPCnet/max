@@ -13,7 +13,7 @@ from max.models import Activity
 from max.models import Conversation
 from max.models import Message
 from max.oauth2 import oauth2
-from max.rabbitmq.notifications import addConversationExchange
+from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
@@ -183,7 +183,10 @@ def postMessage2Conversation(context, request):
     output_message['contexts'][0]['displayName'] = current_conversation.realDisplayName(request.actor)
     output_message['contexts'][0]['tags'] = current_conversation.get('tags', [])
 
-    addConversationExchange(current_conversation)
+    # Notification is done here because we don't want to do it right after insertion
+    # as a possible rollback would cause a  notification of a inexistent conversation
+    notifier = RabbitNotifications(request)
+    notifier.add_conversation(current_conversation)
 
     handler = JSONResourceEntity(output_message, status_code=201)
     return handler.buildResponse()

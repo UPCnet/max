@@ -2,6 +2,7 @@
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPForbidden
 from pyramid.httpexceptions import HTTPInternalServerError
+from pyramid.httpexceptions import HTTPServiceUnavailable
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.httpexceptions import HTTPUnauthorized
@@ -47,6 +48,13 @@ class JSONHTTPNotImplemented(HTTPNotImplemented):
 
 
 class JSONHTTPInternalServerError(HTTPInternalServerError):  # pragma: no cover
+
+    def __init__(self, error):
+        Response.__init__(self, json.dumps(error), status=self.code)
+        self.content_type = 'application/json'
+
+
+class JSONHTTPServiceUnavailable(HTTPServiceUnavailable):  # pragma: no cover
 
     def __init__(self, error):
         Response.__init__(self, json.dumps(error), status=self.code)
@@ -106,5 +114,10 @@ class ValidationError(Exception):
 
 
 class Forbidden(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
+class ConnectionError(Exception):
     def __init__(self, value):
         self.value = value
