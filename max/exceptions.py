@@ -1,123 +1,117 @@
 # -*- coding: utf-8 -*-
-from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.httpexceptions import HTTPForbidden
-from pyramid.httpexceptions import HTTPInternalServerError
-from pyramid.httpexceptions import HTTPServiceUnavailable
-from pyramid.httpexceptions import HTTPNotFound
-from pyramid.httpexceptions import HTTPNotImplemented
-from pyramid.httpexceptions import HTTPUnauthorized
-from pyramid.httpexceptions import HTTPPreconditionFailed
+from pyramid.httpexceptions import HTTPException
 from pyramid.response import Response
 
 import json
 
+"""
 
-class JSONHTTPUnauthorized(HTTPUnauthorized):
+    Base exception classes
 
+"""
+
+
+class JSONHTTPException(HTTPException):
     def __init__(self, error):
         Response.__init__(self, json.dumps(error), status=self.code)
         self.content_type = 'application/json'
 
 
-class JSONHTTPForbidden(HTTPForbidden):
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPBadRequest(HTTPBadRequest):
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPNotFound(HTTPNotFound):
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPNotImplemented(HTTPNotImplemented):
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPInternalServerError(HTTPInternalServerError):  # pragma: no cover
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPServiceUnavailable(HTTPServiceUnavailable):  # pragma: no cover
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class JSONHTTPPreconditionFailed(HTTPPreconditionFailed):  # pragma: no cover
-
-    def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
-        self.content_type = 'application/json'
-
-
-class MissingField(Exception):
+class MaxException(Exception):
     def __init__(self, value):
         self.value = value
 
 
-class ObjectNotSupported(Exception):
-    def __init__(self, value):
-        self.value = value
+"""
+    JSON HTTP Exceptions
+
+    These are regular HTTPExceptions, each with its related code
+    all expecting a dict object to convert to JSON, and set
+    the correct content_type
+"""
 
 
-class ObjectNotFound(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPUnauthorized(JSONHTTPException):
+    code = 401
 
 
-class DuplicatedItemError(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPForbidden(JSONHTTPException):
+    code = 403
 
 
-class UnknownUserError(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPBadRequest(JSONHTTPException):
+    code = 400
 
 
-class Unauthorized(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPNotFound(JSONHTTPException):
+    code = 404
 
 
-class InvalidSearchParams(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPNotImplemented(JSONHTTPException):
+    code = 501
 
 
-class InvalidPermission(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPInternalServerError(JSONHTTPException):  # pragma: no cover
+    code = 500
 
 
-class ValidationError(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPServiceUnavailable(JSONHTTPException):  # pragma: no cover
+    code = 503
 
 
-class Forbidden(Exception):
-    def __init__(self, value):
-        self.value = value
+class JSONHTTPPreconditionFailed(JSONHTTPException):  # pragma: no cover
+    code = 412
 
 
-class ConnectionError(Exception):
-    def __init__(self, value):
-        self.value = value
+"""
+
+    Max Exceptions
+
+    These are meant to be raised through model and endpoints code, and all
+    of them matches one of the prior defined JSON HTTP Exceptions
+
+"""
+
+
+class MissingField(MaxException):
+    pass
+
+
+class ObjectNotSupported(MaxException):
+    pass
+
+
+class ObjectNotFound(MaxException):
+    pass
+
+
+class DuplicatedItemError(MaxException):
+    pass
+
+
+class UnknownUserError(MaxException):
+    pass
+
+
+class Unauthorized(MaxException):
+    pass
+
+
+class InvalidSearchParams(MaxException):
+    pass
+
+
+class InvalidPermission(MaxException):
+    pass
+
+
+class ValidationError(MaxException):
+    pass
+
+
+class Forbidden(MaxException):
+    pass
+
+
+class ConnectionError(MaxException):
+    pass
