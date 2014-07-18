@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.response import Response
-
 from max.resources import Root
+
+from pyramid.response import Response
+from pyramid.view import view_config
 
 
 @view_config(context=Root)

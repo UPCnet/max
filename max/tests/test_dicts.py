@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import unittest
-
 from max.MADObjects import MADDict
+
+import unittest
 
 
 class MyMADDict(MADDict):

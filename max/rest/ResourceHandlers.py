@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from pyramid.response import Response
-from pyramid.httpexceptions import HTTPNotFound, HTTPInternalServerError
 
 import json
 

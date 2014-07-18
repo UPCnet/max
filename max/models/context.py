@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
-from max.rest.utils import getUserIdFromTwitter
+from max.MADObjects import MADBase
 from max.models.user import User
-from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.rabbitmq import RabbitNotifications
+from max.rest.utils import getUserIdFromTwitter
+
 from hashlib import sha1
+from max import DEFAULT_CONTEXT_PERMISSIONS
 
 
 class BaseContext(MADBase):

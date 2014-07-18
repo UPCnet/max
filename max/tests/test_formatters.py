@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-import os
-import json
-import unittest
-from functools import partial
+from max.tests import test_default_security
+from max.tests.base import MaxTestApp
+from max.tests.base import MaxTestBase
+from max.tests.base import mock_post
+from max.tests.base import oauth2Header
 
+from functools import partial
 from mock import patch
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
-from max.tests import test_default_security
+import json
+import os
+import unittest
 
 
 @patch('requests.post', new=mock_post)

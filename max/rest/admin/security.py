@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-
 from max import ALLOWED_ROLES
-from max.exceptions import ObjectNotFound, ValidationError
-from max.resources import loadMAXSecurity
-from max.decorators import MaxResponse
 from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.exceptions import ObjectNotFound
+from max.exceptions import ValidationError
 from max.oauth2 import oauth2
+from max.resources import loadMAXSecurity
 from max.rest.ResourceHandlers import JSONResourceRoot
+
+from pyramid.view import view_config
 
 
 @view_config(route_name='admin_security', request_method='GET', restricted="Manager")

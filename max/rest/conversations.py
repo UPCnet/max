@@ -17,12 +17,15 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
-from max.rest.utils import searchParams, flatten
-from pymongo import DESCENDING
+from max.rest.utils import flatten
+from max.rest.utils import searchParams
+
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 from pyramid.view import view_config
+
 from bson import ObjectId
+from pymongo import DESCENDING
 
 import os
 

@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-    Authentication tests
+from max.tests import test_default_security
+from max.tests import test_manager
+from max.tests.base import MaxTestApp
+from max.tests.base import MaxTestBase
+from max.tests.base import mock_post
+from max.tests.base import oauth2Header
 
-"""
-import os
-import json
-import unittest
 from functools import partial
-
-from paste.deploy import loadapp
 from mock import patch
+from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
-from max.tests import test_default_security, test_manager
+import json
+import os
+import unittest
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -42,3 +42,5 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers['X-Oauth-Scope'] = 'Invalid scope'
         res = self.testapp.post('/people/%s' % username, "", headers, status=401)
         self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')
+
+

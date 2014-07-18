@@ -2,9 +2,12 @@
 #MADMax  Mongo Access Delegate for Max
 
 from max.exceptions import ObjectNotFound
+
 from bson.objectid import ObjectId
-import sys
 from pymongo import DESCENDING
+
+import sys
+
 
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
 

@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-
+from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
+from max import LAST_AUTHORS_LIMIT
 from max.MADMax import MADMaxDB
-from max.rest.ResourceHandlers import JSONResourceRoot
-from max.decorators import MaxResponse, requirePersonActor
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
 from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
-from max import LAST_AUTHORS_LIMIT, AUTHORS_SEARCH_MAX_QUERIES_LIMIT
+
+from pyramid.view import view_config
 
 
 def timelineQuery(actor):

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from max.models.context import BaseContext
 from max.MADMax import MADMaxCollection
-from pymongo import DESCENDING
+from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
+
+from pymongo import DESCENDING
 
 
 class Conversation(BaseContext):

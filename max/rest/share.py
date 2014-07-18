@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.view import view_config
 
 
 @view_config(route_name='user_shares', request_method='GET')

@@ -1,14 +1,13 @@
-
 # -*- coding: utf-8 -*-
-from max.resources import getMAXSettings
 from max.exceptions import ConnectionError
-
-import json
-import datetime
+from max.resources import getMAXSettings
 
 from maxcarrot import RabbitClient
 from maxcarrot import RabbitMessage
 from socket import error as socket_error
+
+import datetime
+import json
 
 
 def noop(*args, **kwargs):

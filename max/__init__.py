@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 import logging
-import pymongo
-from max import patches
-from pyramid.config import Configurator
 
 # logger has to be instantiated BEFORE the import of the following resources import
 maxlogger = logging.getLogger('max')
 
+from max import patches
 from max.resources import Root
-from max.resources import loadMAXSettings
-from max.resources import loadMAXSecurity
 from max.resources import loadCloudAPISettings
+from max.resources import loadMAXSecurity
+from max.resources import loadMAXSettings
 from max.rest.resources import RESOURCES
 
-from pyramid_beaker import set_cache_regions_from_settings
+from pyramid.config import Configurator
 from pyramid.settings import asbool
+from pyramid_beaker import set_cache_regions_from_settings
+
 from max import debug
-from predicates import RestrictedPredicate
+from max.predicates import RestrictedPredicate
+
+import pymongo
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted')
 CONVERSATION_PARTICIPANTS_LIMIT = 20

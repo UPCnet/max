@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.models import Message
+from max.oauth2 import oauth2
+
 from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
-from bson import ObjectId
+from pyramid.view import view_config
 
-from max.models import Message
-from max.decorators import MaxResponse, requirePersonActor
-from max.oauth2 import oauth2
 from base64 import b64encode
+from bson import ObjectId
 
 
 @view_config(route_name='message_image', request_method='GET')

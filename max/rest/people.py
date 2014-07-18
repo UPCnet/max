@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-import os
-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
-from pyramid.httpexceptions import HTTPNoContent
-from pyramid.response import Response
-
-from max.exceptions import ValidationError
-from max.exceptions import ObjectNotFound
-from max.oauth2 import oauth2
 from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import ObjectNotFound
+from max.exceptions import ValidationError
 from max.models import User
-from max.rest.utils import searchParams, flatten
-from max.decorators import MaxResponse, requirePersonActor
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.utils import flatten
+from max.rest.utils import searchParams
+
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.response import Response
+from pyramid.view import view_config
 
 from PIL import Image
 from PIL import ImageOps
+
+import os
 
 
 @view_config(route_name='users', request_method='GET')

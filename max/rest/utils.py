@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
-import json
+from max.exceptions import InvalidSearchParams
+from max.exceptions import Unauthorized
+
+from pyramid.settings import asbool
+from pyramid.threadlocal import get_current_registry
+
 from bson import json_util
+from bson.objectid import ObjectId
 from datetime import datetime
 from rfc3339 import rfc3339
-from max.exceptions import InvalidSearchParams, Unauthorized
-from pyramid.threadlocal import get_current_registry
-from pyramid.settings import asbool
 
-from bson.objectid import ObjectId
-
-import tweepy
-import requests
+import json
 import logging
-import urllib2
 import re
+import requests
 import sys
+import tweepy
+import urllib2
 
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'

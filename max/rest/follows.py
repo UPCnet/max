@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented
-
-from max.decorators import MaxResponse, requirePersonActor
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
 from max.models import Activity
 from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
+
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.view import view_config
 
 
 @view_config(route_name='follows', request_method='GET')

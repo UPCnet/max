@@ -1,10 +1,13 @@
-from pyramid.view import view_config
-from max.rest.resources import RESOURCES
-from max.rest.ResourceHandlers import JSONResourceEntity
+# -*- coding: utf-8 -*-
 from max.predicates import RestrictedPredicate
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.resources import RESOURCES
+
+from pyramid.view import view_config
+
+import json
 import re
 import sys
-import json
 
 
 @view_config(route_name='info_api', request_method='GET')

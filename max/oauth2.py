@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 from max.exceptions import Unauthorized
-from max.resources import getMAXSettings
 from max.resources import Root
+from max.resources import getMAXSettings
 
 from pyramid.settings import asbool
 
-import requests
 from beaker.cache import cache_region
+
+import requests
 
 
 @cache_region('oauth_token')

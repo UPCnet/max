@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent, HTTPGone
-from pyramid.response import Response
-
-from bson import ObjectId
-
 from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import Forbidden
+from max.exceptions import ObjectNotFound
+from max.exceptions import Unauthorized
 from max.models import Activity
-from max.decorators import MaxResponse, requirePersonActor
 from max.oauth2 import oauth2
-from max.exceptions import ObjectNotFound, Unauthorized, Forbidden
-
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
 
+from pyramid.httpexceptions import HTTPGone
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.response import Response
+from pyramid.view import view_config
+
 from base64 import b64encode
+from bson import ObjectId
+
 import re
 
 
@@ -57,7 +62,6 @@ def addUserActivity(context, request):
         :query {"contexts": {"objectType": "context", "url": ""}} The context of the activity
         :query {"generator": ""} The generator of the activity (i.e. "Twitter")
     """
-
     rest_params = {'actor': request.actor,
                    'verb': 'post'}
 

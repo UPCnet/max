@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.models import Context
+from max.models import Conversation
+from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
+
 from pyramid.view import view_config
+
 from bson import ObjectId
+
 import logging
 import re
 
-from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor
-from max.models import Context, Conversation
-from max.MADMax import MADMaxDB
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 
 logger = logging.getLogger('exceptions')
 

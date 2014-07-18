@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-from max.rest.utils import formatMessageEntities, findHashtags, findKeywords
 from max.MADObjects import MADDict
+from max.rest.utils import findHashtags
+from max.rest.utils import findKeywords
+from max.rest.utils import formatMessageEntities
+
+from copy import deepcopy
 from hashlib import sha1
-from datetime import datetime
-from rfc3339 import rfc3339
 
 
 class ASObject(MADDict):
@@ -30,12 +32,18 @@ class Note(ASObject):
     """
     data = {}
     objectType = 'Note'
-    schema = {'_id':           dict(),
-              'content':       dict(required=1, formatters=['stripHTMLTags']),
-              'objectType':    dict(required=1),
-              '_hashtags':     dict(),
-              '_keywords':     dict(),
-              }
+    schema = {
+        '_id': {},
+        'content': {
+            'required': 1,
+            'formatters': ['stripHTMLTags']
+        },
+        'objectType': {
+            'required': 1
+        },
+        '_hashtags': {},
+        '_keywords': {},
+    }
 
     def __init__(self, data, creating=True):
         """
@@ -61,13 +69,21 @@ class Comment(ASObject):
     """
     data = {}
     objectType = 'Comment'
-    schema = {'_id':         dict(),
-              'content':     dict(required=1, formatters=['stripHTMLTags']),
-              'objectType':  dict(required=1),
-              'inReplyTo':   dict(required=1),
-              '_hashtags':     dict(),
-              '_keywords':     dict(),
-              }
+    schema = {
+        '_id': {},
+        'content': {
+            'required': 1,
+            'formatters': ['stripHTMLTags']
+        },
+        'objectType': {
+            'required': 1
+        },
+        'inReplyTo': {
+            'required': 1
+        },
+        '_hashtags': {},
+        '_keywords': {},
+    }
 
     def __init__(self, data, creating=True):
         """
@@ -93,10 +109,15 @@ class Conversation(ASObject):
     """
     data = {}
     objectType = 'Conversation'
-    schema = {'id':          dict(),
-              'objectType':   dict(required=1),
-              'participants': dict(required=1),
-              }
+    schema = {
+        'id': {},
+        'objectType': {
+            'required': 1
+        },
+        'participants': {
+            'required': 1
+        },
+    }
 
 
 class Context(ASObject):
@@ -105,10 +126,15 @@ class Context(ASObject):
     """
     data = {}
     objectType = 'Context'
-    schema = {'_id':         dict(),
-              'url':         dict(required=1),
-              'objectType':  dict(required=1),
-              }
+    schema = {
+        '_id': {},
+        'url': {
+            'required': 1
+        },
+        'objectType': {
+            'required': 1
+        },
+    }
 
     def getHash(self):
         """
@@ -170,12 +196,12 @@ class File(Note):
         self.update(data)
 
     objectType = 'File'
-    schema = dict(Note.schema)
+    schema = deepcopy(Note.schema)
     schema['content']['required'] = 0
-    schema['file'] = dict()
-    schema['filename'] = dict()
-    schema['mimetype'] = dict()
-    schema['fullURL'] = dict()
+    schema['file'] = {}
+    schema['filename'] = {}
+    schema['mimetype'] = {}
+    schema['fullURL'] = {}
 
 
 class Image(File):
@@ -183,5 +209,5 @@ class Image(File):
         An activitystrea.ms Image Object
     """
     objectType = 'Image'
-    schema = dict(File.schema)
-    schema['thumbURL'] = dict()
+    schema = deepcopy(File.schema)
+    schema['thumbURL'] = {}

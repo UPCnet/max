@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNoContent
-
-from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor
-from max.MADMax import MADMaxDB, MADMaxCollection
+from max.MADMax import MADMaxCollection
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import InvalidPermission
+from max.exceptions import ObjectNotFound
+from max.exceptions import Unauthorized
+from max.exceptions import ValidationError
 from max.models import Context
-from max.rest.utils import searchParams, extractPostData
-from max.exceptions import InvalidPermission, Unauthorized, ObjectNotFound, ValidationError
-from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
+from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.utils import extractPostData
+from max.rest.utils import searchParams
+
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.view import view_config
 
 
 @view_config(route_name='contexts', request_method='GET', restricted='Manager')

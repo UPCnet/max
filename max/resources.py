@@ -1,7 +1,11 @@
-from pyramid.security import Everyone, Allow, Authenticated
+# -*- coding: utf-8 -*-
+from max.version import __version__
+
+from pyramid.security import Allow
+from pyramid.security import Authenticated
+from pyramid.security import Everyone
 
 from max import maxlogger
-from max.version import __version__
 
 DUMMY_CLOUD_API_DATA = {
     "twitter": {

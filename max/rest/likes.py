@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotImplemented, HTTPNoContent
-
-from max.decorators import MaxResponse, requirePersonActor
-from max.oauth2 import oauth2
-from max.MADMax import MADMaxDB, MADMaxCollection
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.models import Activity
+from max.MADMax import MADMaxCollection
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
 from max.exceptions import ObjectNotFound
+from max.models import Activity
+from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceEntity
+
+from pyramid.httpexceptions import HTTPNotImplemented
+from pyramid.view import view_config
 
 from bson.objectid import ObjectId
 

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNoContent
-
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import ObjectNotFound
+from max.exceptions import ValidationError
 from max.models import User
 from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor
-from max.MADMax import MADMaxDB
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
-from max.exceptions import ObjectNotFound, ValidationError
+
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.view import view_config
 
 
 @view_config(route_name='users', request_method='GET', restricted='Manager')

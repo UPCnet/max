@@ -1,13 +1,17 @@
-import json
-import pymongo
-
-from pyramid.threadlocal import get_current_request
-
+# -*- coding: utf-8 -*-
 from max.tests import test_manager
 from max.tests.mock_image import image
 
+from pyramid.threadlocal import get_current_request
+
+import json
+import pymongo
+import requests
 
 MOCK_TOKEN = "jfa1sDF2SDF234"
+
+requests_get = requests.get
+requests_post = requests.post
 
 
 class mock_requests_obj(object):
@@ -37,7 +41,8 @@ def mock_post(self, *args, **kwargs):  # pragma: no cover
     elif args[0].endswith('upload'):
         return mock_requests_obj(text='{"uploadURL": "http://localhost:8181/theimage", "thumbURL": "http://localhost:8181/theimage/thumb"}', status_code=201)
     else:
-        return mock_requests_obj(text='', status_code=200)
+        # Proceed with unpatched requests post
+        return requests_post(*args, **kwargs)
 
 
 def mock_get(self, *args, **kwargs):  # pragma: no cover
@@ -51,7 +56,8 @@ def mock_get(self, *args, **kwargs):  # pragma: no cover
         else:
             return mock_requests_obj(content=image, status_code=200)
     else:
-        return mock_requests_obj(text='', status_code=404)
+        # Proceed with unpatched requests get
+        return requests_get(*args, **kwargs)
 
 
 def oauth2Header(username, token=MOCK_TOKEN, scope="widgetcli"):

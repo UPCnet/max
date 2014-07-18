@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
 from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor
 from max.rest.ResourceHandlers import JSONResourceEntity
 
-from max.resources import getMAXSettings
+from pyramid.view import view_config
+
 import re
 
 

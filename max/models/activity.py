@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
+from max.MADMax import MADMaxCollection
+from max.MADObjects import MADBase
+from max.exceptions import Unauthorized
+from max.models.context import Context
+from max.models.user import User
+from max.rabbitmq import RabbitNotifications
+from max.rest.utils import canWriteInContexts
+from max.rest.utils import getMaxModelByObjectType
+from max.rest.utils import hasPermission
+
+from PIL import Image
 from bson import ObjectId
 from hashlib import sha1
 
-from max.MADObjects import MADBase
-from max.MADMax import MADMaxCollection
-from max.models.user import User
-from max.exceptions import Unauthorized
-from max.models.context import Context
-from max.rest.utils import canWriteInContexts, hasPermission
-from max.rest.utils import getMaxModelByObjectType
-from max.rabbitmq import RabbitNotifications
-from PIL import Image
-
 import json
+import os
 import re
 import requests
-import os
 
 
 class BaseActivity(MADBase):

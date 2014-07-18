@@ -1,11 +1,13 @@
-import os
-import unittest
-import doctest
+# -*- coding: utf-8 -*-
+from max.tests import test_default_security
+from max.tests.base import MaxTestBase
+from max.tests.base import oauth2Header
 
 from paste.deploy import loadapp
 
-from max.tests.base import MaxTestBase, oauth2Header
-from max.tests import test_default_security
+import doctest
+import os
+import unittest
 
 OPTIONFLAGS = (doctest.ELLIPSIS |
                doctest.NORMALIZE_WHITESPACE |

@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
-from pyramid.view import view_config
+from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
+from max import LAST_AUTHORS_LIMIT
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requirePersonActor
+from max.exceptions import ObjectNotFound
+from max.exceptions import Unauthorized
+from max.oauth2 import oauth2
+from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.utils import downloadTwitterUserImage
+from max.rest.utils import flatten
+from max.rest.utils import searchParams
+
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
+from pyramid.view import view_config
 
-from max import LAST_AUTHORS_LIMIT, AUTHORS_SEARCH_MAX_QUERIES_LIMIT
-from max.MADMax import MADMaxDB
-from max.exceptions import Unauthorized, ObjectNotFound
-from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor
-from max.rest.ResourceHandlers import JSONResourceRoot, JSONResourceEntity
 import os
-
-from max.rest.utils import downloadTwitterUserImage, searchParams, flatten
 import time
 
 

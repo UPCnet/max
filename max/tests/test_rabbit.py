@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-import os
-import unittest
-from functools import partial
-
-from paste.deploy import loadapp
-from mock import patch
-
-from max.tests.base import MaxTestBase, MaxTestApp, mock_post
 from max.tests import test_default_security
+from max.tests.base import MaxTestApp
+from max.tests.base import MaxTestBase
+from max.tests.base import mock_post
 from maxcarrot import RabbitClient
+
+from functools import partial
+from mock import patch
+from paste.deploy import loadapp
+
 import new
+import os
 import sys
+import unittest
 
 
 skipRabbitTest = partial(

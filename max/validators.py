@@ -1,7 +1,9 @@
-import re
+# -*- coding: utf-8 -*-
 from max.regex import RE_VALID_HASHTAG
-from max.regex import RE_VALID_TWITTER_USERNAME
 from max.regex import RE_VALID_IOS_TOKEN
+from max.regex import RE_VALID_TWITTER_USERNAME
+
+import re
 
 """
     Validators accept ONE parameter containing the value of the field to be validated

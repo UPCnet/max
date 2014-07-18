@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from max.regex import RE_VALID_HASHTAG
 from max.regex import RE_VALID_TWITTER_USERNAME
-import re
+
 import bleach
+import re
 
 
 def stripHash(text):

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
-import datetime
-from max.rest.utils import getMaxModelByObjectType, flatten
-from pyramid.settings import asbool
-from max.rest.utils import getMaxModelByObjectType
 from max.rabbitmq import RabbitNotifications
+from max.rest.utils import flatten
+from max.rest.utils import getMaxModelByObjectType
+
+from pyramid.settings import asbool
+
+import datetime
+
 
 PLATFORM_FIELD_SUFFIX = 'Devices'
 

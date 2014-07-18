@@ -1,19 +1,19 @@
+# -*- coding: utf-8 -*-
+from max.tests import test_default_security
+from max.tests.base import mock_post
+
+from pyramid_robot.layer import Layer
+from pyramid_robot.layer import layered
+
+from functools import partial
+from mock import patch
+from paste.deploy import loadapp
+from webtest import http
+
+import SocketServer
 import os
 import robotsuite
 import unittest
-import SimpleHTTPServer
-import SocketServer
-import threading
-
-from webtest import http
-from paste.deploy import loadapp
-from functools import partial
-
-from mock import patch
-from pyramid_robot.layer import Layer, layered
-
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
-from max.tests import test_manager, test_default_security
 
 STATIC_HTTP_PORT = 8000
 

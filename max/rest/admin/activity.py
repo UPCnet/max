@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
-
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNoContent
-from bson import ObjectId
-
+from max.MADMax import MADMaxDB
+from max.decorators import MaxResponse
+from max.decorators import requireContextActor
+from max.decorators import requirePersonActor
 from max.models import Activity
 from max.oauth2 import oauth2
-from max.decorators import MaxResponse, requirePersonActor, requireContextActor
-from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
+
+from pyramid.httpexceptions import HTTPNoContent
+from pyramid.view import view_config
+
+from bson import ObjectId
+from datetime import timedelta
 
 
 @view_config(route_name='user_activities', request_method='GET', restricted=['Manager'])

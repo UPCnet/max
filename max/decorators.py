@@ -1,23 +1,42 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import MissingField, ObjectNotSupported, ObjectNotFound, DuplicatedItemError, UnknownUserError, Unauthorized, InvalidSearchParams, InvalidPermission, ValidationError, Forbidden, ConnectionError
-from max.exceptions import JSONHTTPServiceUnavailable, JSONHTTPUnauthorized, JSONHTTPBadRequest, JSONHTTPNotFound, JSONHTTPForbidden, JSONHTTPInternalServerError
-from bson.errors import InvalidId
 from max.MADMax import MADMaxDB
+from max.exceptions import ConnectionError
+from max.exceptions import DuplicatedItemError
+from max.exceptions import Forbidden
+from max.exceptions import InvalidPermission
+from max.exceptions import InvalidSearchParams
+from max.exceptions import JSONHTTPBadRequest
+from max.exceptions import JSONHTTPForbidden
+from max.exceptions import JSONHTTPInternalServerError
+from max.exceptions import JSONHTTPNotFound
+from max.exceptions import JSONHTTPServiceUnavailable
+from max.exceptions import JSONHTTPUnauthorized
+from max.exceptions import MissingField
+from max.exceptions import ObjectNotFound
+from max.exceptions import ObjectNotSupported
+from max.exceptions import Unauthorized
+from max.exceptions import UnknownUserError
+from max.exceptions import ValidationError
 from max.resources import Root
 from max.rest.resources import RESOURCES
-from max.rest.utils import getUsernameFromXOAuth, getUsernameFromURI, getUsernameFromPOSTBody, getUrlHashFromURI
-from max.models import User, Context
+from max.rest.utils import getUrlHashFromURI
+from max.rest.utils import getUsernameFromPOSTBody
+from max.rest.utils import getUsernameFromURI
+from max.rest.utils import getUsernameFromXOAuth
 
+from pyramid.settings import asbool
+
+from bson.errors import InvalidId
+from datetime import datetime
+from hashlib import sha1
 from pymongo.errors import AutoReconnect
 from pymongo.errors import ConnectionFailure
 
-import traceback
-from datetime import datetime
 import json
-from hashlib import sha1
 import logging
+import traceback
+
 logger = logging.getLogger('exceptions')
-from pyramid.settings import asbool
 
 
 def getUserActor(db, username):
