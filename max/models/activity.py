@@ -378,9 +378,10 @@ class Activity(BaseActivity):
             self.lastComment = oid
             self.save()
 
-    def _on_insert(self, oid):
+    def _on_insert_object(self, oid):
         # notify activity if the activity is from a context
         # with enabled notifications
+
         notify = self.get('contexts', [{}])[0].get('notifications', False)
         if notify in ['posts', 'comments', True]:
             notifier = RabbitNotifications(self.request)

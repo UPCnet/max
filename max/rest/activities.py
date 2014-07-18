@@ -57,6 +57,7 @@ def addUserActivity(context, request):
         :query {"contexts": {"objectType": "context", "url": ""}} The context of the activity
         :query {"generator": ""} The generator of the activity (i.e. "Twitter")
     """
+
     rest_params = {'actor': request.actor,
                    'verb': 'post'}
 

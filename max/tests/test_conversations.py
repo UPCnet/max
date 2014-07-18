@@ -117,7 +117,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(resp.json.get("tags", None), [])
         self.assertEqual(resp.json.get("permissions", None), permissions)
         self.assertEqual(str(resp.json.get("id", '')), cid)
-        return cid
+        return cid, sender
 
     def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2

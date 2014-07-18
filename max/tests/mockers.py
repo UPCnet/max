@@ -214,7 +214,7 @@ user_status_context = {
     ],
     "object": {
         "objectType": "note",
-        "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
+        "content": "[A] Testejant la creació d'un canvi d'estatus"
     },
 }
 

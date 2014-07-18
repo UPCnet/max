@@ -6,18 +6,30 @@ from functools import partial
 from paste.deploy import loadapp
 from mock import patch
 
-from max.tests.base import MaxTestBase, MaxTestApp, oauth2Header, mock_post
-from max.tests import test_manager, test_default_security
+from max.tests.base import MaxTestBase, MaxTestApp, mock_post
+from max.tests import test_default_security
 from maxcarrot import RabbitClient
 import new
 import sys
-import json
+
 
 skipRabbitTest = partial(
     unittest.skipUnless,
     os.environ.get('rabbit', False),
     'Skipping due to lack of a Rabbitmq Server'
 )
+
+
+def get_module(name):
+    return sys.modules[name]
+
+
+def import_object(module__name, dotted):
+    last = get_module(module__name)
+    parts = dotted.split('.')
+    for part in parts:
+        last = getattr(last, part)
+    return last
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -51,14 +63,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
             Runs a test method from another module in a dirty (but awesome) way
         """
-
-        # Step by step import the module, class and method objects
-        test_module = getattr(sys.modules['max.tests'], test_module_name)
-        test_class = getattr(test_module, 'FunctionalTests')
-        test_method = getattr(test_class, test_name)
+        method_dotted_name = '{}.FunctionalTests.{}'.format(test_module_name, test_name)
+        test_method = import_object('max.tests', method_dotted_name)
 
         # Create a new function sharing code, name and current globals
-        wrapped_test_method = new.function(test_method.func_code, globals(), test_method.func_name)
+        # plus other imports needed by other modules
+        current_globals = globals()
+        current_globals.update({
+            'json': get_module('json'),
+            'oauth2Header': import_object('max.tests', 'base.oauth2Header'),
+            'test_manager': import_object('max.tests', 'test_manager')
+        })
+
+        wrapped_test_method = new.function(test_method.func_code, current_globals, test_method.func_name)
 
         # execute the new method and return result (if any)
         return wrapped_test_method(self)
@@ -81,7 +98,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     @skipRabbitTest()
     def test_create_conversation_bindings(self):
-        cid = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
+        cid, creator = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
 
         # Find defined bindings for this conversation
         bindings = self.server.management.load_exchange_bindings('conversations')
@@ -90,8 +107,23 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(bindings), 4)
 
     @skipRabbitTest()
+    def test_create_conversation_check_notification(self):
+        cid, creator = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
+
+        messages_to_push_queue = self.server.get_all('push')
+        carrot_message, haigha_message = messages_to_push_queue[0]
+
+        self.assertEqual(len(messages_to_push_queue), 1)
+        self.assertEqual(haigha_message.delivery_info['routing_key'], '{}.notifications'.format(cid))
+        self.assertEqual(carrot_message['a'], 'a')
+        self.assertEqual(carrot_message['o'], 'c')
+        self.assertEqual(carrot_message['u']['u'], creator)
+        self.assertEqual(carrot_message['u']['d'], creator)
+
+    @skipRabbitTest()
     def test_delete_conversation_bindings(self):
         cid = self.run_test('test_conversations', 'test_conversation_owner_deletes_conversation')
+
         # Find defined bindings for this conversation
         bindings = self.server.management.load_exchange_bindings('conversations')
         bindings = [bind for bind in bindings if ".*".format(cid) in bind['routing_key']]
@@ -99,7 +131,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(bindings), 0)
 
     @skipRabbitTest()
-    def test_remove_user_bindings(self):
+    def test_remove_user_from_conversation_bindings(self):
         cid, userin, userout = self.run_test('test_conversations', 'test_user_leaves_two_people_conversation')
 
         # Find defined bindings for this conversation
@@ -125,7 +157,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(userout_bindings), 0)
 
     @skipRabbitTest()
-    def test_add_user_bindings(self):
+    def test_add_new_user_to_conversation_bindings(self):
         cid, newuser = self.run_test('test_conversations', 'test_add_participant_to_conversation')
 
         # Find defined bindings for this conversation
@@ -143,23 +175,60 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(newuser_bindings), 2)
 
     @skipRabbitTest()
-    def test_create_context_bindings(self):
-        cid = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
+    def test_delete_context_bindings(self):
+        context_hash = self.run_test('test_contexts_notifications', 'test_delete_context_with_notifications_removes_subscriptions')
 
-        # Find defined bindings for this conversation
-        bindings = self.server.management.load_exchange_bindings('conversations')
-        bindings = [bind for bind in bindings if ".*".format(cid) in bind['routing_key']]
+        # Find defined bindings for this context
+        bindings = self.server.management.load_exchange_bindings('activity')
+        bindings = [bind for bind in bindings if ".*".format(context_hash) in bind['routing_key']]
 
-        self.assertEqual(len(bindings), 4)
+        self.assertEqual(len(bindings), 0)
 
-    # @skipRabbitTest()
-    # def test_delete_context_bindings(self):
-    #     result = self.run_test('test_contexts', 'test_')
+    @skipRabbitTest()
+    def test_add_user_subscription_bindings(self):
+        context_hash, subscribed_user = self.run_test('test_contexts_notifications', 'test_subscribe_user_to_context_with_notifications')
 
-    # @skipRabbitTest()
-    # def test_add_user_subscription_bindings(self):
-    #     result = self.run_test('test_', 'test_')
+        # Find defined bindings for this context
+        bindings = self.server.management.load_exchange_bindings('activity')
+        bindings = [bind for bind in bindings if context_hash in bind['routing_key']]
 
-    # @skipRabbitTest()
-    # def test_remove_user_subscription_bindings(self):
-    #     result = self.run_test('test_', 'test_')
+        # Search for the bindings of the user still on the conversation
+        subscribed_bindings = [
+            bind for bind in bindings
+            if "{}.subscribe".format(subscribed_user) == bind['destination']
+        ]
+
+        self.assertEqual(len(bindings), 1)
+        self.assertEqual(len(subscribed_bindings), 1)
+
+    @skipRabbitTest()
+    def test_remove_user_subscription_bindings(self):
+        context_hash, unsubscribed_user = self.run_test('test_contexts_notifications', 'test_unsubscribe_user_from_context_with_notifications')
+
+        # Find defined bindings for this context
+        bindings = self.server.management.load_exchange_bindings('activity')
+        bindings = [bind for bind in bindings if context_hash in bind['routing_key']]
+
+        # Search for the bindings of the user still on the conversation
+        unsubscribed_bindings = [
+            bind for bind in bindings
+            if "{}.subscribe".format(unsubscribed_user) == bind['destination']
+        ]
+
+        self.assertEqual(len(bindings), 0)
+        self.assertEqual(len(unsubscribed_bindings), 0)
+
+    @skipRabbitTest()
+    def test_post_message_check_notification(self):
+        cid, creator, activity = self.run_test('test_contexts_notifications', 'test_post_activity_on_context_with_notifications')
+
+        messages_to_push_queue = self.server.get_all('push')
+        carrot_message, haigha_message = messages_to_push_queue[0]
+
+        self.assertEqual(len(messages_to_push_queue), 1)
+        self.assertEqual(haigha_message.delivery_info['routing_key'], '{}'.format(cid))
+        self.assertEqual(carrot_message['a'], 'a')
+        self.assertEqual(carrot_message['o'], 'a')
+        self.assertEqual(carrot_message['u']['u'], creator)
+        self.assertEqual(carrot_message['u']['d'], creator)
+        self.assertEqual(carrot_message['d']['text'], activity['object']['content'])

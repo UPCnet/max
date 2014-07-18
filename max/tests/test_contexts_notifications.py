@@ -95,3 +95,29 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(len(res.json), 0)
         return url_hash, username
+
+    def test_post_activity_on_context_with_notifications(self):
+        """ Post an activity to a context which needs the user to be subscribed to read and write
+            and we have previously subscribed the user.
+        """
+        from .mockers import subscribe_context
+        from .mockers import create_context_post_notifications as create_context
+        from .mockers import user_status_context
+        from hashlib import sha1
+
+        username = 'messi'
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        self.create_user(username)
+        context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
+        self.create_context(create_context, permissions=context_permissions)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        res = self.create_activity(username, user_status_context)
+
+        result = json.loads(res.text)
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'note')
+        self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
+        self.assertEqual(result.get('contexts', None)[0]['notifications'], 'posts')
+
+        return url_hash, username, user_status_context
