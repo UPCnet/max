@@ -125,3 +125,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('contexts', None)[0]['notifications'], 'posts')
 
         return url_hash, username, user_status_context
+
+    def test_post_comment_with_comments_notification(self):
+        """ doctest .. http:post:: /activities/{activity}/comments """
+        from .mockers import user_status_context, user_comment
+        from .mockers import subscribe_context
+        from .mockers import create_context_comments_notifications as create_context
+        from hashlib import sha1
+
+        username = 'messi'
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity = self.create_activity(username, user_status_context)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        result = res.json
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
+        self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
+
+        return url_hash, username, user_status_context, user_comment

@@ -188,6 +188,11 @@ class BaseActivity(MADBase):
 
         self.save()
 
+        notify = self.get('contexts', [{}])[0].get('notifications', False)
+        if notify in ['comments']:
+            notifier = RabbitNotifications(self.request)
+            notifier.notify_context_activity_comment(self, comment)
+
     def delete_comment(self, commentid):
         """
         """

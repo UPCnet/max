@@ -133,6 +133,26 @@ class RabbitNotifications(object):
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
         self.client.disconnect()
 
+    def notify_context_activity_comment(self, activity, comment):
+        """
+            Sends a Carrot (TM) notification of a new post on a context
+        """
+        message = RabbitMessage()
+        message.prepare(self.message_defaults)
+        message.update({
+            "user": {
+                'username': self.request.actor.username,
+                'displayname': self.request.actor.displayName,
+            },
+            "action": "add",
+            "object": "activity",
+            "data": {
+                'text': comment['content']
+            }
+        })
+        self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
+        self.client.disconnect()
+
     def add_conversation(self, conversation):
         """
             Sends a Carrot (TM) notification of a new conversation creation

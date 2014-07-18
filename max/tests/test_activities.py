@@ -616,15 +616,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json), 1)
         self.assertNotIn('_keywords', res.json[0]['object'])
 
-    def test_post_comment(self):
+    def test_post_comment_timeline(self):
         """ doctest .. http:post:: /activities/{activity}/comments """
         from .mockers import user_status, user_comment
+        username = 'messi'
+        self.create_user(username)
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+        result = res.json
+        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
+        self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
+        self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
+
+    def test_post_comment_on_context(self):
+        """ doctest .. http:post:: /activities/{activity}/comments """
+        from .mockers import user_status_context, user_comment
         from .mockers import subscribe_context, create_context
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        activity = self.create_activity(username, user_status)
+        activity = self.create_activity(username, user_status_context)
         activity = activity.json
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
         result = res.json

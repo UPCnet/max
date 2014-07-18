@@ -58,6 +58,14 @@ create_context_post_notifications = {
     'notifications': 'posts'
 }
 
+create_context_comments_notifications = {
+
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
+    'tags': ['Assignatura'],
+    'notifications': 'comments'
+}
+
 create_context_comment_notifications = {
 
     'url': 'http://atenea.upc.edu',
@@ -306,7 +314,7 @@ context_search_by_tags = {
 user_comment = {
     "object": {
         "objectType": "comment",
-        "content": "<p>[C] Testejant un comentari nou a una activitat</p>"
+        "content": "[C] Testejant un comentari nou a una activitat"
     }
 }
 
