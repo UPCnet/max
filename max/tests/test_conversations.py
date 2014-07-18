@@ -117,6 +117,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(resp.json.get("tags", None), [])
         self.assertEqual(resp.json.get("permissions", None), permissions)
         self.assertEqual(str(resp.json.get("id", '')), cid)
+        return cid
 
     def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2
@@ -396,19 +397,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
-        recipient3 = 'melendi'
+        newuser = 'melendi'
 
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
-        self.create_user(recipient3)
+        self.create_user(newuser)
 
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, conversation_id), '', oauth2Header(sender), status=201)
+        self.testapp.post('/people/{}/conversations/{}'.format(newuser, conversation_id), '', oauth2Header(sender), status=201)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 4)
+
+        return conversation_id, newuser
 
     def test_add_participant_to_two_people_conversation(self):
         """
@@ -537,6 +540,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json['participants']), 2)
         self.assertIn('archive', res.json['tags'])
         self.assertEqual(res.json['displayName'], recipient)
+        return conversation_id, sender, recipient
 
     def test_user_leaves_conversation(self):
         """
@@ -895,6 +899,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=204)
         self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=404)
         self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=404)
+        return conversation_id
 
     def test_conversation_messages_deleted_after_deleting_conversation(self):
         """

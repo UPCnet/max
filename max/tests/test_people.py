@@ -34,6 +34,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_create_user(self):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
+        return username
 
     def test_create_user_creator_is_admin(self):
         """
