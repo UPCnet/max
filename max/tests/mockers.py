@@ -45,7 +45,23 @@ create_context = {
 
     'url': 'http://atenea.upc.edu',
     'displayName': 'Atenea',
-    'tags': ['Assignatura']
+    'tags': ['Assignatura'],
+}
+
+create_context_post_notifications = {
+
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
+    'tags': ['Assignatura'],
+    'notifications': 'posts'
+}
+
+create_context_comment_notifications = {
+
+    'url': 'http://atenea.upc.edu',
+    'displayName': 'Atenea',
+    'tags': ['Assignatura'],
+    'notifications': 'comments'
 }
 
 create_context_with_uploadurl = {

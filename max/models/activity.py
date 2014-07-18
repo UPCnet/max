@@ -381,8 +381,8 @@ class Activity(BaseActivity):
     def _on_insert(self, oid):
         # notify activity if the activity is from a context
         # with enabled notifications
-
-        if self.get('contexts', [{}])[0].get('notifications', False):
+        notify = self.get('contexts', [{}])[0].get('notifications', False)
+        if notify in ['posts', 'comments', True]:
             notifier = RabbitNotifications(self.request)
             notifier.notify_context_activity(self)
 
