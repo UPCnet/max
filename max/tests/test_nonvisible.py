@@ -120,7 +120,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username_visible1)
         self.create_user(username_nonvisible1)
 
-        message = dict(message)
+        message = deepcopy(message)
         message['contexts'][0]['participants'] = [username_nonvisible1, username_visible1]
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
@@ -140,7 +140,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username_nonvisible1)
         self.create_user(username_nonvisible2)
 
-        message = dict(message)
+        message = deepcopy(message)
         message['contexts'][0]['participants'] = [username_nonvisible1, username_nonvisible2]
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
@@ -163,7 +163,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username_visible1)
         self.create_user(username_visible2)
 
-        message = dict(message)
+        message = deepcopy(message)
         message['contexts'][0]['participants'] = [username_visible2, username_visible1]
 
         self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=201)
@@ -181,7 +181,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username_visible1)
         self.create_user(username_nonvisible1)
 
-        message = dict(message)
+        message = deepcopy(message)
         message['contexts'][0]['participants'] = [username_nonvisible1, username_visible1]
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
