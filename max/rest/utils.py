@@ -7,7 +7,8 @@ from pyramid.threadlocal import get_current_registry
 
 from bson import json_util
 from bson.objectid import ObjectId
-from datetime import datetime
+from calendar import monthrange
+from datetime import datetime, time
 from rfc3339 import rfc3339
 
 import json
@@ -100,6 +101,56 @@ def getUsernameFromPOSTBody(request):
     if isinstance(decoded_data, dict):
         return decoded_data.get('username', None)
     return None
+
+
+def date_filter_parser(date_filter):
+    before = date_filter.startswith('-')
+    after = date_filter.startswith('+')
+    exact = not before and not after
+
+    date_filter = date_filter.lstrip('-').lstrip('+')
+    result = re.search(r'(\d{4})[^\d]*(\d{2})*[^\d]*(\d{2})*', date_filter)
+
+    date1 = [0, 0, 0]
+    date2 = [0, 0, 0]
+
+    if result:
+        year, month, day = result.groups()
+        date1[0] = int(year)
+        date2[0] = int(year)
+
+        if month is not None:
+            date1[1] = int(month)
+            date2[1] = int(month)
+        else:
+            date1[1] = 1 if exact or before else 12
+            if exact:
+                date2[1] = 12
+
+        if day is not None:
+            date1[2] = int(day)
+            date2[2] = int(day)
+        else:
+            last_day_of_month = monthrange(date1[0], date1[1])[1]
+            date1[2] = 1 if exact or before else last_day_of_month
+            if exact:
+                date2[2] = last_day_of_month
+
+        base_dt1 = datetime(*date1)
+        if before:
+            return {
+                '$lt': datetime.combine(base_dt1, time.min)
+            }
+        if after:
+            return {
+                '$gt': datetime.combine(base_dt1, time.max)
+            }
+        if exact:
+            base_dt2 = datetime(*date2)
+            return {
+                '$gte': datetime.combine(base_dt1, time.min),
+                '$lte': datetime.combine(base_dt2, time.max)
+            }
 
 
 def searchParams(request):
