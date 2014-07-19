@@ -6,6 +6,7 @@ from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 
+from copy import deepcopy
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp
@@ -37,6 +38,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(username), status=201)
+
+    def test_create_activity_with_published_date(self):
+        """ doctest .. http:post:: /people/{username}/activities """
+        from .mockers import user_status as activity
+
+        old_activity = deepcopy(activity)
+        old_activity['published'] = '2010-01-01T00:01:30.000Z'
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(old_activity), oauth2Header(username), status=201)
+        import ipdb;ipdb.set_trace()
 
     def test_create_activity_with_invalid_json(self):
         """ doctest .. http:post:: /people/{username}/activities """

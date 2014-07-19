@@ -8,6 +8,7 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.utils import canWriteInContexts
 from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
+from max.rest.utils import rfc3339_parse
 
 from PIL import Image
 from bson import ObjectId
@@ -44,6 +45,7 @@ class BaseActivity(MADBase):
             'required': 1
         },
         'published': {},
+        '_created': {},
         'lastComment': {},
         'contexts': {},
         'replies': {
@@ -122,6 +124,11 @@ class BaseActivity(MADBase):
             ob['contexts'] = [posted_context, ]
         self.update(ob)
 
+        # Set date if specified
+        if 'published' in self.data:
+            self._created = self.published
+            self.published = rfc3339_parse(self.data['published'])
+
         # Set defaults
         properties = {}
         for key, value in self.schema.items():
@@ -133,6 +140,7 @@ class BaseActivity(MADBase):
             elif 'default' in value.keys():
                 properties[key] = default
         self.update(properties)
+        import ipdb;ipdb.set_trace()
 
         if self.verb in ['post']:
             self.setKeywords()

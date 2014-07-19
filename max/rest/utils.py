@@ -103,6 +103,15 @@ def getUsernameFromPOSTBody(request):
     return None
 
 
+def rfc3339_parse(date):
+    """
+    Converts a date in format 2012-10-27T18:14:14.000Z to a python datetime
+    """
+    timeparts = list(re.search(r'(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+).?(\d*)Z', date).groups())
+    timeparts[6] = timeparts[6] and (int(timeparts[6]) * 1000) or 0
+    return datetime(*map(int, timeparts))
+
+
 def date_filter_parser(date_filter):
     before = date_filter.startswith('-')
     after = date_filter.startswith('+')
