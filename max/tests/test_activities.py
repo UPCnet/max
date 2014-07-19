@@ -48,7 +48,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(old_activity), oauth2Header(username), status=201)
-        import ipdb;ipdb.set_trace()
+        self.assertEqual(res.json['published'], '2010-01-01T00:01:30Z')
 
     def test_create_activity_with_invalid_json(self):
         """ doctest .. http:post:: /people/{username}/activities """

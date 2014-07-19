@@ -140,7 +140,6 @@ class BaseActivity(MADBase):
             elif 'default' in value.keys():
                 properties[key] = default
         self.update(properties)
-        import ipdb;ipdb.set_trace()
 
         if self.verb in ['post']:
             self.setKeywords()
