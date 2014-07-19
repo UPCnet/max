@@ -152,6 +152,8 @@ def date_filter_parser(date_filter):
                 '$lte': datetime.combine(base_dt2, time.max)
             }
 
+    return {}
+
 
 def searchParams(request):
     """
@@ -189,6 +191,11 @@ def searchParams(request):
     if 'before' in params and 'after' in params:
         raise InvalidSearchParams('only one offset filter is allowed, after or before')
 
+    if 'date_filter' in params:
+        date_filter = date_filter_parser(request.params.get('date_filter', ''))
+        if date_filter:
+            params['date_filter'] = date_filter
+
     hashtags = request.params.getall('hashtag')
     if hashtags:
         params['hashtag'] = [hasht.lower() for hasht in hashtags]
@@ -218,7 +225,6 @@ def searchParams(request):
     favorites = request.params.get('favorites')
     if asbool(favorites):
         params['favorites'] = request.actor.username
-
 
     context_tags = request.params.getall('context_tags')
     if context_tags:

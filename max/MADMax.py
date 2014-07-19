@@ -74,6 +74,7 @@ class MADMaxCollection(object):
         twitter_enabled = kwargs.get('twitter_enabled', None)
         sort_order = kwargs.get('sort_order', None)
         offset_override = kwargs.get('offset', None)
+        date_filter = kwargs.get('date_filter', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
@@ -146,6 +147,11 @@ class MADMaxCollection(object):
                 ]
             }
             query.update(twe_query)
+
+        if date_filter:
+            # Filter the query to objects matching a specific published date range
+            query.update({'published': date_filter})
+
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)
         cursor = self.collection.find(query, self.show_fields)
