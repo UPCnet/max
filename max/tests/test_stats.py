@@ -6,6 +6,7 @@ from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 
+from copy import deepcopy
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp
@@ -41,6 +42,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/people/%s/activities' % username, '', oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 10)
         res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
+
+    def test_user_activities_stats_per_year(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+
+        self.create_activity(username, user_status)
+
+        old_activity = deepcopy(user_status)
+        old_activity['published'] = '2010-01-01T00:01:30.000Z'
+
+        for i in range(11):
+            self.create_activity(username, old_activity)
+
+        res = self.testapp.get('/people/%s/activities?date_filter=2010' % username, '', oauth2Header(username), status=200)
+        self.assertEqual(len(res.json), 10)
+        res = self.testapp.head('/people/%s/activities?date_filter=2010' % username, oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
     def test_user_activities_stats_without_activity(self):

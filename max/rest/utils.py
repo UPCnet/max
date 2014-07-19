@@ -113,6 +113,30 @@ def rfc3339_parse(date):
 
 
 def date_filter_parser(date_filter):
+    """
+        Parses a date filter query in the following format:
+
+        (+-)yyyy-(mm-dd)
+
+
+        where month and day are optional, and a prefix may be specified to modifiy the query.
+        Separators between year month and day can be anything except a number.
+
+        If no +- modifier is specified, parser assumes it has to perform a exact query. If the
+        + modifier is prepended, parser will generate query for dates earliear than specified,
+        otherwise, if - is prepended, it will look for dates older than specified
+
+        Examples:
+
+            2014          Dates elapsed during year 2014
+            2014-03       Dates elapsed during march of 2014
+            +2014         Dates elapsed after the end of 2014
+                          (anything Starting the first second of 2015, included)
+            -2014-01-30   Dates elapsed before the begginning of the 30th of January 2014
+                          (anything until 2014-01-29 at 23:59:59)
+
+        At the end outputs a mongodb date query suitable to be set on any field
+    """
     before = date_filter.startswith('-')
     after = date_filter.startswith('+')
     exact = not before and not after
@@ -200,7 +224,7 @@ def searchParams(request):
     if 'before' in params and 'after' in params:
         raise InvalidSearchParams('only one offset filter is allowed, after or before')
 
-    if 'date_filter' in params:
+    if 'date_filter' in request.params:
         date_filter = date_filter_parser(request.params.get('date_filter', ''))
         if date_filter:
             params['date_filter'] = date_filter
