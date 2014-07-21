@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.7 (unreleased)
+4.0.7 (2014-07-21)
 ------------------
 
-- Nothing changed yet.
-
+* Provide current version defined in setup.py [Carles Bruguera]
 
 4.0.6 (2014-07-21)
 ------------------
