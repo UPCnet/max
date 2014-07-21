@@ -1,11 +1,24 @@
 CHANGELOG
 =========
 
-4.0.6 (unreleased)
+4.0.6 (2014-07-21)
 ------------------
 
-- Nothing changed yet.
-
+* Test date_filter on user_activity stats [Carles Bruguera]
+* Allow to specify published data, store real published as _created [Carles Bruguera]
+* Add a date filter mechanism [Carles Bruguera]
+* Notify comments on specified contexts [Carles Bruguera]
+* Deepcopy mock message that was being overwritten [Carles Bruguera]
+* PEP8 [Carles Bruguera]
+* Context notifications based on a literal instead of bool [Carles Bruguera]
+* Tests on contexts with notifications [Carles Bruguera]
+* Provide return values in existing tests used in rabbitmq tests [Carles Bruguera]
+* Conditional rabbitmq tests boilerplate [Carles Bruguera]
+* Simplify custom exception classes [Carles Bruguera]
+* Refactor notifications into a wrapper class [Carles Bruguera]
+* Move calls to notifications on ws endpoints to models (except conversation creation) [Carles Bruguera]
+* Raise 503 when rabbitmq not available on starting max [Carles Bruguera]
+* Fix dependencies [Carles Bruguera]
 
 4.0.5 (2014-07-16)
 ------------------
