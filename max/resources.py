@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from max.version import __version__
+from max import maxlogger
 
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
 
-from max import maxlogger
+import pkg_resources
+
 
 DUMMY_CLOUD_API_DATA = {
     "twitter": {
@@ -41,7 +43,7 @@ def loadMAXSettings(settings, config):
     max_ini_settings['max_message_defaults'] = {
         "source": "max",
         "domain": max_ini_settings.get('max_server_id', ''),
-        "version": __version__,
+        "version": pkg_resources.require("max")[0].version,
     }
     return max_ini_settings
 

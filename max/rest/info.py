@@ -6,6 +6,7 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 
 from pyramid.view import view_config
 
+import pkg_resources
 import re
 
 
@@ -25,6 +26,7 @@ def getMaxPublicInfo(context, request):
     for setting in allowed_settings:
         settings[setting] = max_settings[setting]
 
+    settings['version'] = pkg_resources.require("max")[0].version
     handler = JSONResourceEntity(settings)
     return handler.buildResponse()
 
@@ -41,5 +43,7 @@ def getMaxSettings(context, request):
     """
     max_settings = request.registry.settings
     settings = {key: value for key, value in max_settings.items() if re.match('^(max|mongodb|cache|oauth)', key)}
+    settings['version'] = pkg_resources.require("max")[0].version
+
     handler = JSONResourceEntity(settings)
     return handler.buildResponse()
