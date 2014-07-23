@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.8 (unreleased)
+4.0.8 (2014-07-23)
 ------------------
 
-- Nothing changed yet.
-
+* Temporary fix for the sync disconnect problem [Carles Bruguera]
 
 4.0.7 (2014-07-21)
 ------------------
