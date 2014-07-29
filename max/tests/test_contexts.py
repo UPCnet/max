@@ -82,8 +82,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         from .mockers import subscribe_context, create_context
         from .mockers import user_status_context
+        from hashlib import sha1
+
         username = 'messi'
         self.create_user(username)
+        url_hash = sha1(create_context['url']).hexdigest()
+
         context_permissions = dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
         self.admin_subscribe_user_to_context(username, subscribe_context)
@@ -93,6 +97,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('actor', None).get('username', None), 'messi')
         self.assertEqual(result.get('object', None).get('objectType', None), 'note')
         self.assertEqual(result.get('contexts', None)[0]['url'], subscribe_context['object']['url'])
+        return url_hash, username, user_status_context
 
     def test_post_activity_with_private_read_context(self):
         """ Try to post an activity to a context which needs the user to be subscribed to read

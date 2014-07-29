@@ -236,6 +236,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(carrot_message['d']['text'], activity['object']['content'])
 
     @skipRabbitTest()
+    def test_post_message_check_no_notification(self):
+        cid, creator, activity = self.run_test('test_contexts', 'test_post_activity_with_private_read_write_context')
+
+        messages_to_push_queue = self.server.get_all('push')
+        carrot_message, haigha_message = messages_to_push_queue[0]
+
+        self.assertEqual(len(messages_to_push_queue), 0)
+
+    @skipRabbitTest()
     def test_post_comment_check_notification(self):
         cid, creator, activity, comment = self.run_test('test_contexts_notifications', 'test_post_comment_with_comments_notification')
 
