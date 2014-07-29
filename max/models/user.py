@@ -338,9 +338,10 @@ class User(MADBase):
 
         return actor
 
-    def _on_insert_object(self, oid):
+    def _on_insert_object(self, oid, notifications=True):
         """
             Create user exchanges just after user creation on the database
         """
-        notifier = RabbitNotifications(self.request)
-        notifier.add_user(self.username)
+        if notifications:
+            notifier = RabbitNotifications(self.request)
+            notifier.add_user(self.username)

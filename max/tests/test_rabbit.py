@@ -99,6 +99,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
 
     @skipRabbitTest()
+    def test_create_user_without_bindings(self):
+        username = 'messi'
+        self.create_user(username, qs_params={"notifications": False})
+
+        self.server.management.load_exchanges()
+        self.assertNotIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
+        self.assertNotIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
+
+    @skipRabbitTest()
+    def test_recreate_user_creates_bindings(self):
+        username = 'messi'
+        self.create_user(username, qs_params={"notifications": False})
+        self.create_user(username, expect=200)
+
+        self.server.management.load_exchanges()
+        self.assertIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
+        self.assertIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
+
+    @skipRabbitTest()
     def test_create_conversation_bindings(self):
         cid, creator = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
 

@@ -280,12 +280,12 @@ class MADBase(MADDict):
 #        else:
 #            raise ObjectNotFound('Object with {} {} not found on database'.format(self.unique, str()))
 
-    def insert(self):
+    def insert(self, **kwargs):
         """
             Inserts the item into his defined collection and returns its _id
         """
         oid = self.mdb_collection.insert(self)
-        self._on_insert_object(oid)
+        self._on_insert_object(oid, **kwargs)
         self._on_saving_object(oid)
         return str(oid)
 

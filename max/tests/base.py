@@ -3,6 +3,7 @@ from max.tests import test_manager
 from max.tests.mock_image import image
 
 from pyramid.threadlocal import get_current_request
+from urllib import urlencode
 
 import json
 import pymongo
@@ -109,11 +110,13 @@ class MaxTestBase(object):
     def __init__(self, testapp):
         self.testapp = testapp
 
-    def create_user(self, username, expect=201, **kwargs):
+    def create_user(self, username, qs_params={}, expect=201, **kwargs):
         payload = {}
         for key, value in kwargs.items():
             payload[key] = value
-        res = self.testapp.post('/people/%s' % username, json.dumps(payload), oauth2Header(test_manager), status=expect)
+
+        qs = '?{}'.format(urlencode(qs_params)) if qs_params else ''
+        res = self.testapp.post('/people/%s%s' % (username, qs), json.dumps(payload), oauth2Header(test_manager), status=expect)
         return res
 
     def modify_user(self, username, properties):

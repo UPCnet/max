@@ -6,6 +6,7 @@ from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
 from max.models import User
 from max.oauth2 import oauth2
+from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import flatten
@@ -14,6 +15,7 @@ from max.rest.utils import searchParams
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
+from pyramid.settings import asbool
 from pyramid.view import view_config
 
 from PIL import Image
@@ -91,10 +93,12 @@ def addOwnUser(context, request):
     if newuser.get('_id'):
         # Already Exists
         code = 200
+        notifier = RabbitNotifications(request)
+        notifier.add_user(username)
     else:
         # New User
         code = 201
-        userid = newuser.insert()
+        userid = newuser.insert(notifications=asbool(request.params.get('notifications', True)))
         newuser['_id'] = userid
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()
