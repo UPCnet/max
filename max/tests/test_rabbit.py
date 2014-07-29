@@ -259,8 +259,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         cid, creator, activity = self.run_test('test_contexts', 'test_post_activity_with_private_read_write_context')
 
         messages_to_push_queue = self.server.get_all('push')
-        carrot_message, haigha_message = messages_to_push_queue[0]
-
         self.assertEqual(len(messages_to_push_queue), 0)
 
     @skipRabbitTest()
