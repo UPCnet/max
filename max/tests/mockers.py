@@ -375,6 +375,18 @@ message_oneself = {
     }
 }
 
+message_oneself_only = {
+    "contexts": [
+        {"objectType": "conversation",
+         "participants": ["messi"],
+         }
+    ],
+    "object": {
+        "objectType": "note",
+        "content": "Nos espera una gran temporada, no es cierto?",
+    }
+}
+
 invalid_message_without_sender = {
     "contexts": [
         {"objectType": "conversation",

@@ -85,6 +85,9 @@ def postMessage2Conversation(context, request):
         raise ValidationError('Empty participants parameter')
     if len(request_participants) != len(list(set(request_participants))):
         raise ValidationError('One or more users duplicated in participants list')
+    if len(request_participants) == 1 and request_participants[0] == request.actor.username:
+        raise ValidationError('Cannot start a convesation with oneself')
+
     if not request.actor.username in request_participants:
         raise ValidationError('Actor must be part of the participants list.')
 

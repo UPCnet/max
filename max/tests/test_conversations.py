@@ -54,6 +54,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
 
         self.testapp.post('/conversations', json.dumps(message_oneself), oauth2Header(sender), status=400)
+        res = self.testapp.get('/conversations', '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json), 0)
+
+    def test_post_message_to_conversation_to_only_oneself(self):
+        """ doctest .. http:post:: /conversations """
+        from .mockers import message_oneself_only
+        sender = 'messi'
+        self.create_user(sender)
+
+        self.testapp.post('/conversations', json.dumps(message_oneself_only), oauth2Header(sender), status=400)
+        res = self.testapp.get('/conversations', '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json), 0)
 
     def test_post_message_to_conversation_without_context(self):
         """
