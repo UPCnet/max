@@ -176,6 +176,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
+    def test_get_comments_for_user_stats(self):
+        """
+            Test get all comments for a user, both timeline and context
+        """
+        from .mockers import user_status, user_comment
+        from .mockers import subscribe_context, create_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        activity2 = self.create_activity(username, user_status_context)
+        activity2 = activity2.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity2.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.head('/people/%s/comments' % username, oauth2Header(username), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '2')
+
     def test_timeline_authors(self):
         """
             As a plain user

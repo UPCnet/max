@@ -674,6 +674,34 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result[0].get('objectType', None), 'comment')
 
+    def test_get_comments_for_user(self):
+        """
+            Test get all comments for a user, both timeline and context
+        """
+        from .mockers import user_status, user_comment
+        from .mockers import subscribe_context, create_context, user_status_context
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        activity = self.create_activity(username, user_status)
+        activity = activity.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        activity2 = self.create_activity(username, user_status_context)
+        activity2 = activity2.json
+        res = self.testapp.post('/activities/%s/comments' % str(activity2.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
+
+        res = self.testapp.get('/people/%s/comments' % username, "", oauth2Header(username), status=200)
+        result = res.json
+        self.assertEqual(len(result), 2)
+
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[0].get('verb', None), 'comment')
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('verb', None), 'comment')
+
     def test_delete_own_comment(self):
         """
             Given i'm plain user

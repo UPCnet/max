@@ -13,6 +13,7 @@ PUBLIC_RESOURCES = {
     'activity': {'route': '/activities/{activity}', 'category': 'Activities', 'name': 'Activity'},
     'timeline': {'route': '/people/{username}/timeline', 'category': 'Activities', 'name': 'User Timeline'},
     'timeline_authors': {'route': '/people/{username}/timeline/authors', 'category': 'Activities', 'name': 'User Timeline authors'},
+    'user_comments': {'route': '/people/{username}/comments', 'category': 'Comments', 'name': 'User comments'},
 
     'activity_comments': {'route': '/activities/{activity}/comments', 'category': 'Comments', 'name': 'Activity comments'},
     'activity_comment': {'route': '/activities/{activity}/comments/{comment}', 'category': 'Comments', 'name': 'Activity comment'},
@@ -73,7 +74,6 @@ PUBLIC_RESOURCES = {
     'share': {'route': '/activities/{activity}/shares/{shareId}'},
 
     # Not implemented / Not in roadmap
-    'user_comments': {'route': '/people/{username}/comments'},
     'user_conversations': {'route': '/people/{username}/conversations'},
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
