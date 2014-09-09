@@ -19,7 +19,7 @@ Prerequisits
 
 Per poder utilitzar el widget cal:
 
-* Tenir instal·lat a l'entorn web jQuery 1.7.x o superior.
+* Tenir instal·lat a l'entorn web jQuery 1.7.x o superior. (Esta provat amb jQuery fins a versió 1.11.0)
 
 Si no disposem de jQuery, el podem instal·lar localment o bé agafar-lo de
 qualsevol CDN disponible a la xarxa, per exemple:
@@ -38,18 +38,13 @@ plantilles.
 * Disposar d'algun mecanisme per interceptar la autenticació de l'usuari a
   l'aplicació hoste.
 
-* Els usuaris del sistema ha de ser usuaris de l'LDAP UPC.
-
-El servidor de OAUTH que s'utilitza per autenticar els usuaris del widget, te de
-base els usuaris del LDAP.
-
 
 Instal·lació del widget
 -----------------------
 
 La instal·lació del widget consisteix en les següents parts:
 
-* Incorporació del *contenidor* html on es renderitzadà el widget
+* Incorporació del *contenidor* html on es renderitzarà el widget
 * Incorporació del *loader* que descarregarà i inicialitzarà el widget
 * Incorporació dels *css* del widget
 
@@ -113,7 +108,7 @@ asíncrona el widget en la nostra aplicació:
 
     // 3 - Descarregar codi del widget
     (function(d){
-        var mui_location = 'http://rocalcom.upc.edu/maxui/maxui.js'
+        var mui_location = 'https://max.upcnet.es/generali/maxui/maxui.min.js'
         var mui = d.createElement('script'); mui.type = 'text/javascript'; mui.async = true;
         mui.src = mui_location
         var s = d.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mui, s);
@@ -144,11 +139,7 @@ oportuns.
 
 Per últim, injectem en el codi de la pàgina l'ordre per descarregar de manera
 asíncrona el codi del maxui. La ubicació d'aquest codi pot ser remota com a
-l'exemple, que el descarrega de ``http://rocalcom.upc.edu/maxui/maxui.js``, o bé
-el podeu ubicar als vostres servidors. **ULL!** Si l'ubiqueu als vostres
-servidors, les imatges que utilitza el widget les continuara agafant del
-servidor del qual heu descarregat el maxui.js. En cas que volguéssiu hostatjar
-les imatges, haureu de substituir manualment la url al maxui.js.
+l'exemple, que el descarrega de ``https://max.upcnet.es/generali/maxui/maxui.min.js``, o bé el podeu ubicar als vostres servidors.
 
 .. note::
 
@@ -164,11 +155,11 @@ la pàgina:
 
 .. code-block:: html
 
-    <link rel="stylesheet" type="text/css" href="http://rocalcom.upc.edu/maxui/maxui.css">
+    <link rel="stylesheet" type="text/css" href="https://max.upcnet.es/generali/maxui/maxui.css">
 
 o bé, tal com hem explicat anteriorment amb el ``maxui.js``,  el podem hostatjar
 localment en els nostres servidors, i de mateixa manera, haurem de tenir en
-compte la reescriptura de les urls de les imatges que hi ha al css.
+compte la reescriptura de les urls de les imatges que hi ha al css.**ULL!** Les fonts que utilitza el widget per les icones, estan referenciades relativament, i per tant agafen d'adreça base l'adreça de servidor d'on obteniu els css. Per exemple, si ubiquessiu els css en un servidor anomenat ``http://server.com/css/maxui.css``, intentara agafar les fonts de l'adreça ``http://server.com/maxui/*``. Si no es pot adatar a aquest patró s'haurà de modificar el css manualment per incloure la ruta absoluta.
 
 Configuració del widget
 -----------------------
@@ -182,10 +173,10 @@ pot prendre, en mode timeline:
 
     var settings = {
            'language': 'ca',
-           'username' : 'nom.cognom',
+           'username' : 'usuari',
            'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : 'https://rocalcom.upc.edu',
+           'maxServerURL' : 'https://max.upcnet.es/generali',
            'activitySource': 'timeline'
            }
 
@@ -195,10 +186,10 @@ i un altra exemple en mode context:
 
     var settings = {
            'language': 'ca',
-           'username' : 'nom.cognom',
+           'username' : 'usuari',
            'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : 'https://rocalcom.upc.edu',
+           'maxServerURL' : 'https://max.upcnet.es/generali',
            'readContext': 'http://foo.com/bar',
            'writeContexts': ['http://foo.com/bar/cel', 'http://foo.com/bar/cel/ona]''
            'activitySource': 'activities'
@@ -210,13 +201,12 @@ són obligatoris, i el tipus de valor que s'espera en cada un d'ells:
 
 Paràmetres referents al MAX
 
-* ``username`` (obligatori) - Nom d'usuari del MAX (El mateix que el LDAP
-  *nom.cognom*)
+* ``username`` (obligatori) - Nom d'usuari del MAX
 * ``oauthToken`` (obligatori) - token oAuth de l'usuari del MAX
 * ``maxServerURL`` (obligatori) - URL absoluta del servidor max a utilitzar
-* ``maxTalkURL`` (obligatori) - Si desde el servei MAX no s'indica el contrari,
+* ``maxTalkURL`` (opcional) - Si desde el servei MAX no s'indica el contrari,
   és el mateix que ``maxServerURL`` acavat amb ``/max``
-* ``readContext`` (obligatori) - URI del context del qual volem mostrar-ne les
+* ``readContext`` (obligatori) - URI del context (comunitat) del qual volem mostrar-ne les
   activitats.
 * ``writeContexts`` - ``default: []`` - Llista d'URIS de contextos alternatius
   on es publicaran les activitats. El context especificat a * ``readContext``,
@@ -235,7 +225,7 @@ Paràmetres de la UI
 
 * ``UISection`` - ``default: timeline`` - Secció a mostrar al inicialitzar el
   widget. Hi han dues opcions ``timeline`` per mostrar el fil d'activitat, i
-  ``conversations`` per mostrar les converses privades.
+  ``conversations`` per mostrar els xats.
 * ``avatarURLpattern`` - Si no està especificat, el widget intentarà obtenir les
   imatges dels usuaris del propi max. Si l'aplicació vol utilitzar les seves
   propies imatges, pot proporcionar una url on es pugui proporcionar un
@@ -252,6 +242,7 @@ Paràmetres de la UI
   deshabilitar les converses
 * ``language`` - ``default: en`` - Idioma de la interfície, disposa dels
   literals traduïts en Català (ca), Anglès (en) i  Castellà(es).
+* ``hidePostboxOnTimeline`` - Amaga la caixa on s'escriu els missatges independenment de si es te permís d'escriure o no.
 * ``literals`` - Objecte javascript per definir literals personalitzats per
   l'aplicació. Hi ha dos casos d'ús:
 
@@ -262,29 +253,67 @@ Paràmetres de la UI
 
     .. code-block:: js
 
-        {'new_activity_text': 'Escriu alguna cosa...',
-         'activity': 'activitat',
-         'conversations': 'converses',
-         'conversations_list': 'llista de converses',
-         'new_conversation_text': 'Cita a @algú per iniciar una conversa',
-         'new_activity_post': "Publica",
-         'toggle_comments': "comentaris",
-         'new_comment_text': "Comenta alguna cosa...",
-         'new_comment_post': "Comenta",
-         'load_more': "Carrega'n més",
-         'context_published_in': "Publicat a",
-         'generator_via': "via",
-         'search_text': "Busca...",
-         'and_more': "i més...",
-         'new_message_post':'Envia el missatge',
-         'post_permission_unauthorized': 'No estàs autoritzat a publicar en aquest contexte',
-         'post_permission_not_here': "No estas citant a @ningú"
+        {
+        'cancel': 'Cancelar',
+        'delete': 'Elimina',
+        'months': ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'],
+        'new_activity_text': 'Escriu alguna cosa...',
+        'activity': 'activitat',
+        'conversations_lower': 'xats',
+        'conversations': 'Xats',
+        'conversations_list': 'llista de xats',
+        'conversations_info_title': 'Informació del xat',
+        'conversations_info_participants': 'Participants',
+        'conversations_info_owner': 'propietari',
+        'conversations_info_add': 'Afegeix participant...',
+        'conversations_info_created': 'Creada',
+        'conversations_info_leave': 'Marxar del xat',
+        'conversations_info_delete': 'Esborra el xat',
+        'conversations_info_delete_warning': 'Alerta!',
+        'conversations_info_delete_help': 'Si elimines el xat, la resta de participants deixaran de veure els missatges. Per evitar-ho, cancela i traspassa el xat a algú altre.',
+        'conversations_info_kick_message_1': 'Clica per fer fora a ',
+        'conversations_info_kick_message_2': "d'aquest xat",
+        'conversations_info_transfer_message_1': 'Clica per fer a',
+        'conversations_info_transfer_message_2': "l'administrador d'aquest xat",
+        'participants': 'Xateja amb',
+        'chats_load_older': 'Carregar antics',
+        'conversation_name': 'Nom del xat',
+        'message': 'Missatge',
+        'no_chats': 'No hi ha xats',
+        'no_match_found': "No s'han trobat coincidències",
+        'new_conversation_text': 'Afegeix participants i envia el missatge per iniciar un xat',
+        'new_activity_post': "Publica",
+        'toggle_comments': "comentaris",
+        'new_comment_text': "Comenta alguna cosa...",
+        'new_comment_post': "Comenta",
+        'load_more': "Carrega'n més",
+        'context_published_in': "Publicat a",
+        'generator_via': "via",
+        'search_text': "Cerca a les entrades...",
+        'and_more': "i més...",
+        'new_message_post': 'Envia el missatge',
+        'post_permission_unauthorized': 'No estàs autoritzat a publicar en aquest contexte',
+        'post_permission_not_here': "No estas citant a @ningú",
+        'post_permission_not_enough_participants': "Has d'afegir participants",
+        'post_permission_missing_displayName': "Tens que posar nom al xat",
+        'delete_activity_confirmation': "Estàs segur?",
+        'delete_activity_delete': "Esborra",
+        'delete_activity_cancel': "No ho toquis!",
+        'delete_activity_icon': "esborra",
+        'favorites_filter_hint': 'Filtra per activitat favorita',
+        'favorites': 'Favorits',
+        'favorite': 'favorit',
+        'unfavorite': 'treure favorit',
+        'like': "m'agrada",
+        'unlike': "ja no m'agrada",
+        'recent_activity': "Darreres activitats",
+        'valued_activity': "Activitats més valorades",
+        'recent_favorited_activity': "Darreres favorites",
+        'valued_favorited_activity': "Favorites més valorades"
         }
 
 Altres Paràmetres
 
-* ``maxRequestsAPI`` - ``default: jquery`` - Api a utilitzar per les peticions
-  al servidor MAX. Actualment només suporta jquery en aquesta versió.
 * ``enableAlerts`` - ``default: false`` - Booleà per activar finestres emergents
   d'alerta quan succeeixi algun error. Útil per a depurar errors.
 
@@ -297,7 +326,7 @@ Autenticació
 ------------
 
 La autenticació del widget es fa mitjançant un token oauth que s'ha de demanar
-al servidor https://oauth.upc.edu. Per demanar aquest token s'ha de fer la
+al servidor corresponent. Per demanar aquest token s'ha de fer la
 petició corresponent al servidor, i injectar el token juntament amb el nom
 d'usuari als paràmetres de configuració explicats anteriorment.
 
