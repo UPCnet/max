@@ -96,10 +96,15 @@ def getUrlHashFromURI(request):
 
 def getUsernameFromPOSTBody(request):
     """
+        Try to extract an username from a dict following pattern
+           {'actor':
+               {'username': 'xxxx'}
+            }
+         otherwise return None
     """
-    decoded_data = extractPostData(request).get('actor', {})
+    decoded_data = extractPostData(request)
     if isinstance(decoded_data, dict):
-        return decoded_data.get('username', None)
+        return decoded_data.get('actor', {}).get('username', None)
     return None
 
 
