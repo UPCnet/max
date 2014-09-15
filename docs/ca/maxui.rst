@@ -38,6 +38,8 @@ plantilles.
 * Disposar d'algun mecanisme per interceptar la autenticació de l'usuari a
   l'aplicació hoste.
 
+- Els usuaris del sistema han de ser els mateixos usuaris associats a l'oauth utilitzat, o disposar d'un mecanisme per relacionar-los, si s'escau.
+
 
 Instal·lació del widget
 -----------------------
@@ -108,7 +110,7 @@ asíncrona el widget en la nostra aplicació:
 
     // 3 - Descarregar codi del widget
     (function(d){
-        var mui_location = 'https://max.upcnet.es/generali/maxui/maxui.min.js'
+        var mui_location = 'https://max.upcnet.es/domini/maxui/maxui.min.js'
         var mui = d.createElement('script'); mui.type = 'text/javascript'; mui.async = true;
         mui.src = mui_location
         var s = d.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mui, s);
@@ -139,7 +141,7 @@ oportuns.
 
 Per últim, injectem en el codi de la pàgina l'ordre per descarregar de manera
 asíncrona el codi del maxui. La ubicació d'aquest codi pot ser remota com a
-l'exemple, que el descarrega de ``https://max.upcnet.es/generali/maxui/maxui.min.js``, o bé el podeu ubicar als vostres servidors.
+l'exemple, que el descarrega de ``https://max.upcnet.es/domini/maxui/maxui.min.js``, o bé el podeu ubicar als vostres servidors.
 
 .. note::
 
@@ -155,7 +157,7 @@ la pàgina:
 
 .. code-block:: html
 
-    <link rel="stylesheet" type="text/css" href="https://max.upcnet.es/generali/maxui/maxui.css">
+    <link rel="stylesheet" type="text/css" href="https://max.upcnet.es/domini/maxui/maxui.css">
 
 o bé, tal com hem explicat anteriorment amb el ``maxui.js``,  el podem hostatjar
 localment en els nostres servidors, i de mateixa manera, haurem de tenir en
@@ -176,7 +178,7 @@ pot prendre, en mode timeline:
            'username' : 'usuari',
            'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : 'https://max.upcnet.es/generali',
+           'maxServerURL' : 'https://max.upcnet.es/domini',
            'activitySource': 'timeline'
            }
 
@@ -189,7 +191,7 @@ i un altra exemple en mode context:
            'username' : 'usuari',
            'oAuthToken' : '01234567890abcdef01234567890abcd',
            'oAuthGrantType' : 'password',
-           'maxServerURL' : 'https://max.upcnet.es/generali',
+           'maxServerURL' : 'https://max.upcnet.es/domini',
            'readContext': 'http://foo.com/bar',
            'writeContexts': ['http://foo.com/bar/cel', 'http://foo.com/bar/cel/ona]''
            'activitySource': 'activities'
