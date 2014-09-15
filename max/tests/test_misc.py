@@ -47,6 +47,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s' % username, oauth2Header(test_manager), status=401)
         self.assertEqual(res.json['error_description'], u'Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...')
 
+    def test_bad_body_content_parsing(self):
+        """
+            Test calling a service with a list on post body, that expects nothing on it
+            It should not fail, simply ignore content. Failures would be due a parsing error
+            trying to extract actor information from the body.
+        """
+        username = 'messi'
+        self.testapp.post('/people/%s' % username, '[]', oauth2Header(test_manager), status=201)
+
     def test_post_tunneling_on_delete(self):
         """
             Test that calling a endpoint with DELETE indirectly within a POST
