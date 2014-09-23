@@ -9,6 +9,7 @@ from max.rest.utils import canWriteInContexts
 from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
+from max.rest.utils import rotate_image_by_EXIF
 
 from PIL import Image
 from bson import ObjectId
@@ -353,6 +354,7 @@ class BaseActivity(MADBase):
                 # Generate thumbnail
                 activity_file.file.seek(0)
                 thumb = Image.open(activity_file.file)
+                rotate_image_by_EXIF(thumb)
                 thumb.thumbnail((400, 400), Image.ANTIALIAS)
                 thumb.save(path + '/' + filename + ".thumb", "JPEG")
 

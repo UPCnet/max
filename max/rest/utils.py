@@ -26,6 +26,12 @@ FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\w\-\_\.%s]+)' % UNICODE_ACCEPTED_CHARS
 FIND_KEYWORDS_REGEX = r'(\s|^)(?:#|\'|\"|\w\')?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
 
+EXIF_ROTATIONS = {
+    3: 180,
+    6: -90,
+    8: -270
+}
+
 
 def getMaxModelByObjectType(objectType):
     return getattr(sys.modules['max.models'], objectType.capitalize(), None)
@@ -567,3 +573,15 @@ def canReadContext(actor, url):
 
     #If we reached here, we have permission to read on all contexts
     return True
+
+
+def rotate_image_by_EXIF(image):
+    """
+        Images with rotation will have a value in field 274. If we don't know how much
+        we have to rotate or we don't have the value, will make no changes to the image.
+    """
+    exif_data = image._getexif()
+    exif_rotation = EXIF_ROTATIONS.get(274, 0) if exif_data is not None else 0
+    if exif_rotation:
+        image.rotate(exif_rotation)
+    return exif_rotation
