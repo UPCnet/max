@@ -353,8 +353,8 @@ class BaseActivity(MADBase):
             if file_type == 'image':
                 # Generate thumbnail
                 activity_file.file.seek(0)
-                thumb = Image.open(activity_file.file)
-                rotate_image_by_EXIF(thumb)
+                image = Image.open(activity_file.file)
+                thumb = rotate_image_by_EXIF(image)
                 thumb.thumbnail((400, 400), Image.ANTIALIAS)
                 thumb.save(path + '/' + filename + ".thumb", "JPEG")
 
