@@ -1,11 +1,19 @@
 CHANGELOG
 =========
 
-4.0.10 (unreleased)
+4.0.10 (2014-09-25)
 -------------------
 
-- Nothing changed yet.
-
+* Return the rotated image [Carles Bruguera]
+* Fix rotation [Carles Bruguera]
+* Rotate image by EXIF value if needed [Carles Bruguera]
+* Test calling with bad body [Carles Bruguera]
+* Make maxui docs generic domain-based [Carles Bruguera]
+* GLobal user comments and stats [Carles Bruguera]
+* Update maxui dev steps docs [Carles Bruguera]
+* Check data type before accessing like a dict [Carles Bruguera]
+* Fridge for robot tests on MAX [Victor Fernandez de Alba]
+* BUG: Disallow creating conversations with oneself [Carles Bruguera]
 
 4.0.9 (2014-07-29)
 ------------------
