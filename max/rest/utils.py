@@ -580,9 +580,10 @@ def rotate_image_by_EXIF(image):
         Images with rotation will have a value in field 274. If we don't know how much
         we have to rotate or we don't have the value, will make no changes to the image.
     """
-    exif_data = image._getexif()
+    exif_data = image._getexif() if hasattr(image, '_getexif') else {}
     exif_rotation_identifier = exif_data.get(274, None) if isinstance(exif_data, dict) else None
     exif_rotation = EXIF_ROTATIONS.get(exif_rotation_identifier, 0)
+
     if exif_rotation:
         return image.rotate(exif_rotation)
     return image

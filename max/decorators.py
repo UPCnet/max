@@ -34,6 +34,7 @@ from pymongo.errors import ConnectionFailure
 
 import json
 import logging
+import re
 import traceback
 
 logger = logging.getLogger('exceptions')
@@ -180,6 +181,33 @@ END EXCEPTION REPORT
 """
 
 
+def format_raw_request(request):
+    """
+        Formats raw request. Replaces images with a tag to avoid log flood and errors
+        returns an error string if not able to parse request
+    """
+    raw_request = request.as_bytes()
+    content_type = request.headers.get('Content-Type', '')
+    if 'multipart/form-data' in content_type:
+
+        boundary = re.search(r"boundary\s*=\s*(.*?)$", content_type).groups()[0]
+        if boundary:
+            boundary = boundary.replace('$', r'\$')
+            image = re.search(r'\r\n(?:.*?Content-type:\s*image.*?)\r\n\r\n(.*?){}'.format(boundary), raw_request, re.DOTALL | re.IGNORECASE).groups()[0]
+            if image:
+                raw_request = raw_request.replace(image, '<Image data {} bytes>\r\n'.format(len(image)))
+
+    try:
+        raw_request.encode('utf-8')
+
+    except UnicodeDecodeError as unicode_error:
+        return raw_request[:unicode_error.start] + "\r\n*** Unicode Decode Error parsing request, request trunked at byte {} ***\r\n".format(unicode_error.start)
+    except Exception:
+        return"\r\n*** Error parsing request ***\r\n\r\n{}\r\n*** End traceback ***".format(traceback.format_exc())
+
+    return raw_request
+
+
 def saveException(request, error):  # pragma: no cover
     """
         Logs the exception
@@ -188,13 +216,15 @@ def saveException(request, error):  # pragma: no cover
          So, as the tests will not ever see this, we exlcude it from coverage
     """
     time = datetime.now().isoformat()
+
     entry = dict(
         traceback=error,
         time=time,
-        raw_request=request.as_bytes(),
+        raw_request=format_raw_request(request),
         matched_route=request.matched_route.name,
         matchdict=request.matchdict,
     )
+
     dump = json.dumps(entry)
     entry['hash'] = sha1(dump).hexdigest()
     exception_log = ERROR_TEMPLATE.format(**entry)
