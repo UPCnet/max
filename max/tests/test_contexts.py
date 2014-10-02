@@ -282,10 +282,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
-        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura4", "twitterUsername": ""}), oauth2Header(test_manager), status=200)
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "", "twitterUsername": ""}), oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hash)
-        self.assertEqual(result.get('twitterHashtag', None), 'assignatura4')
+        self.assertEqual(result.get('twitterHashtag', None), None)
         self.assertEqual(result.get('twitterUsername', None), None)
         self.assertEqual(result.get('twitterUsernameId', None), None)
 
