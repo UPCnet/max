@@ -8,6 +8,8 @@ from socket import error as socket_error
 
 import datetime
 import json
+import pkg_resources
+import sys
 
 
 def noop(*args, **kwargs):
@@ -30,8 +32,15 @@ class RabbitNotifications(object):
         self.message_defaults = settings.get('max_message_defaults', {})
         self.enabled = True
 
+        client_properties = {
+            "product": "max",
+            "version": pkg_resources.require('max')[0].version,
+            "platform": 'Python {0.major}.{0.minor}.{0.micro}'.format(sys.version_info),
+            "server": settings.get('max_server', '')
+        }
+
         try:
-            self.client = RabbitClient(self.url)
+            self.client = RabbitClient(self.url, client_properties=client_properties)
         except AttributeError:
             self.enabled = False
         except socket_error:

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from max.version import __version__
 from max import maxlogger
 
 from pyramid.security import Allow
