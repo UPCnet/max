@@ -53,6 +53,19 @@ def main(global_config, **settings):
         conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set, use_greenlets=True)
 
     db = conn[settings['mongodb.db_name']]
+
+    # Authenticate to mongodb if auth is enabled
+    if settings.get('mongodb.auth', False):
+        mongodb_username = settings.get('mongodb.username', '')
+        mongodb_password = settings.get('mongodb.password', '')
+        mongodb_auth_db = settings.get('mongodb.authdb', settings['mongodb.db_name'])
+
+        # If we have valid username and password, authorize on
+        # specified database
+        if mongodb_username and mongodb_password:
+            auth_db = conn[mongodb_auth_db]
+            auth_db.auth(mongodb_username, mongodb_password)
+
     config.registry.max_store = db
 
     # Set MAX settings
