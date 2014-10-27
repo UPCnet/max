@@ -1,11 +1,15 @@
 CHANGELOG
 =========
 
-4.0.11 (unreleased)
+4.0.11 (2014-10-27)
 -------------------
 
-- Nothing changed yet.
-
+* Prepare max to handle auth and non-auth mongodbs [Carles Bruguera]
+* Disconnect clients after operation [Carles Bruguera]
+* Provide client_properties to maxcarrot [Carles Bruguera]
+* Delete unused version file [Carles Bruguera]
+* Bug on trying to print exc. with images in request [Carles Bruguera]
+* Test multiple unsetting [Carles Bruguera]
 
 4.0.10 (2014-09-25)
 -------------------
