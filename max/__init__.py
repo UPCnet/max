@@ -64,7 +64,7 @@ def main(global_config, **settings):
         # specified database
         if mongodb_username and mongodb_password:
             auth_db = conn[mongodb_auth_db]
-            auth_db.auth(mongodb_username, mongodb_password)
+            auth_db.authenticate(mongodb_username, mongodb_password)
 
     config.registry.max_store = db
 
