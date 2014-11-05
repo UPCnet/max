@@ -238,7 +238,7 @@ def getContextSubscriptions(context, request):
     """
     chash = request.matchdict['hash']
     mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username"], **searchParams(request))
+    found_contexts = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username", "permissions"], **searchParams(request))
     handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
 
