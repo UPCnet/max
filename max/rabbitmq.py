@@ -74,6 +74,13 @@ class RabbitNotifications(object):
         self.client.create_user(username)
         self.client.disconnect()
 
+    def delete_user(self, username):
+        """
+            Deletes the specified user exchange and bindings
+        """
+        self.client.delete_user(username)
+        self.client.disconnect()
+
     def bind_user_to_context(self, context, username):
         """
             Creates a binding between user exchanges and a context

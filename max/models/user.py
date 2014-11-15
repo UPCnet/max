@@ -345,3 +345,10 @@ class User(MADBase):
         if notifications:
             notifier = RabbitNotifications(self.request)
             notifier.add_user(self.username)
+
+    def _after_delete(self):
+        """
+            Deletes user exchanges just after user is deleted.
+        """
+        notifier = RabbitNotifications(self.request)
+        notifier.delete_user(self.username)
