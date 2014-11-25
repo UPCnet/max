@@ -1,11 +1,13 @@
 CHANGELOG
 =========
 
-4.0.12 (unreleased)
+4.0.12 (2014-11-25)
 -------------------
 
-- Nothing changed yet.
-
+* Export stomp server url if defined [Carles Bruguera]
+* Delete exchanges on user delete [Carles Bruguera]
+* Added permissions field to the subscribed users endpoint [Victor Fernandez de Alba]
+* Wrong method name [Carles Bruguera]
 
 4.0.11 (2014-10-27)
 -------------------
