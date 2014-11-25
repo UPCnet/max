@@ -18,7 +18,7 @@ def getMaxPublicInfo(context, request):
         Returns max server settings, only the ones allowed unauthenticad
     """
     allowed_settings = [
-        'max.oauth_server'
+        'max.oauth_server',
         'max.stomp_server'
     ]
 
