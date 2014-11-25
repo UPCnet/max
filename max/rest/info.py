@@ -19,12 +19,14 @@ def getMaxPublicInfo(context, request):
     """
     allowed_settings = [
         'max.oauth_server'
+        'max.stomp_server'
     ]
 
     max_settings = request.registry.settings
     settings = {}
     for setting in allowed_settings:
-        settings[setting] = max_settings[setting]
+        if setting in settings:
+            settings[setting] = max_settings[setting]
 
     settings['version'] = pkg_resources.require("max")[0].version
     handler = JSONResourceEntity(settings)
