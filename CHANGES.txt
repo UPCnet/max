@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.13 (unreleased)
+4.0.13 (2014-11-25)
 -------------------
 
-- Nothing changed yet.
-
+* Var name mismatch [Carles Bruguera]
 
 4.0.12 (2014-11-25)
 -------------------
