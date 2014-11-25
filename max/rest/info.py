@@ -25,7 +25,7 @@ def getMaxPublicInfo(context, request):
     max_settings = request.registry.settings
     settings = {}
     for setting in allowed_settings:
-        if setting in settings:
+        if setting in max_settings:
             settings[setting] = max_settings[setting]
 
     settings['version'] = pkg_resources.require("max")[0].version
