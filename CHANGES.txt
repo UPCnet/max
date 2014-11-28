@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.15 (unreleased)
+4.0.15 (2014-11-28)
 -------------------
 
-- Nothing changed yet.
-
+* Use maxutils.mongodb to connect [Carles Bruguera]
 
 4.0.14 (2014-11-25)
 -------------------
