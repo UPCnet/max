@@ -18,7 +18,7 @@ from pyramid_beaker import set_cache_regions_from_settings
 from max import debug
 from max.predicates import RestrictedPredicate
 
-import pymongo
+from maxutils import mongodb
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
@@ -43,28 +43,21 @@ def main(global_config, **settings):
 
     config.add_route('wadl', '/WADL')
 
-    # Store in registry
-    if not asbool(settings.get('mongodb.cluster', False)):
-        db_uri = settings['mongodb.url']
-        conn = pymongo.MongoClient(db_uri)
-    else:
-        hosts = settings.get('mongodb.hosts', '')
-        replica_set = settings.get('mongodb.replica_set', '')
-        conn = pymongo.MongoReplicaSetClient(hosts, replicaSet=replica_set, use_greenlets=True)
+    # Mongodb connection initialization
+    cluster_enabled = asbool(settings.get('mongodb.cluster', False))
+    auth_enabled = asbool(settings.get('mongodb.auth', False))
+    mongodb_uri = settings.get('mongodb.hosts') if cluster_enabled else settings['mongodb.url']
 
-    db = conn[settings['mongodb.db_name']]
-
-    # Authenticate to mongodb if auth is enabled
-    if settings.get('mongodb.auth', False):
-        mongodb_username = settings.get('mongodb.username', '')
-        mongodb_password = settings.get('mongodb.password', '')
-        mongodb_auth_db = settings.get('mongodb.authdb', settings['mongodb.db_name'])
-
-        # If we have valid username and password, authorize on
-        # specified database
-        if mongodb_username and mongodb_password:
-            auth_db = conn[mongodb_auth_db]
-            auth_db.authenticate(mongodb_username, mongodb_password)
+    conn = mongodb.get_connection(
+        mongodb_uri,
+        use_greenlets=True,
+        cluster=settings.get('mongodb.replica_set', None))
+    db = mongodb.get_database(
+        conn,
+        settings['mongodb.db_name'],
+        username=settings.get('mongodb.username', None) if auth_enabled else None,
+        password=settings.get('mongodb.password', None) if auth_enabled else None,
+        authdb=settings.get('mongodb.authdb', None) if auth_enabled else None)
 
     config.registry.max_store = db
 
