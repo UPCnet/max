@@ -23,7 +23,7 @@ class Conversation(BaseContext):
     def buildObject(self):
         super(Conversation, self).buildObject()
 
-        #Set displayName only if it's not specified
+        # Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', ', '.join([a['username'] for a in self.participants]))
 
     def prepareUserSubscription(self):
@@ -61,7 +61,7 @@ class Conversation(BaseContext):
             'objectType': message['object']['objectType']
         }
 
-        #Set object urls for media types
+        # Set object urls for media types
         if message['object']['objectType'] in ['file', 'image']:
             lastMessage['fullURL'] = message['object'].get('fullURL', '')
             if message['object']['objectType'] == 'image':

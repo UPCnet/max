@@ -88,7 +88,7 @@ def postMessage2Conversation(context, request):
     if len(request_participants) == 1 and request_participants[0] == request.actor.username:
         raise ValidationError('Cannot start a convesation with oneself')
 
-    if not request.actor.username in request_participants:
+    if request.actor.username not in request_participants:
         raise ValidationError('Actor must be part of the participants list.')
 
     # Loop trough all participants, if there's one that doesn't exists, an exception will raise
@@ -143,7 +143,7 @@ def postMessage2Conversation(context, request):
         for user in newconversation['participants']:
             db_user = participants[user['username']]
             db_user.addSubscription(newconversation)
-            # Initialize a Subscription Activity
+            # Initialize a Subscription Activity
             rest_params = {'actor': db_user,
                            'verb': 'subscribe',
                            'object': {'objectType': 'conversation',
@@ -346,7 +346,7 @@ def joinConversation(context, request):
     actor = request.actor
     cid = request.matchdict['id']
 
-    #Check if user is already subscribed
+    # Check if user is already subscribed
     current_conversations = [a['id'] for a in actor.talkingIn]
     if cid in current_conversations:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
@@ -357,7 +357,7 @@ def joinConversation(context, request):
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
-        #Register subscription to the actor
+        # Register subscription to the actor
         conversations = MADMaxCollection(context.db.conversations)
         conversation = conversations[cid]
 

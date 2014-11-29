@@ -131,7 +131,7 @@ def getUserAvatar(context, request):
             named_size = None
 
     # Check if normal size exists, otherwise, fallback to
-    # previously setted missing avatar image filename
+    # previously setted missing avatar image filename
     normal_filename = '{}.png'.format(username)
     if named_size is None and exists(normal_filename):
         filename = '{}.png'.format(username)

@@ -34,7 +34,7 @@ class Message(BaseActivity):
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
 
-        #Append actor as username if object has keywords and actor is a Person
+        # Append actor as username if object has keywords and actor is a Person
         if ob['object'].get('_keywords', None):
             ob['object']['_keywords'].append(self.data['actor']['username'])
 
@@ -46,7 +46,7 @@ class Message(BaseActivity):
             for cobject in self.data['contexts']:
                 subscription = dict(self.data['actor'].getSubscription(cobject))
 
-                #Clean innecessary fields
+                # Clean innecessary fields
                 non_needed_subscription_fields = ['tags', 'published', 'permissions', 'participants']
                 for fieldname in non_needed_subscription_fields:
                     if fieldname in subscription:

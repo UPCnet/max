@@ -196,7 +196,7 @@ class User(MADBase):
         criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
-         # overwrite permissions
+        # overwrite permissions
         what = {
             '$set': {
                 '{}.$.permissions'.format(context_storage_field): new_permissions,
@@ -249,7 +249,7 @@ class User(MADBase):
         criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
         criteria.update({'_id': self._id})                 # of collection entry with _id
 
-         # overwrite permissions
+        # overwrite permissions
 
         what = {
             '$set': {
