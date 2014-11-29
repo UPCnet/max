@@ -365,7 +365,7 @@ def joinConversation(context, request):
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         if 'group' not in conversation.get('tags', []):
-            raise Forbidden('This is not a group conversation, so anyone else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
+            raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         users = MADMaxCollection(context.db.users, query_key='username')
         creator = users[request.creator]
@@ -381,8 +381,8 @@ def joinConversation(context, request):
         if not creator.isAllowedToSee(actor):
             raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(creator.username, actor.username))
 
-        actor.addSubscription(conversation)
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
+        actor.addSubscription(conversation)
 
         # If we add anyone to a conversation,  we remove the archive tag, no matter how many participants have
         if 'archive' in conversation.get('tags', []):
@@ -443,7 +443,7 @@ def trasnferConversationOwnership(context, request):
     # Give hability to add new users to the new owner
     request.actor.grantPermission(subscription, 'subscribe')
 
-    # Take off hability to add new users from the previpus owner
+    # Revoke hability to add new users from the previpus owner
     users = MADMaxCollection(context.db.users, query_key='username')
     previous_owner = users[previous_owner_username]
     previous_owner.revokePermission(subscription, 'subscribe')

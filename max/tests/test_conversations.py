@@ -408,6 +408,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And I am the owner of the conversation
             When i try to add a participant to a conversation
             Then the participant joins the conversation
+            And all subscriptions get updated
         """
         from .mockers import group_message as creation_message
         sender = 'messi'
@@ -426,6 +427,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/people/{}/conversations/{}'.format(newuser, conversation_id), '', oauth2Header(sender), status=201)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 4)
+
+        def get_user_subscription_participants(username):
+            resp = self.testapp.get('/people/{}'.format(username), '', oauth2Header(username), status=200)
+            return resp.json['talkingIn'][0]['participants']
+
+        u0_participants = get_user_subscription_participants(sender)
+        u1_participants = get_user_subscription_participants(recipient)
+        u2_participants = get_user_subscription_participants(recipient2)
+        u3_participants = get_user_subscription_participants(newuser)
+
+        self.assertEqual(len(u0_participants), 4)
+        self.assertEqual(len(u1_participants), 4)
+        self.assertEqual(len(u2_participants), 4)
+        self.assertEqual(len(u3_participants), 4)
 
         return conversation_id, newuser
 
@@ -583,6 +598,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json['participants']), 2)
         participant_usernames = [user['username'] for user in res.json['participants']]
         self.assertNotIn(recipient2, participant_usernames)
+
+        def get_user_subscription_participants(username):
+            resp = self.testapp.get('/people/{}'.format(username), '', oauth2Header(username), status=200)
+            return resp.json['talkingIn'][0]['participants']
+
+        u0_participants = get_user_subscription_participants(sender)
+        u1_participants = get_user_subscription_participants(recipient)
+
+        self.assertEqual(len(u0_participants), 2)
+        self.assertEqual(len(u1_participants), 2)
 
     def test_users_leaves_group_conversation(self):
         """
@@ -869,6 +894,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json['participants']), 2)
         participant_usernames = [user['username'] for user in res.json['participants']]
         self.assertNotIn(recipient2, participant_usernames)
+
+        def get_user_subscription_participants(username):
+            resp = self.testapp.get('/people/{}'.format(username), '', oauth2Header(username), status=200)
+            return resp.json['talkingIn'][0]['participants']
+
+        u0_participants = get_user_subscription_participants(sender)
+        u1_participants = get_user_subscription_participants(recipient)
+
+        self.assertEqual(len(u0_participants), 2)
+        self.assertEqual(len(u1_participants), 2)
 
     def test_non_conversation_owner_kicks_user(self):
         """

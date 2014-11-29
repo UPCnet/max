@@ -26,6 +26,24 @@ class Conversation(BaseContext):
         #Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', ', '.join([a['username'] for a in self.participants]))
 
+    def prepareUserSubscription(self):
+        """
+        """
+        fields_to_squash = ['published', 'owner', 'creator', 'participants', 'tags', 'displayName']
+        if '_id' != self.unique:
+            fields_to_squash.append('_id')
+        subscription = self.flatten(squash=fields_to_squash)
+
+        # If we are subscribing the user, read permission is granted
+        user_permissions = ['read']
+
+        # Add subscription permissions based on defaults and context values
+        user_permissions = self.subscription_permissions(base=user_permissions)
+
+        # Assign permissions to the subscription object before adding it
+        subscription['permissions'] = user_permissions
+        return subscription
+
     def lastMessage(self):
         """
             Retrieves last conversation message

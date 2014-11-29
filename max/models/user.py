@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
+from max.MADMax import MADMaxCollection
 from max.rabbitmq import RabbitNotifications
 from max.rest.utils import flatten
 from max.rest.utils import getMaxModelByObjectType
 
+from bson import ObjectId
 from pyramid.settings import asbool
 
 import datetime
@@ -325,12 +327,17 @@ class User(MADBase):
         actor = self.flatten()
         if self.check_field_permission('talkingIn', 'view'):
             actor.setdefault('talkingIn', [])
+            conversations_collection = MADMaxCollection(self.db.conversations)
+            conversations = conversations_collection.search({'_id': {'$in': [ObjectId(conv['id']) for conv in actor['talkingIn']]}})
+            conversations_by_id = {str(conv['_id']): conv for conv in conversations}
             for conversation in actor['talkingIn']:
-                Conversation = getMaxModelByObjectType('conversation')
-                conversation_object = Conversation()
+                conversation_object = conversations_by_id[conversation['id']]
                 conversation_object.fromObject(conversation)
                 conversation['displayName'] = conversation_object.realDisplayName(self.username)
                 conversation['lastMessage'] = conversation_object.lastMessage()
+
+                conversation['participants'] = conversation_object.participants
+                conversation['tags'] = conversation_object.tags
 
                 conversation['messages'] = 0
 
