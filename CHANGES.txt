@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-4.0.16 (unreleased)
+4.0.16 (2014-11-29)
 -------------------
 
-- Nothing changed yet.
-
+* Don't store extended conversation info on user [Carles Bruguera]
+* Get fresh conversation info on GET people/{username}/ [Carles Bruguera]
 
 4.0.15 (2014-11-28)
 -------------------
