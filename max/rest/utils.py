@@ -283,6 +283,10 @@ def searchParams(request):
     if twitter_enabled:
         params['twitter_enabled'] = twitter_enabled
 
+    show_fields = request.params.get('show_fields')
+    if show_fields:
+        params['show_fields'] = re.findall(r'\w+', show_fields)
+
     return params
 
 

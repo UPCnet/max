@@ -44,7 +44,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, show_fields=None, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, count=False, **kwargs):
+    def search(self, query, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, count=False, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -75,6 +75,7 @@ class MADMaxCollection(object):
         sort_order = kwargs.get('sort_order', None)
         offset_override = kwargs.get('offset', None)
         date_filter = kwargs.get('date_filter', None)
+        show_fields = kwargs.get('show_fields', None)
 
         if after or before:
             condition = after and '$gt' or '$lt'
