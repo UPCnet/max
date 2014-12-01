@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.17 (unreleased)
+4.0.17 (2014-12-01)
 -------------------
 
-- Nothing changed yet.
-
+* Enable show_fields as a request switch [Carles Bruguera]
 
 4.0.16 (2014-11-29)
 -------------------
