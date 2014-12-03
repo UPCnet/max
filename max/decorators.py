@@ -36,8 +36,19 @@ import json
 import logging
 import re
 import traceback
+import signal
 
 logger = logging.getLogger('exceptions')
+request_logger = logging.getLogger('requestdump')
+dump_requests = {'enabled': False}
+
+
+def set_signal():
+    def toggle_request_dump(*args):
+        dump_requests['enabled'] = not dump_requests['enabled']
+        request_logger.debug('{}abling request dumper'.format('En' if dump_requests['enabled'] else 'Dis'))
+
+    signal.signal(signal.SIGINFO, toggle_request_dump)
 
 
 def getUserActor(db, username):
@@ -125,7 +136,7 @@ def requireContextActor(exists=True):
             nkargs = [a for a in args]
             context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
 
-            #check we have a hash in the uri
+            # check we have a hash in the uri
             contexthash = getUrlHashFromURI(request)
             if not contexthash:
                 raise UnknownUserError('No context specified as actor')
@@ -137,7 +148,7 @@ def requireContextActor(exists=True):
                 except IndexError:
                     raise UnknownUserError('Unknown actor identified by context : %s' % contexthash)
                 else:
-                    #Only ontexts are allowed as context actors
+                    # Only ontexts are allowed as context actors
                     if actor['objectType'].lower() not in ['context']:
                         raise ObjectNotSupported('%s objectType not supported as an actor' % actor['objectType'])
 
@@ -208,6 +219,23 @@ def format_raw_request(request):
     return raw_request
 
 
+def format_raw_response(response):
+    """
+        Formats a raw response. Replaces images with a tag to avoid log flood errors.
+        Returns an error string if not able to parse request
+    """
+    headers = u'\n'.join([u'{}: {}'.format(*header) for header in response.headers.items()])
+
+    has_image = re.search(r'Content-type:\s*image', headers, re.DOTALL | re.IGNORECASE)
+    if has_image:
+        body = u'<Image data {} bytes>'.format(len(response.body))
+    else:
+        body = response.ubody
+
+    raw_response = u'{}\n{}\n\n{}'.format(response.status, headers, body)
+    return raw_response
+
+
 def saveException(request, error):  # pragma: no cover
     """
         Logs the exception
@@ -276,11 +304,36 @@ def catch_exception(request, e):
 
         return JSONHTTPInternalServerError(error=dict(objectType='error', error='ServerError', error_description=error_description))
 
+SEPARATOR = '-' * 80
+DUMP_TEMPLATE = """
+{sep}
+{{}}
+
+--
+
+{{}}
+{sep}
+""".format(sep=SEPARATOR)
+
+
+def dump_request(request, response):
+    """
+        Logs formatted request + response to request_dump logger
+        if global var dump_requests['enabled'] is True
+    """
+    if dump_requests['enabled'] and response.status_int != 500:
+        request_logger.debug(DUMP_TEMPLATE.format(
+            format_raw_request(request),
+            format_raw_response(response)
+        ))
+
 
 def MaxResponse(fun):
     def replacement(*args, **kwargs):
-        # Handle exceptions throwed in the process of executing the REST method and
-        # issue proper status code with message
+        """
+            Handle exceptions throwed in the process of executing the REST method and
+            issue proper status code with message
+        """
         nkargs = [a for a in args]
         context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
         # response = fun(*args, **kwargs)
@@ -295,15 +348,20 @@ def MaxResponse(fun):
                 except AutoReconnect:
                     pass
                 except Exception, e:
-                    return catch_exception(request, e)
+                    response = catch_exception(request, e)
+                    dump_request(request, response)
+                    return response
                 else:
                     tryin_to_reconnect = False
         except Exception, e:
-            return catch_exception(request, e)
+            response = catch_exception(request, e)
+            dump_request(request, response)
+            return response
         else:
             # Don't cache by default, get configuration from resource if any
             route_cache_settings = RESOURCES.get(request.matched_route.name, {}).get('cache', 'must-revalidate, max-age=0, no-cache, no-store')
             response.headers.update({'Cache-Control': route_cache_settings})
+            dump_request(request, response)
             return response
     replacement.__name__ = fun.__name__
     replacement.__doc__ = fun.__doc__

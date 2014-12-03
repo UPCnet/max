@@ -17,6 +17,7 @@ from pyramid_beaker import set_cache_regions_from_settings
 
 from max import debug
 from max.predicates import RestrictedPredicate
+from max.decorators import set_signal
 
 from maxutils import mongodb
 
@@ -81,5 +82,5 @@ def main(global_config, **settings):
     config.scan('max', ignore=['max.tests', 'max.scripts'])
 
     config.add_view_predicate('restricted', RestrictedPredicate)
-
+    set_signal()
     return config.make_wsgi_app()

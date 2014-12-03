@@ -106,6 +106,7 @@ def addOwnUser(context, request):
 
 @view_config(route_name='avatar', request_method='GET')
 @view_config(route_name='avatar_sizes', request_method='GET')
+@MaxResponse
 def getUserAvatar(context, request):
     """
         /people/{username}/avatar
