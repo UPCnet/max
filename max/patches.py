@@ -1,4 +1,15 @@
-#Patch to get the real function name on multiple-decorated functions
+import inspect
+
+
+def marmoset_patch(old, new, extra_globals={}):
+    g = old.func_globals
+    g.update(extra_globals)
+    c = inspect.getsource(new)
+    exec c in g
+    old.im_func.func_code = g[new.__name__].func_code
+
+
+# Patch to get the real function name on multiple-decorated functions
 import venusian
 
 
@@ -24,3 +35,15 @@ def attach(wrapped, callback, **kwargs):
 
 venusian.original_attach = venusian.attach
 venusian.attach = attach
+
+
+# Patch to disable requests logging on gevent
+def log_request(self):
+    pass
+
+try:
+    from gevent.pywsgi import WSGIHandler
+except:
+    pass
+else:
+    marmoset_patch(WSGIHandler.log_request, log_request)
