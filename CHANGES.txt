@@ -1,11 +1,13 @@
 CHANGELOG
 =========
 
-4.0.18 (unreleased)
+4.0.18 (2014-12-04)
 -------------------
 
-- Nothing changed yet.
-
+* Fix conversation subscription get bug [Carles Bruguera]
+* Use greenlets on mongodb only if gevent present [Carles Bruguera]
+* Enable a request dumper toggled by USR1 signal [Carles Bruguera]
+* Prevent logging of requests within gevent [Carles Bruguera]
 
 4.0.17 (2014-12-01)
 -------------------
