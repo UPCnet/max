@@ -238,15 +238,16 @@ def getUserConversationSubscription(context, request):
     subscription = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
     conversations_collection = MADMaxCollection(context.db.conversations)
-    conversation = conversations_collection[subscription['id']]
+    conversation_object = conversations_collection[subscription['id']]
+    conversation = conversation_object.flatten()
 
-    # Update temporary conversation with subscription permissions
-    conversation['displayName'] = conversation.realDisplayName(request.actor.username)
-    conversation['lastMessage'] = conversation.lastMessage()
-    conversation['messages'] = 0
+    # Update temporary conversation with subscription permissions and other stuff
+    conversation['displayName'] = conversation_object.realDisplayName(request.actor.username)
+    conversation['lastMessage'] = conversation_object.lastMessage()
     conversation['permissions'] = subscription['permissions']
+    conversation['messages'] = 0
 
-    handler = JSONResourceEntity(conversation.flatten())
+    handler = JSONResourceEntity(conversation)
     return handler.buildResponse()
 
 

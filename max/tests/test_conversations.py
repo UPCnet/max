@@ -150,6 +150,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(resp.json.get("participants", None)[1]['username'], recipient)
         self.assertEqual(resp.json.get("objectType", None), "conversation")
         self.assertEqual(resp.json.get("tags", None), [])
+        self.assertIn('lastMessage', resp.json)
 
         permissions = ['read', 'write', 'unsubscribe']
         self.assertEqual(resp.json.get("permissions", None), permissions)
