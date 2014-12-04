@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 import logging
-
 # logger has to be instantiated BEFORE the import of the following resources import
 maxlogger = logging.getLogger('max')
+
+try:
+    __import__('gevent')
+except ImportError:
+    GEVENT_AVAILABLE = False
+else:
+    GEVENT_AVAILABLE = True
 
 from max import patches
 from max.resources import Root
@@ -51,7 +57,7 @@ def main(global_config, **settings):
 
     conn = mongodb.get_connection(
         mongodb_uri,
-        use_greenlets=True,
+        use_greenlets=GEVENT_AVAILABLE,
         cluster=settings.get('mongodb.replica_set', None))
     db = mongodb.get_database(
         conn,
