@@ -135,6 +135,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(str(resp.json.get("id", '')), cid)
         return cid, sender
 
+    def test_get_user_conversation_subscription(self):
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        resp = self.testapp.get('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(sender), status=200)
+        self.assertEqual(resp.json.get("participants", None)[0]['username'], sender)
+        self.assertEqual(resp.json.get("participants", None)[1]['username'], recipient)
+        self.assertEqual(resp.json.get("objectType", None), "conversation")
+        self.assertEqual(resp.json.get("tags", None), [])
+
+        permissions = ['read', 'write', 'unsubscribe']
+        self.assertEqual(resp.json.get("permissions", None), permissions)
+
     def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2
         sender = 'messi'

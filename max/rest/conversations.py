@@ -236,15 +236,17 @@ def getUserConversationSubscription(context, request):
         raise Unauthorized('User {} is not subscriped to any conversation with id {}'.format(request.actor.username, cid))
 
     subscription = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-    conversation_object = Conversation()
-    conversation_object.fromObject(subscription)
 
-    conversation = dict(subscription)
-    conversation['displayName'] = conversation_object.realDisplayName(request.actor.username)
-    conversation['lastMessage'] = conversation_object.lastMessage()
+    conversations_collection = MADMaxCollection(context.db.conversations)
+    conversation = conversations_collection[subscription['id']]
+
+    # Update temporary conversation with subscription permissions
+    conversation['displayName'] = conversation.realDisplayName(request.actor.username)
+    conversation['lastMessage'] = conversation.lastMessage()
     conversation['messages'] = 0
+    conversation['permissions'] = subscription['permissions']
 
-    handler = JSONResourceEntity(conversation)
+    handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()
 
 
