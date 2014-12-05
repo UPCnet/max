@@ -11,7 +11,7 @@ import sys
 
 
 @view_config(route_name='info_api', request_method='GET')
-def endpoints(context, request):
+def endpoints_view(request):
     """
     """
     views = request.registry.introspector.get_category('views')

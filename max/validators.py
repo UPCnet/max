@@ -5,13 +5,11 @@ from max.regex import RE_VALID_TWITTER_USERNAME
 
 import re
 
-"""
-    Validators accept ONE parameter containing the value of the field to be validated
-    Validators respond with a 2-element tuple (success, message)
+# Validators accept ONE parameter containing the value of the field to be validated
+# Validators respond with a 2-element tuple (success, message)
 
-    - success MUST be a boolean indicating were the validation succeded or not
-    - message MUST be a message indicating a description of why the validation didn't succeded
-"""
+# - success MUST be a boolean indicating were the validation succeded or not
+# - message MUST be a message indicating a description of why the validation didn't succeded
 
 
 def isValidHashtag(text, message='Invalid hashtag'):

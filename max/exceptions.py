@@ -1,34 +1,30 @@
 # -*- coding: utf-8 -*-
 from pyramid.httpexceptions import HTTPException
-from pyramid.response import Response
 
 import json
 
-"""
-
-    Base exception classes
-
-"""
+# Base exception classes
 
 
 class JSONHTTPException(HTTPException):
+    """
+        Base exception class for all exceptions raised as the result
+        of an error, to provide a message to the client
+    """
     def __init__(self, error):
-        Response.__init__(self, json.dumps(error), status=self.code)
+        """
+            Configures exception and inner response status code, content
+            and content_type
+        """
+        super(JSONHTTPException, self).__init__(body=json.dumps(error))
         self.content_type = 'application/json'
 
 
-class MaxException(Exception):
-    def __init__(self, value):
-        self.value = value
+# JSON HTTP Exceptions
 
-
-"""
-    JSON HTTP Exceptions
-
-    These are regular HTTPExceptions, each with its related code
-    all expecting a dict object to convert to JSON, and set
-    the correct content_type
-"""
+# These are regular HTTPExceptions, each with its related code
+# all expecting a dict object to convert to JSON, and set
+# the correct content_type
 
 
 class JSONHTTPUnauthorized(JSONHTTPException):
@@ -63,55 +59,51 @@ class JSONHTTPPreconditionFailed(JSONHTTPException):  # pragma: no cover
     code = 412
 
 
-"""
+# Max Exceptions
 
-    Max Exceptions
-
-    These are meant to be raised through model and endpoints code, and all
-    of them matches one of the prior defined JSON HTTP Exceptions
-
-"""
+# These are meant to be raised through model and endpoints code, and all
+# of them matches one of the prior defined JSON HTTP Exceptions
 
 
-class MissingField(MaxException):
+class MissingField(Exception):
     pass
 
 
-class ObjectNotSupported(MaxException):
+class ObjectNotSupported(Exception):
     pass
 
 
-class ObjectNotFound(MaxException):
+class ObjectNotFound(Exception):
     pass
 
 
-class DuplicatedItemError(MaxException):
+class DuplicatedItemError(Exception):
     pass
 
 
-class UnknownUserError(MaxException):
+class UnknownUserError(Exception):
     pass
 
 
-class Unauthorized(MaxException):
+class Unauthorized(Exception):
     pass
 
 
-class InvalidSearchParams(MaxException):
+class InvalidSearchParams(Exception):
     pass
 
 
-class InvalidPermission(MaxException):
+class InvalidPermission(Exception):
     pass
 
 
-class ValidationError(MaxException):
+class ValidationError(Exception):
     pass
 
 
-class Forbidden(MaxException):
+class Forbidden(Exception):
     pass
 
 
-class ConnectionError(MaxException):
+class ConnectionError(Exception):
     pass

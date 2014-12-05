@@ -81,13 +81,13 @@ def rebuildSubscriptions(context, request):
     mmdb = MADMaxDB(context.db)
     existing_contexts = {}
     contexts = mmdb.contexts.dump()
-    for num, context in enumerate(contexts):
+    for context in contexts:
         context.updateUsersSubscriptions(force_update=True)
         context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
     users = mmdb.users.search({'subscribedTo.0': {'$exists': True}})
-    for num, user in enumerate(users):
+    for user in users:
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
                 print user.username, subscription["displayName"]

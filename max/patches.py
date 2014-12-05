@@ -38,7 +38,7 @@ venusian.attach = attach
 
 
 # Patch to disable requests logging on gevent
-def log_request(self):
+def log_request(self):  # pragma: no cover
     pass
 
 try:

@@ -223,6 +223,7 @@ def ModifyUser(context, request):
 @view_config(route_name='user', request_method='DELETE')
 def DeleteUser(context, request):
     """
+        User auto-deletion
     """
     return HTTPNotImplemented()  # pragma: no cover
 

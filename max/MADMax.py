@@ -12,6 +12,24 @@ import sys
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
 
 
+class ResultsWrapper(list):
+    """
+        Wraps a list of results to provide a flag
+        showing if there are more items left to show.
+    """
+    def __init__(self, results, limit):
+        """
+            Slice the results, and set remaining flag if there are more items
+            in the results that the limit specified.
+
+            Queries with limit are executed with limit + 1, so, if we have
+            more result items thatn the limit says, it mens that the query that
+            originated this results has items remaining.
+        """
+        self.extend(results[:limit])
+        self.remaining = len(results) > limit
+
+
 class MADMaxCollection(object):
     """
         Wrapper for accessing collections
@@ -171,21 +189,8 @@ class MADMaxCollection(object):
         # Wrap the result in its Mad Class,
         # and flattens it if specified
 
-        class ResultsWrapper(list):
-            """
-            """
-            remaining = False
-
-        result_wrapper = ResultsWrapper()
         results = [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
-
-        # If we queried for one more item than specified, return what was asked
-        result_wrapper.extend(results[:limit])
-        # If not exists that extra item we searched with limit +1
-        # It means that this query has no remaining items
-        result_wrapper.remaining = len(results) > limit
-
-        return result_wrapper
+        return ResultsWrapper(results, limit=limit)
 
     def _getQuery(self, itemID):
         """

@@ -65,6 +65,7 @@ def subscribe(context, request):
 @requirePersonActor(force_own=False)
 def unsubscribe(context, request):
     """
+        Unconditionally unsubscribe user from context
     """
     actor = request.actor
     mmdb = MADMaxDB(context.db)

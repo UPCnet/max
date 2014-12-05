@@ -266,27 +266,28 @@ def catch_exception(request, e):
     elif isinstance(e, InvalidId):
         return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidId.__name__, error_description=e.message))
     elif isinstance(e, ObjectNotSupported):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=ObjectNotSupported.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=ObjectNotSupported.__name__, error_description=e.message))
     elif isinstance(e, ObjectNotFound):
-        return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description=e.value))
+        return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description=e.message))
     elif isinstance(e, MissingField):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=MissingField.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=MissingField.__name__, error_description=e.message))
     elif isinstance(e, DuplicatedItemError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=DuplicatedItemError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=DuplicatedItemError.__name__, error_description=e.message))
     elif isinstance(e, UnknownUserError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=UnknownUserError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=UnknownUserError.__name__, error_description=e.message))
     elif isinstance(e, Unauthorized):
-        return JSONHTTPUnauthorized(error=dict(objectType='error', error=Unauthorized.__name__, error_description=e.value))
+        return JSONHTTPUnauthorized(error=dict(objectType='error', error=Unauthorized.__name__, error_description=e.message))
     elif isinstance(e, InvalidSearchParams):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidSearchParams.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidSearchParams.__name__, error_description=e.message))
     elif isinstance(e, InvalidPermission):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidPermission.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidPermission.__name__, error_description=e.message))
     elif isinstance(e, ValidationError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=e.value))
+        return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=e.message))
     elif isinstance(e, Forbidden):
-        return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.value))
+        return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.message))
+
     elif isinstance(e, ConnectionError):
-        return JSONHTTPServiceUnavailable(error=dict(objectType='error', error=ConnectionError.__name__, error_description=e.value))
+        return JSONHTTPServiceUnavailable(error=dict(objectType='error', error=ConnectionError.__name__, error_description=e.message))
 
     # JSON decode error????
     # elif isinstance(e, ValueError):

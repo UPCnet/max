@@ -22,8 +22,9 @@ class ASObject(MADDict):
         """
         """
         self.data = data
-        self.processFields()
-        self.update(data)
+        if creating:
+            self.processFields()
+        self.update(self.data)
 
 
 class Note(ASObject):

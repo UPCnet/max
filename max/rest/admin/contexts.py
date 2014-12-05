@@ -291,7 +291,6 @@ def updateContextTags(context, request):
 
     contexts = MADMaxCollection(context.db.contexts, query_key='hash')
     context = contexts[chash]
-    context.tags
     context.tags.extend(tags)
     context.tags = list(set(context.tags))
     context.save()

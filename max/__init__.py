@@ -34,10 +34,9 @@ AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
 ALLOWED_ROLES = ['Manager', 'NonVisible']
 
 
-def main(global_config, **settings):
+def main(*args, **settings):
     """ This function returns a WSGI application.
     """
-
     # App config
     config = Configurator(settings=settings,
                           root_factory=Root)
@@ -69,7 +68,7 @@ def main(global_config, **settings):
     config.registry.max_store = db
 
     # Set MAX settings
-    config.registry.max_settings = loadMAXSettings(settings, config)
+    config.registry.max_settings = loadMAXSettings(settings)
 
     # Set Twitter settings
     config.registry.cloudapis_settings = loadCloudAPISettings(config.registry)

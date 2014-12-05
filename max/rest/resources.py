@@ -74,7 +74,6 @@ PUBLIC_RESOURCES = {
     'share': {'route': '/activities/{activity}/shares/{shareId}'},
 
     # Not implemented / Not in roadmap
-    'user_conversations': {'route': '/people/{username}/conversations'},
     'context_permissions': {'route': '/contexts/{hash}/permissions'},
     'context_user_permissions': {'route': '/contexts/{hash}/permissions/{username}'},
 

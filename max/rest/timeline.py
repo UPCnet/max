@@ -24,7 +24,7 @@ def timelineQuery(actor):
     contexts_followings = []
     for subscribed in actor['subscribedTo']:
         # Don't show conversations in timeline
-            contexts_followings.append({'contexts.url': subscribed['url']})
+        contexts_followings.append({'contexts.url': subscribed['url']})
 
     query_items = []
     query_items.append(actor_query)

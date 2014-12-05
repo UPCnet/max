@@ -37,7 +37,7 @@ def getMAXSettings(request):
     return request.registry.max_settings
 
 
-def loadMAXSettings(settings, config):
+def loadMAXSettings(settings):
     max_ini_settings = {key.replace('max.', 'max_'): settings[key] for key in settings.keys() if 'max' in key}
     max_ini_settings['max_message_defaults'] = {
         "source": "max",

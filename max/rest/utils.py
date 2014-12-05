@@ -120,7 +120,7 @@ def rfc3339_parse(date):
     """
     timeparts = list(re.search(r'(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+).?(\d*)Z', date).groups())
     timeparts[6] = timeparts[6] and (int(timeparts[6]) * 1000) or 0
-    return datetime(*map(int, timeparts))
+    return datetime(*[int(part) for part in timeparts])
 
 
 def date_filter_parser(date_filter):

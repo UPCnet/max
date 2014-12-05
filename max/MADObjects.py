@@ -259,7 +259,7 @@ class MADBase(MADDict):
     def _on_saving_object(self, oid):
         return True
 
-    def _on_insert_object(self, oid):
+    def _on_insert_object(self, oid, **kwargs):
         return True
 
     def fromObject(self, source, collection=None):
