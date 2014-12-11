@@ -67,6 +67,9 @@ def addAdminUserActivity(context, request):
         'published': {'$gt': newactivity.published - timedelta(minutes=1)}
     }
 
+    if newactivity.get('contexts', []):
+        query['contexts.hash'] = {'$in': [a['hash'] for a in newactivity.contexts]}
+
     duplicated = mmdb.activity.search(query)
 
     if duplicated:
@@ -116,6 +119,10 @@ def addAdminContextActivity(context, request):
         'object.content': newactivity['object']['content'],
         'published': {'$gt': newactivity.published - timedelta(minutes=1)}
     }
+
+    if newactivity.get('contexts', []):
+        query['contexts.hash'] = {'$in': [a['hash'] for a in newactivity.contexts]}
+
     duplicated = mmdb.activity.search(query)
 
     if duplicated:

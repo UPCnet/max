@@ -266,6 +266,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=201)
         self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(test_manager), status=200)
 
+    def test_create_activity_on_context_check_duplicate_activity(self):
+        """
+            Given a admin user
+            When I post an activity in the name of someone else on a context
+            And I try to post the same content twice on another context in less than a minute
+            Then the activity is posted again on the new context
+        """
+        from .mockers import subscribe_contextA, create_contextA, user_status_contextA
+        from .mockers import subscribe_contextB, create_contextB, user_status_contextB
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextB)
+        self.testapp.post('/people/%s/activities' % username, json.dumps(user_status_contextA), oauth2Header(test_manager), status=201)
+        self.testapp.post('/people/%s/activities' % username, json.dumps(user_status_contextB), oauth2Header(test_manager), status=201)
+
     def test_create_activity_as_context_check_not_duplicated_activity(self):
         """
             Given a admin user
