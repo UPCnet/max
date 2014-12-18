@@ -108,10 +108,62 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertNotIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
 
     @skipRabbitTest()
-    def test_recreate_user_creates_bindings(self):
+    def test_create_existing_user_dont_create_bindings(self):
+        """
+            Given a created user without rabbitmq exchanges
+            When i try to create the user again
+            The exchanges won't be created
+        """
         username = 'messi'
         self.create_user(username, qs_params={"notifications": False})
         self.create_user(username, expect=200)
+
+        self.server.management.load_exchanges()
+        self.assertNotIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
+        self.assertNotIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
+
+    @skipRabbitTest()
+    def test_create_existing_user_create_bindings(self):
+        """
+            Given a created user without rabbitmq exchanges
+            When i try to create the user again
+            And i explicitly request to create exchanges for notifications
+            The exchanges will be created
+        """
+        username = 'messi'
+        self.create_user(username, qs_params={"notifications": False})
+        self.create_user(username, qs_params={"notifications": True}, expect=200)
+
+        self.server.management.load_exchanges()
+        self.assertIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
+        self.assertIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
+
+    @skipRabbitTest()
+    def test_self_create_existing_user_dont_create_bindings(self):
+        """
+            Given a created user without rabbitmq exchanges
+            When i try to create the user again
+            The exchanges won't be created
+        """
+        username = 'messi'
+        self.create_user(username, qs_params={"notifications": False}, creator=username)
+        self.create_user(username, expect=200, creator=username)
+
+        self.server.management.load_exchanges()
+        self.assertNotIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
+        self.assertNotIn('{}.subscribe'.format(username), self.server.management.exchanges_by_name)
+
+    @skipRabbitTest()
+    def test_self_create_existing_user_create_bindings(self):
+        """
+            Given a created user without rabbitmq exchanges
+            When i try to create the user again
+            And i explicitly request to create exchanges for notifications
+            The exchanges will be created
+        """
+        username = 'messi'
+        self.create_user(username, qs_params={"notifications": False}, creator=username)
+        self.create_user(username, qs_params={"notifications": True}, expect=200, creator=username)
 
         self.server.management.load_exchanges()
         self.assertIn('{}.publish'.format(username), self.server.management.exchanges_by_name)
