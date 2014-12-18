@@ -93,12 +93,22 @@ def addOwnUser(context, request):
     if newuser.get('_id'):
         # Already Exists
         code = 200
-        notifier = RabbitNotifications(request)
-        notifier.add_user(username)
+
+        # Determine if we have to recreate exchanges for an existing user
+        # Defaults NOT to recreate them if not specified
+        create_exchanges = asbool(request.params.get('notifications', False))
+        if create_exchanges:
+            notifier = RabbitNotifications(request)
+            notifier.add_user(username)
     else:
         # New User
         code = 201
-        userid = newuser.insert(notifications=asbool(request.params.get('notifications', True)))
+
+        # Determine if we have to recreate exchanges for a new user
+        # Defaults to Create them if not specified
+        create_exchanges = asbool(request.params.get('notifications', True))
+        userid = newuser.insert(notifications=create_exchanges)
+
         newuser['_id'] = userid
     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
     return handler.buildResponse()

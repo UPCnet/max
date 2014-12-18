@@ -110,13 +110,13 @@ class MaxTestBase(object):
     def __init__(self, testapp):
         self.testapp = testapp
 
-    def create_user(self, username, qs_params={}, expect=201, **kwargs):
+    def create_user(self, username, qs_params={}, expect=201, creator=test_manager, **kwargs):
         payload = {}
         for key, value in kwargs.items():
             payload[key] = value
 
         qs = '?{}'.format(urlencode(qs_params)) if qs_params else ''
-        res = self.testapp.post('/people/%s%s' % (username, qs), json.dumps(payload), oauth2Header(test_manager), status=expect)
+        res = self.testapp.post('/people/%s%s' % (username, qs), json.dumps(payload), oauth2Header(creator), status=expect)
         return res
 
     def modify_user(self, username, properties):
