@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-4.0.20 (unreleased)
+4.0.20 (2014-12-18)
 -------------------
 
-- Nothing changed yet.
-
+* Do not try to recreate exchanges if user exists [Carles Bruguera]
+* Pylint [Carles Bruguera]
 
 4.0.19 (2014-12-04)
 -------------------
