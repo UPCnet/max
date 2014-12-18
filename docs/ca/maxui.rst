@@ -346,7 +346,7 @@ disposa del password de l'usuari:
 CORS - Cross Origin Resource Sharing
 -------------------------------------
 
-Les crides al MAX que es fan des del widget es van via peticions XHR des del
+Les crides al MAX que es fan des del widget es fan via peticions XHR des del
 navegador. Degut a restriccions de seguretat, per defecte els navegadors no
 permeten que una crida XHR interactuï amb dominis diferents del qual s'ha
 accedit. Per exemple, si hem carregat l'aplicació a ``http://www.foo.com``, no
