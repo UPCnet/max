@@ -65,21 +65,21 @@ class RabbitNotifications(object):
         default_exchange = ''
         restart_request_time = datetime.datetime.now().strftime('%s.%f')
         self.client.send(default_exchange, restart_request_time, 'tweety_restart')
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def add_user(self, username):
         """
             Creates the specified user exchange and bindings
         """
         self.client.create_user(username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def delete_user(self, username):
         """
             Deletes the specified user exchange and bindings
         """
         self.client.delete_user(username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def bind_user_to_context(self, context, username):
         """
@@ -87,7 +87,7 @@ class RabbitNotifications(object):
         """
         context_id = context.getIdentifier()
         self.client.activity.bind_user(context_id, username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def unbind_user_from_context(self, context, username):
         """
@@ -95,7 +95,7 @@ class RabbitNotifications(object):
         """
         context_id = context.getIdentifier()
         self.client.activity.unbind_user(context_id, username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def unbind_context(self, context):
         """
@@ -103,7 +103,7 @@ class RabbitNotifications(object):
         """
         context_id = context.getIdentifier()
         self.client.activity.delete(context_id)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def bind_user_to_conversation(self, conversation, username):
         """
@@ -111,7 +111,7 @@ class RabbitNotifications(object):
         """
         context_id = conversation.getIdentifier()
         self.client.conversations.bind_user(context_id, username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def unbind_user_from_conversation(self, conversation, username):
         """
@@ -119,7 +119,7 @@ class RabbitNotifications(object):
         """
         context_id = conversation.getIdentifier()
         self.client.conversations.unbind_user(context_id, username)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def unbind_conversation(self, conversation):
         """
@@ -127,7 +127,7 @@ class RabbitNotifications(object):
         """
         context_id = conversation.getIdentifier()
         self.client.conversations.delete(context_id)
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def notify_context_activity(self, activity):
         """
@@ -147,7 +147,7 @@ class RabbitNotifications(object):
             }
         })
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def notify_context_activity_comment(self, activity, comment):
         """
@@ -167,7 +167,7 @@ class RabbitNotifications(object):
             }
         })
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
-        self.client.disconnect()
+        #self.client.disconnect()
 
     def add_conversation(self, conversation):
         """
@@ -190,4 +190,4 @@ class RabbitNotifications(object):
             "data": {}
         })
         self.client.send('conversations', json.dumps(message.packed), routing_key='{}.notifications'.format(conversation_id))
-        self.client.disconnect()
+        #self.client.disconnect()
