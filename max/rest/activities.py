@@ -225,6 +225,68 @@ def deleteActivity(context, request):
     return HTTPNoContent()
 
 
+@view_config(route_name='flag', request_method='POST')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def flagActivity(context, request):
+    """
+         Sets the flagged mark on an activity
+    """
+    mmdb = MADMaxDB(context.db)
+    activityid = request.matchdict.get('activity', None)
+    try:
+        found_activity = mmdb.activity[activityid]
+    except:
+        raise ObjectNotFound("There's no activity with id: %s" % activityid)
+
+    # Check if the activity is flaggable by the actor
+    if found_activity.get('contexts', []):
+        mmdb = MADMaxDB(context.db)
+        ctxt = mmdb.contexts.getItemsByhash(found_activity.contexts[0]['hash'])[0]
+        if ctxt._owner != request.actor.username:
+            raise Unauthorized("You are not allowed to flag this activity.")
+    else:
+        raise Forbidden("Only context activities can be flagged.")
+
+    found_activity.flag()
+    found_activity.save()
+
+    handler = JSONResourceEntity(found_activity.flatten())
+    return handler.buildResponse()
+
+
+@view_config(route_name='flag', request_method='DELETE')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor
+def unflagActivity(context, request):
+    """
+         Unsets the flagged mark on an activity
+    """
+    mmdb = MADMaxDB(context.db)
+    activityid = request.matchdict.get('activity', None)
+    try:
+        found_activity = mmdb.activity[activityid]
+    except:
+        raise ObjectNotFound("There's no activity with id: %s" % activityid)
+
+    # Check if the activity is flaggable by the actor
+    if found_activity.get('contexts', []):
+        mmdb = MADMaxDB(context.db)
+        ctxt = mmdb.contexts.getItemsByhash(found_activity.contexts[0]['hash'])[0]
+        if ctxt._owner != request.actor.username:
+            raise Unauthorized("You are not allowed to unflag this activity.")
+    else:
+        raise Forbidden("Only context activities can be unflagged.")
+
+    found_activity.unflag()
+    found_activity.save()
+
+    handler = JSONResourceEntity(found_activity.flatten())
+    return handler.buildResponse()
+
+
 @view_config(route_name='activity', request_method='PUT')
 def modifyActivity(context, request):
     """

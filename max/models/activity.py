@@ -383,6 +383,7 @@ class Activity(BaseActivity):
     schema['deletable'] = {}
     schema['liked'] = {}
     schema['favorited'] = {}
+    schema['flagged'] = {'default': False}
     schema['likes'] = {'default': []}
     schema['likesCount'] = {'default': 0}
     schema['favorites'] = {'default': []}
@@ -457,6 +458,16 @@ class Activity(BaseActivity):
 
             self['favorited'] = self.has_favorite_from(self.request.actor)
             self['liked'] = self.has_like_from(self.request.actor)
+
+    def flag(self):
+        """
+        """
+        self.flagged = True
+
+    def unflag(self):
+        """
+        """
+        self.flagged = False
 
     def add_favorite_from(self, actor):
         """

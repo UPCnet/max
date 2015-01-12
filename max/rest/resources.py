@@ -51,6 +51,7 @@ PUBLIC_RESOURCES = {
     'participant': {'route': '/conversations/{id}/participant', 'category': 'Conversations', 'name': 'Conversation participant'},
 
     # MAX 3.6
+    'flag': {'route': '/activities/{activity}/flag', 'category': 'Activities'},
     'likes': {'route': '/activities/{activity}/likes', 'category': 'Activities'},
     'like': {'route': '/activities/{activity}/likes/{username}', 'category': 'Activities'},
     'user_likes': {'route': '/people/{username}/likes', 'category': 'User', 'name': 'User liked activity'},
