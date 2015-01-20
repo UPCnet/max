@@ -27,7 +27,7 @@ from max.decorators import set_signal
 
 from maxutils import mongodb
 
-DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted')
+DEFAULT_CONTEXT_PERMISSIONS = dict(read='public', write='public', subscribe='public', invite='public', delete='restricted', flag='restricted')
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6

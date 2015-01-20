@@ -242,9 +242,9 @@ def flagActivity(context, request):
 
     # Check if the activity is flaggable by the actor
     if found_activity.get('contexts', []):
-        mmdb = MADMaxDB(context.db)
-        ctxt = mmdb.contexts.getItemsByhash(found_activity.contexts[0]['hash'])[0]
-        if ctxt._owner != request.actor.username:
+        ctxt = found_activity.contexts[0]
+        subscription = request.actor.getSubscription(ctxt)
+        if 'flag' not in subscription['permissions']:
             raise Unauthorized("You are not allowed to flag this activity.")
     else:
         raise Forbidden("Only context activities can be flagged.")
@@ -273,9 +273,9 @@ def unflagActivity(context, request):
 
     # Check if the activity is flaggable by the actor
     if found_activity.get('contexts', []):
-        mmdb = MADMaxDB(context.db)
-        ctxt = mmdb.contexts.getItemsByhash(found_activity.contexts[0]['hash'])[0]
-        if ctxt._owner != request.actor.username:
+        ctxt = found_activity.contexts[0]
+        subscription = request.actor.getSubscription(ctxt)
+        if 'flag' not in subscription['permissions']:
             raise Unauthorized("You are not allowed to unflag this activity.")
     else:
         raise Forbidden("Only context activities can be unflagged.")
