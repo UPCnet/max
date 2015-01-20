@@ -1,11 +1,15 @@
 CHANGELOG
 =========
 
-4.0.21 (unreleased)
+4.0.21 (2015-01-20)
 -------------------
 
-- Nothing changed yet.
-
+* Use new sorting style on timeline [Carles Bruguera]
+* Store flagged as a data [Carles Bruguera]
+* Custom method for each sortBy case [Carles Bruguera]
+* Flag/unflag based on context permissions [Carles Bruguera]
+* Flag/unflag endpoint [Carles Bruguera]
+* Disable connection close [Carles Bruguera]
 
 4.0.20 (2014-12-18)
 -------------------
