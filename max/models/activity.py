@@ -15,6 +15,7 @@ from PIL import Image
 from bson import ObjectId
 from hashlib import sha1
 
+import datetime
 import json
 import os
 import re
@@ -383,7 +384,7 @@ class Activity(BaseActivity):
     schema['deletable'] = {}
     schema['liked'] = {}
     schema['favorited'] = {}
-    schema['flagged'] = {'default': False}
+    schema['flagged'] = {}
     schema['likes'] = {'default': []}
     schema['likesCount'] = {'default': 0}
     schema['favorites'] = {'default': []}
@@ -462,12 +463,12 @@ class Activity(BaseActivity):
     def flag(self):
         """
         """
-        self.flagged = True
+        self.flagged = datetime.datetime.utcnow()
 
     def unflag(self):
         """
         """
-        self.flagged = False
+        self.flagged = None
 
     def add_favorite_from(self, actor):
         """

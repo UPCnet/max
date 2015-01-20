@@ -108,7 +108,8 @@ class MADMaxCollection(object):
             sortBy_field = {
                 'activities': '_id',
                 'comments': 'lastComment',
-                'likes': 'likesCount'
+                'likes': 'likesCount',
+                'flagged': 'flagged'
             }
             # Filter the query to return objects created later or earlier than the one
             # represented by offset (offset not included). Take the overridden offse if provided
