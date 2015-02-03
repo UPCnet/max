@@ -12,6 +12,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import downloadTwitterUserImage
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.rest.sorting import sorted_query
 
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
@@ -62,12 +63,6 @@ def getContextAuthors(context, request):
     # and activity WITHOUT the visible field
     query['visible'] = {'$ne': False}
 
-    sortBy_fields = {
-        'activities': '_id',
-        'comments': 'lastComment',
-    }
-    sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-
     still_has_activities = True
 
     # Save full author object to construct de response
@@ -84,14 +79,14 @@ def getContextAuthors(context, request):
         if not activities:
             if before is not None:
                 search_params['before'] = before
-            activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
+            activities = sorted_query(request, mmdb.activity, query)
             still_has_activities = len(activities) > 0
         if still_has_activities:
             activity = activities.pop(0)
-            before = activity._id
-            if activity.actor['username'] not in distinct_usernames:
-                distinct_authors.append(activity.actor)
-                distinct_usernames.append(activity.actor['username'])
+            before = activity['id']
+            if activity['actor']['username'] not in distinct_usernames:
+                distinct_authors.append(activity['actor'])
+                distinct_usernames.append(activity['actor']['username'])
     handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()
 

@@ -10,7 +10,7 @@ from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
-from max.rest.sorting import SORT_METHODS
+from max.rest.sorting import sorted_query
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPNoContent
@@ -43,7 +43,7 @@ def getUserActivities(context, request):
         query['contexts.hash'] = chash
 
     is_head = request.method == 'HEAD'
-    activities = mmdb.activity.search(query, sort="_id", keep_private_fields=False, squash=['favorites', 'likes'], flatten=1, count=is_head, **searchParams(request))
+    activities = mmdb.activity.search(query, keep_private_fields=False, squash=['favorites', 'likes'], flatten=1, count=is_head, **searchParams(request))
 
     handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()
@@ -133,20 +133,17 @@ def getActivities(context, request):
         public_query = {'contexts.url': {'$in': public}}
         contexts_query.append(public_query)                        # pubic contexts
 
-    is_head = request.method == 'HEAD'
-
     if contexts_query:
         query.update({'$or': contexts_query})
 
-        sort_type = request.params.get('sortBy', 'activities')
-        sort_method = SORT_METHODS[sort_type]
-        activities = sort_method(request, mmdb, query, is_head)
+        activities = sorted_query(request, mmdb.activity, query)
 
     else:
         # we have no public contexts and we are not subscribed to any context, so we
         # won't get anything
         raise Forbidden("You don't have permission to see anyting in this context and it's child")
 
+    is_head = request.method == 'HEAD'
     handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()
 

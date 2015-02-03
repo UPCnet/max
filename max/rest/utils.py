@@ -207,7 +207,29 @@ def searchParams(request):
     """
     params = {}
 
-    params['sort_order'] = request.params.get('sortBy', 'activities')
+    # KEEP For compatibility with older max, that did'nt distinguish
+    # between sort order and sort priority. "sortBy" param will be translated
+    # to sort_params
+
+    deprecated_sort_by = request.params.get('sortBy', None)
+
+    if deprecated_sort_by == 'activities':
+        params['sort_strategy'] = 'published'
+        params['sort_priority'] = 'activity'
+    elif deprecated_sort_by == 'comments':
+        params['sort_strategy'] = 'published'
+        params['sort_priority'] = 'comments'
+    elif deprecated_sort_by == 'likes':
+        params['sort_strategy'] = 'likes'
+        params['sort_priority'] = 'activity'
+    elif deprecated_sort_by == 'flagged':
+        params['sort_strategy'] = 'flagged'
+        params['sort_priority'] = 'activity'
+
+    sort_order = request.params.get('sort', None)
+    if sort_order:
+        params['sort_strategy'] = sort_order
+        params['sort_priority'] = request.params.get('priority', 'activity')
 
     limit = request.params.get('limit', 10)
     try:

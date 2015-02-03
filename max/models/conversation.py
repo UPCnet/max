@@ -53,7 +53,7 @@ class Conversation(BaseContext):
             'contexts.id': self.getIdentifier()
         }
 
-        messages = MADMaxCollection(self.db.messages).search(query, flatten=1, limit=1, sort="published", sort_dir=DESCENDING)
+        messages = MADMaxCollection(self.db.messages).search(query, flatten=1, limit=1)
         message = messages[0]
         lastMessage = {
             'published': message['published'],

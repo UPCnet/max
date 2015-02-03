@@ -50,7 +50,7 @@ def getConversations(context, request):
              '_id': {'$in': subscribed_conversations}
              }
 
-    conversations = mmdb.conversations.search(query, sort="published")
+    conversations = mmdb.conversations.search(query, sort_by_field="published")
 
     conversations_info = []
     for conversation in conversations:
@@ -213,7 +213,7 @@ def getMessages(context, request):
 
     mmdb = MADMaxDB(context.db)
     query = {'contexts.id': cid}
-    messages = mmdb.messages.search(query, sort="published", sort_dir=DESCENDING, keep_private_fields=False, **searchParams(request))
+    messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining
     handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
     return handler.buildResponse()

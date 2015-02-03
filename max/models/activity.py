@@ -387,6 +387,7 @@ class Activity(BaseActivity):
     schema['flagged'] = {}
     schema['likes'] = {'default': []}
     schema['likesCount'] = {'default': 0}
+    schema['lastLike'] = {}
     schema['favorites'] = {'default': []}
     schema['favoritesCount'] = {'default': 0}
 
@@ -492,6 +493,7 @@ class Activity(BaseActivity):
         }
         self.add_to_list('likes', prepared_actor, allow_duplicates=False)
         self.likesCount = len(self.likes)
+        self.lastLike = datetime.datetime.utcnow()
         self.save()
 
     def delete_favorite_from(self, actor):

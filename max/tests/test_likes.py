@@ -10,6 +10,7 @@ from mock import patch
 from paste.deploy import loadapp
 
 import os
+import time
 import unittest
 
 
@@ -170,38 +171,106 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['object']['liked'], False)
         self.assertEqual(res.json['object']['likesCount'], 1)
 
-    def test_timeline_by_likes(self):
+    def test_likes_sorting_1(self):
         """
+            Test without liked objects, sort order must be by descending
+            published date of the activities
+
         """
         from .mockers import user_status_context
         from .mockers import subscribe_context, create_context
+
+        page_size = 3
 
         # Store the ids of all created activities. First is the oldest
         activities = []
         self.create_context(create_context)
 
-        # Create 10 users, subscribe to a context and write a post for each one
-        # Like the activities created until then
-        # At the and, activity from user 1 will have likes from the rest,
-        # and activity by user 10 won't have any likes
-        for i in range(1, 11):
-            username = 'username{}'.format(i)
+        for i in range(1, 7):
+            username = 'user{}'.format(i)
             self.create_user(username)
             self.admin_subscribe_user_to_context(username, subscribe_context)
             res = self.create_activity(username, user_status_context)
-            for activity_id in activities:
-                self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=201)
             activities.append(res.json['id'])
 
-        res = self.testapp.get('/people/%s/timeline?sortBy=likes' % "username1", "", oauth2Header("username1"), status=200)
+        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sortBy=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
 
-        self.assertEqual(res.json[0]['likesCount'], 9)
-        self.assertEqual(res.json[0]['id'], activities[0])
+        self.assertEqual(len(firstpage.json), 3)
 
-        self.assertEqual(len(res.json), 9)
+        self.assertEqual(firstpage.json[0]['likesCount'], 0)
+        self.assertEqual(firstpage.json[0]['id'], activities[5])
+        self.assertEqual(firstpage.json[1]['likesCount'], 0)
+        self.assertEqual(firstpage.json[1]['id'], activities[4])
+        self.assertEqual(firstpage.json[2]['likesCount'], 0)
+        self.assertEqual(firstpage.json[2]['id'], activities[3])
 
-    def test_timeline_by_likes_paginated(self):
+        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=%d&before=%s' % ("user1", page_size, activities[3]), "", oauth2Header("user1"), status=200)
+
+        self.assertEqual(len(secondpage.json), 3)
+
+        self.assertEqual(secondpage.json[0]['likesCount'], 0)
+        self.assertEqual(secondpage.json[0]['id'], activities[2])
+        self.assertEqual(secondpage.json[1]['likesCount'], 0)
+        self.assertEqual(secondpage.json[1]['id'], activities[1])
+        self.assertEqual(secondpage.json[2]['likesCount'], 0)
+        self.assertEqual(secondpage.json[2]['id'], activities[0])
+
+    def test_likes_sorting_2(self):
         """
+            Test with all activities liked once, sort order must be by descending
+            date of the last time that the activity was liked.
+
+        """
+        from .mockers import user_status_context
+        from .mockers import subscribe_context, create_context
+
+        page_size = 3
+
+        # Store the ids of all created activities. First is the oldest
+        activities = []
+        self.create_context(create_context)
+
+        # Create 6 users, post an activity with each one and self-like it
+        for i in range(1, 7):
+            username = 'user{}'.format(i)
+            self.create_user(username)
+            self.admin_subscribe_user_to_context(username, subscribe_context)
+            res = self.create_activity(username, user_status_context)
+            activities.append(res.json['id'])
+
+        self.like_activity(username, activities[0])
+        self.like_activity(username, activities[3])
+        self.like_activity(username, activities[1])
+        self.like_activity(username, activities[5])
+        self.like_activity(username, activities[4])
+        self.like_activity(username, activities[2])
+
+        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sortBy=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
+
+        self.assertEqual(len(firstpage.json), 3)
+        self.assertEqual(firstpage.json[0]['likesCount'], 1)
+        self.assertEqual(firstpage.json[0]['id'], activities[2])
+        self.assertEqual(firstpage.json[1]['likesCount'], 1)
+        self.assertEqual(firstpage.json[1]['id'], activities[4])
+        self.assertEqual(firstpage.json[2]['likesCount'], 1)
+        self.assertEqual(firstpage.json[2]['id'], activities[5])
+
+        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=%d&before=%s' % ("user1", page_size, activities[5]), "", oauth2Header("user1"), status=200)
+
+        self.assertEqual(len(secondpage.json), 3)
+
+        self.assertEqual(secondpage.json[0]['likesCount'], 1)
+        self.assertEqual(secondpage.json[0]['id'], activities[1])
+        self.assertEqual(secondpage.json[1]['likesCount'], 1)
+        self.assertEqual(secondpage.json[1]['id'], activities[3])
+        self.assertEqual(secondpage.json[2]['likesCount'], 1)
+        self.assertEqual(secondpage.json[2]['id'], activities[0])
+
+    def test_timeline_by_likes_paginated_same_likes_span(self):
+        """
+            Test likes sorting when activities with the same likes span trough
+            more than one page, having pages with activities with targeted likeCount
+            in the bottom of page, and other on top
         """
         from .mockers import user_status_context
         from .mockers import subscribe_context, create_context
@@ -218,60 +287,80 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             res = self.create_activity(username, user_status_context)
             activities.append(res.json['id'])
 
-        # Take the first 6 activities, and make users like it, starting with 6 likes
-        # At the end, activity #0 must have 6 likes and activity #5 1 like, decrementing in between
+        # Like activities so activities with 3 likes spans trough pages 1,2 and 3
 
         self.like_activity('user1', activities[0])
         self.like_activity('user2', activities[0])
         self.like_activity('user3', activities[0])
         self.like_activity('user4', activities[0])
         self.like_activity('user5', activities[0])
-        self.like_activity('user6', activities[0])
 
         self.like_activity('user1', activities[1])
         self.like_activity('user2', activities[1])
         self.like_activity('user3', activities[1])
         self.like_activity('user4', activities[1])
-        self.like_activity('user5', activities[1])
 
+        time.sleep(1)
         self.like_activity('user1', activities[2])
         self.like_activity('user2', activities[2])
         self.like_activity('user3', activities[2])
-        self.like_activity('user4', activities[2])
 
+        time.sleep(1)
         self.like_activity('user1', activities[3])
         self.like_activity('user2', activities[3])
         self.like_activity('user3', activities[3])
 
+        time.sleep(1)
         self.like_activity('user1', activities[4])
         self.like_activity('user2', activities[4])
+        self.like_activity('user3', activities[4])
 
+        time.sleep(1)
         self.like_activity('user1', activities[5])
+        self.like_activity('user2', activities[5])
+        self.like_activity('user3', activities[5])
+
+        time.sleep(1)
+        self.like_activity('user1', activities[6])
+        self.like_activity('user2', activities[6])
+        self.like_activity('user3', activities[6])
+
+        self.like_activity('user1', activities[7])
+        self.like_activity('user2', activities[7])
+
+        self.like_activity('user1', activities[8])
 
         firstpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3' % "user1", "", oauth2Header("user1"), status=200)
 
-        self.assertEqual(firstpage.json[0]['likesCount'], 6)
+        self.assertEqual(len(firstpage.json), 3)
+        self.assertEqual(firstpage.json[0]['likesCount'], 5)
         self.assertEqual(firstpage.json[0]['id'], activities[0])
-        self.assertEqual(firstpage.json[1]['likesCount'], 5)
+        self.assertEqual(firstpage.json[1]['likesCount'], 4)
         self.assertEqual(firstpage.json[1]['id'], activities[1])
-        self.assertEqual(firstpage.json[2]['likesCount'], 4)
-        self.assertEqual(firstpage.json[2]['id'], activities[2])
+        self.assertEqual(firstpage.json[2]['likesCount'], 3)
+        self.assertEqual(firstpage.json[2]['id'], activities[6])
 
-        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[2]), "", oauth2Header("user1"), status=200)
+        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[6]), "", oauth2Header("user1"), status=200)
 
+        self.assertEqual(len(secondpage.json), 3)
         self.assertEqual(secondpage.json[0]['likesCount'], 3)
-        self.assertEqual(secondpage.json[0]['id'], activities[3])
-        self.assertEqual(secondpage.json[1]['likesCount'], 2)
+        self.assertEqual(secondpage.json[0]['id'], activities[5])
+        self.assertEqual(secondpage.json[1]['likesCount'], 3)
         self.assertEqual(secondpage.json[1]['id'], activities[4])
-        self.assertEqual(secondpage.json[2]['likesCount'], 1)
-        self.assertEqual(secondpage.json[2]['id'], activities[5])
+        self.assertEqual(secondpage.json[2]['likesCount'], 3)
+        self.assertEqual(secondpage.json[2]['id'], activities[3])
 
-        thirdpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[5]), "", oauth2Header("user1"), status=200)
+        thirdpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[3]), "", oauth2Header("user1"), status=200)
 
-        self.assertEqual(thirdpage.json[0]['likesCount'], 0)
-        self.assertEqual(thirdpage.json[0]['id'], activities[6])
-        self.assertEqual(thirdpage.json[1]['likesCount'], 0)
+        self.assertEqual(len(thirdpage.json), 3)
+        self.assertEqual(thirdpage.json[0]['likesCount'], 3)
+        self.assertEqual(thirdpage.json[0]['id'], activities[2])
+        self.assertEqual(thirdpage.json[1]['likesCount'], 2)
         self.assertEqual(thirdpage.json[1]['id'], activities[7])
-        self.assertEqual(thirdpage.json[2]['likesCount'], 0)
+        self.assertEqual(thirdpage.json[2]['likesCount'], 1)
         self.assertEqual(thirdpage.json[2]['id'], activities[8])
 
+        fourthpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[8]), "", oauth2Header("user1"), status=200)
+        self.assertEqual(len(fourthpage.json), 1)
+        self.assertEqual(fourthpage.json[0]['likesCount'], 0)
+        self.assertEqual(fourthpage.json[0]['id'], activities[9])

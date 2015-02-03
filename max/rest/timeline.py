@@ -7,7 +7,7 @@ from max.decorators import requirePersonActor
 from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
-from max.rest.sorting import SORT_METHODS
+from max.rest.sorting import sorted_query
 
 from pyramid.view import view_config
 
@@ -55,9 +55,7 @@ def getUserTimeline(context, request):
 
     query = timelineQuery(actor)
 
-    sort_type = request.params.get('sortBy', 'activities')
-    sort_method = SORT_METHODS[sort_type]
-    activities = sort_method(request, mmdb, query)
+    activities = sorted_query(request, mmdb.activity, query)
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
@@ -80,12 +78,6 @@ def getUserTimelineAuthors(context, request):
 
     query = timelineQuery(actor)
 
-    sortBy_fields = {
-        'activities': '_id',
-        'comments': 'lastComment',
-    }
-    sort_order = sortBy_fields[request.params.get('sortBy', 'activities')]
-
     still_has_activities = True
 
     # Save full author object to construct de response
@@ -102,15 +94,15 @@ def getUserTimelineAuthors(context, request):
         if not activities:
             if before is not None:
                 search_params['before'] = before
-            activities = mmdb.activity.search(query, sort=sort_order, flatten=0, keep_private_fields=False, **search_params)
+            activities = sorted_query(request, mmdb.activity, query)
             queries += 1
             still_has_activities = len(activities) > 0
         if still_has_activities:
             activity = activities.pop(0)
-            before = activity._id
-            if activity.actor['username'] not in distinct_usernames:
-                distinct_authors.append(activity.actor)
-                distinct_usernames.append(activity.actor['username'])
+            before = activity['id']
+            if activity['actor']['username'] not in distinct_usernames:
+                distinct_authors.append(activity['actor'])
+                distinct_usernames.append(activity['actor']['username'])
 
     handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()

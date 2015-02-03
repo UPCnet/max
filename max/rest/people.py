@@ -37,7 +37,7 @@ def getUsers(context, request):
     """
     mmdb = MADMaxDB(context.db)
     query = {}
-    users = mmdb.users.search(query, show_fields=["username", "displayName", "objectType", 'subscribedTo'], sort="username", flatten=0, **searchParams(request))
+    users = mmdb.users.search(query, show_fields=["username", "displayName", "objectType", 'subscribedTo'], sort_by_field="username", flatten=0, **searchParams(request))
     remaining = users.remaining
 
     # Filter user results

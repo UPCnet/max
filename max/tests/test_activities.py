@@ -451,7 +451,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             When I post activities on a context
             and I comment on an old activity
-            Then the in the comment-sorted activities, the commented activity becomes the first
+            Then in the comment-sorted activities, the commented activity becomes the first
         """
         from .mockers import user_comment
         from .mockers import user_status_context
@@ -775,7 +775,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             When I post activities
             and I comment on an old activity
-            Then the in the comment-sorted timeline, the commented activity becomes the first
+            Then in the comment-sorted timeline, the commented activity becomes the first
         """
         from .mockers import user_status, user_comment
         username = 'messi'
@@ -807,7 +807,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             When I post activities
             and I comment on an old activity
-            Then the in the activities-sorted timeline, the order equals the activity order
+            Then in the activities-sorted timeline, the order equals the activity order
         """
         from .mockers import user_status, user_comment
         username = 'messi'

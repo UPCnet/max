@@ -6,6 +6,8 @@ from max.exceptions import ObjectNotFound
 from bson.objectid import ObjectId
 from pymongo import DESCENDING
 
+from copy import deepcopy
+
 import sys
 
 
@@ -62,7 +64,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, keep_private_fields=True, flatten=0, sort=None, sort_dir=DESCENDING, count=False, **kwargs):
+    def search(self, query, keep_private_fields=True, flatten=0, count=False, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -75,9 +77,9 @@ class MADMaxCollection(object):
                 tags: A list of tags to filter contexts
                 object_tags: A list of tags to filter context activities
                 twitter_enabled: Boolean for returning objects Twitter attributes
-                sort_order: whether to sort by activities or comments published date
         """
 
+        search_query = deepcopy(query)
         #Extract known params from kwargs
         limit = kwargs.get('limit', None)
         after = kwargs.get('after', None)
@@ -90,52 +92,56 @@ class MADMaxCollection(object):
         tags = kwargs.get('tags', None)
         context_tags = kwargs.get('context_tags', None)
         twitter_enabled = kwargs.get('twitter_enabled', None)
-        sort_order = kwargs.get('sort_order', None)
-        offset_override = kwargs.get('offset', None)
+        sort_params = kwargs.get('sort_params', None)
         date_filter = kwargs.get('date_filter', None)
         show_fields = kwargs.get('show_fields', None)
+        offset_field = kwargs.get('offset_field', None)
+
+        sort_by_field = kwargs.get('sort_by_field', None)
+        if sort_by_field:
+            sort_direction = kwargs.get('sort_direction', DESCENDING)
+            sort_params = [(sort_by_field, sort_direction)]
+
+        # After & before contains the ObjectId of the offset that
+        # we must use to skip results when paging results.
+        # Depending on which of the two params is used, we'll determine
+        # the direction of the filtering and store the actual offset
+        # in its definitive variable query offset.
 
         if after or before:
             condition = after and '$gt' or '$lt'
             offset = after and after or before
         else:
+            # conflicting offset definition will get no offset
             offset = None
 
-        if sort_order == 'likes':
-            query.update({'likesCount': {'$gt': 0}})
-
+        # If we have an offset defined, insert the filtering condition
+        # on the search query.
         if offset:
-            sortBy_field = {
-                'activities': '_id',
-                'comments': 'lastComment',
-                'likes': 'likesCount',
-                'flagged': 'flagged'
-            }
-            # Filter the query to return objects created later or earlier than the one
-            # represented by offset (offset not included). Take the overridden offse if provided
-            query_offset = offset_override if offset_override is not None else offset
-            query.update({sortBy_field[sort_order]: {condition: query_offset}})
+            default_offset_field = sort_params[0][0] if sort_params else '_id'
+            offset_field = offset_field if offset_field else default_offset_field
+            search_query.update({offset_field: {condition: offset}})
 
         if hashtag:
             # Filter the query to only objects containing certain hashtags
             # Filter the query to only objects containing certain hashtags
             hashtag_query = {'object._hashtags': {'$all': hashtag}}
-            query.update(hashtag_query)
+            search_query.update(hashtag_query)
 
         if actor:
             # Filter the query to only objects containing certain hashtags
             username_query = {'actor.username': actor}
-            query.update(username_query)
+            search_query.update(username_query)
 
         if favorites:
             # filter the query to only objectes favorited by the requesting actor
             favorites_query = {'favorites.username': favorites}
-            query.update(favorites_query)
+            search_query.update(favorites_query)
 
         if keywords:
             # Filter the query to only objects containing certain keywords
             keywords_query = {'_keywords': {'$all': keywords}}
-            query.update(keywords_query)
+            search_query.update(keywords_query)
 
         if username:
             # Filter the query to only objects containing certain hashtags
@@ -145,17 +151,17 @@ class MADMaxCollection(object):
                     {"displayName": {"$regex": username, "$options": "i", }}
                 ]
             }
-            query.update(username_query)
+            search_query.update(username_query)
 
         if tags:
             # Filter the query to only objects containing certain tags
             tags_query = {'tags': {'$all': tags}}
-            query.update(tags_query)
+            search_query.update(tags_query)
 
         if context_tags:
             # Filter the query to only objects containing certain tags
             object_tags_query = {'contexts.tags': {'$all': context_tags}}
-            query.update(object_tags_query)
+            search_query.update(object_tags_query)
 
         if twitter_enabled:
             # Filter the query to only objects (contexts) containing a certain
@@ -166,23 +172,23 @@ class MADMaxCollection(object):
                     {"twitterHashtag": {"$exists": True}},
                 ]
             }
-            query.update(twe_query)
+            search_query.update(twe_query)
 
         if date_filter:
             # Filter the query to objects matching a specific published date range
-            query.update({'published': date_filter})
+            search_query.update({'published': date_filter})
 
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)
-        cursor = self.collection.find(query, self.show_fields)
+        cursor = self.collection.find(search_query, self.show_fields)
 
         # If it's a count search, return the cursor's count before sorting and limiting
         if count:
             return cursor.count()
 
         # Sort and limit the results if specified
-        if sort:
-            cursor = cursor.sort(sort, sort_dir)
+        if sort_params:
+            cursor = cursor.sort(sort_params)
         if limit:
             cursor = cursor.limit(limit + 1)
 
