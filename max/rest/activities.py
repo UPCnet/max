@@ -136,7 +136,7 @@ def getActivities(context, request):
     if contexts_query:
         query.update({'$or': contexts_query})
 
-        activities = sorted_query(request, mmdb.activity, query)
+        activities = sorted_query(request, mmdb.activity, query, flatten=1)
 
     else:
         # we have no public contexts and we are not subscribed to any context, so we

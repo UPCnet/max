@@ -64,7 +64,7 @@ class MADMaxCollection(object):
         else:
             self.show_fields = None
 
-    def search(self, query, keep_private_fields=True, flatten=0, count=False, **kwargs):
+    def search(self, query, keep_private_fields=True, count=False, **kwargs):
         """
             Performs a search on the mongoDB
             Kwargs may contain:
@@ -80,8 +80,10 @@ class MADMaxCollection(object):
         """
 
         search_query = deepcopy(query)
-        #Extract known params from kwargs
+
+        # Extract known params from kwargs
         limit = kwargs.get('limit', None)
+        flatten = kwargs.get('flatten', 0)
         after = kwargs.get('after', None)
         before = kwargs.get('before', None)
         hashtag = kwargs.get('hashtag', None)

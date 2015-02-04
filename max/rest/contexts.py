@@ -74,19 +74,18 @@ def getContextAuthors(context, request):
     before = None
     queries = 0
 
-    search_params = searchParams(request)
     while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
         if not activities:
-            if before is not None:
-                search_params['before'] = before
-            activities = sorted_query(request, mmdb.activity, query)
+            extra = {'before': before} if before else {}
+            activities = sorted_query(request, mmdb.activity, query, **extra)
+            queries += 1
             still_has_activities = len(activities) > 0
         if still_has_activities:
             activity = activities.pop(0)
-            before = activity['id']
-            if activity['actor']['username'] not in distinct_usernames:
-                distinct_authors.append(activity['actor'])
-                distinct_usernames.append(activity['actor']['username'])
+            before = activity._id
+            if activity.actor['username'] not in distinct_usernames:
+                distinct_authors.append(activity.actor)
+                distinct_usernames.append(activity.actor['username'])
     handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()
 

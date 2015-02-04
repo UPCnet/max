@@ -31,7 +31,7 @@ SORT_STRATEGIES = {
 }
 
 
-def sorted_query(request, collection, query):
+def sorted_query(request, collection, query, **kwargs):
     """
         Main sort method that determines which method of sorting to use
         based on sort parameters found in the request.
@@ -39,6 +39,7 @@ def sorted_query(request, collection, query):
         Falls back to sensible defaults if no sorting defined
     """
     search_params = searchParams(request)
+    search_params.update(kwargs)
     is_head = request.method == 'HEAD'
     strategy = search_params.pop('sort_strategy', 'published')
     priority = search_params.pop('sort_priority', 'activity')
@@ -49,9 +50,11 @@ def sorted_query(request, collection, query):
         activities = simple_sort(collection, query, search_params, is_head)
 
     elif strategy == 'likes':
+        search_params['flatten'] = 1
         activities = get_activities_sorted_by_like_count(collection, query, search_params, is_head)
 
     elif strategy == 'flagged':
+        search_params['flatten'] = 1
         activities = get_activities_sorted_by_flagged_first(collection, query, search_params, is_head)
 
     return activities
@@ -61,7 +64,6 @@ def simple_sort(collection, query, search_params, is_head):
     return collection.search(
         query,
         count=is_head,
-        flatten=1,
         keep_private_fields=False,
         **search_params)
 
@@ -127,7 +129,6 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
                 query,
                 count=is_head,
                 offset_field='lastLike',
-                flatten=1,
                 keep_private_fields=False,
                 **same_likesCount_search_params)
 
@@ -165,7 +166,6 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
             query,
             count=is_head,
             offset_field='lastLike',
-            flatten=1,
             keep_private_fields=False,
             **search_params)
 
@@ -189,7 +189,6 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
         non_liked_activities = collection.search(
             query,
             count=is_head,
-            flatten=1,
             keep_private_fields=False,
             **search_params)
         needed = search_params['limit'] - len(activities)
@@ -224,7 +223,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
             do_search_flagged = False
 
     if do_search_flagged:
-        activities = collection.activity.search(query, count=is_head, sort='flagged', flatten=1, keep_private_fields=False, **search_params)
+        activities = collection.activity.search(query, count=is_head, sort='flagged', keep_private_fields=False, **search_params)
 
     # Use case 1:
     # - We requested <limit> flagged activities, and we got zero or less than <limit
@@ -241,7 +240,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
         if not do_search_flagged:
             search_params['before'] = last._id
 
-        non_flagged_activities = collection.activity.search(query, count=is_head, sort='_id', flatten=1, keep_private_fields=False, **search_params)
+        non_flagged_activities = collection.activity.search(query, count=is_head, sort='_id', keep_private_fields=False, **search_params)
         needed = search_params['limit'] - len(activities)
         activities += non_flagged_activities[:needed]
 
