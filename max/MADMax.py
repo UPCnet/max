@@ -141,8 +141,12 @@ class MADMaxCollection(object):
             search_query.update(favorites_query)
 
         if keywords:
+            keyword_field = '_keywords'
+            # XXX Temporary fix to filter by comment keywords
+            if search_query.get('verb') == 'comment':
+                keyword_field = 'object._keywords'
             # Filter the query to only objects containing certain keywords
-            keywords_query = {'_keywords': {'$all': keywords}}
+            keywords_query = {keyword_field: {'$all': keywords}}
             search_query.update(keywords_query)
 
         if username:
