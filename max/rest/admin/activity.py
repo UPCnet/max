@@ -151,6 +151,21 @@ def getActivities(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='context_activities', request_method='GET', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=False)
+def getContextActivities(context, request):
+    """
+    """
+    chash = request.matchdict.get('hash', None)
+    mmdb = MADMaxDB(context.db)
+    is_head = request.method == 'HEAD'
+    activities = mmdb.activity.search({'verb': 'post', 'contexts.hash': chash}, flatten=1, count=is_head, **searchParams(request))
+    handler = JSONResourceRoot(activities, stats=is_head)
+    return handler.buildResponse()
+
+
 @view_config(route_name='activity', request_method='DELETE', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])

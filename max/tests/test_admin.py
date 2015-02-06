@@ -183,7 +183,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         fake_id = '519200000000000000000000'
         self.testapp.delete('/activities/%s' % (fake_id), '', oauth2Header(test_manager), status=404)
 
-    def test_admin_activities_search_by_context(self):
+    def test_admin_get_people_activities_by_context(self):
         """
         """
         from .mockers import user_status
@@ -199,6 +199,38 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username, user_status)
 
         res = self.testapp.get('/people/%s/activities' % username, context_query, oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 1)
+
+    def test_admin_get_all_activities_by_context(self):
+        """
+        """
+        from .mockers import user_status
+        from .mockers import subscribe_context, subscribe_contextA
+        from .mockers import create_context, create_contextA
+        from .mockers import user_status_context, user_status_contextA
+
+        from hashlib import sha1
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+        url_hashA = sha1(create_contextA['url']).hexdigest()
+
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_contextA)
+        self.create_activity(username, user_status)
+
+        res = self.testapp.get('/contexts/%s/activities' % url_hash, {}, oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 1)
+
+        res = self.testapp.get('/contexts/%s/activities' % url_hashA, {}, oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
 
