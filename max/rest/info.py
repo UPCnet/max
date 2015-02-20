@@ -19,7 +19,8 @@ def getMaxPublicInfo(context, request):
     """
     allowed_settings = [
         'max.oauth_server',
-        'max.stomp_server'
+        'max.stomp_server',
+        'max.server_id'
     ]
 
     max_settings = request.registry.settings
