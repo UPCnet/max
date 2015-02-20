@@ -1,11 +1,14 @@
 CHANGELOG
 =========
 
-4.0.22 (unreleased)
+4.0.22 (2015-02-20)
 -------------------
 
-- Nothing changed yet.
-
+* Include server id on basic info [Carles Bruguera]
+* Fix for comment keyword search [Carles Bruguera]
+* Add admin method to get all context's activities [Carles Bruguera]
+* Finish sorting refactoring [Carles Bruguera]
+* Sorting refactor WIP [Carles Bruguera]
 
 4.0.21 (2015-01-20)
 -------------------
