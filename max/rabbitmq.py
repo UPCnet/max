@@ -143,7 +143,7 @@ class RabbitNotifications(object):
             "action": "add",
             "object": "activity",
             "data": {
-                'text': activity['object']['content']
+                'text': activity['object'].get('content', '')
             }
         })
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])

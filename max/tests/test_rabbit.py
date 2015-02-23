@@ -13,7 +13,7 @@ import new
 import os
 import sys
 import unittest
-
+from time import sleep
 
 skipRabbitTest = partial(
     unittest.skipUnless,
@@ -183,10 +183,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_create_conversation_check_notification(self):
         cid, creator = self.run_test('test_conversations', 'test_post_message_to_conversation_check_conversation')
 
-        messages_to_push_queue = self.server.get_all('push')
-        carrot_message, haigha_message = messages_to_push_queue[0]
+        sleep(0.1)
 
+        messages_to_push_queue = self.server.get_all('push')
         self.assertEqual(len(messages_to_push_queue), 1)
+
+        carrot_message, haigha_message = messages_to_push_queue[0]
         self.assertEqual(haigha_message.delivery_info['routing_key'], '{}.notifications'.format(cid))
         self.assertEqual(carrot_message['a'], 'a')
         self.assertEqual(carrot_message['o'], 'c')
@@ -295,6 +297,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_post_message_check_notification(self):
         cid, creator, activity = self.run_test('test_contexts_notifications', 'test_post_activity_on_context_with_notifications')
 
+        sleep(0.1)
+
         messages_to_push_queue = self.server.get_all('push')
         carrot_message, haigha_message = messages_to_push_queue[0]
 
@@ -304,7 +308,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(carrot_message['o'], 'a')
         self.assertEqual(carrot_message['u']['u'], creator)
         self.assertEqual(carrot_message['u']['d'], creator)
-        self.assertEqual(carrot_message['d']['text'], activity['object']['content'])
+        self.assertEqual(carrot_message['d']['text'].encode('utf-8'), activity['object']['content'])
 
     @skipRabbitTest()
     def test_post_message_check_no_notification(self):
@@ -317,6 +321,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_post_comment_check_notification(self):
         cid, creator, activity, comment = self.run_test('test_contexts_notifications', 'test_post_comment_with_comments_notification')
 
+        sleep(0.1)
+
         messages_to_push_queue = self.server.get_all('push')
         self.assertEqual(len(messages_to_push_queue), 2)
 
@@ -327,7 +333,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(carrot_message['o'], 'a')
         self.assertEqual(carrot_message['u']['u'], creator)
         self.assertEqual(carrot_message['u']['d'], creator)
-        self.assertEqual(carrot_message['d']['text'], activity['object']['content'])
+        self.assertEqual(carrot_message['d']['text'].encode('utf-8'), activity['object']['content'])
 
         carrot_message, haigha_message = messages_to_push_queue[1]
 
@@ -336,4 +342,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(carrot_message['o'], 'a')
         self.assertEqual(carrot_message['u']['u'], creator)
         self.assertEqual(carrot_message['u']['d'], creator)
-        self.assertEqual(carrot_message['d']['text'], comment['object']['content'])
+        self.assertEqual(carrot_message['d']['text'].encode('utf-8'), comment['object']['content'])
