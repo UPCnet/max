@@ -132,6 +132,14 @@ class MaxTestBase(object):
         res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=expect)
         return res
 
+    def flag_activity(self, username, activity_id, expect=201):
+        res = self.testapp.post('/activities/%s/flag' % activity_id, '', oauth2Header(username), status=expect)
+        return res
+
+    def unflag_activity(self, username, activity_id, expect=204):
+        res = self.testapp.delete('/activities/%s/flag' % activity_id, '', oauth2Header(username), status=expect)
+        return res
+
     def favorite_activity(self, username, activity_id, expect=201):
         res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username), status=expect)
         return res

@@ -208,19 +208,24 @@ def flagActivity(context, request):
     except:
         raise ObjectNotFound("There's no activity with id: %s" % activityid)
 
+    status_code = 200
     # Check if the activity is flaggable by the actor
     if found_activity.get('contexts', []):
         ctxt = found_activity.contexts[0]
         subscription = request.actor.getSubscription(ctxt)
         if 'flag' not in subscription['permissions']:
             raise Unauthorized("You are not allowed to flag this activity.")
+
+        # Flag only if not already flagged
+        if found_activity.get('flagged', None) is None:
+            found_activity.flag()
+            found_activity.save()
+            status_code = 201
+
     else:
         raise Forbidden("Only context activities can be flagged.")
 
-    found_activity.flag()
-    found_activity.save()
-
-    handler = JSONResourceEntity(found_activity.flatten())
+    handler = JSONResourceEntity(found_activity.flatten(), status_code=status_code)
     return handler.buildResponse()
 
 
@@ -251,8 +256,7 @@ def unflagActivity(context, request):
     found_activity.unflag()
     found_activity.save()
 
-    handler = JSONResourceEntity(found_activity.flatten())
-    return handler.buildResponse()
+    return HTTPNoContent()
 
 
 @view_config(route_name='activity', request_method='PUT')

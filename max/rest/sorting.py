@@ -200,7 +200,6 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
 def get_activities_sorted_by_flagged_first(collection, query, search_params, is_head):
     """
     """
-
     # This var controls whether if we have to look for flagged
     # items. We alway look for them on first page, not aloways on 2+ pages
     do_search_flagged = True
@@ -223,7 +222,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
             do_search_flagged = False
 
     if do_search_flagged:
-        activities = collection.activity.search(query, count=is_head, sort='flagged', keep_private_fields=False, **search_params)
+        activities = collection.search(query, count=is_head, keep_private_fields=False, **search_params)
 
     # Use case 1:
     # - We requested <limit> flagged activities, and we got zero or less than <limit
@@ -234,15 +233,18 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
     if len(activities) < search_params['limit']:
         # Search non-flagged activities to fullfill <limit> requirement
         query.pop('flagged', None)
-        query['flagged'] = {'$eq': None}
+        query['flagged'] = {'$exists': 0}
         # (Use case 2) Filter by the last displayed
-        search_params['sort_order'] = 'activities'
         if not do_search_flagged:
             search_params['before'] = last._id
 
-        non_flagged_activities = collection.activity.search(query, count=is_head, sort='_id', keep_private_fields=False, **search_params)
+        search_params['sort_params'] = SORT_STRATEGIES['published']['activity']
+        non_flagged_activities = collection.search(
+            query,
+            count=is_head,
+            keep_private_fields=False,
+            **search_params)
         needed = search_params['limit'] - len(activities)
         activities += non_flagged_activities[:needed]
 
     return activities
-
