@@ -63,7 +63,7 @@ def addAdminUserActivity(context, request):
     mmdb = MADMaxDB(context.db)
     query = {
         'actor.username': request.actor.username,
-        'object.content': newactivity['object']['content'],
+        'object.content': newactivity['object'].get('content', ''),
         'published': {'$gt': newactivity.published - timedelta(minutes=1)}
     }
 
