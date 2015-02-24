@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.25 (unreleased)
+4.0.25 (2015-02-24)
 -------------------
 
-- Nothing changed yet.
-
+* Rerelease to fix bad release
 
 4.0.24 (2015-02-24)
 -------------------
