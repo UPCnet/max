@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-4.0.24 (unreleased)
+4.0.24 (2015-02-24)
 -------------------
 
-- Nothing changed yet.
-
+* Fix crash on admin posting images without text [Carles Bruguera]
 
 4.0.23 (2015-02-24)
 -------------------
