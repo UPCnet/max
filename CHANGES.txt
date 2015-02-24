@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-4.0.23 (unreleased)
+4.0.23 (2015-02-24)
 -------------------
 
-- Nothing changed yet.
-
+* Fix failing tests [Carles Bruguera]
+* Don't assume we'll have a content [Carles Bruguera]
+* make sure format_raw_request don't crash [Carles Bruguera]
 
 4.0.22 (2015-02-20)
 -------------------
