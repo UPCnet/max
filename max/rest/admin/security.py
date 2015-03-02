@@ -7,6 +7,7 @@ from max.exceptions import ValidationError
 from max.oauth2 import oauth2
 from max.resources import loadMAXSecurity
 from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest.ResourceHandlers import JSONResourceEntity
 
 from pyramid.view import view_config
 
@@ -56,6 +57,32 @@ def getSecurityUsers(context, request):
     user_roles = [{'username': username, 'roles': [{'name': role, 'active': user_roles.get(role, False)} for role in ALLOWED_ROLES]} for username, user_roles in users.items()]
 
     handler = JSONResourceRoot(user_roles)
+    return handler.buildResponse()
+
+
+@view_config(route_name='admin_security_role_user', request_method='GET', restricted="Manager")
+@MaxResponse
+@oauth2(['widgetcli'])
+def check_user_role(context, request):
+    """
+    """
+
+    role = request.matchdict['role']
+    user = request.matchdict['user']
+
+    mmdb = MADMaxDB(context.db)
+    query = {}
+    security = mmdb.security.search(query)[0]
+    security.setdefault('roles', {})
+    security['roles'].setdefault(role, [])
+
+    if role not in ALLOWED_ROLES:
+        raise ValidationError('Role "{}" is not a valid role'.format(role))
+
+    if user not in security['roles'][role]:
+        raise ObjectNotFound("User {} doesn't have role {}".format(user, role))
+
+    handler = JSONResourceEntity({'roles': [role]})
     return handler.buildResponse()
 
 
@@ -119,5 +146,5 @@ def remove_user_from_role(context, request):
         security['roles'][role].remove(user)
     security.save()
     request.registry.max_security = loadMAXSecurity(request.registry)
-    handler = JSONResourceRoot(security.flatten()['roles'][role], status_code=200)
+    handler = JSONResourceRoot(security.flatten()['roles'][role], status_code=204)
     return handler.buildResponse()
