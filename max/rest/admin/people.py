@@ -62,6 +62,7 @@ def ModifyUser(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='users', request_method='POST', restricted='Manager')
 @view_config(route_name='user', request_method='POST', restricted='Manager')
 @MaxResponse
 @oauth2(['widgetcli'])
