@@ -11,6 +11,7 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.rest.utils import extractPostData
 
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.httpexceptions import HTTPNotImplemented
@@ -68,6 +69,7 @@ def getUser(context, request):
     return handler.buildResponse()
 
 
+@view_config(route_name='users', request_method='POST')
 @view_config(route_name='user', request_method='POST')
 @MaxResponse
 @oauth2(['widgetcli'])
@@ -78,8 +80,14 @@ def addOwnUser(context, request):
 
         Creates a the own system user.
     """
-    username = request.matchdict['username'].lower()
-    rest_params = {'username': username}
+    username = request.matchdict.get('username', None)
+    if username is None:
+        params = extractPostData(request)
+        username = params.get('username', None)
+        if username is None:
+            raise ValidationError('Missing username in request')
+
+    rest_params = {'username': username.lower()}
 
     # Initialize a User object from the request
     newuser = User()

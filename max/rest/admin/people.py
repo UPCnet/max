@@ -10,6 +10,7 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
+from max.rest.utils import extractPostData
 
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.settings import asbool
@@ -73,8 +74,14 @@ def addUser(context, request):
 
         [RESTRICTED] Creates a system user.
     """
-    username = request.matchdict['username'].lower()
-    rest_params = {'username': username}
+    username = request.matchdict.get('username', None)
+    if username is None:
+        params = extractPostData(request)
+        username = params.get('username', None)
+        if username is None:
+            raise ValidationError('Missing username in request')
+
+    rest_params = {'username': username.lower()}
 
     # Initialize a User object from the request
     newuser = User()
