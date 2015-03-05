@@ -10,6 +10,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.ResourceHandlers import JSONResourceEntity
 
 from pyramid.view import view_config
+from pyramid.httpexceptions import HTTPNoContent
 
 
 @view_config(route_name='admin_security', request_method='GET', restricted="Manager")
@@ -146,5 +147,4 @@ def remove_user_from_role(context, request):
         security['roles'][role].remove(user)
     security.save()
     request.registry.max_security = loadMAXSecurity(request.registry)
-    handler = JSONResourceRoot(security.flatten()['roles'][role], status_code=204)
-    return handler.buildResponse()
+    return HTTPNoContent()
