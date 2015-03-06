@@ -155,6 +155,23 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         permissions = ['read', 'write', 'unsubscribe']
         self.assertEqual(resp.json.get("permissions", None), permissions)
 
+    def test_last_message_in_user_info(self):
+        from .mockers import message, message2, message3
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message3), oauth2Header(sender), status=201)
+
+        resp = self.testapp.get('/people/{}'.format(sender), '', oauth2Header(sender), status=200)
+
+        self.assertEqual(resp.json['talkingIn'][0]['lastMessage']['content'], message3['object']['content'])
+
     def test_post_messages_to_an_already_existing_two_people_conversation_check_not_duplicated_conversation(self):
         from .mockers import message, message2
         sender = 'messi'

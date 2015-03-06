@@ -94,7 +94,7 @@ class MADMaxCollection(object):
         tags = kwargs.get('tags', None)
         context_tags = kwargs.get('context_tags', None)
         twitter_enabled = kwargs.get('twitter_enabled', None)
-        sort_params = kwargs.get('sort_params', None)
+        sort_params = kwargs.get('sort_params', [('_id', DESCENDING)])
         date_filter = kwargs.get('date_filter', None)
         show_fields = kwargs.get('show_fields', None)
         offset_field = kwargs.get('offset_field', None)
