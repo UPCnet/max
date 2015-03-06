@@ -111,8 +111,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
-        res = self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=200)
-        self.assertListEqual(['test_manager'], res.json)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=204)
 
     def test_security_remove_user_from_role_user_not_in_role(self):
         username = 'messi'
@@ -131,7 +130,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(test_manager2)
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=201)
         self.testapp.get('/activities', "", oauth2Header(test_manager2), status=200)
-        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=200)
+        self.testapp.delete('/admin/security/roles/%s/users/%s' % ('Manager', test_manager2), "", oauth2Header(test_manager), status=204)
         self.testapp.get('/activities', "", oauth2Header(test_manager2), status=404)
 
     def test_get_other_activities(self):
