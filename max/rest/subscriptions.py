@@ -26,11 +26,27 @@ def getUserSubscriptions(context, request):
 
         List all subscriptions for the the suplied oauth user.
     """
+
+    search_params = searchParams(request)
+
+    # XXX Remove when refactoring subscriptions storage to a different collection
+    tags = set(search_params.pop('tags', []))
+
     mmdb = MADMaxDB(context.db)
     query = {'username': request.actor['username']}
-    users = mmdb.users.search(query, preserve=["username", "subscribedTo"], flatten=1, **searchParams(request))
+    users = mmdb.users.search(query, preserve=["username", "subscribedTo"], flatten=1, **search_params)
 
-    handler = JSONResourceRoot(users[0]['subscribedTo'])
+    subscriptions = users[0]['subscribedTo'] if users else []
+
+    # XXX Remove when refactoring subscriptions storage to a different collection
+    if tags:
+        filtered_subscriptions = []
+        for subscription in subscriptions:
+            if tags.intersection(set(subscription.get('tags', []))) == tags:
+                filtered_subscriptions.append(subscription)
+        subscriptions = filtered_subscriptions
+
+    handler = JSONResourceRoot(subscriptions)
     return handler.buildResponse()
 
 

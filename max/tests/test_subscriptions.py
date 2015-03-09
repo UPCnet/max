@@ -100,6 +100,23 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('url'), 'http://atenea.upc.edu/A')
         self.assertEqual(result[1].get('url'), 'http://atenea.upc.edu/B')
 
+    def test_get_all_subscribed_contexts_tagged_for_user(self):
+        """ doctest .. http:get:: /people/{username}/subscriptions """
+        from .mockers import subscribe_contextA, create_contextA
+        from .mockers import subscribe_contextB, create_contextB
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_contextA, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.create_context(create_contextB, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username, subscribe_contextB)
+
+        res = self.testapp.get('/people/%s/subscriptions' % username, {"tags": ['Assignatura']}, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0].get('url'), 'http://atenea.upc.edu/A')
+
     def test_get_subscriptions_from_another_user(self):
         """
             Given a plain user
