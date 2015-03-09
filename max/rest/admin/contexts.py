@@ -151,13 +151,13 @@ def grantPermissionOnContext(context, request):
     if not subscription:
         raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
 
-    #If we reach here, we are subscribed to a context and ready to set the permission
+    # If we reach here, we are subscribed to a context and ready to set the permission
 
     if permission in subscription.get('_grants', []):
-        #Already have the permission grant
+        # Already have the permission grant
         code = 200
     else:
-        #Assign the permission
+        # Assign the permission
         code = 201
         subscription = request.actor.grantPermission(subscription, permission)
 
@@ -183,7 +183,7 @@ def resetPermissionsOnContext(context, request):
     if not subscription:
         raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
 
-    #If we reach here, we are subscribed to a context and ready to reset the permissions
+    # If we reach here, we are subscribed to a context and ready to reset the permissions
 
     contexts = MADMaxCollection(context.db.contexts)
     maxcontext = contexts.getItemsByhash(chash)[0]
@@ -214,14 +214,14 @@ def revokePermissionOnContext(context, request):
     if not subscription:
         raise Unauthorized("You can't remove permissions on a context where you are not subscribed")
 
-    #If we reach here, we are subscribed to a context and ready to remove the permission
+    # If we reach here, we are subscribed to a context and ready to remove the permission
 
     code = 200
     if permission in subscription.get('_vetos', []):
         code = 200
         # Alredy vetted
     else:
-        #We have the permission, let's delete it
+        # We have the permission, let's delete it
         subscription = request.actor.revokePermission(subscription, permission)
         code = 201
     handler = JSONResourceEntity(subscription, status_code=code)
