@@ -156,7 +156,6 @@ def grantPermissionOnContext(context, request):
     if permission in subscription.get('_grants', []):
         #Already have the permission grant
         code = 200
-        open('/tmp/debug', 'w').write(str(subscription))
     else:
         #Assign the permission
         code = 201
@@ -225,7 +224,6 @@ def revokePermissionOnContext(context, request):
         #We have the permission, let's delete it
         subscription = request.actor.revokePermission(subscription, permission)
         code = 201
-        open('/tmp/debug', 'w').write(str(subscription))
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
 
