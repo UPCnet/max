@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADMax import MADMaxCollection
 from max.MADMax import MADMaxDB
 from max.decorators import MaxResponse
@@ -162,7 +163,7 @@ def grantPermissionOnContext(context, request):
         subscription = request.actor.grantPermission(
             subscription,
             permission,
-            permanent=request.params.get('permanent', False))
+            permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
 
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()
@@ -201,7 +202,7 @@ def revokePermissionOnContext(context, request):
         subscription = request.actor.revokePermission(
             subscription,
             permission,
-            permanent=request.params.get('permanent', False))
+            permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
         code = 201
     handler = JSONResourceEntity(subscription, status_code=code)
     return handler.buildResponse()

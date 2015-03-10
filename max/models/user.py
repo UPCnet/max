@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.rabbitmq import RabbitNotifications
@@ -158,7 +159,7 @@ class User(MADBase):
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
                 self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
 
-    def grantPermission(self, subscription, permission, permanent=False):
+    def grantPermission(self, subscription, permission, permanent=DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY):
         """
         Grant a permission on a context's user subscription.
 
@@ -218,7 +219,7 @@ class User(MADBase):
 
         return subscription
 
-    def revokePermission(self, subscription, permission, permanent=False):
+    def revokePermission(self, subscription, permission, permanent=DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY):
         """
         Revoke a permission on a context's user subscription.
 
