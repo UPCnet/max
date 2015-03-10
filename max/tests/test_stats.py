@@ -32,6 +32,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     # BEGIN TESTS
 
+    def test_head_without_permissions(self):
+        """
+            Given a user that is not Manager
+            And a GET endpoint protected with Manager role
+            When i try to call that endpoint with HEAD method
+            Then i can access the results count
+            And the same endpoint with GET is undefined
+        """
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+
+        for i in range(11):
+            self.create_activity(username, user_status)
+        res = self.testapp.get('/activities', '', oauth2Header(username), status=404)
+        res = self.testapp.head('/activities', oauth2Header(username), status=200)
+        self.assertEqual(res.headers.get('X-totalItems'), '11')
+
     def test_user_activities_stats(self):
         from .mockers import user_status
         username = 'messi'

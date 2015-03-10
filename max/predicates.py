@@ -22,5 +22,5 @@ class RestrictedPredicate(object):
         security = self.registry.max_security
         user_has_roles = [username in security.get("roles").get(role) for role in allowed_roles]
         user_is_allowed = reduce(operator.and_, user_has_roles, True)
-
-        return user_is_allowed
+        method_is_head = request.method.upper() == 'HEAD'
+        return user_is_allowed or method_is_head
