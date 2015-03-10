@@ -180,7 +180,7 @@ def postMessage2Conversation(context, request):
     # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
     # Will not be able to grow
     if len(current_conversation.participants) > 2:
-        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'subscribe')
+        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'subscribe', permanent=True)
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
@@ -444,9 +444,9 @@ def trasnferConversationOwnership(context, request):
     found_context.save()
 
     # Give hability to add new users to the new owner
-    request.actor.grantPermission(subscription, 'subscribe')
+    request.actor.grantPermission(subscription, 'subscribe', permanent=True)
 
-    # Revoke hability to add new users from the previpus owner
+    # Revoke hability to add new users from the previous owner
     users = MADMaxCollection(context.db.users, query_key='username')
     previous_owner = users[previous_owner_username]
     previous_owner.revokePermission(subscription, 'subscribe')

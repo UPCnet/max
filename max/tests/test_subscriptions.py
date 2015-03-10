@@ -329,8 +329,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
         permission = 'write'
-        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
-
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
         data = json.dumps({"permissions": {'write': 'restricted'}})
         res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['permissions']['read'], 'subscribed')
@@ -377,7 +376,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
 
         permission = 'write'
-        res = self.testapp.delete('/contexts/%s/permissions/%s/%s' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
+        res = self.testapp.delete('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
 
         data = json.dumps({"permissions": {'write': 'subscribed'}})
         res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)

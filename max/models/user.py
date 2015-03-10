@@ -158,10 +158,12 @@ class User(MADBase):
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
                 self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
 
-    def grantPermission(self, subscription, permission):
+    def grantPermission(self, subscription, permission, permanent=False):
         """
-        Grant a permission persistently, so a change in the context permissions defaults doesn't
-        leave the user without the permission
+        Grant a permission on a context's user subscription.
+
+        Grants will persist over context default permission changes based on permanent parameter.
+        Non permament permission grant, will remove vetos!
         """
         criteria = {}
 
@@ -172,12 +174,14 @@ class User(MADBase):
         if permission not in new_permissions:
             new_permissions.append(permission)
 
-        # Add permission to grants if not present
-        subscription.setdefault('_grants', [])
-        if permission not in subscription['_grants']:
-            subscription['_grants'].append(permission)
+        # Persist permissions across changes on context
+        if permanent:
+            # Add permission to grants if not present
+            subscription.setdefault('_grants', [])
+            if permission not in subscription['_grants']:
+                subscription['_grants'].append(permission)
 
-        # Remove permission from vetos if present
+        # Remove permission from vetos if present, always
         subscription.setdefault('_vetos', [])
         subscription['_vetos'] = [vetted for vetted in subscription['_vetos'] if vetted != permission]
 
@@ -200,8 +204,8 @@ class User(MADBase):
         what = {
             '$set': {
                 '{}.$.permissions'.format(context_storage_field): new_permissions,
-                '{}.$._grants'.format(context_storage_field): subscription['_grants'],
-                '{}.$._vetos'.format(context_storage_field): subscription['_vetos'],
+                '{}.$._grants'.format(context_storage_field): subscription.get('_grants', []),
+                '{}.$._vetos'.format(context_storage_field): subscription.get('_vetos', [])
             }
         }
 
@@ -214,10 +218,13 @@ class User(MADBase):
 
         return subscription
 
-    def revokePermission(self, subscription, permission):
+    def revokePermission(self, subscription, permission, permanent=False):
         """
-        Revoke a permission persistently, so a change in the context permissions defaults doesn't
-        grant the permission automatically
+        Revoke a permission on a context's user subscription.
+
+        Revokes will persist over context default permission changes based on permanent parameter.
+        Non permanent permission revoke will remove grants!
+
         """
         criteria = {}
         new_permissions = []
@@ -225,10 +232,11 @@ class User(MADBase):
         # Add current permissions except revoked one
         new_permissions = [p for p in subscription['permissions'] if permission != p]
 
-        # Add permission to vetos if not present
-        subscription.setdefault('_vetos', [])
-        if permission not in subscription['_vetos']:
-            subscription['_vetos'].append(permission)
+        if permanent:
+            # Add permission to vetos if not present
+            subscription.setdefault('_vetos', [])
+            if permission not in subscription['_vetos']:
+                subscription['_vetos'].append(permission)
 
         # Remove permission from grants if present
         subscription.setdefault('_grants', [])
@@ -254,8 +262,8 @@ class User(MADBase):
         what = {
             '$set': {
                 '{}.$.permissions'.format(context_storage_field): new_permissions,
-                '{}.$._grants'.format(context_storage_field): subscription['_grants'],
-                '{}.$._vetos'.format(context_storage_field): subscription['_vetos'],
+                '{}.$._grants'.format(context_storage_field): subscription.get('_grants', []),
+                '{}.$._vetos'.format(context_storage_field): subscription.get('_vetos', [])
             }
         }
 
