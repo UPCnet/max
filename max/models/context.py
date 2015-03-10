@@ -229,6 +229,13 @@ class BaseContext(MADBase):
         }
         activitydb.remove(which_to_delete, logical=logical)
 
+    def getInfo(self):
+        context = self.flatten()
+        context.setdefault('permissions', {})
+        for permission, value in DEFAULT_CONTEXT_PERMISSIONS.items():
+            context['permissions'][permission] = context['permissions'].get(permission, value)
+        return context
+
     def _after_subscription_add(self, username):
         """
             Executed after a user has been subscribed to this context

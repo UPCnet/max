@@ -67,7 +67,7 @@ def getContext(context, request):
     if not found_context:
         raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
 
-    handler = JSONResourceEntity(found_context[0].flatten())
+    handler = JSONResourceEntity(found_context[0].getInfo())
     return handler.buildResponse()
 
 

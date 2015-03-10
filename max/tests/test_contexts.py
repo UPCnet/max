@@ -158,6 +158,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(result.get('hash', None), url_hash)
 
+    def test_context_informs_all_permissions(self):
+        """ doctest .. http:get:: /contexts/{hash} """
+        from hashlib import sha1
+        from .mockers import create_context
+        from max import DEFAULT_CONTEXT_PERMISSIONS
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.create_context(create_context)
+        res = self.testapp.get('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('hash', None), url_hash)
+        self.assertItemsEqual(result['permissions'].keys(), DEFAULT_CONTEXT_PERMISSIONS.keys())
+
     def test_create_context_that_already_exists(self):
         """ doctest .. http:get:: /contexts/{hash} """
         from hashlib import sha1

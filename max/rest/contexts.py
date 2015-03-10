@@ -35,7 +35,7 @@ def getPublicContexts(context, request):
     mmdb = MADMaxDB(context.db)
     found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
-    handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'pubished']))
+    handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'published']))
     return handler.buildResponse()
 
 
