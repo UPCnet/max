@@ -1,11 +1,25 @@
 CHANGELOG
 =========
 
-4.0.26 (unreleased)
+4.0.26 (2015-03-11)
 -------------------
 
-- Nothing changed yet.
-
+* /context/{hash} now shows all permission, event defaults [Carles Bruguera]
+* Set context permission permanency to True [Carles Bruguera]
+* Allow access to any endpoint authenticated req. via HEAD [Carles Bruguera]
+* Refactor permission grants to be permanent only if requested [Carles Bruguera]
+* Set safe defaults [Carles Bruguera]
+* PEP8 [Carles Bruguera]
+* Fix tags filter on people subscriptions query [Carles Bruguera]
+* PEP8 and remove file log [Carles Bruguera]
+* Return permissions in context subscriptions endpoint [Carles Bruguera]
+* Fix error responses [Carles Bruguera]
+* Fix default sorting [Carles Bruguera]
+* Fix 204 content length errorx [Paco Gregori]
+* Validate existence of username [Carles Bruguera]
+* Add a rest-compliant user adder endpoint [Carles Bruguera]
+* Add endpoint to check user roles [Carles Bruguera]
+* Add HubManager role [Carles Bruguera]
 
 4.0.25 (2015-02-24)
 -------------------
