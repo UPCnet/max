@@ -23,9 +23,7 @@ def checkToken(url, username, token, scope, oauth_standard):
 
 def oauth2(allowed_scopes=[]):
     def wrap(view_function):
-        def new_function(*args, **kw):
-            nkargs = [a for a in args]
-            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
+        def new_function(context, request, *args, **kw):
 
             # Extract the username and token from request headers
             # It will be like:
@@ -61,7 +59,7 @@ def oauth2(allowed_scopes=[]):
                 request.set_property(getCreator, name='creator', reify=True)
                 request.set_property(getRoles, name='roles', reify=True)
 
-                return view_function(*args, **kw)
+                return view_function(context, request, *args, **kw)
             else:
                 raise Unauthorized('Invalid token.')
 

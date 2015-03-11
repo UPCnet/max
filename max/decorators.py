@@ -71,10 +71,7 @@ def requirePersonActor(exists=True, force_own=True):
         force_own: Actor username must match the username provided in auhentication
     """
     def wrap(view_function):
-        def new_function(*args, **kw):
-            nkargs = [a for a in args]
-            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
-
+        def new_function(context, request, *args, **kw):
             # Get user from Oauth headers
             oauth_username = getUsernameFromXOAuth(request)
             username = str(oauth_username)  # To avoid variable reference
@@ -110,7 +107,7 @@ def requirePersonActor(exists=True, force_own=True):
 
             request.set_property(getActor, name='actor', reify=True)
 
-            return view_function(*args, **kw)
+            return view_function(context, request, *args, **kw)
 
         new_function.__doc__ = view_function.__doc__
         new_function.__name__ = view_function.__name__
@@ -132,10 +129,7 @@ def requireContextActor(exists=True):
         exists:    Actor context must match an existing context on DB
     """
     def wrap(view_function):
-        def new_function(*args, **kw):
-            nkargs = [a for a in args]
-            context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
-
+        def new_function(context, request, *args, **kw):
             # check we have a hash in the uri
             contexthash = getUrlHashFromURI(request)
             if not contexthash:
@@ -161,7 +155,7 @@ def requireContextActor(exists=True):
 
             request.set_property(getActor, name='actor', reify=True)
 
-            return view_function(*args, **kw)
+            return view_function(context, request, *args, **kw)
 
         new_function.__doc__ = view_function.__doc__
         new_function.__name__ = view_function.__name__
@@ -329,17 +323,15 @@ def dump_request(request, response):
 
 
 def MaxResponse(fun):
-    def replacement(*args, **kwargs):
+    def replacement(context, request, *args, **kwargs):
         """
             Handle exceptions throwed in the process of executing the REST method and
             issue proper status code with message
         """
-        nkargs = [a for a in args]
-        context, request = isinstance(nkargs[0], Root) and tuple(nkargs) or tuple(nkargs[::-1])
         # response = fun(*args, **kwargs)
         # return response
         try:
-            response = fun(*args, **kwargs)
+            response = fun(context, request, *args, **kwargs)
         except AutoReconnect:
             tryin_to_reconnect = True
             while tryin_to_reconnect:
