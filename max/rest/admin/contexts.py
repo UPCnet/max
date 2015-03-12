@@ -104,7 +104,7 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT', restricted='Manager')
+@view_config(route_name='context', request_method='PUT', permission='Can modify context')
 @MaxResponse
 @requirePersonActor(force_own=False, exists=True)
 @oauth2(['widgetcli'])
@@ -114,19 +114,11 @@ def ModifyContext(context, request):
 
         Modify the given context.
     """
-    chash = request.matchdict['hash']
-    contexts = MADMaxCollection(context.db.contexts)
-    maxcontext = contexts.getItemsByhash(chash)
-    if maxcontext:
-        maxcontext = maxcontext[0]
-    else:
-        raise ObjectNotFound('Unknown context: %s' % chash)
-
-    properties = maxcontext.getMutablePropertiesFromRequest(request)
-    maxcontext.modifyContext(properties)
-    maxcontext.updateUsersSubscriptions()
-    maxcontext.updateContextActivities()
-    handler = JSONResourceEntity(maxcontext.flatten())
+    properties = context.getMutablePropertiesFromRequest(request)
+    context.modifyContext(properties)
+    context.updateUsersSubscriptions()
+    context.updateContextActivities()
+    handler = JSONResourceEntity(context.flatten())
     return handler.buildResponse()
 
 

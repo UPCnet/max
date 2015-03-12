@@ -101,6 +101,9 @@ class MaxTestApp(object):
             if hasattr(res, 'json'):
                 if 'error' in getattr(res, 'json', []):
                     message += '\nRaised {error}: "{error_description}"'.format(**res.json)
+            elif res.status_int != status:
+                print res.body
+
             self.testcase.assertEqual(status, res.status_int, message)
         return res
 
@@ -144,13 +147,15 @@ class MaxTestBase(object):
         res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username), status=expect)
         return res
 
-    def create_context(self, context, permissions=None, expect=201):
+    def create_context(self, context, permissions=None, expect=201, owner=None):
         default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(context)
         if 'permissions' not in new_context:
             new_context['permissions'] = default_permissions
         if permissions:
             new_context['permissions'].update(permissions)
+        if owner is not None:
+            new_context['owner'] = owner
         res = self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=expect)
         return res
 

@@ -10,6 +10,23 @@ import re
 import sys
 
 
+from pyramid.view import forbidden_view_config
+from pyramid.view import notfound_view_config
+
+from max.exceptions import JSONHTTPNotFound, ObjectNotFound, Forbidden, JSONHTTPForbidden
+
+
+@forbidden_view_config()
+def forbidden(request):
+    message = 'User "{}" has no permission "{}" here '.format(request.authenticated_userid, request.exception.result.permission)
+    return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=message))
+
+
+@notfound_view_config()
+def notfound(request):
+    return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description='Object {} not found'.format(request.exception.detail)))
+
+
 @view_config(route_name='info_api', request_method='GET')
 def endpoints_view(request):
     """

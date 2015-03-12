@@ -204,13 +204,14 @@ class MADBase(MADDict):
     mdb_collection = None
     old = {}
     data = {}
+    __parent__ = None
 
     def __init__(self):
         self.old = {}
         self.request = get_current_request()
         # When called from outside a pyramyd app, we have no request
         try:
-            self.db = self.request.context.db
+            self.db = self.request.registry.max_store
             self.mdb_collection = self.db[self.collection]
         except:
             pass

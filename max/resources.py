@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max import maxlogger
-
+from max.MADMax import MADMaxCollection
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from pyramid.security import Everyone
@@ -18,7 +18,7 @@ DUMMY_CLOUD_API_DATA = {
 }
 
 
-class Root(object):
+class Root(dict):
     __parent__ = __name__ = None
     __acl__ = [(Allow, Everyone, 'anonymous'),
                (Allow, Authenticated, 'restricted'),
@@ -31,6 +31,20 @@ class Root(object):
         # MongoDB:
         registry = self.request.registry
         self.db = registry.max_store
+        self['contexts'] = ContextTraverser(request)
+
+
+class ContextTraverser(object):
+    def __init__(self, request):
+        self.request = request
+        self.db = self.request.registry.max_store.contexts
+        self.contexts = MADMaxCollection(self.db, query_key='hash')
+
+    def __getitem__(self, key):
+        try:
+            return self.contexts[key]
+        except:
+            raise KeyError(key)
 
 
 def getMAXSettings(request):

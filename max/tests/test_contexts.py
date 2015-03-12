@@ -192,6 +192,33 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('hash', None), url_hash)
         self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
 
+    def test_modify_context_with_owner(self):
+        """ doctest .. http:put:: /contexts/{hash} """
+        from hashlib import sha1
+        from .mockers import create_context
+
+        mindundi = 'messi'
+        self.create_user(mindundi)
+        self.create_user(test_manager)
+        self.create_context(create_context, owner=mindundi)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('hash', None), url_hash)
+        self.assertEqual(result.get('twitterHashtag', None), 'assignatura1')
+
+    def test_modify_context_forbidden(self):
+        """ doctest .. http:put:: /contexts/{hash} """
+        from hashlib import sha1
+        from .mockers import create_context
+
+        mindundi = 'messi'
+        self.create_user(mindundi)
+        self.create_user(test_manager)
+        self.create_context(create_context)
+        url_hash = sha1(create_context['url']).hexdigest()
+        self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=403)
+
     def test_modify_inexistent_context(self):
         """ doctest .. http:put:: /contexts/{hash} """
 

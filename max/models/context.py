@@ -7,6 +7,8 @@ from max.rest.utils import getUserIdFromTwitter
 
 from hashlib import sha1
 from max import DEFAULT_CONTEXT_PERMISSIONS
+from pyramid.security import Allow
+from max.security import Owner
 
 
 class BaseContext(MADBase):
@@ -37,6 +39,12 @@ class BaseContext(MADBase):
             'edit': ['Owner', 'Manager']
         }
     }
+
+    def getOwner(self, request):
+        if hasattr(self, '_owner'):
+            return self._owner
+
+        return self.data.get('owner', request.creator)
 
     def getIdentifier(self):
         return str(self[self.unique])
@@ -81,13 +89,13 @@ class BaseContext(MADBase):
             fields_to_squash.append('_id')
         subscription = self.flatten(squash=fields_to_squash)
 
-        #If we are subscribing the user, read permission is granted
+        # If we are subscribing the user, read permission is granted
         user_permissions = ['read']
 
         # Add subscription permissions based on defaults and context values
         user_permissions = self.subscription_permissions(base=user_permissions)
 
-        #Assign permissions to the subscription object before adding it
+        # Assign permissions to the subscription object before adding it
         subscription['permissions'] = user_permissions
         return subscription
 
@@ -294,6 +302,12 @@ class Context(BaseContext):
 
     schema['uploadURL'] = {}
 
+    @property
+    def __acl__(self):
+        return [
+            (Allow, Owner, 'Can modify context'),
+        ]
+
     def alreadyExists(self):
         """
             Checks if there's an object with the value specified in the unique field.
@@ -334,7 +348,7 @@ class Context(BaseContext):
 
         self['hash'] = self.getIdentifier()
 
-        #Set displayName only if it's not specified
+        # Set displayName only if it's not specified
         self['displayName'] = self.get('displayName', self.url)
 
     def modifyContext(self, properties):
