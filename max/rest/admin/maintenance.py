@@ -97,8 +97,7 @@ def rebuildSubscriptions(context, request):
             else:
                 subscription.pop('vetos', None)
                 subscription.pop('grants', None)
-                subscription.save()
-
+        user.save()
     handler = JSONResourceRoot([])
     return handler.buildResponse()
 
