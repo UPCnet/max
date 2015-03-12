@@ -379,7 +379,7 @@ def deUnderescore(di, key):
     if key.startswith('_'):
         newkey = key.lstrip('_')
         di[newkey] = di[key]
-        del di[key]
+        di.pop(key, None)
         return newkey
     return key
 
@@ -390,7 +390,7 @@ def clearPrivateFields(di):
     """
     for key in di.keys():
         if key.startswith('_') and key not in ['_id']:
-            del di[key]
+            di.pop(key, None)
 
 
 def flattendict(di, **kwargs):
@@ -420,7 +420,7 @@ def flattendict(di, **kwargs):
             decodeBSONEntity(di, key)
         newkey = deUnderescore(di, key)
         if key in squash or newkey in squash:
-            del di[newkey]
+            di.pop(newkey, None)
     return di
 
 
