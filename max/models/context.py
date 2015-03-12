@@ -13,6 +13,7 @@ class BaseContext(MADBase):
     """
         A max Context object representation
     """
+    updatable_fields = ['permissions', 'displayName']
     unique = '_id'
     uniqueMethod = None
     schema = {
@@ -142,33 +143,39 @@ class BaseContext(MADBase):
             Now only updates displayName and permissions and tags
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
-        updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants', 'url']
-        updatable_fields = set(updatable_fields).intersection(self.data.keys())
-        updatable_fields_with_changes = [field for field in updatable_fields if self.field_changed(field)]
-        if updatable_fields and (updatable_fields_with_changes or force_update):
+        if force_update:
+            must_update_fields = self.updatable_fields
+        else:
+            fields_with_update_request = set(self.updatable_fields).intersection(self.data.keys())
+            must_update_fields = [field for field in fields_with_update_request if self.field_changed(field)]
+
+        # Construct a list of all updatable fields that has changes. On force_update=True, all
+        # fields with requested update will pass trough
+
+        if must_update_fields:
             for user in self.subscribedUsers():
                 user_object = User()
                 user_object.fromObject(user)
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 
-                if 'url' in self.schema.keys() and (self.field_changed('url') or force_update):
+                if 'url' in must_update_fields:
                     updates.update({'{}.$.url'.format(self.user_subscription_storage): self.url})
                     updates.update({'{}.$.hash'.format(self.user_subscription_storage): self.hash})
 
-                if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
+                if 'displayName' in must_update_fields:
                     updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
 
-                if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
+                if 'tags' in must_update_fields:
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.get('tags', [])})
 
-                if 'notifications' in self.schema.keys() and (self.field_changed('notifications') or force_update):
+                if 'notifications' in must_update_fields:
                     updates.update({'{}.$.notifications'.format(self.user_subscription_storage): self.get('notifications', False)})
 
-                if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
+                if 'participants' in must_update_fields:
                     updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
 
-                if 'permissions' in self.schema.keys() and (self.field_changed('permissions') or force_update):
+                if 'permissions' in must_update_fields:
                     subscription = user_object.getSubscription(self)
                     _vetos = subscription.get('_vetos', [])
                     _grants = subscription.get('_grants', [])
@@ -258,6 +265,7 @@ class Context(BaseContext):
         A context containing a Uri
     """
 
+    updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'url']
     collection = 'contexts'
     unique = 'hash'
     user_subscription_storage = 'subscribedTo'

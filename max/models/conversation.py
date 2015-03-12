@@ -11,6 +11,7 @@ class Conversation(BaseContext):
         A conversation between people. This are normal contexts but stored in
         another collection
     """
+    updatable_fields = ['permissions', 'displayName', 'tags', 'participants']
     collection = 'conversations'
     unique = '_id'
     user_subscription_storage = 'talkingIn'
