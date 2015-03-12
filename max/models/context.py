@@ -143,8 +143,9 @@ class BaseContext(MADBase):
             Updates will only occur if the fields changed, to force the update, set force_update=True
         """
         updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'participants', 'url']
-        has_updatable_fields = set(updatable_fields).intersection(self.data.keys())
-        if has_updatable_fields or force_update:
+        updatable_fields = set(updatable_fields).intersection(self.data.keys())
+        updatable_fields_with_changes = [field for field in updatable_fields if self.field_changed(field)]
+        if updatable_fields and (updatable_fields_with_changes or force_update):
             for user in self.subscribedUsers():
                 user_object = User()
                 user_object.fromObject(user)
@@ -188,8 +189,9 @@ class BaseContext(MADBase):
 
                     updates.update({'{}.$.permissions'.format(self.user_subscription_storage): new_permissions})
 
-                combined_updates = {'$set': updates}
-                self.mdb_collection.database.users.update(criteria, combined_updates, multi=True)
+                if updates:
+                    combined_updates = {'$set': updates}
+                    self.mdb_collection.database.users.update(criteria, combined_updates, multi=True)
 
                 # update original subscriptions related to this user when changing url
                 if self.field_changed('url'):

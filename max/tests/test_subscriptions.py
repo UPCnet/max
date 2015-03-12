@@ -291,6 +291,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(len(result), 0)
 
+    def test_change_context_with_same_permissions(self):
+        """
+            Create a public context, user subscribes to context.
+            Try to update the context with the same permissions.
+            Permissions  remain the same
+
+            NOTE: Test added to catch a bug where modifying a context with the same
+            permissions would crash on a mongodb empty query
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context
+
+        self.create_user(test_manager)
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'messi'
+        self.create_user(username)
+        permissions = dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted')
+        self.create_context(create_context, permissions=permissions)
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=201)
+        data = json.dumps({"permissions": permissions})
+        res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json['permissions']['read'], 'subscribed')
+        self.assertEqual(res.json['permissions']['write'], 'subscribed')
+        self.assertEqual(res.json['permissions']['subscribe'], 'public')
+        self.assertEqual(res.json['permissions']['invite'], 'restricted')
+
     def test_change_public_context_to_restricted(self):
         """
             Create a public context, user subscribes to context.
