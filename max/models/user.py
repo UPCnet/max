@@ -24,13 +24,20 @@ class User(MADBase):
     unique = 'username'
     schema = {
         '_id': {},
-        '_creator': {},
-        '_owner': {},
+        '_creator': {
+            'edit': []
+        },
+        '_owner': {
+            'edit': []
+
+        },
         'objectType': {
+            'edit': [],
             'default': 'person'
         },
         'username': {
             'required': 1,
+            'edit': ['Manager'],
             'view': ['Owner', 'Manager', 'Authenticated']
         },
         'displayName': {
@@ -39,15 +46,20 @@ class User(MADBase):
         },
         'last_login': {},
         'following': {
+            'edit': [],
             'default': []
         },
         'subscribedTo': {
+            'edit': [],
             'default': []
         },
         'talkingIn': {
+            'edit': [],
             'default': []
         },
-        'published': {},
+        'published': {
+            'edit': []
+        },
         'twitterUsername': {
             'edit': ['Owner', 'Manager'],
             'view': ['Owner', 'Manager', 'Authenticated'],
@@ -55,9 +67,11 @@ class User(MADBase):
             'validators': ['isValidTwitterUsername']
         },
         'iosDevices': {
+            'edit': [],
             'default': []
         },
         'androidDevices': {
+            'edit': [],
             'default': []
         },
     }

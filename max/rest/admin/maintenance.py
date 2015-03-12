@@ -94,6 +94,11 @@ def rebuildSubscriptions(context, request):
                 fake_deleted_context = Context()
                 fake_deleted_context.fromObject(subscription)
                 user.removeSubscription(fake_deleted_context)
+            else:
+                subscription['hash'].pop('vetos', None)
+                subscription['hash'].pop('grants', None)
+                subscription.save()
+
     handler = JSONResourceRoot([])
     return handler.buildResponse()
 
