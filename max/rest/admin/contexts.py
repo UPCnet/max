@@ -71,9 +71,7 @@ def getContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='contexts', request_method='POST', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(route_name='contexts', request_method='POST', restricted='Manager', user_required=True)
 def addContext(context, request):
     """
         /contexts
@@ -104,10 +102,7 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT', permission='Can modify context')
-@MaxResponse
-@requirePersonActor(force_own=False, exists=True)
-@oauth2(['widgetcli'])
+@view_config(route_name='context', request_method='PUT', permission='Can modify context', user_required=True)
 def ModifyContext(context, request):
     """
         /contexts/{hash}

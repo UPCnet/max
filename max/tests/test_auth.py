@@ -36,6 +36,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s' % username, json.dumps({}), oauth2Header(test_manager, token='bad token'), status=401)
         self.assertEqual(res.json['error_description'], 'Invalid token.')
 
+    def test_invalid_token_TEMPORARY(self):
+        from hashlib import sha1
+        from .mockers import create_context
+
+        mindundi = 'messi'
+        self.create_user(mindundi)
+        self.create_user(test_manager)
+        self.create_context(create_context, owner=mindundi)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi, token='bad token'), status=401)
+        self.assertEqual(res.json['error_description'], 'Invalid token.')
+
     def test_invalid_scope(self):
         username = 'messi'
         headers = oauth2Header(test_manager)
@@ -43,4 +55,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/%s' % username, "", headers, status=401)
         self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')
 
+    def test_invalid_scope_TEMPORARY(self):
+        from hashlib import sha1
+        from .mockers import create_context
 
+        mindundi = 'messi'
+        headers = oauth2Header(test_manager)
+        headers['X-Oauth-Scope'] = 'Invalid scope'
+        self.create_user(mindundi)
+        self.create_user(test_manager)
+        self.create_context(create_context, owner=mindundi)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), headers, status=401)
+        self.assertEqual(res.json['error_description'], 'The specified scope is not allowed for this resource.')
+
+    def test_required_user_not_found(self):
+        from hashlib import sha1
+        from .mockers import create_context
+
+        mindundi = 'messi'
+        self.create_user(test_manager)
+        self.create_context(create_context, owner=mindundi)
+        url_hash = sha1(create_context['url']).hexdigest()
+        res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=400)
+        self.assertEqual(res.json['error_description'], 'Unknown actor identified by username: messi')

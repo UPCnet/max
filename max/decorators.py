@@ -1,23 +1,11 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxDB
 from max.exceptions import ConnectionError
-from max.exceptions import DuplicatedItemError
-from max.exceptions import Forbidden
-from max.exceptions import InvalidPermission
-from max.exceptions import InvalidSearchParams
-from max.exceptions import JSONHTTPBadRequest
-from max.exceptions import JSONHTTPForbidden
-from max.exceptions import JSONHTTPInternalServerError
-from max.exceptions import JSONHTTPNotFound
-from max.exceptions import JSONHTTPServiceUnavailable
-from max.exceptions import JSONHTTPUnauthorized
-from max.exceptions import MissingField
-from max.exceptions import ObjectNotFound
 from max.exceptions import ObjectNotSupported
 from max.exceptions import Unauthorized
 from max.exceptions import UnknownUserError
-from max.exceptions import ValidationError
-from max.resources import Root
+from max.exceptions.http import JSONHTTPInternalServerError
+from max.exceptions.http import JSONHTTPServiceUnavailable
 from max.rest.resources import RESOURCES
 from max.rest.utils import getUrlHashFromURI
 from max.rest.utils import getUsernameFromPOSTBody
@@ -26,7 +14,6 @@ from max.rest.utils import getUsernameFromXOAuth
 
 from pyramid.settings import asbool
 
-from bson.errors import InvalidId
 from datetime import datetime
 from hashlib import sha1
 from pymongo.errors import AutoReconnect
@@ -256,29 +243,6 @@ def saveException(request, error):  # pragma: no cover
 def catch_exception(request, e):
     if isinstance(e, ConnectionFailure):
         return JSONHTTPInternalServerError(error=dict(objectType='error', error='DatabaseConnectionError', error_description='Please try again later.'))
-    elif isinstance(e, InvalidId):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidId.__name__, error_description=e.message))
-    elif isinstance(e, ObjectNotSupported):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=ObjectNotSupported.__name__, error_description=e.message))
-    elif isinstance(e, ObjectNotFound):
-        return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description=e.message))
-    elif isinstance(e, MissingField):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=MissingField.__name__, error_description=e.message))
-    elif isinstance(e, DuplicatedItemError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=DuplicatedItemError.__name__, error_description=e.message))
-    elif isinstance(e, UnknownUserError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=UnknownUserError.__name__, error_description=e.message))
-    elif isinstance(e, Unauthorized):
-        return JSONHTTPUnauthorized(error=dict(objectType='error', error=Unauthorized.__name__, error_description=e.message))
-    elif isinstance(e, InvalidSearchParams):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidSearchParams.__name__, error_description=e.message))
-    elif isinstance(e, InvalidPermission):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=InvalidPermission.__name__, error_description=e.message))
-    elif isinstance(e, ValidationError):
-        return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=e.message))
-    elif isinstance(e, Forbidden):
-        return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=e.message))
-
     elif isinstance(e, ConnectionError):
         return JSONHTTPServiceUnavailable(error=dict(objectType='error', error=ConnectionError.__name__, error_description=e.message))
 

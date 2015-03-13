@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import JSONHTTPPreconditionFailed
+from max.exceptions.http import JSONHTTPPreconditionFailed
 
 
 def compatibility_checker_factory(handler, registry):
