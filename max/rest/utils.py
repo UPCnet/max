@@ -13,6 +13,7 @@ from rfc3339 import rfc3339
 
 import json
 import logging
+import os
 import re
 import requests
 import sys
@@ -613,3 +614,28 @@ def rotate_image_by_EXIF(image):
     if exif_rotation:
         return image.rotate(exif_rotation)
     return image
+
+# def
+SPLITTERS = {
+    'people': re.compile(r'^(.?)')
+}
+
+
+def get_avatar_folder(base_folder, context='', identifier='', size=''):
+    """
+        Returns the right folder for the given parameters set, and
+        creates the folder if is missing.
+    """
+    id_splitter = SPLITTERS.get(context)
+    id_path = '' if id_splitter is None else id_splitter.search(identifier).groups()[0]
+
+    avatar_path_parts = [
+        base_folder,
+        context, size, id_path
+    ]
+
+    avatar_path = os.path.join(*avatar_path_parts)
+
+    if not os.path.exists(avatar_path):
+        os.makedirs(avatar_path)
+    return avatar_path.rstrip('/')
