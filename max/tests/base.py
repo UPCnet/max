@@ -26,7 +26,7 @@ class mock_requests_obj(object):
 
 
 def mock_post(self, *args, **kwargs):  # pragma: no cover
-    #Return OK to any post request targeted to 'checktoken', with the mock token
+    # Return OK to any post request targeted to 'checktoken', with the mock token
     if args[0].endswith('checktoken'):
         token = kwargs.get('data', {}).get('oauth_token')
         status_code = 200 if token == MOCK_TOKEN else 401
@@ -47,17 +47,17 @@ def mock_post(self, *args, **kwargs):  # pragma: no cover
 
 
 def mock_get(self, *args, **kwargs):  # pragma: no cover
-    if args[0].lower() == 'http://api.twitter.com/1/users/show.json?screen_name=maxupcnet':
-        result = '{"id_str":"526326641", "profile_image_url_https": "https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png"}'
-        return mock_requests_obj(text=result, status_code=200)
-    elif args[0].endswith('logo_MAX_color_normal.png'):
-        request = get_current_request()
-        if request.headers.get('SIMULATE_TWITTER_FAIL', False):
-            return mock_requests_obj(text='', status_code=500)
-        else:
-            return mock_requests_obj(content=image, status_code=200)
-    else:
-        # Proceed with unpatched requests get
+    # if args[0].lower() == 'http://api.twitter.com/1/users/show.json?screen_name=maxupcnet':
+    #     result = '{"id_str":"526326641", "profile_image_url_https": "https://si0.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png"}'
+    #     return mock_requests_obj(text=result, status_code=200)
+    # elif args[0].endswith('logo_MAX_color_normal.png'):
+    #     request = get_current_request()
+    #     if request.headers.get('SIMULATE_TWITTER_FAIL', False):
+    #         return mock_requests_obj(text='', status_code=500)
+    #     else:
+    #         return mock_requests_obj(content=image, status_code=200)
+    # else:
+    #     # Proceed with unpatched requests get
         return requests_get(*args, **kwargs)
 
 

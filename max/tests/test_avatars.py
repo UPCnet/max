@@ -13,14 +13,39 @@ from functools import partial
 from mock import patch
 from paste.deploy import loadapp
 
+import httpretty
 import json
 import os
 import shutil
 import tempfile
+import tweepy
 import unittest
 
 from io import BytesIO
 from PIL import Image
+
+
+def http_mock_twitter_user_image(image):
+    httpretty.register_uri(
+        httpretty.GET, "https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png",
+        body=open(image, "rb").read(),
+        status=200,
+        content_type="image/png"
+    )
+
+
+class MockTweepyAPI(object):
+    def __init__(self, auth):
+        pass
+
+    def verify_credentials(self, *args, **kwargs):
+        return True
+
+    def get_user(self, username):
+        user = tweepy.models.User
+        user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
+        user.id_str = '526326641'
+        return user
 
 
 class AvatarFolderTests(unittest.TestCase):
@@ -120,7 +145,7 @@ class AvatarFolderTests(unittest.TestCase):
         self.assertFileExists(expected_folder)
 
 
-class FunctionalTests(unittest.TestCase, MaxTestBase):
+class AvatarTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         self.conf_dir = os.path.dirname(__file__)
@@ -200,18 +225,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('image', response.content_type)
         self.assertEqual(self.get_image_dimensions_from(response), (250, 250))
 
+    @httpretty.activate
+    @patch('tweepy.API', MockTweepyAPI)
     def test_get_context_twitter_download_avatar(self):
         """
         """
-        from .mock_image import image
         from hashlib import sha1
         from .mockers import create_context_full
+
+        avatar_image = os.path.join(self.conf_dir, "avatar.png")
+        http_mock_twitter_user_image(avatar_image)
+
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
 
         response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
-        self.assertIn('image', response.content_type)
-        self.assertEqual(len(image), len(response.body))
+
+        self.assertEqual(self.get_image_dimensions_from(response), (98, 98))
+        self.assertFileExists(os.path.join(self.conf_dir, ""))
 
     def test_get_context_twitter_download_error_from_twitter_avatar(self):
         """
