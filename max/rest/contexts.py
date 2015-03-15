@@ -119,6 +119,7 @@ def getContextAvatar(context, request):
         Return the context's avatar. To the date, this is only implemented to
         work integrated with Twitter.
     """
+    import ipdb;ipdb.set_trace()
     chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     context_image_filename = '%s/%s.png' % (AVATAR_FOLDER, chash)
