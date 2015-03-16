@@ -19,6 +19,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.rest.utils import get_avatar_folder
 
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
@@ -529,10 +530,16 @@ def getConversationUserAvatar(context, request):
 
         Returns conversation avatar. Public endpoint.
     """
-    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     cid = request.matchdict['id']
-    filename = cid if os.path.exists(os.path.join(AVATAR_FOLDER, '{}.png'.format(cid))) else 'missing-conversation'
-    data = open(os.path.join(AVATAR_FOLDER, '{}.png'.format(filename))).read()
+
+    base_folder = request.registry.settings.get('avatar_folder')
+    avatar_folder = get_avatar_folder('conversations', cid)
+
+    missing_avatar = os.path.join(base_folder, 'missing-conversation.png')
+    conversation_avatar = os.path.join(avatar_folder, cid)
+    filename = conversation_avatar if os.path.exists(conversation_avatar) else missing_avatar
+
+    data = open(filename).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/png'
     return image
