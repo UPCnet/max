@@ -13,6 +13,7 @@ from max.rest.utils import get_twitter_api
 from max.rest.utils import download_twitter_user_image
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.rest.utils import get_avatar_folder
 from max.rest.sorting import sorted_query
 
 from pyramid.httpexceptions import HTTPNotImplemented
@@ -121,8 +122,11 @@ def getContextAvatar(context, request):
         work integrated with Twitter.
     """
     chash = request.matchdict['hash']
-    AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
-    context_image_filename = '%s/%s.png' % (AVATAR_FOLDER, chash)
+
+    base_folder = request.registry.settings.get('avatar_folder')
+    avatar_folder = get_avatar_folder(base_folder, 'contexts', chash)
+
+    context_image_filename = '%s/%s' % (avatar_folder, chash)
 
     api = get_twitter_api(request.registry)
     if not os.path.exists(context_image_filename):
@@ -135,7 +139,7 @@ def getContextAvatar(context, request):
             raise ObjectNotFound("There's no context with hash %s" % chash)
 
     if os.path.exists(context_image_filename):
-        # Calculate time since last download and set if we have to redownload or not
+        # Calculate time since last download and set if we have to re-download or not
         modification_time = os.path.getmtime(context_image_filename)
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
         if hours_since_last_modification > 3:
@@ -144,7 +148,7 @@ def getContextAvatar(context, request):
             twitter_username = found_context[0]['twitterUsername']
             download_twitter_user_image(api, twitter_username, context_image_filename)
     else:
-        context_image_filename = '%s/missing.png' % (AVATAR_FOLDER)
+        context_image_filename = '%s/missing.png' % (get_avatar_folder(base_folder))
 
     data = open(context_image_filename).read()
     image = Response(data, status_int=200)

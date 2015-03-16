@@ -177,7 +177,7 @@ def postUserAvatar(context, request):
     """
     base_folder = request.registry.settings.get('avatar_folder')
     AVATAR_SIZE = (48, 48)
-    MEDIUM_SIZE = (250, 250)
+    LARGE_SIZE = (250, 250)
 
     username = request.matchdict['username']
 
@@ -188,7 +188,7 @@ def postUserAvatar(context, request):
     file_key = request.POST.keys()[0]
     input_file = request.POST[file_key].file
 
-    # Saving the standard (48x48) avatar image in png format, resize if needed
+    # Saving the standard avatar image in png format, resize if needed
     regular_avatar_folder = get_avatar_folder(base_folder, 'people', username)
     file_path = os.path.join(regular_avatar_folder, username)
     input_file.seek(0)
@@ -196,27 +196,15 @@ def postUserAvatar(context, request):
 
     avatar = ImageOps.fit(image, AVATAR_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
     avatar.save(file_path, 'PNG')
-    # if image.size[0] > 48:
-    #     image.thumbnail((48,9800), Image.ANTIALIAS)
-    #     image = image.transform((48,48), Image.EXTENT, (0, 0, 48, 48), Image.BICUBIC)
-    # image.save(file_path, 'PNG')
 
-    # Saving the large (176x176) avatar image in png format, resize if needed
+    # Saving the large avatar image in png format, resize if needed
     large_avatar_folder = get_avatar_folder(base_folder, 'people', username, size='large')
     file_path = os.path.join(large_avatar_folder, username)
     input_file.seek(0)
     image = Image.open(input_file)
 
-    medium = ImageOps.fit(image, MEDIUM_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
+    medium = ImageOps.fit(image, LARGE_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
     medium.save(file_path, 'PNG')
-    # if image.size[0] > 176:
-    #     image.thumbnail((176,9800), Image.ANTIALIAS)
-    #     image = image.transform((176,176), Image.EXTENT, (0, 0, 176, 176), Image.BICUBIC)
-    # image.save(file_path ,'PNG')
-
-    # Use with files
-    # with open(file_path, 'wb') as output_file:
-    #     shutil.copyfileobj(input_file, output_file)
 
     return Response("Uploaded", status_int=201)
 

@@ -26,21 +26,21 @@ class mock_requests_obj(object):
         self.status_code = kwargs['status_code']
 
 
-def mock_post(self, *args, **kwargs):  # pragma: no cover
+def mock_post(self, url, *args, **kwargs):  # pragma: no cover
     # Return OK to any post request targeted to 'checktoken', with the mock token
-    if args[0].endswith('checktoken'):
+    if url.endswith('checktoken'):
         token = kwargs.get('data', {}).get('oauth_token')
         status_code = 200 if token == MOCK_TOKEN else 401
         return mock_requests_obj(text='', status_code=status_code)
-    elif '/people/messi/activities' in args[0]:
+    elif '/people/messi/activities' in url:
         # Fake the requests.post thorough the self.testapp instance, and test result later in test
-        res = self.testapp.post('/people/%s/activities' % 'messi', args[1], oauth2Header(test_manager), status=201)
+        res = self.testapp.post('/people/%s/activities' % 'messi', args[0], oauth2Header(test_manager), status=201)
         return mock_requests_obj(text=res.text, status_code=201)
-    elif '/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in args[0]:
+    elif '/contexts/90c8f28a7867fbad7a2359c6427ae8798a37ff07/activities' in url:
         # Fake the requests.post thorough the self.testapp instance, and test result later in test
         res = self.testapp.post('/contexts/%s/activities' % '90c8f28a7867fbad7a2359c6427ae8798a37ff07', args[1], oauth2Header(test_manager), status=201)
         return mock_requests_obj(text=res.text, status_code=201)
-    elif args[0].endswith('upload'):
+    elif url.endswith('upload'):
         return mock_requests_obj(text='{"uploadURL": "http://localhost:8181/theimage", "thumbURL": "http://localhost:8181/theimage/thumb"}', status_code=201)
     else:
         # Proceed with unpatched requests post
