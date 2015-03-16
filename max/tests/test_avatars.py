@@ -98,7 +98,21 @@ class AvatarFolderTests(unittest.TestCase, MaxTestBase):
         """
         folder = get_avatar_folder(self.folder, 'people', 'sheldon')
 
-        expected_folder = '{}/people/s'.format(self.folder)
+        expected_folder = '{}/people/sh'.format(self.folder)
+
+        self.assertEqual(folder, expected_folder)
+        self.assertFileExists(expected_folder)
+
+    def test_avatar_folder_with_context_and_id_2(self):
+        """
+            Given a base folder
+            And a context and identifier
+            Then the first subfolder contains the context
+            And the second subfolder the trimmed identifier correspondint to the context
+        """
+        folder = get_avatar_folder(self.folder, 'contexts', 'e6847aed3105e85ae603c56eb2790ce85e212997')
+
+        expected_folder = '{}/contexts/e6/84/7a'.format(self.folder)
 
         self.assertEqual(folder, expected_folder)
         self.assertFileExists(expected_folder)
@@ -129,7 +143,7 @@ class AvatarFolderTests(unittest.TestCase, MaxTestBase):
         """
         folder = get_avatar_folder(self.folder, 'people', 'sheldon', 'large')
 
-        expected_folder = '{}/people/large/s'.format(self.folder)
+        expected_folder = '{}/people/large/sh'.format(self.folder)
 
         self.assertEqual(folder, expected_folder)
         self.assertFileExists(expected_folder)
@@ -186,6 +200,8 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         """
             Deletes test avatar folder with all test images
         """
+        self.patched_post.stop()
+        self.patched_get.stop()
         shutil.rmtree(self.avatar_folder)
 
     def get_image_dimensions_from(self, response):
@@ -199,16 +215,16 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
             Returns the (width, height) of an image for a especifi user, located
             in the designated folder for that user.
         """
-        avatar_folder = get_avatar_folder(self.avatar_folder)
-        filename = '{}/{}.png'.format(avatar_folder, context)
+        avatar_folder = get_avatar_folder(self.avatar_folder, 'contexts', context)
+        filename = '{}/{}'.format(avatar_folder, context)
         return os.path.getmtime(filename)
 
     def rewind_context_avatar_mod_time(self, context, hours):
         """
             Changes the contex's avatar file modifcation time x hours back in time
         """
-        avatar_folder = get_avatar_folder(self.avatar_folder)
-        filename = '{}/{}.png'.format(avatar_folder, context)
+        avatar_folder = get_avatar_folder(self.avatar_folder, 'contexts', context)
+        filename = '{}/{}'.format(avatar_folder, context)
         modification_time = os.path.getmtime(filename)
         new_time = modification_time - (hours * 60 * 60)
         os.utime(filename, (new_time, new_time))
@@ -300,7 +316,8 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
 
         self.assertEqual(self.get_image_dimensions_from(response), (98, 98))
-        self.assertFileExists(os.path.join(self.avatar_folder, '{}.png'.format(url_hash)))
+        avatar_folder = get_avatar_folder(self.avatar_folder, 'contexts', url_hash)
+        self.assertFileExists(os.path.join(avatar_folder, url_hash))
 
     @httpretty.activate
     @patch('tweepy.API', new=partial(MockTweepyAPI, fail=True))

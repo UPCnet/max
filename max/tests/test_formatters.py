@@ -14,7 +14,6 @@ import os
 import unittest
 
 
-@patch('requests.post', new=mock_post)
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
@@ -30,6 +29,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
+
+    def tearDown(self):
+        self.patched_post.stop()
 
     # BEGIN TESTS
 

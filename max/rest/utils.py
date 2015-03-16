@@ -3,7 +3,7 @@ from max.exceptions import InvalidSearchParams
 from max.exceptions import Unauthorized
 
 from pyramid.settings import asbool
-from pyramid.threadlocal import get_current_registry
+from pyramid.threadlocal import get_current_request
 
 from bson import json_util
 from bson.objectid import ObjectId
@@ -441,8 +441,11 @@ def formatMessageEntities(text):
         function that shearches for elements in the text that have to be formatted.
         Currently shortens urls.
     """
+    request = get_current_request()
+
     def shorten(matchobj):
-        return shortenURL(matchobj.group(0))
+        url = matchobj.group(0)
+        return shortenURL(url, secure=request.url.startswith('https://'))
 
     shortened = re.sub(FIND_URL_REGEX, shorten, text)
 
@@ -476,7 +479,7 @@ def findKeywords(text):
     return keywords
 
 
-def shortenURL(url):
+def shortenURL(url, secure=False):
     """
         Shortens a url using bitly API. Keeps the original url in case
         something goes wrong with the api call
@@ -504,10 +507,12 @@ def shortenURL(url):
     try:
         response = json.loads(req.content)
         if response.get('status_code', None) == 200:
-            if 'data' in response.keys():
-                return response['data']['url']
+            url = response.get('data', {}).get('url', queryurl)
+            if secure:
+                url.replace('http://', 'https://')
     except:
-        return url
+        url = queryurl
+
     return url
 
 
@@ -614,7 +619,8 @@ def rotate_image_by_EXIF(image):
 
 # def
 SPLITTERS = {
-    'people': re.compile(r'^(.?)')
+    'people': re.compile(r'^(.{2})'),
+    'contexts': re.compile(r'^(.{2})(.{2})(.{2})')
 }
 
 
@@ -624,12 +630,19 @@ def get_avatar_folder(base_folder, context='', identifier='', size=''):
         creates the folder if is missing.
     """
     id_splitter = SPLITTERS.get(context)
-    id_path = '' if id_splitter is None else id_splitter.search(identifier).groups()[0]
+
+    if id_splitter:
+        match = id_splitter.search(identifier)
+        splitter_parts = match.groups() if match else []
+    else:
+        splitter_parts = []
 
     avatar_path_parts = [
         base_folder,
-        context, size, id_path
+        context, size
     ]
+
+    avatar_path_parts.extend(splitter_parts)
 
     avatar_path = os.path.join(*avatar_path_parts)
 
