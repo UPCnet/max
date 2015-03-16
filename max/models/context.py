@@ -3,7 +3,8 @@ from max.MADMax import MADMaxCollection
 from max.MADObjects import MADBase
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
-from max.rest.utils import getUserIdFromTwitter
+from max.rest.utils import get_twitter_api
+from max.rest.utils import get_userid_from_twitter
 
 from hashlib import sha1
 from max import DEFAULT_CONTEXT_PERMISSIONS
@@ -344,7 +345,8 @@ class Context(BaseContext):
 
         # If creating with the twitterUsername, get its Twitter ID
         if self.data.get('twitterUsername', None):
-            self['twitterUsernameId'] = getUserIdFromTwitter(self.data['twitterUsername'])
+            api = get_twitter_api(self.request.registry)
+            self['twitterUsernameId'] = get_userid_from_twitter(api, self.data['twitterUsername'])
 
         self['hash'] = self.getIdentifier()
 
@@ -355,7 +357,8 @@ class Context(BaseContext):
         """Update the user object with the given properties"""
         # If updating the twitterUsername, get its Twitter ID
         if properties.get('twitterUsername', None):
-            properties['twitterUsernameId'] = getUserIdFromTwitter(properties['twitterUsername'])
+            api = get_twitter_api(self.request.registry)
+            properties['twitterUsernameId'] = get_userid_from_twitter(api, properties['twitterUsername'])
 
         self.updateFields(properties)
 

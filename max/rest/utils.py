@@ -38,8 +38,7 @@ def getMaxModelByObjectType(objectType):
     return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 
 
-def get_twitter_api():
-    registry = get_current_registry()
+def get_twitter_api(registry):
     twitter_settings = registry.cloudapis_settings.get('twitter', None)
 
     if twitter_settings:
@@ -55,11 +54,10 @@ def get_twitter_api():
             return None
 
 
-def downloadTwitterUserImage(twitterUsername, filename):
+def download_twitter_user_image(api, twitterUsername, filename):
     """
     """
     exit_status = False
-    api = get_twitter_api()
     if api:
         user = api.get_user(twitterUsername)
         image_url = user.profile_image_url_https
@@ -76,8 +74,7 @@ def downloadTwitterUserImage(twitterUsername, filename):
     return exit_status
 
 
-def getUserIdFromTwitter(twitterUsername):
-    api = get_twitter_api()
+def get_userid_from_twitter(api, twitterUsername):
     if api:
         user = api.get_user(twitterUsername)
         return user.id_str

@@ -9,7 +9,8 @@ from max.exceptions import Unauthorized
 from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.utils import downloadTwitterUserImage
+from max.rest.utils import get_twitter_api
+from max.rest.utils import download_twitter_user_image
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
 from max.rest.sorting import sorted_query
@@ -119,17 +120,17 @@ def getContextAvatar(context, request):
         Return the context's avatar. To the date, this is only implemented to
         work integrated with Twitter.
     """
-    import ipdb;ipdb.set_trace()
     chash = request.matchdict['hash']
     AVATAR_FOLDER = request.registry.settings.get('avatar_folder')
     context_image_filename = '%s/%s.png' % (AVATAR_FOLDER, chash)
 
+    api = get_twitter_api(request.registry)
     if not os.path.exists(context_image_filename):
         mmdb = MADMaxDB(context.db)
         found_context = mmdb.contexts.getItemsByhash(chash)
         if len(found_context) > 0:
             twitter_username = found_context[0]['twitterUsername']
-            downloadTwitterUserImage(twitter_username, context_image_filename)
+            download_twitter_user_image(api, twitter_username, context_image_filename)
         else:
             raise ObjectNotFound("There's no context with hash %s" % chash)
 
@@ -141,7 +142,7 @@ def getContextAvatar(context, request):
             mmdb = MADMaxDB(context.db)
             found_context = mmdb.contexts.getItemsByhash(chash)
             twitter_username = found_context[0]['twitterUsername']
-            downloadTwitterUserImage(twitter_username, context_image_filename)
+            download_twitter_user_image(api, twitter_username, context_image_filename)
     else:
         context_image_filename = '%s/missing.png' % (AVATAR_FOLDER)
 
