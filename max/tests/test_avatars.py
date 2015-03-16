@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_default_security
+from max.tests import test_cloudapis
 from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
@@ -35,10 +36,12 @@ def http_mock_twitter_user_image(image):
 
 
 class MockTweepyAPI(object):
-    def __init__(self, auth):
-        pass
+    def __init__(self, auth, fail=False):
+        self.fail = fail
 
     def verify_credentials(self, *args, **kwargs):
+        if self.fail:
+            raise Exception('Simulated Twitter Failure')
         return True
 
     def get_user(self, username):
@@ -48,16 +51,17 @@ class MockTweepyAPI(object):
         return user
 
 
-class AvatarFolderTests(unittest.TestCase):
+class AvatarFolderTests(unittest.TestCase, MaxTestBase):
+    """
+        Tests to check the correct resoultion of avatar folder
+        for different scenarios.
+    """
 
     def setUp(self):
         self.folder = tempfile.mkdtemp()
 
     def tearDown(self):
         shutil.rmtree(self.folder)
-
-    def assertFileExists(self, path):
-        self.assertTrue(os.path.exists(path))
 
     def test_avatar_folder_without_params(self):
         """
@@ -146,6 +150,10 @@ class AvatarFolderTests(unittest.TestCase):
 
 
 class AvatarTests(unittest.TestCase, MaxTestBase):
+    """
+        Tests to check the uploading, downlading and retrieving of all
+        avatar types used in max, included the ones coming from twitter.
+    """
 
     def setUp(self):
         self.conf_dir = os.path.dirname(__file__)
@@ -154,7 +162,9 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.drop_collection('cloudapis')
         self.app.registry.max_store.security.insert(test_default_security)
+        self.app.registry.max_store.cloudapis.insert(test_cloudapis)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.patched_get = patch('requests.get', new=partial(mock_get, self))
@@ -173,16 +183,49 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-people-large.png'.format(self.avatar_folder))
 
     def tearDown(self):
+        """
+            Deletes test avatar folder with all test images
+        """
         shutil.rmtree(self.avatar_folder)
 
     def get_image_dimensions_from(self, response):
+        """
+            Returns the (width, height) of an image found in a request response.
+        """
         return Image.open(BytesIO(response.body)).size
 
+    def get_context_avatar_modification_time(self, context):
+        """
+            Returns the (width, height) of an image for a especifi user, located
+            in the designated folder for that user.
+        """
+        avatar_folder = get_avatar_folder(self.avatar_folder)
+        filename = '{}/{}.png'.format(avatar_folder, context)
+        return os.path.getmtime(filename)
+
+    def rewind_context_avatar_mod_time(self, context, hours):
+        """
+            Changes the contex's avatar file modifcation time x hours back in time
+        """
+        avatar_folder = get_avatar_folder(self.avatar_folder)
+        filename = '{}/{}.png'.format(avatar_folder, context)
+        modification_time = os.path.getmtime(filename)
+        new_time = modification_time - (hours * 60 * 60)
+        os.utime(filename, (new_time, new_time))
+
     def get_user_avatar_dimensions(self, username, size=''):
+        """
+            Returns the (width, height) of an image for a especifi user, located
+            in the designated folder for that user.
+        """
         avatar_folder = get_avatar_folder(self.avatar_folder, 'people', username, size=size)
         return Image.open('{}/{}'.format(avatar_folder, username)).size
 
     def upload_user_avatar(self, username, filename):
+        """
+            Uploads the file specified in filename, to become the avatar for
+            username.
+        """
         avatar_file = open(os.path.join(self.conf_dir, filename), "rb")
         files = [('image', filename, avatar_file.read(), 'image/png')]
         self.testapp.post('/people/{}/avatar'.format(username), '', headers=oauth2Header(username), upload_files=files, status=201)
@@ -190,6 +233,12 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
     # BEGIN TESTS
 
     def test_upload_user_avatar(self):
+        """
+            Given a user without avatar
+            When I upload an image for that user
+            Then a normal 48x48 image is stored in the correct avatar folder
+            And a large 250x250 image is stored in the correct avatar folder
+        """
         username = 'messi'
         self.create_user(username)
         avatar_file = open(os.path.join(self.conf_dir, "avatar.png"), "rb")
@@ -202,6 +251,9 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
 
     def test_get_user_avatar(self):
         """
+            Given a user with avatar
+            When I retrieve the avatar
+            Then I get the 48x48 version of that avatar
         """
         username = 'messi'
         self.create_user(username)
@@ -214,6 +266,9 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
 
     def test_get_user_avatar_large(self):
         """
+            Given a user without avatar
+            When I retrieve the large avatar
+            Then I get the 250x250 version of that avatar
         """
         username = 'messi'
         self.create_user(username)
@@ -229,6 +284,9 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
     @patch('tweepy.API', MockTweepyAPI)
     def test_get_context_twitter_download_avatar(self):
         """
+            Given a context with twitter username
+            When i retrieve the context's avatar
+            Then the twitter's user avatar is downloaded and stored
         """
         from hashlib import sha1
         from .mockers import create_context_full
@@ -242,63 +300,92 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
 
         self.assertEqual(self.get_image_dimensions_from(response), (98, 98))
-        self.assertFileExists(os.path.join(self.conf_dir, ""))
+        self.assertFileExists(os.path.join(self.avatar_folder, '{}.png'.format(url_hash)))
 
+    @httpretty.activate
+    @patch('tweepy.API', new=partial(MockTweepyAPI, fail=True))
     def test_get_context_twitter_download_error_from_twitter_avatar(self):
         """
+            Given a context with twitter username
+            When i retrieve the context's avatar
+            And some error happens when talking to twitter
+            Then the twitter's user avatar is not downloaded nor stored
+            And the default image is retrieved
         """
-        from .mock_image import image
         from hashlib import sha1
         from .mockers import create_context_full
+
+        avatar_image = os.path.join(self.conf_dir, "avatar.png")
+        http_mock_twitter_user_image(avatar_image)
+
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
 
-        response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {'SIMULATE_TWITTER_FAIL': '1'}, status=200)
-        self.assertIn('image', response.content_type)
-        self.assertEqual(len(image), len(response.body))
-        self.assertEqual(len(os.listdir(self.app.registry.settings['avatar_folder'])), 1)
+        response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+
+        self.assertEqual(self.get_image_dimensions_from(response), (48, 48))
+        self.assertFileNotExists(os.path.join(self.avatar_folder, '{}.png'.format(url_hash)))
 
     def test_get_context_twitter_avatar_inexistent_context(self):
         """
+            Given an unexisting context
+            When i retrieve the context's avatar
+            Then i get a NotFound error
+            And no image is retrieved
         """
         self.testapp.get('/contexts/%s/avatar' % '000000000000000000', '', {}, status=404)
 
+    @httpretty.activate
+    @patch('tweepy.API', MockTweepyAPI)
     def test_get_context_twitter_avatar_already_downloaded(self):
         """
+            Given a context with twitter username
+            When i retrieve the context's avatar
+            And the image has just been retrieved
+            Then the twitter's user avatar is not downloaded again
+            And the existing image is returned
         """
-        from .mock_image import image
         from hashlib import sha1
         from .mockers import create_context_full
+
+        avatar_image = os.path.join(self.conf_dir, "avatar.png")
+        http_mock_twitter_user_image(avatar_image)
+
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
-        open('%s/%s.png' % (self.app.registry.settings['avatar_folder'], url_hash), 'w').write(image)
 
-        response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
-        self.assertIn('image', response.content_type)
-        self.assertEqual(len(image), len(response.body))
+        self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+        old_mod_date = self.get_context_avatar_modification_time(url_hash)
 
-    @unittest.skipUnless(os.environ.get('Twitter', False), 'Skipping due to lack of Twitter config')
+        self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+        new_mod_date = self.get_context_avatar_modification_time(url_hash)
+
+        self.assertEqual(old_mod_date, new_mod_date)
+
+    @httpretty.activate
+    @patch('tweepy.API', MockTweepyAPI)
     def test_get_context_twitter_avatar_redownload_previous(self):
         """
+            Given a context with twitter username
+            When i retrieve the context's avatar
+            And the image has not been retrieved for at least 4 hours
+            Then the twitter's user avatar is redownloaded
+            And the new image is returned
         """
         from hashlib import sha1
         from .mockers import create_context_full
-        from .mock_image import image
+
+        avatar_image = os.path.join(self.conf_dir, "avatar.png")
+        http_mock_twitter_user_image(avatar_image)
+
         self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
-        image_filename = '%s/%s.png' % (self.app.registry.settings['avatar_folder'], url_hash)
 
-        # Save the file and rewind its date 4 hours
-        open(image_filename, 'w').write(image)
-        modification_time = os.path.getmtime(image_filename)
-        new_time = modification_time - (60 * 60 * 4)
-        os.utime(image_filename, (new_time, new_time))
-        modification_time = os.path.getmtime(image_filename)
+        self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+        self.rewind_context_avatar_mod_time(url_hash, hours=4)
+        rewinded_mod_date = self.get_context_avatar_modification_time(url_hash)
 
-        response = self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
-        self.assertIn('image', response.content_type)
-        self.assertEqual(len(image), len(response.body))
+        self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+        new_mod_date = self.get_context_avatar_modification_time(url_hash)
 
-        # Assert that the file is rencently downloaded
-        new_modification_time = os.path.getmtime(image_filename)
-        self.assertNotEqual(modification_time, new_modification_time)
+        self.assertNotEqual(rewinded_mod_date, new_mod_date)

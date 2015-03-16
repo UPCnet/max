@@ -6,6 +6,7 @@ from pyramid.threadlocal import get_current_request
 from urllib import urlencode
 
 import json
+import os
 import pymongo
 import requests
 
@@ -109,6 +110,12 @@ class MaxTestBase(object):
 
     def __init__(self, testapp):
         self.testapp = testapp
+
+    def assertFileExists(self, path):
+        self.assertTrue(os.path.exists(path))
+
+    def assertFileNotExists(self, path):
+        self.assertFalse(os.path.exists(path))
 
     def create_user(self, username, qs_params={}, expect=201, creator=test_manager, **kwargs):
         payload = {}
