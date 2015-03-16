@@ -157,7 +157,7 @@ def getUserAvatar(context, request):
 
     avatar_folder = avatar_folder if filename else get_avatar_folder(base_folder)
     named_size_sufix = '-{}'.format(named_size) if named_size else ''
-    filename = filename if filename else 'missing-{}{}.png'.format(context, named_size_sufix)
+    filename = filename if filename else 'missing-people.png'.format(context, named_size_sufix)
 
     data = open(os.path.join(avatar_folder, filename)).read()
     image = Response(data, status_int=200)
