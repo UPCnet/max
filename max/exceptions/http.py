@@ -6,6 +6,7 @@ all expecting a dict object to convert to JSON, and set
 the correct content_type"""
 
 from pyramid.httpexceptions import HTTPException
+from pyramid.httpexceptions import HTTPBadRequest
 
 import json
 
@@ -20,7 +21,10 @@ class JSONHTTPException(HTTPException):
             Configures exception and inner response status code, content
             and content_type
         """
-        super(JSONHTTPException, self).__init__(body=json.dumps(error))
+        super(JSONHTTPException, self).__init__(
+            detail=error['error_description']
+        )
+        self.body = json.dumps(error)
         self.content_type = 'application/json'
 
 
@@ -32,8 +36,9 @@ class JSONHTTPForbidden(JSONHTTPException):
     code = 403
 
 
-class JSONHTTPBadRequest(JSONHTTPException):
-    code = 400
+class JSONHTTPBadRequest(JSONHTTPException, HTTPBadRequest):
+    """
+    """
 
 
 class JSONHTTPNotFound(JSONHTTPException):

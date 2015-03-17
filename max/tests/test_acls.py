@@ -233,3 +233,49 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
         res = self.create_context(create_context)
         chash = res.json['hash']
         self.testapp.delete('/contexts/%s' % (chash,), "", oauth2Header(username), status=403)
+
+    # Test context authors
+
+    def test_get_context_authors_as_manager(self):
+        """
+            Given a user that is Manager
+            When i try to list context activity authors
+            I succeed
+        """
+        from .mockers import create_context
+
+        self.create_user(test_manager)
+        res = self.create_context(create_context)
+        chash = res.json['hash']
+        self.testapp.get('/contexts/%s/activities/authors' % (chash,), "", oauth2Header(test_manager), status=200)
+
+    def test_get_context_authors_as_non_manager(self):
+        """
+            Given a user that is not Manager
+            When i try to list context activity authors
+            I get a Forbidden
+        """
+        from .mockers import create_context
+        username = 'sheldon'
+
+        self.create_user(test_manager)
+        self.create_user(username)
+        res = self.create_context(create_context)
+        chash = res.json['hash']
+        self.testapp.get('/contexts/%s/activities/authors' % (chash,), "", oauth2Header(username), status=403)
+
+    def test_get_count_context_authors_as_non_manager(self):
+        """
+            Given a user that is not Manager
+            When i try to list the count of context activity authors
+            I succeed
+        """
+        from .mockers import create_context, subscribe_context
+        username = 'sheldon'
+
+        self.create_user(test_manager)
+        self.create_user(username)
+        res = self.create_context(create_context)
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        chash = res.json['hash']
+        self.testapp.head('/contexts/%s/activities/authors' % (chash,), oauth2Header(username), status=200)

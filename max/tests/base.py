@@ -99,11 +99,18 @@ class MaxTestApp(object):
         res = testapp_method(*args, **kwargs)
         if status is not None:
             message = "Response status is {},  we're expecting {}. ".format(res.status_int, status)
+
+            # Identify whem response  contains a json formatted error
             if hasattr(res, 'json'):
                 if 'error' in getattr(res, 'json', []):
                     message += '\nRaised {error}: "{error_description}"'.format(**res.json)
+            # Identify errors without json
             elif res.status_int != status:
                 print res.body
+                # Print a alert to avoid going mad again debugging why a
+                # error response has no body, because was a HEAD ...
+                if res.request.method == 'HEAD':
+                    message += "\n\n  !!! WARNING:  Response has no body beacause is a HEAD request. !!!"
 
             self.testcase.assertEqual(status, res.status_int, message)
         return res

@@ -307,7 +307,6 @@ class Context(BaseContext):
     @property
     def __acl__(self):
         acl = []
-        acl += self.__parent__.__acl__
         acl.extend([
             (Allow, Authenticated, view_context),
             (Allow, Owner, modify_context),

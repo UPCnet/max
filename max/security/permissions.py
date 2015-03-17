@@ -1,5 +1,8 @@
 modify_context = 'Can modify context'
 list_contexts = 'List contexts'
+list_public_contexts = 'List public contexts'
 add_context = 'Add context'
 delete_context = 'Delete context'
 view_context = 'View context'
+view_stats = 'View stats'
+view_context_activity = 'View context activity'

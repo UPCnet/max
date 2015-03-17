@@ -93,8 +93,9 @@ def getUserTimelineAuthors(context, request):
         if not activities:
             extra = {'before': before} if before else {}
             activities = sorted_query(request, mmdb.activity, query, **extra)
+            activities_count = activities if isinstance(activities, int) else len(activities)
             queries += 1
-            still_has_activities = len(activities) > 0
+            still_has_activities = activities_count > 0
         if still_has_activities:
             activity = activities.pop(0)
             before = activity._id

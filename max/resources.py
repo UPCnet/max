@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from max import maxlogger
 from max.MADMax import MADMaxCollection
-from pyramid.security import Allow
+from pyramid.security import Allow, Authenticated
 
 
 from max.security import Manager
-from max.security.permissions import add_context, list_contexts, delete_context, modify_context, view_context
+from max.security.permissions import add_context, list_contexts, delete_context, modify_context, view_context, view_stats, list_public_contexts, view_context_activity
 import pkg_resources
+import inspect
 
 
 DUMMY_CLOUD_API_DATA = {
@@ -19,9 +20,40 @@ DUMMY_CLOUD_API_DATA = {
 }
 
 
+def get_pyramid_authorization_frame():
+    """
+        Returns the upper frame if we determine that on this point,
+        pyramid is checking the acls from the permits  method of the
+        authorization module
+    """
+
+    frame = inspect.currentframe().f_back.f_back
+    parent_method = frame.f_code.co_name
+    parent_filename = frame.f_code.co_filename
+    if parent_method == 'permits' and parent_filename.endswith('pyramid/authorization.py'):
+        return frame
+
+
 class Root(dict):
     __parent__ = __name__ = None
-    __acl__ = []
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, view_stats),
+        ]
+
+        # Grant the permission associated with the view to the authenticated user
+        # ONLY when we're making a HEAD request. This way we can keep view permissions sane
+        # Related to GET methods, while allowing HEAD counterpart available to the
+        # requesting user
+        if self.request.method == 'HEAD':
+            frame = get_pyramid_authorization_frame()
+            if frame:
+                required_view_permission = frame.f_locals['permission']
+                acl.append((Allow, Authenticated, required_view_permission))
+
+        return acl
 
     def __init__(self, request):
         self.request = request
@@ -41,13 +73,14 @@ class ContextTraverser(object):
     @property
     def __acl__(self):
         acl = []
-        acl += self.__parent__.__acl__
         acl.extend([
             (Allow, Manager, add_context),
             (Allow, Manager, list_contexts),
+            (Allow, Authenticated, list_public_contexts),
             (Allow, Manager, modify_context),
             (Allow, Manager, delete_context),
-            (Allow, Manager, view_context)
+            (Allow, Manager, view_context),
+            (Allow, Manager, view_context_activity)
         ])
         return acl
 
