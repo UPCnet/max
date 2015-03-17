@@ -1,0 +1,5 @@
+modify_context = 'Can modify context'
+list_contexts = 'List contexts'
+add_context = 'Add context'
+delete_context = 'Delete context'
+view_context = 'View context'

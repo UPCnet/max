@@ -66,10 +66,10 @@ class RequiredUserPredicate(object):
         if uri_username:
             username = uri_username.lower()
 
-        # Check a valid actor exists in the tdatabase
+        # Check a valid actor exists in the database
         if self.required:
             try:
-                actor = getUserActor(context.db, username)
+                actor = getUserActor(self.registry.max_store, username)
             except IndexError:
                 raise UnknownUserError('Unknown actor identified by username: %s' % username)
 

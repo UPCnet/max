@@ -15,13 +15,16 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
 from max.rest.utils import searchParams
 
+from max.security.permissions import add_context, list_contexts, delete_context, view_context, modify_context
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.view import view_config
 
 
-@view_config(route_name='contexts', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='contexts',
+    request_method='GET',
+    permission=list_contexts,
+    user_required=True)
 def getContexts(context, request):
     """
     """
@@ -31,9 +34,11 @@ def getContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='DELETE', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='context',
+    request_method='DELETE',
+    permission=delete_context,
+    user_required=True)
 def DeleteContext(context, request):
     """
     """
@@ -51,9 +56,11 @@ def DeleteContext(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='context', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='context',
+    request_method='GET',
+    permission=view_context,
+    user_required=True)
 def getContext(context, request):
     """
         /contexts/{hash}
@@ -71,7 +78,11 @@ def getContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='contexts', request_method='POST', restricted='Manager', user_required=True)
+@view_config(
+    route_name='contexts',
+    request_method='POST',
+    permission=add_context,
+    user_required=True)
 def addContext(context, request):
     """
         /contexts
@@ -102,7 +113,11 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='PUT', permission='Can modify context', user_required=True)
+@view_config(
+    route_name='context',
+    request_method='PUT',
+    permission=modify_context,
+    user_required=True)
 def ModifyContext(context, request):
     """
         /contexts/{hash}

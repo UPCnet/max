@@ -4,7 +4,7 @@ from zope.interface import implementer
 
 from max.exceptions import Unauthorized
 from max.resources import getMAXSettings
-from max.security import Owner
+from max.security import Owner, is_owner, get_user_roles
 
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.security import Authenticated
@@ -95,11 +95,12 @@ class MaxAuthenticationPolicy(object):
             when authorizing the user
         """
 
-        # The
         principals = self.authenticated_userid
         principals = [Everyone, Authenticated]
-        if request.context._owner == request.authenticated_userid:
+        if is_owner(request.context, request.authenticated_userid):
             principals.append(Owner)
+
+        principals.extend(get_user_roles(request, request.authenticated_userid))
         return principals
 
     def remember(self, request, principal, **kw):

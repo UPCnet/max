@@ -92,26 +92,6 @@ def getContextAuthors(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-def getContext(context, request):
-    """
-        /contexts/{hash}
-
-        [RESTRICTED] Return a context by its hash.
-    """
-    mmdb = MADMaxDB(context.db)
-    chash = request.matchdict.get('hash', None)
-    found_context = mmdb.contexts.getItemsByhash(chash)
-
-    if not found_context:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
-
-    handler = JSONResourceEntity(found_context[0].flatten())
-    return handler.buildResponse()
-
-
 @view_config(route_name='context_avatar', request_method='GET')
 @MaxResponse
 def getContextAvatar(context, request):

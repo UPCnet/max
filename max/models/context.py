@@ -8,8 +8,9 @@ from max.rest.utils import get_userid_from_twitter
 
 from hashlib import sha1
 from max import DEFAULT_CONTEXT_PERMISSIONS
-from pyramid.security import Allow
+from pyramid.security import Allow, Authenticated
 from max.security import Owner
+from max.security.permissions import modify_context, delete_context, view_context
 
 
 class BaseContext(MADBase):
@@ -305,9 +306,14 @@ class Context(BaseContext):
 
     @property
     def __acl__(self):
-        return [
-            (Allow, Owner, 'Can modify context'),
-        ]
+        acl = []
+        acl += self.__parent__.__acl__
+        acl.extend([
+            (Allow, Authenticated, view_context),
+            (Allow, Owner, modify_context),
+            (Allow, Owner, delete_context)
+        ])
+        return acl
 
     def alreadyExists(self):
         """

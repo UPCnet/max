@@ -2,9 +2,10 @@
 from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow
-from pyramid.security import Authenticated
-from pyramid.security import Everyone
 
+
+from max.security import Manager
+from max.security.permissions import add_context, list_contexts, delete_context, modify_context, view_context
 import pkg_resources
 
 
@@ -20,29 +21,41 @@ DUMMY_CLOUD_API_DATA = {
 
 class Root(dict):
     __parent__ = __name__ = None
-    __acl__ = [(Allow, Everyone, 'anonymous'),
-               (Allow, Authenticated, 'restricted'),
-               (Allow, 'operations', 'operations'),
-               (Allow, 'admin', 'admin')
-               ]
+    __acl__ = []
 
     def __init__(self, request):
         self.request = request
         # MongoDB:
         registry = self.request.registry
         self.db = registry.max_store
-        self['contexts'] = ContextTraverser(request)
+        self['contexts'] = ContextTraverser(self, request)
 
 
 class ContextTraverser(object):
-    def __init__(self, request):
+    def __init__(self, parent, request):
         self.request = request
+        self.__parent__ = parent
         self.db = self.request.registry.max_store.contexts
         self.contexts = MADMaxCollection(self.db, query_key='hash')
 
+    @property
+    def __acl__(self):
+        acl = []
+        acl += self.__parent__.__acl__
+        acl.extend([
+            (Allow, Manager, add_context),
+            (Allow, Manager, list_contexts),
+            (Allow, Manager, modify_context),
+            (Allow, Manager, delete_context),
+            (Allow, Manager, view_context)
+        ])
+        return acl
+
     def __getitem__(self, key):
         try:
-            return self.contexts[key]
+            context = self.contexts[key]
+            context.__parent__ = self
+            return context
         except:
             raise KeyError(key)
 

@@ -25,7 +25,7 @@ PUBLIC_RESOURCES = {
     'user_conversation': {'route': '/people/{username}/conversations/{id}', 'category': 'Conversations', 'name': 'User conversation'},
     'user_conversation_messages': {'route': '/people/{username}/conversations/{id}/messages', 'category': 'Conversations', 'name': 'User conversation messages'},
 
-    'contexts': {'route': '/contexts', 'category': 'Contexts', 'name': 'Contexts'},
+    'contexts': {'route': '/contexts', 'category': 'Contexts', 'name': 'Contexts', 'traverse': '/contexts'},
     'context': {'route': '/contexts/{hash}', 'category': 'Contexts', 'name': 'Context', 'traverse': '/contexts/{hash}'},
     'context_avatar': {'route': '/contexts/{hash}/avatar', 'filesystem': True, 'category': 'Contexts', 'name': 'Context avatar'},
     'public_contexts': {'route': '/contexts/public', 'category': 'Contexts', 'name': 'Public contexts'},
