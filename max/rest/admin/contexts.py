@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADMax import MADMaxCollection
 from max.MADMax import MADMaxDB
 from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
-from max.exceptions import InvalidPermission
 from max.exceptions import ObjectNotFound
-from max.exceptions import Unauthorized
 from max.exceptions import ValidationError
 from max.models import Context
 from max.oauth2 import oauth2
@@ -14,8 +10,12 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import extractPostData
 from max.rest.utils import searchParams
+from max.security.permissions import add_context
+from max.security.permissions import delete_context
+from max.security.permissions import list_contexts
+from max.security.permissions import modify_context
+from max.security.permissions import view_context
 
-from max.security.permissions import add_context, list_contexts, delete_context, view_context, modify_context
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.view import view_config
 
@@ -132,135 +132,11 @@ def ModifyContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permission', request_method='PUT', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
-def grantPermissionOnContext(context, request):
-    """ [RESTRICTED]
-    """
-    permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'subscribe', 'invite', 'delete', 'flag']:
-        raise InvalidPermission("There's not any permission named '%s'" % permission)
-
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to set the permission
-
-    if permission in subscription.get('_grants', []):
-        # Already have the permission grant
-        code = 200
-    else:
-        # Assign the permission
-        code = 201
-        subscription = request.actor.grantPermission(
-            subscription,
-            permission,
-            permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
-
-    handler = JSONResourceEntity(subscription, status_code=code)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context_user_permission', request_method='DELETE', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
-def revokePermissionOnContext(context, request):
-    """ [RESTRICTED]
-    """
-    permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'subscribe', 'invite', 'flag']:
-        raise InvalidPermission("There's not any permission named '%s'" % permission)
-
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized("You can't remove permissions on a context where you are not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to remove the permission
-
-    code = 200
-    if permission in subscription.get('_vetos', []):
-        code = 200
-        # Alredy vetted
-    else:
-        # We have the permission, let's delete it
-        subscription = request.actor.revokePermission(
-            subscription,
-            permission,
-            permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
-        code = 201
-    handler = JSONResourceEntity(subscription, status_code=code)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context_user_permissions_defaults', request_method='POST', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
-def resetPermissionsOnContext(context, request):
-    """ [RESTRICTED]
-    """
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to reset the permissions
-
-    contexts = MADMaxCollection(context.db.contexts)
-    maxcontext = contexts.getItemsByhash(chash)[0]
-    subscription = request.actor.reset_permissions(subscription, maxcontext)
-    handler = JSONResourceEntity(subscription, status_code=200)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context_subscriptions', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-def getContextSubscriptions(context, request):
-    """
-    """
-    chash = request.matchdict['hash']
-    mmdb = MADMaxDB(context.db)
-    found_users = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
-
-    for user in found_users:
-        subscription = user['subscribedTo'][0]
-        del user['subscribedTo']
-        user['permissions'] = subscription.pop('permissions')
-        user['vetos'] = subscription.pop('vetos', [])
-        user['grants'] = subscription.pop('grants', [])
-
-    handler = JSONResourceRoot(found_users)
-    return handler.buildResponse()
-
-
-@view_config(route_name='context_tags', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='context_tags',
+    request_method='GET',
+    permission=view_context,
+    user_required=True)
 def getContextTags(context, request):
     """
     """
@@ -271,9 +147,11 @@ def getContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_tags', request_method='DELETE', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='context_tags',
+    request_method='DELETE',
+    permission=modify_context,
+    user_required=True)
 def clearContextTags(context, request):
     """
     """
@@ -288,9 +166,11 @@ def clearContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_tags', request_method='PUT', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@view_config(
+    route_name='context_tags',
+    request_method='PUT',
+    permission=modify_context,
+    user_required=True)
 def updateContextTags(context, request):
     """
     """
@@ -315,7 +195,11 @@ def updateContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_tag', request_method='DELETE', restricted='Manager')
+@view_config(
+    route_name='context_tag',
+    request_method='DELETE',
+    permission=modify_context,
+    user_required=True)
 @MaxResponse
 @oauth2(['widgetcli'])
 def removeContextTag(context, request):
@@ -335,29 +219,3 @@ def removeContextTag(context, request):
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
     return HTTPNoContent()
-
-
-@view_config(route_name='context_push_tokens', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-def getPushTokensForContext(context, request):
-    """
-         /contexts/{hash}/tokens
-         Return all relevant tokens for a given context
-    """
-
-    cid = request.matchdict['hash']
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-    ctxt = contexts[cid]
-
-    users = ctxt.subscribedUsers()
-
-    result = []
-    for user in users:
-        for idevice in user.get('iosDevices', []):
-            result.append(dict(token=idevice, platform='iOS', username=user.get('username')))
-        for adevice in user.get('androidDevices', []):
-            result.append(dict(token=adevice, platform='android', username=user.get('username')))
-
-    handler = JSONResourceRoot(result)
-    return handler.buildResponse()
