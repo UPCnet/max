@@ -12,6 +12,7 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
 from max.rest.utils import extractPostData
 
+from max.security.permissions import add_people
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.settings import asbool
 from pyramid.view import view_config
@@ -63,11 +64,11 @@ def ModifyUser(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='users', request_method='POST', restricted='Manager')
-@view_config(route_name='user', request_method='POST', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(exists=False, force_own=False)
+#@view_config(route_name='users', request_method='POST', restricted='Manager')
+from max.views import endpoint
+
+
+@endpoint(route_name='user', request_method='POST', permission=add_people, user_required=False)
 def addUser(context, request):
     """
         /people/{username}

@@ -73,14 +73,14 @@ class RequiredUserPredicate(object):
             except IndexError:
                 raise UnknownUserError('Unknown actor identified by username: %s' % username)
 
-            def getActor(request):
-                try:
-                    actor.setdefault('displayName', actor['username'])
-                    return actor
-                except:
-                    return None
+        def getActor(request):
+            try:
+                actor.setdefault('displayName', actor['username'])
+                return actor
+            except:
+                return None
 
-            request.set_property(getActor, name='actor', reify=True)
+        request.set_property(getActor, name='actor', reify=True)
 
         # Inner methods define here to use var username as a closure
 

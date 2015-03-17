@@ -33,8 +33,8 @@ def attach(wrapped, callback, **kwargs):
     attach_info.codeinfo = new_codeinfo
     return attach_info
 
-venusian.original_attach = venusian.attach
-venusian.attach = attach
+# venusian.original_attach = venusian.attach
+# venusian.attach = attach
 
 
 # Patch to disable requests logging on gevent

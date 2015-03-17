@@ -41,6 +41,7 @@ class Root(dict):
     def __acl__(self):
         acl = [
             (Allow, Manager, view_stats),
+            (Allow, Manager, 'Add people')
         ]
 
         # Grant the permission associated with the view to the authenticated user

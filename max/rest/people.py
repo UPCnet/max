@@ -70,57 +70,57 @@ def getUser(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='users', request_method='POST')
-@view_config(route_name='user', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(exists=False)
-def addOwnUser(context, request):
-    """
-        /people/{username}
+# @view_config(route_name='users', request_method='POST')
+# @view_config(route_name='user', request_method='POST')
+# @MaxResponse
+# @oauth2(['widgetcli'])
+# @requirePersonActor(exists=False)
+# def addOwnUser(context, request):
+#     """
+#         /people/{username}
 
-        Creates a the own system user.
-    """
-    username = request.matchdict.get('username', None)
-    if username is None:
-        params = extractPostData(request)
-        username = params.get('username', None)
-        if username is None:
-            raise ValidationError('Missing username in request')
+#         Creates a the own system user.
+#     """
+#     username = request.matchdict.get('username', None)
+#     if username is None:
+#         params = extractPostData(request)
+#         username = params.get('username', None)
+#         if username is None:
+#             raise ValidationError('Missing username in request')
 
-    rest_params = {'username': username.lower()}
+#     rest_params = {'username': username.lower()}
 
-    # Initialize a User object from the request
-    newuser = User()
-    newuser.fromRequest(request, rest_params=rest_params)
+#     # Initialize a User object from the request
+#     newuser = User()
+#     newuser.fromRequest(request, rest_params=rest_params)
 
-    # If we have the _id setted, then the object already existed in the DB,
-    # otherwise, proceed to insert it into the DB
-    # In both cases, respond with the JSON of the object and the appropiate
-    # HTTP Status Code
+#     # If we have the _id setted, then the object already existed in the DB,
+#     # otherwise, proceed to insert it into the DB
+#     # In both cases, respond with the JSON of the object and the appropiate
+#     # HTTP Status Code
 
-    if newuser.get('_id'):
-        # Already Exists
-        code = 200
+#     if newuser.get('_id'):
+#         # Already Exists
+#         code = 200
 
-        # Determine if we have to recreate exchanges for an existing user
-        # Defaults NOT to recreate them if not specified
-        create_exchanges = asbool(request.params.get('notifications', False))
-        if create_exchanges:
-            notifier = RabbitNotifications(request)
-            notifier.add_user(username)
-    else:
-        # New User
-        code = 201
+#         # Determine if we have to recreate exchanges for an existing user
+#         # Defaults NOT to recreate them if not specified
+#         create_exchanges = asbool(request.params.get('notifications', False))
+#         if create_exchanges:
+#             notifier = RabbitNotifications(request)
+#             notifier.add_user(username)
+#     else:
+#         # New User
+#         code = 201
 
-        # Determine if we have to recreate exchanges for a new user
-        # Defaults to Create them if not specified
-        create_exchanges = asbool(request.params.get('notifications', True))
-        userid = newuser.insert(notifications=create_exchanges)
+#         # Determine if we have to recreate exchanges for a new user
+#         # Defaults to Create them if not specified
+#         create_exchanges = asbool(request.params.get('notifications', True))
+#         userid = newuser.insert(notifications=create_exchanges)
 
-        newuser['_id'] = userid
-    handler = JSONResourceEntity(newuser.flatten(), status_code=code)
-    return handler.buildResponse()
+#         newuser['_id'] = userid
+#     handler = JSONResourceEntity(newuser.flatten(), status_code=code)
+#     return handler.buildResponse()
 
 
 @view_config(route_name='avatar', request_method='GET')

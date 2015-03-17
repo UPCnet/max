@@ -6,3 +6,5 @@ delete_context = 'Delete context'
 view_context = 'View context'
 view_stats = 'View stats'
 view_context_activity = 'View context activity'
+
+add_people = 'Add people'
