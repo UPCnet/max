@@ -18,12 +18,15 @@ import unittest
 class ContextACLTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
-        conf_dir = os.path.dirname(__file__)
+        conf_dir = os.path.dirname(os.path.dirname(__file__))
+
         self.app = loadapp('config:tests.ini', relative_to=conf_dir)
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
         self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.drop_collection('conversations')
+        self.app.registry.max_store.drop_collection('messages')
         self.app.registry.max_store.security.insert(test_default_security)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
@@ -37,7 +40,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to get create a context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
 
         self.create_user(test_manager)
         self.testapp.post('/contexts', json.dumps(create_context), oauth2Header(test_manager), status=201)
@@ -48,7 +51,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to create a context
             I get a Forbidden exception
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(username)
@@ -63,7 +66,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             I succeed
         """
 
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         self.create_user(test_manager)
         res = self.create_context(create_context)
         chash = res.json['hash']
@@ -75,7 +78,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to update any context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -92,7 +95,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to get all contexts
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
 
         self.create_user(test_manager)
         self.create_context(create_context)
@@ -104,7 +107,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to get all contexts
             I get a Forbidden exception
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -121,7 +124,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             I succeed
         """
 
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         self.create_user(test_manager)
         res = self.create_context(create_context)
         chash = res.json['hash']
@@ -135,7 +138,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             I succeed
         """
 
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         self.create_user(test_manager)
         self.create_user(test_manager2)
         res = self.create_context(create_context)
@@ -149,7 +152,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to update the context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -165,7 +168,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to update the context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -182,7 +185,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to remove a context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         self.create_user(test_manager)
         res = self.create_context(create_context)
         chash = res.json['hash']
@@ -195,7 +198,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to remove a context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         self.create_user(test_manager)
         self.create_user(test_manager2)
         res = self.create_context(create_context)
@@ -209,7 +212,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to remove a context
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -225,7 +228,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to remove a context
             I get a Forbidden
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -242,7 +245,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to list context activity authors
             I succeed
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
 
         self.create_user(test_manager)
         res = self.create_context(create_context)
@@ -255,7 +258,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to list context activity authors
             I get a Forbidden
         """
-        from .mockers import create_context
+        from max.tests.mockers import create_context
         username = 'sheldon'
 
         self.create_user(test_manager)
@@ -270,7 +273,7 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
             When i try to list the count of context activity authors
             I succeed
         """
-        from .mockers import create_context, subscribe_context
+        from max.tests.mockers import create_context, subscribe_context
         username = 'sheldon'
 
         self.create_user(test_manager)
