@@ -99,7 +99,6 @@ class MaxTestApp(object):
         res = testapp_method(*args, **kwargs)
         if status is not None:
             message = "Response status is {},  we're expecting {}. ".format(res.status_int, status)
-
             # Identify whem response  contains a json formatted error
             if hasattr(res, 'json'):
                 if 'error' in getattr(res, 'json', []):
@@ -128,12 +127,12 @@ class MaxTestBase(object):
         self.assertFalse(os.path.exists(path))
 
     def create_user(self, username, qs_params={}, expect=201, creator=test_manager, **kwargs):
-        payload = {}
+        payload = {'username': username}
         for key, value in kwargs.items():
             payload[key] = value
 
         qs = '?{}'.format(urlencode(qs_params)) if qs_params else ''
-        res = self.testapp.post('/people/%s%s' % (username, qs), json.dumps(payload), oauth2Header(creator), status=expect)
+        res = self.testapp.post('/people%s' % (qs), json.dumps(payload), oauth2Header(creator), status=expect)
         return res
 
     def modify_user(self, username, properties):

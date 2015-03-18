@@ -6,6 +6,10 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.utils import flatten
 from max.rest.utils import getMaxModelByObjectType
 
+from pyramid.security import Allow
+from max.security import Owner
+from max.security.permissions import modify_user
+
 from bson import ObjectId
 from pyramid.settings import asbool
 
@@ -75,6 +79,14 @@ class User(MADBase):
             'default': []
         },
     }
+
+    @property
+    def __acl__(self):
+        acl = []
+        acl.extend([
+            (Allow, Owner, modify_user),
+        ])
+        return acl
 
     def getOwner(self, request):
         """

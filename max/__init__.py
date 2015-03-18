@@ -58,6 +58,7 @@ def main(*args, **settings):
 
     # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
     config.add_tween('pyramid.tweens.excview_tween_factory')
+    config.add_tween('max.tweens.deprecation_wrapper_factory')
     config.add_tween('max.tweens.post_tunneling_factory')
     config.add_tween('max.tweens.compatibility_checker_factory')
 

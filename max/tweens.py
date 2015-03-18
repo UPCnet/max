@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from max.exceptions.http import JSONHTTPPreconditionFailed
 
+import re
+import json
+
 
 def compatibility_checker_factory(handler, registry):
     def compatibility_checker_tween(request):
@@ -44,6 +47,27 @@ def post_tunneling_factory(handler, registry):
         response = handler(request)
         return response
     return post_tunneling_tween
+
+people_resource_matcher = re.compile(r'/people/([^\/]+)$').search
+
+
+def deprecation_wrapper_factory(handler, registry):
+    def deprecation_wrapper_tween(request):
+        if request.method == 'POST':
+            match = people_resource_matcher(request.path_info)
+            if match:
+                # We have a deprecated use of creating an user, let's try to refactor it
+                username = match.groups()[0]
+                try:
+                    replacement_body = json.loads(request.body)
+                except:
+                    replacement_body = {}
+                replacement_body['username'] = username
+                request.body = json.dumps(replacement_body)
+                request.path_info = '/people'
+        response = handler(request)
+        return response
+    return deprecation_wrapper_tween
 
 
 def browser_debug_factory(handler, registry):

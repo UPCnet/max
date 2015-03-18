@@ -95,8 +95,7 @@ class MaxAuthenticationPolicy(object):
             when authorizing the user
         """
 
-        principals = self.authenticated_userid
-        principals = [Everyone, Authenticated]
+        principals = [Everyone, Authenticated, request.authenticated_userid]
         if is_owner(request.context, request.authenticated_userid):
             principals.append(Owner)
 

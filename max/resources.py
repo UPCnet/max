@@ -5,7 +5,8 @@ from pyramid.security import Allow, Authenticated
 
 
 from max.security import Manager
-from max.security.permissions import add_context, list_contexts, delete_context, modify_context, view_context, view_stats, list_public_contexts, view_context_activity
+from max.security import permissions
+
 import pkg_resources
 import inspect
 
@@ -40,8 +41,6 @@ class Root(dict):
     @property
     def __acl__(self):
         acl = [
-            (Allow, Manager, view_stats),
-            (Allow, Manager, 'Add people')
         ]
 
         # Grant the permission associated with the view to the authenticated user
@@ -52,7 +51,7 @@ class Root(dict):
             frame = get_pyramid_authorization_frame()
             if frame:
                 required_view_permission = frame.f_locals['permission']
-                acl.append((Allow, Authenticated, required_view_permission))
+                acl.append((Allow, self.request.authenticated_userid, required_view_permission))
 
         return acl
 
@@ -62,36 +61,58 @@ class Root(dict):
         registry = self.request.registry
         self.db = registry.max_store
         self['contexts'] = ContextTraverser(self, request)
+        self['people'] = PeopleTraverser(self, request)
 
 
-class ContextTraverser(object):
+class MongoDBTraverser(MADMaxCollection):
+    collection_name = ''
+    query_key = '_id'
+
     def __init__(self, parent, request):
         self.request = request
         self.__parent__ = parent
-        self.db = self.request.registry.max_store.contexts
-        self.contexts = MADMaxCollection(self.db, query_key='hash')
+        self.collection = self.request.registry.max_store[self.collection_name]
+        self.show_fields = None
+
+
+class ContextTraverser(MongoDBTraverser):
+    collection_name = 'contexts'
+    query_key = 'hash'
 
     @property
     def __acl__(self):
-        acl = []
-        acl.extend([
-            (Allow, Manager, add_context),
-            (Allow, Manager, list_contexts),
-            (Allow, Authenticated, list_public_contexts),
-            (Allow, Manager, modify_context),
-            (Allow, Manager, delete_context),
-            (Allow, Manager, view_context),
-            (Allow, Manager, view_context_activity)
-        ])
+        acl = [
+            (Allow, Manager, permissions.add_context),
+            (Allow, Manager, permissions.list_contexts),
+            (Allow, Authenticated, permissions.list_public_contexts),
+            (Allow, Manager, permissions.modify_context),
+            (Allow, Manager, permissions.delete_context),
+            (Allow, Manager, permissions.view_context),
+            (Allow, Manager, permissions.view_context_activity)
+        ]
         return acl
 
-    def __getitem__(self, key):
-        try:
-            context = self.contexts[key]
-            context.__parent__ = self
-            return context
-        except:
-            raise KeyError(key)
+
+class PeopleTraverser(MongoDBTraverser):
+    collection_name = 'users'
+    query_key = 'username'
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.add_people),
+            (Allow, Manager, permissions.list_all_people),
+            (Allow, Manager, permissions.modify_user),
+            (Allow, Manager, permissions.delete_user),
+            (Allow, Authenticated, permissions.list_visible_people),
+            (Allow, Authenticated, permissions.view_user_profile),
+        ]
+
+        # Grant add permission if user is trying to create itself
+        if self.request.authenticated_userid == self.request.target_user:
+            acl.append((Allow, self.request.authenticated_userid, permissions.add_people))
+
+        return acl
 
 
 def getMAXSettings(request):

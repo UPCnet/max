@@ -1,6 +1,6 @@
 PUBLIC_RESOURCES = {
-    'users': {'route': '/people', 'category': 'User', 'name': 'Users'},
-    'user': {'route': '/people/{username}', 'category': 'User', 'name': 'User'},
+    'users': {'route': '/people', 'category': 'User', 'name': 'Users', 'traverse': '/people'},
+    'user': {'route': '/people/{username}', 'category': 'User', 'name': 'User', 'traverse': '/people/{username}'},
     'avatar': {'route': '/people/{username}/avatar', 'filesystem': True, 'category': 'User', 'name': 'User avatar'},
     'avatar_sizes': {'route': '/people/{username}/avatar/{size}', 'filesystem': True, 'category': 'User', 'name': 'User avatar sizes'},
     'user_activities': {'route': '/people/{username}/activities', 'category': 'Activities', 'name': 'User activities'},

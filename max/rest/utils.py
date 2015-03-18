@@ -108,7 +108,7 @@ def getUsernameFromPOSTBody(request):
     """
     decoded_data = extractPostData(request)
     if isinstance(decoded_data, dict):
-        return decoded_data.get('actor', {}).get('username', None)
+        return decoded_data.get('username', None)
     return None
 
 

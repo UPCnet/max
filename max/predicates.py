@@ -66,6 +66,8 @@ class RequiredUserPredicate(object):
         if uri_username:
             username = uri_username.lower()
 
+        target_user = getUsernameFromPOSTBody(request)
+
         # Check a valid actor exists in the database
         if self.required:
             try:
@@ -84,6 +86,9 @@ class RequiredUserPredicate(object):
 
         # Inner methods define here to use var username as a closure
 
+        def getTarget(request):
+            return target_user
+
         def getCreator(request):
             return username
 
@@ -94,5 +99,6 @@ class RequiredUserPredicate(object):
 
         request.set_property(getCreator, name='creator', reify=True)
         request.set_property(getRoles, name='roles', reify=True)
+        request.set_property(getTarget, name='target_user', reify=True)
 
         return True

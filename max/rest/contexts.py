@@ -28,17 +28,16 @@ from max.rest import endpoint
 
 
 @endpoint(route_name='contexts', request_method='GET', permission=list_contexts, user_required=True)
-def getContexts(context, request):
+def getContexts(contexts, request):
     """
     """
-    mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.contexts.search({}, flatten=1, **searchParams(request))
+    found_contexts = contexts.search({}, flatten=1, **searchParams(request))
     handler = JSONResourceRoot(found_contexts)
     return handler.buildResponse()
 
 
 @endpoint(route_name='contexts', request_method='POST', permission=add_context, user_required=True)
-def addContext(context, request):
+def addContext(contexts, request):
     """
         /contexts
 
@@ -75,14 +74,7 @@ def getContext(context, request):
 
         [RESTRICTED] Return a context by its hash.
     """
-    mmdb = MADMaxDB(context.db)
-    chash = request.matchdict.get('hash', None)
-    found_context = mmdb.contexts.getItemsByhash(chash)
-
-    if not found_context:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
-
-    handler = JSONResourceEntity(found_context[0].getInfo())
+    handler = JSONResourceEntity(context.getInfo())
     return handler.buildResponse()
 
 
@@ -105,17 +97,9 @@ def ModifyContext(context, request):
 def DeleteContext(context, request):
     """
     """
-    mmdb = MADMaxDB(context.db)
-    chash = request.matchdict.get('hash', None)
-    found_contexts = mmdb.contexts.getItemsByhash(chash)
-
-    if not found_contexts:
-        raise ObjectNotFound("There's no context matching this url hash: %s" % chash)
-
-    ctx = found_contexts[0]
-    ctx.removeUserSubscriptions()
-    ctx.removeActivities(logical=True)
-    ctx.delete()
+    context.removeUserSubscriptions()
+    context.removeActivities(logical=True)
+    context.delete()
     return HTTPNoContent()
 
 
@@ -123,9 +107,6 @@ def DeleteContext(context, request):
 def getContextTags(context, request):
     """
     """
-    chash = request.matchdict['hash']
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-    context = contexts[chash]
     handler = JSONResourceRoot(context.tags)
     return handler.buildResponse()
 
@@ -134,9 +115,6 @@ def getContextTags(context, request):
 def clearContextTags(context, request):
     """
     """
-    chash = request.matchdict['hash']
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-    context = contexts[chash]
     context.tags = []
     context.save()
     context.updateContextActivities(force_update=True)
@@ -149,7 +127,6 @@ def clearContextTags(context, request):
 def updateContextTags(context, request):
     """
     """
-    chash = request.matchdict['hash']
     tags = extractPostData(request)
 
     # Validate tags is a list of strings
@@ -159,8 +136,6 @@ def updateContextTags(context, request):
     if not valid_tags:
         raise ValidationError("Sorry, We're expecting a list of strings...")
 
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-    context = contexts[chash]
     context.tags.extend(tags)
     context.tags = list(set(context.tags))
     context.save()
@@ -176,10 +151,7 @@ def updateContextTags(context, request):
 def removeContextTag(context, request):
     """
     """
-    chash = request.matchdict['hash']
     tag = request.matchdict['tag']
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
-    context = contexts[chash]
 
     try:
         context.tags.remove(tag)
@@ -193,14 +165,13 @@ def removeContextTag(context, request):
 
 
 @endpoint(route_name='public_contexts', request_method='GET', permission=list_public_contexts, user_required=True)
-def getPublicContexts(context, request):
+def getPublicContexts(contexts, request):
     """
         /contexts/public
 
         Return a list of public-subscribable contexts
     """
-    mmdb = MADMaxDB(context.db)
-    found_contexts = mmdb.contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
+    found_contexts = contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
     handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'published']))
     return handler.buildResponse()

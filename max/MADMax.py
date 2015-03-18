@@ -253,8 +253,11 @@ class MADMaxCollection(object):
         query = self._getQuery(itemID)
         item = self.collection.find_one(query, self.show_fields)
         if item:
-            return self.ItemWrapper(item)
+            wrapped = self.ItemWrapper(item)
+            wrapped.__parent__ = self
+            return wrapped
         else:
+            import ipdb;ipdb.set_trace()
             querykey = len(query.keys()) == 1 and query.keys()[0] or 'id'
             raise ObjectNotFound("Object with %s %s not found inside %s" % (querykey, itemID, self.collection.name))
 
@@ -267,7 +270,7 @@ class MADMaxCollection(object):
             fieldname = name[10:]
             return lambda value: self._getItemsByFieldName(fieldname, value)
         else:
-            getattr(self, name)
+            raise AttributeError(name)
 
     def dump(self, flatten=0, **kwargs):
         """
