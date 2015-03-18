@@ -65,7 +65,7 @@ def ModifyUser(context, request):
 
 
 #@view_config(route_name='users', request_method='POST', restricted='Manager')
-from max.views import endpoint
+from max.rest import endpoint
 
 
 @endpoint(route_name='user', request_method='POST', permission=add_people, user_required=False)

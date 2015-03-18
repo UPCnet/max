@@ -24,14 +24,10 @@ from max.security.permissions import view_context
 from max.security.permissions import view_context_activity
 
 from pyramid.httpexceptions import HTTPNoContent
-from pyramid.view import view_config
+from max.rest import endpoint
 
 
-@view_config(
-    route_name='contexts',
-    request_method='GET',
-    permission=list_contexts,
-    user_required=True)
+@endpoint(route_name='contexts', request_method='GET', permission=list_contexts, user_required=True)
 def getContexts(context, request):
     """
     """
@@ -41,11 +37,7 @@ def getContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='contexts',
-    request_method='POST',
-    permission=add_context,
-    user_required=True)
+@endpoint(route_name='contexts', request_method='POST', permission=add_context, user_required=True)
 def addContext(context, request):
     """
         /contexts
@@ -76,11 +68,7 @@ def addContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context',
-    request_method='GET',
-    permission=view_context,
-    user_required=True)
+@endpoint(route_name='context', request_method='GET', permission=view_context, user_required=True)
 def getContext(context, request):
     """
         /contexts/{hash}
@@ -98,11 +86,7 @@ def getContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context',
-    request_method='PUT',
-    permission=modify_context,
-    user_required=True)
+@endpoint(route_name='context', request_method='PUT', permission=modify_context, user_required=True)
 def ModifyContext(context, request):
     """
         /contexts/{hash}
@@ -117,11 +101,7 @@ def ModifyContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context',
-    request_method='DELETE',
-    permission=delete_context,
-    user_required=True)
+@endpoint(route_name='context', request_method='DELETE', permission=delete_context, user_required=True)
 def DeleteContext(context, request):
     """
     """
@@ -139,11 +119,7 @@ def DeleteContext(context, request):
     return HTTPNoContent()
 
 
-@view_config(
-    route_name='context_tags',
-    request_method='GET',
-    permission=view_context,
-    user_required=True)
+@endpoint(route_name='context_tags', request_method='GET', permission=view_context, user_required=True)
 def getContextTags(context, request):
     """
     """
@@ -154,11 +130,7 @@ def getContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context_tags',
-    request_method='DELETE',
-    permission=modify_context,
-    user_required=True)
+@endpoint(route_name='context_tags', request_method='DELETE', permission=modify_context, user_required=True)
 def clearContextTags(context, request):
     """
     """
@@ -173,11 +145,7 @@ def clearContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context_tags',
-    request_method='PUT',
-    permission=modify_context,
-    user_required=True)
+@endpoint(route_name='context_tags', request_method='PUT', permission=modify_context, user_required=True)
 def updateContextTags(context, request):
     """
     """
@@ -202,11 +170,7 @@ def updateContextTags(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context_tag',
-    request_method='DELETE',
-    permission=modify_context,
-    user_required=True)
+@endpoint(route_name='context_tag', request_method='DELETE', permission=modify_context, user_required=True)
 @MaxResponse
 @oauth2(['widgetcli'])
 def removeContextTag(context, request):
@@ -228,11 +192,7 @@ def removeContextTag(context, request):
     return HTTPNoContent()
 
 
-@view_config(
-    route_name='public_contexts',
-    request_method='GET',
-    permission=list_public_contexts,
-    user_required=True)
+@endpoint(route_name='public_contexts', request_method='GET', permission=list_public_contexts, user_required=True)
 def getPublicContexts(context, request):
     """
         /contexts/public
@@ -246,11 +206,7 @@ def getPublicContexts(context, request):
     return handler.buildResponse()
 
 
-@view_config(
-    route_name='context_activities_authors',
-    request_method='GET',
-    permission=view_context_activity,
-    user_required=True)
+@endpoint(route_name='context_activities_authors', request_method='GET', permission=view_context_activity, user_required=True)
 def getContextAuthors(context, request):
     """
         /contexts/{hash}/activities/authors

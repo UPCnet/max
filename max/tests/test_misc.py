@@ -82,3 +82,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers['X-HTTP-Method-Override'] = 'PUT'
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
+
