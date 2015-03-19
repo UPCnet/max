@@ -268,3 +268,50 @@ class SubscriptionsACLTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
         self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
         self.testapp.get('/contexts/{}/subscriptions'.format(chash), "", headers=oauth2Header(other), status=403)
+
+    def test_get_user_subscriptions_as_manager(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to get all subscriptions from a user
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+
+        self.create_user(username)
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'})
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.testapp.get('/people/{}/subscriptions'.format(username), "", headers=oauth2Header(test_manager), status=200)
+
+    def test_get_own_user_subscriptions(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            When i try to get all my subscriptions
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+
+        self.create_user(username)
+
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'}, owner=username)
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.testapp.get('/people/{}/subscriptions'.format(username), "", headers=oauth2Header(username), status=200)
+
+    def test_get_user_subscriptions_as_non_manager_neither_own(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            When i try to get all subscriptions from another user
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'}, owner=username)
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.testapp.get('/people/{}/subscriptions'.format(username), "", headers=oauth2Header(other), status=403)
+

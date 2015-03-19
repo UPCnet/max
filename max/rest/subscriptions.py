@@ -63,12 +63,11 @@ def unsubscribe(subscription, request):
 
 
 @view_config(route_name='context_subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
-def getContextSubscriptions(subscriptions, request):
+def getContextSubscriptions(context, request):
     """
     """
-    chash = request.matchdict['hash']
     mmdb = MADMaxDB(request.db)
-    found_users = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
+    found_users = mmdb.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
     for user in found_users:
 
         subscription = user['subscribedTo'][0]
@@ -81,26 +80,20 @@ def getContextSubscriptions(subscriptions, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='GET', requires_actor=True)
-def getUserSubscriptions(context, request):
+@view_config(route_name='subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
+def getUserSubscriptions(user, request):
     """
         /people/{username}/subscriptions
 
         List all subscriptions for the the suplied oauth user.
     """
+    subscriptions = user.get('subscribedTo', [])
 
     search_params = searchParams(request)
-
-    # XXX Remove when refactoring subscriptions storage to a different collection
     tags = set(search_params.pop('tags', []))
 
-    mmdb = MADMaxDB(request.db)
-    query = {'username': request.actor['username']}
-    users = mmdb.users.search(query, preserve=["username", "subscribedTo"], flatten=1, **search_params)
-
-    subscriptions = users[0]['subscribedTo'] if users else []
-
-    # XXX Remove when refactoring subscriptions storage to a different collection
+    # XXX Whhen refactoring subscriptions storage to a different collection
+    # Change this for a search on subscriptions collection
     if tags:
         filtered_subscriptions = []
         for subscription in subscriptions:

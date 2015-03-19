@@ -2,7 +2,7 @@
 from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
-
+from max.exceptions import ObjectNotFound
 from max.security import Manager, is_self_operation, Owner
 from max.security import permissions
 
@@ -100,6 +100,26 @@ class PeopleTraverser(MongoDBTraverser):
     collection_name = 'users'
     query_key = 'username'
 
+    def __getitem__(self, userid):
+        """
+            Overrides __getitem__ to avoid fetching the user twice , when
+            user that we're going to request is the same actor on the request.
+
+            Because the actor on the request won't be in the traversal chain,
+            provide it a parent before returning.
+
+            If the userid doesn't match the request actor fallback to query database.
+            If the actor doesn't exists, raise a not found.
+        """
+        if userid == self.request.actor_username:
+            actor = self.request.actor
+            if actor is None:
+                raise ObjectNotFound("Object with %s %s not found inside %s" % (self.query_key, userid, self.collection.name))
+            actor.__parent__ = self
+            return actor
+
+        return MADMaxCollection.__getitem__(self, userid)
+
     @property
     def __acl__(self):
         acl = [
@@ -109,6 +129,8 @@ class PeopleTraverser(MongoDBTraverser):
             (Allow, Manager, permissions.delete_user),
             (Allow, Authenticated, permissions.list_visible_people),
             (Allow, Authenticated, permissions.view_user_profile),
+            (Allow, Manager, permissions.view_subscriptions),
+            (Allow, Owner, permissions.view_subscriptions),
         ]
 
         # Grant add permission if user is trying to create itself
