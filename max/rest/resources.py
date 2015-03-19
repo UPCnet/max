@@ -18,7 +18,7 @@ PUBLIC_RESOURCES = {
     'activity_comments': dict(route='/activities/{activity}/comments', category='Comments', name='Activity comments'),
     'activity_comment': dict(route='/activities/{activity}/comments/{comment}', category='Comments', name='Activity comment'),
 
-    'subscriptions': dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions'),
+    'subscriptions': dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}'),
     'subscription': dict(route='/people/{username}/subscriptions/{hash}', category='Subscriptions', name='User subscription'),
 
     'user_conversations': dict(route='/people/{username}/conversations', category='Conversations', name='User conversations'),
