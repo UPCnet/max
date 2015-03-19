@@ -15,3 +15,4 @@ delete_user = 'Delete user'
 
 add_subscription = 'Subscribe an user to a context'
 remove_subscription = 'Unsubscribe an user to a context'
+manage_subcription_permissions = 'Grant or revoke permissions on a subscription'

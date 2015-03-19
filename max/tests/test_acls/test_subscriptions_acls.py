@@ -51,6 +51,22 @@ class SubscriptionsACLTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
 
+    def test_subscribe_user_to_context_as_context_owner(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            And i'm the owner of the context
+            When i try to subscribe another user to a context
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+        self.create_context(create_context, owner=username)
+        self.user_subscribe_user_to_context(other, subscribe_context, auth_user=username, expect=201)
+
     def test_self_subscribe_to_public_context_as_non_manager(self):
         """
             Given i'm a user that doesn't have the Manager role
@@ -123,6 +139,26 @@ class SubscriptionsACLTests(unittest.TestCase, MaxTestBase):
         chash = sha1(subscribe_context['object']['url']).hexdigest()
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
         self.admin_unsubscribe_user_from_context(username, chash, expect=204)
+
+    def test_unsubscribe_user_from_context_as_context_owner(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            And i'm the owner of the context
+            When i try to unsubscribe another user from to a context
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'}, owner=username)
+        chash = sha1(subscribe_context['object']['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        self.user_unsubscribe_user_from_context(other, chash, auth_user=username, expect=204)
 
     def test_self_unsubscribe_user_from_context_as_non_manager(self):
         """

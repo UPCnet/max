@@ -216,6 +216,36 @@ class MADBase(MADDict):
             pass
         self.data = RUDict({})
 
+    def __getattr__(self, key):
+        """
+            Maps dict items access to attributes, while preserving access to class attributes.
+
+            Wakes up objects from database when necessary.
+        """
+
+        try:
+            # Try to get the requested key as a native object attribute
+            return object.__getattribute__(self, key)
+        except AttributeError:
+            return self.__getitem__(key)
+
+    def __getitem__(self, key):
+        """
+            Triggered when accessing to fields directly as keys
+        """
+        try:
+            # If not found, try to get the key as a dict container
+            return dict.__getitem__(self, key)
+        except KeyError as exc:
+            # If not found, before raising the catched exception,
+            # Try to wake up the object from the database. We're deteecting
+            # if the object is already waken up if it has a _id key. if the
+            # object can't be retrieved, a KeyError will raise.
+            if key in self.schema and '_id' not in self:
+                self.wake()
+                return dict.__getitem__(self, key)
+            raise exc
+
     def field_changed(self, field):
         return self.get(field, None) != self.old.get(field, None)
 
@@ -223,7 +253,7 @@ class MADBase(MADDict):
         self['published'] = datetime.datetime.utcnow()
 
     def getOwner(self, request):
-        return request.creator
+        return request['creator']
 
     def fromRequest(self, request, rest_params={}):
         self.data.update(self.request.decoded_payload)
@@ -270,15 +300,19 @@ class MADBase(MADDict):
             self['_id'] = source['id']
         self._post_init_from_object(source)
 
-    def fromDatabase(self, key):
-        self.data[self.unique] = key
+    def wake(self):
+        """
+            Tries to recover a lazy object from the database
+        """
         obj = self.alreadyExists()
         if obj:
             self.update(obj)
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
-#        else:
-#            raise ObjectNotFound('Object with {} {} not found on database'.format(self.unique, str()))
+
+    def fromDatabase(self, key):
+        self.data[self.unique] = key
+        self.wake()
 
     def insert(self, **kwargs):
         """

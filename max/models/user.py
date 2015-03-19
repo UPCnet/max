@@ -92,12 +92,10 @@ class User(MADBase):
         """
             Overrides the getOwner method to set the
             current user object as owner instead of the creator
-            Oneself will be always owner of oneself
+            Oneself will be always owner of oneself. If not found,
+            look for data being processed and finally default to creator.
         """
-        if hasattr(self, 'username'):
-            return self.username
-
-        return self.data.get('username', request.creator)
+        return self.get('username', self.data.get('username', request.creator))
 
     def buildObject(self):
         """

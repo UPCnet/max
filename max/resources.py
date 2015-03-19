@@ -3,7 +3,7 @@ from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
 
-from max.security import Manager, is_self_operation
+from max.security import Manager, is_self_operation, Owner
 from max.security import permissions
 
 import pkg_resources
@@ -127,12 +127,19 @@ class Subscription(object):
         self.context.fromObject({'objectType': 'context', 'hash': chash})
         self.subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
 
+    @property
+    def _owner(self):
+        """
+            Proxy of the ownership of the underliying context
+        """
+        return self.context._owner
+
     def __acl__(self):
         acl = []
 
         # Grant ubsubscribe permission if the user subscription allows it
         # but only if is trying to unsubscribe itself
-        if 'unsubscribe' in self.subscription['permissions'] and is_self_operation(request):
+        if 'unsubscribe' in self.subscription['permissions'] and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
 
         return acl
@@ -150,7 +157,8 @@ class SubscriptionsTraverser(object):
     @property
     def __acl__(self):
         acl = [
-            (Allow, Manager, permissions.remove_subscription)
+            (Allow, Manager, permissions.remove_subscription),
+            (Allow, Owner, permissions.remove_subscription)
         ]
 
         return acl

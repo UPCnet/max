@@ -15,7 +15,7 @@ from pyramid.httpexceptions import HTTPNoContent
 from pyramid.view import view_config
 from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.exceptions import InvalidPermission
-from max.security.permissions import add_subscription, remove_subscription
+from max.security.permissions import add_subscription, remove_subscription, manage_subcription_permissions
 
 
 @view_config(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
@@ -62,7 +62,7 @@ def unsubscribe(subscription, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='context_user_permission', request_method='PUT', restricted='Manager', requires_actor=True)
+@view_config(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor(force_own=False)

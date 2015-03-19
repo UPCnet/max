@@ -43,10 +43,13 @@ class BaseContext(MADBase):
     }
 
     def getOwner(self, request):
-        if hasattr(self, '_owner'):
-            return self._owner
-
-        return self.data.get('owner', request.creator)
+        """
+            Overrides the getOwner method to set the
+            owner as the current _owner as the owner.
+            If not found,look for data being processed wiht param "owner"
+            and finally default to creator.
+        """
+        return self.get('_owner', self.data.get('owner', request.creator))
 
     def getIdentifier(self):
         return str(self[self.unique])
@@ -326,7 +329,9 @@ class Context(BaseContext):
             If present, return the object, otherwise returns None
         """
         unique = self.unique
-        if self.unique not in self.data.keys():
+        if self.unique in self:
+            value = self[self.unique]
+        elif self.unique not in self.data.keys():
             value = self.data.get('url', '')
             value = sha1(value).hexdigest()
         else:
