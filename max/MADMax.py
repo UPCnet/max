@@ -227,7 +227,7 @@ class MADMaxCollection(object):
         wrapped = model()
         wrapped.fromObject(item, collection=self.collection)
 
-        #Also wrap subobjects, only if we are not flattening
+        # Also wrap subobjects, only if we are not flattening
         if not flatten and 'object' in wrapped:
             wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
 
@@ -257,7 +257,6 @@ class MADMaxCollection(object):
             wrapped.__parent__ = self
             return wrapped
         else:
-            import ipdb;ipdb.set_trace()
             querykey = len(query.keys()) == 1 and query.keys()[0] or 'id'
             raise ObjectNotFound("Object with %s %s not found inside %s" % (querykey, itemID, self.collection.name))
 
