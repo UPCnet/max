@@ -35,7 +35,8 @@ PUBLIC_RESOURCES = {
     'context_push_tokens': {'route': '/contexts/{hash}/tokens', 'category': 'Contexts', 'name': 'Context tokens'},
     'context_comments': {'route': '/contexts/{hash}/comments', 'category': 'Comments', 'name': 'Context comments'},
     'context_activities_authors': {'route': '/contexts/{hash}/activities/authors', 'category': 'Activities', 'name': 'Context authors', 'traverse': '/contexts/{hash}'},
-    'context_subscriptions': {'route': '/contexts/{hash}/subscriptions', 'category': 'Contexts', 'name': 'Users subscribed to context'},
+    'context_subscriptions': {'route': '/contexts/{hash}/subscriptions', 'category': 'Contexts', 'name': 'Users subscribed to context', 'traverse': '/contexts/{hash}'},
+    'context_subscription': {'route': '/contexts/{hash}/subscriptions/{username}', 'category': 'Contexts', 'name': 'User subscription', 'traverse': '/subscriptions/{hash}'},
     'context_tags': {'route': '/contexts/{hash}/tags', 'category': 'Contexts', 'name': 'Context tags'},
     'context_tag': {'route': '/contexts/{hash}/tags/{tag}', 'category': 'Contexts', 'name': 'Context tag'},
 

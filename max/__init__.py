@@ -12,7 +12,7 @@ else:
 
 from max import debug
 from max.decorators import set_signal
-from max.predicates import RequiredUserPredicate
+from max.predicates import RequiredActorPredicate
 from max.predicates import RestrictedPredicate
 from max.resources import loadCloudAPISettings
 from max.resources import loadMAXSecurity
@@ -21,7 +21,12 @@ from max.resources import Root
 from max.rest.resources import RESOURCES
 from max.security.authentication import MaxAuthenticationPolicy
 from maxutils import mongodb
-
+from max.request import get_request_creator
+from max.request import get_request_actor_username
+from max.request import get_request_actor
+from max.request import get_authenticated_user_roles
+from max.request import get_database
+from max.request import extract_post_data
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.settings import asbool
@@ -61,6 +66,13 @@ def main(*args, **settings):
     config.add_tween('max.tweens.deprecation_wrapper_factory')
     config.add_tween('max.tweens.post_tunneling_factory')
     config.add_tween('max.tweens.compatibility_checker_factory')
+
+    config.add_request_method(get_request_actor_username, name='actor_username', reify=True)
+    config.add_request_method(get_request_actor, name='actor', reify=True)
+    config.add_request_method(get_request_creator, name='creator', reify=True)
+    config.add_request_method(get_authenticated_user_roles, name='roles', reify=True)
+    config.add_request_method(get_database, name='db', reify=True)
+    config.add_request_method(extract_post_data, name='decoded_payload', reify=True)
 
     debug.setup(config, settings)
 
@@ -105,6 +117,6 @@ def main(*args, **settings):
     config.scan('max', ignore=['max.tests', 'max.scripts'])
 
     config.add_view_predicate('restricted', RestrictedPredicate)
-    config.add_view_predicate('user_required', RequiredUserPredicate)
+    config.add_view_predicate('requires_actor', RequiredActorPredicate)
     set_signal()
     return config.make_wsgi_app()

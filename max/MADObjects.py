@@ -4,7 +4,6 @@ from max.exceptions import MissingField
 from max.exceptions import ObjectNotSupported
 from max.exceptions import ValidationError
 from max.rest.utils import RUDict
-from max.rest.utils import extractPostData
 from max.rest.utils import flatten
 
 from pyramid.threadlocal import get_current_request
@@ -227,7 +226,7 @@ class MADBase(MADDict):
         return request.creator
 
     def fromRequest(self, request, rest_params={}):
-        self.data.update(extractPostData(request))
+        self.data.update(self.request.decoded_payload)
         self.data.update(rest_params)
 
         # Since we are building from a request,
@@ -469,7 +468,7 @@ class MADBase(MADDict):
         """
             Get the mutable properties base on the user's current roles
         """
-        params = extractPostData(request)
+        params = self.request.decoded_payload
 
         properties = {fieldName: params.get(fieldName) for fieldName in self.get_editable_fields() if params.get(fieldName, None) is not None}
         return properties

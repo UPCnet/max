@@ -11,6 +11,14 @@ def is_owner(context, userid):
     return getattr(context, '_owner', None) == userid
 
 
+def is_self_operation(request):
+    """
+        Checks if the authenticated user is performing the action on himself
+
+    """
+    return request.authenticated_userid == request.actor_username
+
+
 def get_user_roles(request, userid):
     """
         Returns the global max roles that userid posesses.

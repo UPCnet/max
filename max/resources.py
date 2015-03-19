@@ -3,8 +3,7 @@ from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
 
-
-from max.security import Manager
+from max.security import Manager, is_self_operation
 from max.security import permissions
 
 import pkg_resources
@@ -62,9 +61,11 @@ class Root(dict):
         self.db = registry.max_store
         self['contexts'] = ContextTraverser(self, request)
         self['people'] = PeopleTraverser(self, request)
+        self['subscriptions'] = SubscriptionsTraverser(self, request)
 
 
 class MongoDBTraverser(MADMaxCollection):
+
     collection_name = ''
     query_key = '_id'
 
@@ -109,8 +110,48 @@ class PeopleTraverser(MongoDBTraverser):
         ]
 
         # Grant add permission if user is trying to create itself
-        if self.request.authenticated_userid == self.request.target_user:
+        if self.request.authenticated_userid == self.request.actor_username:
             acl.append((Allow, self.request.authenticated_userid, permissions.add_people))
+
+        return acl
+
+
+class Subscription(object):
+    def __init__(self, parent, request, chash, actor):
+        from max.models import Context
+        self.__parent__ = parent
+        self.request = request
+        self.hash = chash
+        self.actor = actor
+        self.context = Context()
+        self.context.fromObject({'objectType': 'context', 'hash': chash})
+        self.subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
+
+    def __acl__(self):
+        acl = []
+
+        # Grant ubsubscribe permission if the user subscription allows it
+        # but only if is trying to unsubscribe itself
+        if 'unsubscribe' in self.subscription['permissions'] and is_self_operation(request):
+            acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
+
+        return acl
+
+
+class SubscriptionsTraverser(object):
+    def __init__(self, parent, request):
+        self.request = request
+        self.db = request.registry.max_store
+        self.__parent__ = parent
+
+    def __getitem__(self, key):
+        return Subscription(self, self.request, key, self.request.actor)
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.remove_subscription)
+        ]
 
         return acl
 

@@ -16,7 +16,7 @@ from max.rest import endpoint
 from max.security.permissions import list_all_people, list_visible_people, add_people, view_user_profile, modify_user, delete_user
 
 
-@view_config(route_name='users', request_method='GET', permission=list_all_people, restricted='Manager', user_required=True)
+@view_config(route_name='users', request_method='GET', permission=list_all_people, restricted='Manager', requires_actor=True)
 def getUsers(users, request):
     """
     """
@@ -25,7 +25,7 @@ def getUsers(users, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='users', request_method='GET', permission=list_visible_people, user_required=True)
+@view_config(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
 def getVisibleUsers(users, request):
     """
          /people
@@ -44,14 +44,14 @@ def getVisibleUsers(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='users', request_method='POST', permission=add_people, user_required=False)
+@endpoint(route_name='users', request_method='POST', permission=add_people, requires_actor=False)
 def addUser(users, request):
     """
         /people/{username}
 
         [RESTRICTED] Creates a system user.
     """
-    username = request.target_user
+    username = request.actor_username
     if username is None:
         raise ValidationError('Missing username in request')
 
@@ -90,7 +90,7 @@ def addUser(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='GET', permission=view_user_profile, user_required=True)
+@endpoint(route_name='user', request_method='GET', permission=view_user_profile, requires_actor=True)
 def getUser(user, request):
     """
         /people/{username}
@@ -108,7 +108,7 @@ def getUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='PUT', permission=modify_user, user_required=True)
+@endpoint(route_name='user', request_method='PUT', permission=modify_user, requires_actor=True)
 def ModifyUser(user, request):
     """
         /people/{username}
@@ -123,7 +123,7 @@ def ModifyUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='DELETE', permission=delete_user, user_required=True)
+@endpoint(route_name='user', request_method='DELETE', permission=delete_user, requires_actor=True)
 def deleteUser(user, request):
     """
     """

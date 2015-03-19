@@ -80,38 +80,6 @@ def get_userid_from_twitter(api, twitterUsername):
         return user.id_str
 
 
-def getUsernameFromXOAuth(request):
-    """
-    """
-    return request.headers.get('X-Oauth-Username')
-
-
-def getUsernameFromURI(request):
-    """
-    """
-    return request.matchdict.get('username', None)
-
-
-def getUrlHashFromURI(request):
-    """
-    """
-    return request.matchdict.get('hash', None)
-
-
-def getUsernameFromPOSTBody(request):
-    """
-        Try to extract an username from a dict following pattern
-           {'actor':
-               {'username': 'xxxx'}
-            }
-         otherwise return None
-    """
-    decoded_data = extractPostData(request)
-    if isinstance(decoded_data, dict):
-        return decoded_data.get('username', None)
-    return None
-
-
 def rfc3339_parse(date):
     """
     Converts a date in format 2012-10-27T18:14:14.000Z to a python datetime
@@ -514,29 +482,6 @@ def shortenURL(url, secure=False):
         url = queryurl
 
     return url
-
-
-def extractPostData(request):
-    if 'multipart/form-data' in request.content_type:
-        try:
-            json_data = json.loads(request.params.get('json_data'), object_hook=json_util.object_hook)
-            if json_data.get('object', {}).get('objectType', '') in ['file', 'image']:
-                json_data['object']['file'] = request.params.get('file')
-        except:
-            json_data = {}
-
-    elif not 'multipart/form-data' in request.content_type and request.body:
-        # Usually look for JSON encoded body, catch the case it does not contain
-        # valid JSON data, e.g when uploading a file
-        try:
-            json_data = json.loads(request.body, object_hook=json_util.object_hook)
-        except:
-            json_data = {}
-    else:
-        json_data = {}
-
-    return json_data
-    # TODO: Do more syntax and format checks of sent data
 
 
 def hasPermission(subscription, permission):

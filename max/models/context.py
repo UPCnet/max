@@ -9,8 +9,8 @@ from max.rest.utils import get_userid_from_twitter
 from hashlib import sha1
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from pyramid.security import Allow, Authenticated
-from max.security import Owner
-from max.security.permissions import modify_context, delete_context, view_context
+from max.security import Owner, Manager, is_self_operation
+from max.security import permissions
 
 
 class BaseContext(MADBase):
@@ -306,12 +306,18 @@ class Context(BaseContext):
 
     @property
     def __acl__(self):
-        acl = []
-        acl.extend([
-            (Allow, Authenticated, view_context),
-            (Allow, Owner, modify_context),
-            (Allow, Owner, delete_context)
-        ])
+        acl = [
+            (Allow, Authenticated, permissions.view_context),
+            (Allow, Owner, permissions. modify_context),
+            (Allow, Owner, permissions.delete_context),
+            (Allow, Manager, permissions.add_subscription),
+            (Allow, Owner, permissions.add_subscription),
+        ]
+
+        # Grant subscribe permission to the user to subscribe itself if the context allows it
+        if self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
+            acl.append((Allow, self.request.authenticated_userid, permissions.add_subscription))
+
         return acl
 
     def alreadyExists(self):
@@ -340,10 +346,24 @@ class Context(BaseContext):
             self[self.unique] = self.getIdentifier()
 
     def getIdentifier(self):
-        if 'url' in self.schema.keys() and self.field_changed('url'):
-            return self.old.get('hash', sha1(self['url']).hexdigest())
-        else:
-            return sha1(self['url']).hexdigest()
+        """
+            Resolves a valid identifier from this context. Different attemps will be
+            made, based on different possible status of the context
+
+            1. Try to get the hash from the object
+            2. If the context has url field and it's set, calculate the hash
+
+        """
+        chash = self.get('hash', None)
+
+        url = self.get('url', None)
+        if 'url' in self.schema.keys() and url:
+            if self.field_changed('url'):
+                return self.old.get('hash', sha1(self['url']).hexdigest())
+            else:
+                return sha1(self['url']).hexdigest()
+
+        return chash
 
     def buildObject(self):
         super(Context, self).buildObject()

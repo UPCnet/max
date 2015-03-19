@@ -16,7 +16,6 @@ from max.oauth2 import oauth2
 from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.utils import extractPostData
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
 from max.rest.utils import get_avatar_folder
@@ -76,7 +75,7 @@ def postMessage2Conversation(context, request):
     """
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
-    data = extractPostData(request)
+    data = request.payload
     ctxts = data.get('contexts', [])
     if len(ctxts) == 0:
         raise ValidationError('Empty contexts parameter')

@@ -7,11 +7,6 @@ from max.exceptions import UnknownUserError
 from max.exceptions.http import JSONHTTPInternalServerError
 from max.exceptions.http import JSONHTTPServiceUnavailable
 from max.rest.resources import RESOURCES
-from max.rest.utils import getUrlHashFromURI
-from max.rest.utils import getUsernameFromPOSTBody
-from max.rest.utils import getUsernameFromURI
-from max.rest.utils import getUsernameFromXOAuth
-
 from max.exceptions.scavenger import format_raw_request, format_raw_response
 
 from pymongo.errors import AutoReconnect

@@ -5,7 +5,7 @@ from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max import RESOURCES
 from pyramid.view import view_config
-from max.predicates import RequiredUserPredicate
+from max.predicates import RequiredActorPredicate
 import pkg_resources
 import re
 import sys
@@ -95,7 +95,7 @@ def endpoints_view(request):
 
     def required_user(view):
         for predicate in view['predicates']:
-            if isinstance(predicate, RequiredUserPredicate):
+            if isinstance(predicate, RequiredActorPredicate):
                 return predicate.required
         return False
 

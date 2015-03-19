@@ -160,13 +160,13 @@ class MaxTestBase(object):
         res = self.testapp.post('/activities/%s/favorites' % activity_id, '', oauth2Header(username), status=expect)
         return res
 
-    def create_context(self, context, permissions=None, expect=201, owner=None):
+    def create_context(self, context, permissions={}, expect=201, owner=None):
         default_permissions = dict(read='public', write='public', subscribe='public', invite='subscribed')
         new_context = dict(context)
         if 'permissions' not in new_context:
             new_context['permissions'] = default_permissions
-        if permissions:
-            new_context['permissions'].update(permissions)
+        new_context['permissions'].update(permissions)
+
         if owner is not None:
             new_context['owner'] = owner
         res = self.testapp.post('/contexts', json.dumps(new_context), oauth2Header(test_manager), status=expect)
@@ -178,32 +178,34 @@ class MaxTestBase(object):
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), oauth2Header(test_manager), status=200)
         return res
 
-    def admin_subscribe_user_to_context(self, username, context, expect=201,):
+    def admin_subscribe_user_to_context(self, username, context, expect=201):
         """
             Subscribes an user to a context as a manager user
         """
         res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(test_manager), status=expect)
         return res
 
-    def user_subscribe_user_to_context(self, username, context, expect=201,):
+    def user_subscribe_user_to_context(self, username, context, auth_user=None, expect=201):
         """
             Subscribes an user to a context as himself
         """
-        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(username), status=expect)
+        auth_user = username if auth_user is None else auth_user
+        res = self.testapp.post('/people/%s/subscriptions' % username, json.dumps(context), oauth2Header(auth_user), status=expect)
         return res
 
     def admin_unsubscribe_user_from_context(self, username, chash, expect=204):
         """
             UnSubscribes an user to a context as himself
         """
-        res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, chash), {}, oauth2Header(test_manager), status=expect)
+        res = self.testapp.delete('/contexts/%s/subscriptions/%s' % (chash, username), {}, oauth2Header(test_manager), status=expect)
         return res
 
-    def user_unsubscribe_user_from_context(self, username, chash, expect=204):
+    def user_unsubscribe_user_from_context(self, username, chash, auth_user=None, expect=204):
         """
             UnSubscribes an user to a context as himself
         """
-        res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, chash), {}, oauth2Header(username), status=expect)
+        auth_user = username if auth_user is None else auth_user
+        res = self.testapp.delete('/contexts/%s/subscriptions/%s' % (chash, username), {}, oauth2Header(auth_user), status=expect)
         return res
 
     def exec_mongo_query(self, collection, method, query, action={}):
