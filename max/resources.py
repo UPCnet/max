@@ -89,7 +89,9 @@ class ContextTraverser(MongoDBTraverser):
             (Allow, Manager, permissions.modify_context),
             (Allow, Manager, permissions.delete_context),
             (Allow, Manager, permissions.view_context),
-            (Allow, Manager, permissions.view_context_activity)
+            (Allow, Manager, permissions.view_context_activity),
+            (Allow, Manager, permissions.view_subscriptions),
+            (Allow, Owner, permissions.view_subscriptions)
         ]
         return acl
 

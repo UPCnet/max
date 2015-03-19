@@ -1,4 +1,4 @@
-Owner = 'max.Owner'
+Owner = 'Owner'
 Manager = 'Manager'
 
 

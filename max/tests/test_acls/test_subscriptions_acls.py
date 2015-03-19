@@ -211,3 +211,60 @@ class SubscriptionsACLTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
         self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
         self.user_unsubscribe_user_from_context(username, chash, auth_user=other, expect=403)
+
+    # Get context subscriptions
+
+    def test_get_context_subscriptions_as_manager(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to get all subscriptions from a context
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+
+        self.create_user(username)
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'})
+        chash = sha1(subscribe_context['object']['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.testapp.get('/contexts/{}/subscriptions'.format(chash), "", headers=oauth2Header(test_manager), status=200)
+
+    def test_get_context_subscriptions_as_owner(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            And i'm the owner of the context
+            When i try to get all subscriptions from a context
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'}, owner=username)
+        chash = sha1(subscribe_context['object']['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        self.testapp.get('/contexts/{}/subscriptions'.format(chash), "", headers=oauth2Header(username), status=200)
+
+    def test_get_context_subscriptions_as_non_manager_neither_owner(self):
+        """
+            Given i'm a user that doesn't have the Manager role
+            And i'm not the owner of the context
+            When i try to get all subscriptions from a context
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'unsubscribe': 'restricted'}, owner=username)
+        chash = sha1(subscribe_context['object']['url']).hexdigest()
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        self.testapp.get('/contexts/{}/subscriptions'.format(chash), "", headers=oauth2Header(other), status=403)
