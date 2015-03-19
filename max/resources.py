@@ -140,7 +140,14 @@ class PeopleTraverser(MongoDBTraverser):
         return acl
 
 
-class Subscription(object):
+class Subscription(dict):
+    """
+        Object representing a subscription.
+
+        This is temporary, to allow us to work assuming subscriptions are
+        real objects. In the (near) future, this should be migrated to models
+        as a regular mongodb collecion object.
+    """
     def __init__(self, parent, request, chash, actor):
         from max.models import Context
         self.__parent__ = parent
@@ -149,7 +156,7 @@ class Subscription(object):
         self.actor = actor
         self.context = Context()
         self.context.fromObject({'objectType': 'context', 'hash': chash})
-        self.subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
+        self.update(actor.getSubscription({'hash': chash, 'objectType': 'context'}))
 
     @property
     def _owner(self):
@@ -163,7 +170,7 @@ class Subscription(object):
 
         # Grant ubsubscribe permission if the user subscription allows it
         # but only if is trying to unsubscribe itself
-        if 'unsubscribe' in self.subscription['permissions'] and is_self_operation(self.request):
+        if 'unsubscribe' in self.get('permissions', []) and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
 
         return acl
@@ -182,7 +189,9 @@ class SubscriptionsTraverser(object):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.remove_subscription),
-            (Allow, Owner, permissions.remove_subscription)
+            (Allow, Owner, permissions.remove_subscription),
+            (Allow, Manager, permissions.manage_subcription_permissions),
+            (Allow, Owner, permissions.manage_subcription_permissions),
         ]
 
         return acl

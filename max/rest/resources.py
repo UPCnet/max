@@ -77,7 +77,7 @@ PUBLIC_RESOURCES = {
 
     # Not implemented / Not in roadmap
     'context_permissions': dict(route='/contexts/{hash}/permissions'),
-    'context_user_permissions': dict(route='/contexts/{hash}/permissions/{username}'),
+
 
 }
 

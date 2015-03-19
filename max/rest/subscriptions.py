@@ -106,28 +106,12 @@ def getUserSubscriptions(user, request):
 
 
 @view_config(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
-def grantPermissionOnContext(context, request):
+def grantPermissionOnContext(subscription, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'subscribe', 'invite', 'delete', 'flag']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
-
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to set the permission
 
     if permission in subscription.get('_grants', []):
         # Already have the permission grant
@@ -145,28 +129,12 @@ def grantPermissionOnContext(context, request):
 
 
 @view_config(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
-def revokePermissionOnContext(context, request):
-    """ [RESTRICTED]
+def revokePermissionOnContext(subscription, request):
+    """
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'subscribe', 'invite', 'flag']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
-
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
-
-    if not subscription:
-        raise Unauthorized("You can't remove permissions on a context where you are not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to remove the permission
 
     code = 200
     if permission in subscription.get('_vetos', []):
@@ -184,26 +152,10 @@ def revokePermissionOnContext(context, request):
 
 
 @view_config(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
-def resetPermissionsOnContext(context, request):
-    """ [RESTRICTED]
+def resetPermissionsOnContext(subscription, request):
     """
-    chash = request.matchdict.get('hash', None)
-    subscription = None
-    pointer = 0
-    while subscription is None and pointer < len(request.actor.subscribedTo):
-        if request.actor.subscribedTo[pointer]['hash'] == chash:
-            subscription = request.actor.subscribedTo[pointer]
-        pointer += 1
+    """
 
-    if not subscription:
-        raise Unauthorized("You can't set permissions on a context where the user is not subscribed")
-
-    # If we reach here, we are subscribed to a context and ready to reset the permissions
-
-    contexts = MADMaxCollection(request.db.contexts)
-    maxcontext = contexts.getItemsByhash(chash)[0]
-    subscription = request.actor.reset_permissions(subscription, maxcontext)
+    subscription = request.actor.reset_permissions(subscription, subscription.context)
     handler = JSONResourceEntity(subscription, status_code=200)
     return handler.buildResponse()
-
-

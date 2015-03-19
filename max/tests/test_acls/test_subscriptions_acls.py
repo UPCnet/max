@@ -315,3 +315,182 @@ class SubscriptionsACLTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
         self.testapp.get('/people/{}/subscriptions'.format(username), "", headers=oauth2Header(other), status=403)
 
+        # Test Grant subscription permissions
+
+    def test_grant_permission_on_subscription_as_manager(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to grant a permission on a user's suscription
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        self.create_user(username)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'})
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.put('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
+
+    def test_grant_permission_on_subscription_as_context_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm the owner of the context
+            When i try to grant a permission on a user's suscription
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.put('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, other, permission), "", oauth2Header(username), status=201)
+
+    def test_grant_permission_on_subscription_as_non_manager_nor_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm not the owner of the context
+            When i try to grant a permission on a user's suscription
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.put('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, other, permission), "", oauth2Header(other), status=403)
+
+        # Test revoke subscription permissions
+
+    def test_revoke_permission_on_subscription_as_manager(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to revoke a permission on a user's suscription
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        self.create_user(username)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'})
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.delete('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, username, permission), "", oauth2Header(test_manager), status=201)
+
+    def test_revoke_permission_on_subscription_as_context_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm the owner of the context
+            When i try to revoke a permission on a user's suscription
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.delete('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, other, permission), "", oauth2Header(username), status=201)
+
+    def test_revoke_permission_on_subscription_as_non_manager_nor_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm not the owner of the context
+            When i try to revoke a permission on a user's suscription
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        permission = 'write'
+        self.testapp.delete('/contexts/%s/permissions/%s/%s?permanent=1' % (url_hash, other, permission), "", oauth2Header(other), status=403)
+
+        # Test revoke subscription permissions
+
+    def test_reset_permission_defaults_on_subscription_as_manager(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to reset all permission on a user's suscription to defaults
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        self.create_user(username)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'})
+        self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
+        self.testapp.post('/contexts/%s/permissions/%s/defaults' % (url_hash, username), "", oauth2Header(test_manager), status=200)
+
+    def test_reset_permission_defaults_on_subscription_as_context_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm the owner of the context
+            When i try to reset all permission on a user's suscription to defaults
+            I succeed
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        self.testapp.post('/contexts/%s/permissions/%s/defaults' % (url_hash, other), "", oauth2Header(username), status=200)
+
+    def test_reset_permission_defaults_on_subscription_as_non_manager_nor_owner(self):
+        """
+            Given i'm a user that don't have the Manager role
+            And i'm not the owner of the context
+            When i try to reset all permission on a user's suscription to defaults
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import create_context, subscribe_context
+
+        url_hash = sha1(create_context['url']).hexdigest()
+        username = 'sheldon'
+        other = 'penny'
+
+        self.create_user(username)
+        self.create_user(other)
+
+        self.create_context(create_context, permissions={'read': 'subscribed'}, owner=username)
+        self.admin_subscribe_user_to_context(other, subscribe_context, expect=201)
+        self.testapp.post('/contexts/%s/permissions/%s/defaults' % (url_hash, other), "", oauth2Header(other), status=403)
