@@ -5,7 +5,7 @@ from max.exceptions import ObjectNotSupported
 from max.exceptions import ValidationError
 from max.rest.utils import RUDict
 from max.rest.utils import flatten
-
+from pyramid.security import ACLAllowed
 from pyramid.threadlocal import get_current_request
 
 from bson import ObjectId
@@ -196,8 +196,8 @@ class MADBase(MADDict):
         specifications by subclassing it and providing an schema with the required fields,
         and a structure builder function 'buildObject'
     """
-    default_field_view_roles = ['Authenticated']
-    default_field_edit_roles = ['Manager', 'Owner']
+    default_field_view_permission = None
+    default_field_edit_permission = None
     unique = ''
     collection = ''
     mdb_collection = None
@@ -271,7 +271,7 @@ class MADBase(MADDict):
 
         self.processFields()
 
-        #check if the object we pretend to create already exists
+        # check if the object we pretend to create already exists
         existing_object = self.alreadyExists()
         if not existing_object:
             # if we are creating a new object, set the object dates.
@@ -454,29 +454,16 @@ class MADBase(MADDict):
     # Security Related methods and properties
     #
 
-    @property
-    def authenticated_user_roles(self):
+    def has_field_permission(self, fieldName, permission_field):
         """
-            Returns the roles assigned the the current authenticated user
+            Returns the name of the permission needed to grant permission_field.
+            param permission_field MUST be "view" or "edit.
         """
-        user_roles = self.request.roles
-        has_owner = hasattr(self, '_owner')
-        if has_owner:
-            if self.request.creator == self._owner:
-                user_roles.append('Owner')
-        return user_roles
+        def default_permission():
+            return getattr(self, 'default_field_{}_permission'.format(permission_field), None)
 
-    def check_field_permission(self, fieldName, permission):
-        """
-            Returns a list containing the current authenticated user roles
-            that matches any of the field allowed roles for a particular field
-        """
-        try:
-            default = getattr(self, 'default_field_{}_roles'.format(permission))
-        except KeyError:
-            return []
-        required_roles = set(self.schema[fieldName].get(permission, default))
-        return required_roles.intersection(set(self.authenticated_user_roles))
+        permission_name = self.schema[fieldName].get(permission_field, default_permission())
+        return isinstance(self.request.has_permission(permission_name), ACLAllowed)
 
     def get_visible_fields(self):
         """
@@ -485,7 +472,7 @@ class MADBase(MADDict):
         """
         fields = []
         for fieldName in self.schema:
-            if self.check_field_permission(fieldName, 'view'):
+            if self.has_field_permission(fieldName, 'view'):
                 fields.append(fieldName.lstrip('_'))
         return fields
 
@@ -495,7 +482,7 @@ class MADBase(MADDict):
             the current authenticated userhas permission to edit
         """
         for fieldName in self.schema:
-            if self.check_field_permission(fieldName, 'edit'):
+            if self.has_field_permission(fieldName, 'edit'):
                 yield fieldName.lstrip('_')
 
     def getMutablePropertiesFromRequest(self, request):

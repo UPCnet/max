@@ -69,7 +69,6 @@ def getContextSubscriptions(subscriptions, request):
     chash = request.matchdict['hash']
     mmdb = MADMaxDB(request.db)
     found_users = mmdb.users.search({"subscribedTo.hash": chash}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
-    import ipdb;ipdb.set_trace()
     for user in found_users:
 
         subscription = user['subscribedTo'][0]

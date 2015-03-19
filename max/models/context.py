@@ -17,6 +17,8 @@ class BaseContext(MADBase):
     """
         A max Context object representation
     """
+    default_field_view_permission = permissions.view_context
+    default_field_edit_permission = permissions.modify_context
     updatable_fields = ['permissions', 'displayName']
     unique = '_id'
     uniqueMethod = None
@@ -28,7 +30,6 @@ class BaseContext(MADBase):
             'default': 'context'
         },
         'displayName': {
-            'edit': ['Owner', 'Manager']
         },
         'published': {},
         'permissions': {
@@ -38,7 +39,6 @@ class BaseContext(MADBase):
                 'subscribe': DEFAULT_CONTEXT_PERMISSIONS['subscribe'],
                 'invite': DEFAULT_CONTEXT_PERMISSIONS['invite']
             },
-            'edit': ['Owner', 'Manager']
         }
     }
 
@@ -277,6 +277,8 @@ class Context(BaseContext):
     """
         A context containing a Uri
     """
+    default_field_view_permission = permissions.view_context
+    default_field_edit_permission = permissions.modify_context
 
     updatable_fields = ['notifications', 'permissions', 'displayName', 'tags', 'url']
     collection = 'contexts'
@@ -288,20 +290,16 @@ class Context(BaseContext):
     schema['url'] = {'required': 1}
     schema['tags'] = {'default': []}
     schema['twitterHashtag'] = {
-        'edit': ['Owner', 'Manager'],
         'formatters': ['stripHash'],
         'validators': ['isValidHashtag'],
     }
     schema['twitterUsername'] = {
-        'edit': ['Owner', 'Manager'],
         'formatters': ['stripTwitterUsername'],
         'validators': ['isValidTwitterUsername'],
     }
     schema['twitterUsernameId'] = {
-        'edit': ['Owner', 'Manager']
     }
     schema['notifications'] = {
-        'edit': ['Owner', 'Manager'],
         'default': False
     }
 

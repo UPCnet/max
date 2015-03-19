@@ -8,7 +8,7 @@ from max.rest.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
 from max.security import Owner
-from max.security.permissions import modify_user
+from max.security.permissions import modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -23,30 +23,29 @@ class User(MADBase):
     """
         An activitystrea.ms User object representation
     """
-    default_field_view_roles = ['Owner', 'Manager']
+    default_field_view_permission = view_user_profile
+    default_field_edit_permission = modify_user
     collection = 'users'
     unique = 'username'
     schema = {
-        '_id': {},
+        '_id': {
+            'edit': modify_immutable_fields
+        },
         '_creator': {
-            'edit': []
+            'edit': modify_immutable_fields
         },
         '_owner': {
-            'edit': []
+            'edit': change_ownership
 
         },
         'objectType': {
-            'edit': [],
+            'edit': modify_immutable_fields,
             'default': 'person'
         },
         'username': {
             'required': 1,
-            'edit': ['Manager'],
-            'view': ['Owner', 'Manager', 'Authenticated']
         },
         'displayName': {
-            'edit': ['Owner', 'Manager'],
-            'view': ['Owner', 'Manager', 'Authenticated']
         },
         'last_login': {},
         'following': {
@@ -54,28 +53,30 @@ class User(MADBase):
             'default': []
         },
         'subscribedTo': {
-            'edit': [],
+            'view': view_subscriptions,
+            'edit': modify_immutable_fields,
             'default': []
         },
         'talkingIn': {
-            'edit': [],
+            'view': view_subscriptions,
+            'edit': modify_immutable_fields,
             'default': []
         },
         'published': {
-            'edit': []
+            'edit': modify_immutable_fields
         },
         'twitterUsername': {
-            'edit': ['Owner', 'Manager'],
-            'view': ['Owner', 'Manager', 'Authenticated'],
             'formatters': ['stripTwitterUsername'],
             'validators': ['isValidTwitterUsername']
         },
         'iosDevices': {
-            'edit': [],
+            'view': manage_user_devices,
+            'edit': manage_user_devices,
             'default': []
         },
         'androidDevices': {
-            'edit': [],
+            'edit': manage_user_devices,
+            'view': manage_user_devices,
             'default': []
         },
     }
@@ -358,7 +359,7 @@ class User(MADBase):
 
     def getInfo(self):
         actor = self.flatten()
-        if self.check_field_permission('talkingIn', 'view'):
+        if self.has_field_permission('talkingIn', 'view'):
             actor.setdefault('talkingIn', [])
             conversations_collection = MADMaxCollection(self.db.conversations)
             conversations = conversations_collection.search({'_id': {'$in': [ObjectId(conv['id']) for conv in actor['talkingIn']]}})
