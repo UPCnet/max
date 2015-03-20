@@ -10,7 +10,9 @@ from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
-
+from max.security import Manager, Owner, is_owner
+from max.security.permissions import view_activity, delete_activity, modify_activity
+from pyramid.security import Allow
 from PIL import Image
 from bson import ObjectId
 from hashlib import sha1
@@ -26,6 +28,8 @@ class BaseActivity(MADBase):
     """
         An activitystrea.ms Activity object representation
     """
+    default_field_view_permission = view_activity
+    default_field_edit_permission = modify_activity
     unique = '_id'
     schema = {
         '_id': {},
@@ -57,6 +61,32 @@ class BaseActivity(MADBase):
             'default': None
         },
     }
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, view_activity),
+            (Allow, Manager, delete_activity),
+            (Allow, Owner, view_activity),
+            (Allow, Owner, delete_activity)
+        ]
+
+        # When checking permissions directly on the object (For example when determining
+        # the visible fields), request.context.owner will be related to the owner of where we are posting the
+        # activity), so we need to provide permissions for the owner of the object itself, or the flatten will result empty...
+        if is_owner(self, self.request.authenticated_userid):
+            acl.append((Allow, self.request.authenticated_userid, view_activity))
+
+        # If we have an activity that has contexts, grant view_activity if the context
+        # subscription provides the read permission
+        if self.get('contexts', []):
+            if 'read' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
+                acl.append((Allow, self.request.authenticated_userid, view_activity))
+
+            if 'delete' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
+                acl.append((Allow, self.request.authenticated_userid, delete_activity))
+
+        return acl
 
     def getOwner(self, request):
         """
@@ -108,7 +138,7 @@ class BaseActivity(MADBase):
             for cobject in self.data['contexts']:
                 subscription = dict(self.data['actor'].getSubscription(cobject))
 
-                #Clean innecessary fields
+                # Clean innecessary fields
                 non_needed_subscription_fields = ['published', 'permissions', 'id', '_vetos', '_grants']
                 for fieldname in non_needed_subscription_fields:
                     if fieldname in subscription:
@@ -157,7 +187,7 @@ class BaseActivity(MADBase):
         return comments[0] if comments is not [] else False
 
     def setKeywords(self):
-        #Append actor as username if object has keywords and actor is a Person
+        # Append actor as username if object has keywords and actor is a Person
         self['_keywords'] = []
         self['_keywords'].extend(self.object.get('_keywords', []))
         if self.actor['objectType'] == 'person':

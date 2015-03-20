@@ -2,6 +2,7 @@
 from max.MADMax import MADMaxDB
 import json
 from bson import json_util
+from hashlib import sha1
 
 
 def extract_post_data(request):
@@ -116,12 +117,32 @@ def get_request_actor_username(request):
     return username
 
 
+def get_context_author_url(request):
+    """
+        Determine and return the url of the context specified as actor
+    """
+
+    actor = extract_post_data(request).get('actor', {})
+    return actor.get('url', '')
+
+
 def get_request_actor(request):
     """
-        Retrieves the User object from the database matching the actor
-        found in the request
-
+        Retrieves the User object or the Context from the database matching the actor
+        found in the request. If a context author is found, will override any person
+        actor
     """
+    context_actor_url = get_context_author_url(request)
+    if context_actor_url:
+        try:
+            url_hash = sha1(context_actor_url).hexdigest()
+            mmdb = MADMaxDB(request.registry.max_store)
+            actor = mmdb.contexts.getItemsByhash(url_hash)[0]
+            actor.setdefault('displayName', actor['username'])
+            return actor
+        except:
+            return None
+
     username = get_request_actor_username(request)
     try:
         mmdb = MADMaxDB(request.registry.max_store)

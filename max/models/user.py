@@ -7,8 +7,8 @@ from max.rest.utils import flatten
 from max.rest.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
-from max.security import Owner
-from max.security.permissions import modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices
+from max.security import Owner, Manager, is_self_operation
+from max.security.permissions import modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -83,10 +83,16 @@ class User(MADBase):
 
     @property
     def __acl__(self):
-        acl = []
-        acl.extend([
+        acl = [
             (Allow, Owner, modify_user),
-        ])
+            (Allow, Manager, view_activities),
+            (Allow, Owner, view_activities),
+            (Allow, Owner, add_activity),
+            (Allow, Manager, add_activity),
+            (Allow, Manager, view_subscriptions),
+            (Allow, Owner, view_subscriptions),
+        ]
+
         return acl
 
     def getOwner(self, request):

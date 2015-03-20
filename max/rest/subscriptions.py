@@ -69,7 +69,6 @@ def getContextSubscriptions(context, request):
     mmdb = MADMaxDB(request.db)
     found_users = mmdb.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
     for user in found_users:
-
         subscription = user['subscribedTo'][0]
         del user['subscribedTo']
         user['permissions'] = subscription.pop('permissions')

@@ -2,8 +2,8 @@
 from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
-from max.exceptions import ObjectNotFound
-from max.security import Manager, is_self_operation, Owner
+from max.exceptions import ObjectNotFound, Forbidden
+from max.security import Manager, is_self_operation, Owner, is_manager
 from max.security import permissions
 
 import pkg_resources
@@ -56,12 +56,10 @@ class Root(dict):
 
     def __init__(self, request):
         self.request = request
-        # MongoDB:
-        registry = self.request.registry
-        self.db = registry.max_store
         self['contexts'] = ContextTraverser(self, request)
         self['people'] = PeopleTraverser(self, request)
         self['subscriptions'] = SubscriptionsTraverser(self, request)
+        self['activities'] = ActivitiesTraverser(self, request)
 
 
 class MongoDBTraverser(MADMaxCollection):
@@ -92,6 +90,18 @@ class ContextTraverser(MongoDBTraverser):
             (Allow, Manager, permissions.view_context_activity),
             (Allow, Manager, permissions.view_subscriptions),
             (Allow, Owner, permissions.view_subscriptions)
+        ]
+        return acl
+
+
+class ActivitiesTraverser(MongoDBTraverser):
+    collection_name = 'activity'
+    query_key = '_id'
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.view_activities),
         ]
         return acl
 
@@ -156,7 +166,18 @@ class Subscription(dict):
         self.actor = actor
         self.context = Context()
         self.context.fromObject({'objectType': 'context', 'hash': chash})
-        self.update(actor.getSubscription({'hash': chash, 'objectType': 'context'}))
+        subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
+
+        # If a subscription is not found, we raise a Forbidden here, except that
+        # the user authenticated is a Manager: in that case, a fake read-granted subscription is
+        # given in order to grant him the view_activities on this subscription's context
+        if subscription is None:
+            current_user_is_manager = is_manager(self.request, self.request.authenticated_userid)
+            if not current_user_is_manager:
+                raise Forbidden('{} is not subscribed to {}'.format(self.request.actor_username, self.hash))
+            subscription = {'permissions': ['read']}
+
+        self.update(subscription)
 
     @property
     def _owner(self):
@@ -165,13 +186,25 @@ class Subscription(dict):
         """
         return self.context._owner
 
+    @property
     def __acl__(self):
-        acl = []
+        acl = [
+            (Allow, Manager, permissions.add_activity),
+        ]
 
         # Grant ubsubscribe permission if the user subscription allows it
         # but only if is trying to unsubscribe itself
         if 'unsubscribe' in self.get('permissions', []) and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
+
+        # Grant add_activity permission if the user subscription allows it
+        # but only if is trying to unsubscribe itself
+        if 'write' in self.get('permissions', []):
+            acl.append((Allow, self.request.authenticated_userid, permissions.add_activity))
+
+        # Grant view_activities permission if the user subscription allows it
+        if 'read' in self.get('permissions', []):
+            acl.append((Allow, self.request.authenticated_userid, permissions.view_activities))
 
         return acl
 

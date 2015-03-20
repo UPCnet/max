@@ -463,7 +463,7 @@ class MADBase(MADDict):
             return getattr(self, 'default_field_{}_permission'.format(permission_field), None)
 
         permission_name = self.schema[fieldName].get(permission_field, default_permission())
-        return isinstance(self.request.has_permission(permission_name), ACLAllowed)
+        return isinstance(self.request.has_permission(permission_name, self), ACLAllowed)
 
     def get_visible_fields(self):
         """

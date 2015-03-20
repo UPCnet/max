@@ -94,11 +94,8 @@ class BaseContext(MADBase):
             fields_to_squash.append('_id')
         subscription = self.flatten(squash=fields_to_squash)
 
-        # If we are subscribing the user, read permission is granted
-        user_permissions = ['read']
-
         # Add subscription permissions based on defaults and context values
-        user_permissions = self.subscription_permissions(base=user_permissions)
+        user_permissions = self.subscription_permissions(base=[])
 
         # Assign permissions to the subscription object before adding it
         subscription['permissions'] = user_permissions
@@ -313,6 +310,8 @@ class Context(BaseContext):
             (Allow, Owner, permissions.delete_context),
             (Allow, Manager, permissions.add_subscription),
             (Allow, Owner, permissions.add_subscription),
+            (Allow, Manager, permissions.view_activities),
+            (Allow, Manager, permissions.add_activity)
         ]
 
         # Grant subscribe permission to the user to subscribe itself if the context allows it

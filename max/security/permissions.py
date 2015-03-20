@@ -22,3 +22,11 @@ modify_immutable_fields = 'Modify immutable fields'
 change_ownership = "Change an object's owner"
 
 manage_user_devices = 'View and edit user device tokens'
+
+view_activities = 'View activities'
+view_activity = 'View activity'
+modify_activity = 'Modify activity'
+add_activity = 'Add activity'
+delete_activity = 'Delete activity'
+flag_activity = 'Flag an activity'
+unflag_activity = 'Unflag an activity'

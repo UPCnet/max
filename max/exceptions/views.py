@@ -38,11 +38,16 @@ def main_forbidden(request):
     """
         This view pops up when an authorization error occurs in the pyramid pipeline.
 
-        NOTE: There is another forbidden view that catches the Forbidden exceptions
-        inside endpoint code.
+        NOTE: There is another forbidden view just below here, that catches the
+        Forbidden exceptions inside endpoint code.
     """
     message = 'User "{}" has no permission "{}" here '.format(request.authenticated_userid, request.exception.result.permission)
     return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=message))
+
+
+@view_config(context=Forbidden)
+def forbidden(exc, request):
+    return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=exc.message))
 
 
 @notfound_view_config()
@@ -93,11 +98,6 @@ def invalid_permission(exc, request):
 @view_config(context=ValidationError)
 def validation_error(exc, request):
     return JSONHTTPBadRequest(error=dict(objectType='error', error=ValidationError.__name__, error_description=exc.message))
-
-
-@view_config(context=Forbidden)
-def forbidden(exc, request):
-    return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=exc.message))
 
 
 @view_config(context=Exception)

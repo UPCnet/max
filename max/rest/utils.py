@@ -506,23 +506,24 @@ def canWriteInContexts(actor, contexts):
 
     subscriptions = {}
 
+    from max.exceptions import Forbidden
     for context in contexts:
         subscription = subscriptions.get(context.getIdentifier(), None)
         if subscription is None:
-            #update subscriptions dict
+            # update subscriptions dict
             u_field = context.unique.lstrip('_')
             subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {})])
             subscriptions.update(subsc)
             subscription = subscriptions.get(context.getIdentifier(), None)
             if subscription is None:
-                raise Unauthorized("You are not subscribed to this context : %s" % context.getIdentifier())
+                raise Forbidden("You are not subscribed to this context : %s" % context.getIdentifier())
 
         # If user is trying to post on a subscribed context/s
         # Check that has write permission in all the contexts
 
         allowed_to_write = hasPermission(subscription, 'write')
         if not allowed_to_write:
-            raise Unauthorized("You are not allowed to post to this context : %s" % context.getIdentifier())
+            raise Forbidden("You are not allowed to post to this context : %s" % context.getIdentifier())
 
     # If we reached here, we have permission to post on all contexts
     return True
