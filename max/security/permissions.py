@@ -30,3 +30,7 @@ add_activity = 'Add activity'
 delete_activity = 'Delete activity'
 flag_activity = 'Flag an activity'
 unflag_activity = 'Unflag an activity'
+
+view_comments = 'View activity comments'
+add_comment = 'Add a comment to an activity'
+delete_comment = 'Remove a activity comment'

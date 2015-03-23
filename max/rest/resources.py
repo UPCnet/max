@@ -13,10 +13,10 @@ PUBLIC_RESOURCES = {
     'activity': dict(route='/activities/{activity}', category='Activities', name='Activity', traverse='/activities/{activity}'),
     'timeline': dict(route='/people/{username}/timeline', category='Activities', name='User Timeline'),
     'timeline_authors': dict(route='/people/{username}/timeline/authors', category='Activities', name='User Timeline authors'),
-    'user_comments': dict(route='/people/{username}/comments', category='Comments', name='User comments'),
+    'user_comments': dict(route='/people/{username}/comments', category='Comments', name='User comments', traverse='/people/{username}'),
 
-    'activity_comments': dict(route='/activities/{activity}/comments', category='Comments', name='Activity comments'),
-    'activity_comment': dict(route='/activities/{activity}/comments/{comment}', category='Comments', name='Activity comment'),
+    'activity_comments': dict(route='/activities/{activity}/comments', category='Comments', name='Activity comments', traverse="/activities/{activity}"),
+    'activity_comment': dict(route='/activities/{activity}/comments/{comment}', category='Comments', name='Activity comment', traverse="/activities/{activity}"),
 
     'subscriptions': dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}'),
     'subscription': dict(route='/people/{username}/subscriptions/{hash}', category='Subscriptions', name='User subscription'),

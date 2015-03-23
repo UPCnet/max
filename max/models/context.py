@@ -311,7 +311,8 @@ class Context(BaseContext):
             (Allow, Manager, permissions.add_subscription),
             (Allow, Owner, permissions.add_subscription),
             (Allow, Manager, permissions.view_activities),
-            (Allow, Manager, permissions.add_activity)
+            (Allow, Manager, permissions.add_activity),
+            (Allow, Manager, permissions.view_comments)
         ]
 
         # Grant subscribe permission to the user to subscribe itself if the context allows it

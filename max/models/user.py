@@ -8,7 +8,7 @@ from max.rest.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
 from max.security import Owner, Manager, is_self_operation
-from max.security.permissions import modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
+from max.security.permissions import view_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -91,6 +91,8 @@ class User(MADBase):
             (Allow, Manager, add_activity),
             (Allow, Manager, view_subscriptions),
             (Allow, Owner, view_subscriptions),
+            (Allow, Manager, view_comments),
+            (Allow, Owner, view_comments)
         ]
 
         return acl

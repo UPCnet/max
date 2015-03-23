@@ -60,6 +60,7 @@ class Root(dict):
         self['people'] = PeopleTraverser(self, request)
         self['subscriptions'] = SubscriptionsTraverser(self, request)
         self['activities'] = ActivitiesTraverser(self, request)
+        self['comments'] = CommentsTraverser(self, request)
 
 
 class MongoDBTraverser(MADMaxCollection):
@@ -72,6 +73,33 @@ class MongoDBTraverser(MADMaxCollection):
         self.__parent__ = parent
         self.collection = self.request.registry.max_store[self.collection_name]
         self.show_fields = None
+
+
+class CommentsTraverser(object):
+    """
+        Traverser to hold permissons for global comment access
+
+        This traverser will look for a comment inside an activty, assuming the parent
+        object is an activity
+    """
+    def __init__(self, parent, request):
+        self.request = request
+        self.db = request.registry.max_store
+        self.__parent__ = parent
+
+    def __getitem__(self, key):
+        from max.models import Activity
+
+        if isinstance(self.__parent__, Activity):
+            import ipdb;ipdb.set_trace()
+            return
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.view_comments)
+        ]
+        return acl
 
 
 class ContextTraverser(MongoDBTraverser):

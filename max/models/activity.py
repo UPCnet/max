@@ -5,13 +5,14 @@ from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
+from max.resources import CommentsTraverser
 from max.rest.utils import canWriteInContexts
 from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner
-from max.security.permissions import view_activity, delete_activity, modify_activity
+from max.security.permissions import view_activity, delete_activity, modify_activity, view_comments, add_comment
 from pyramid.security import Allow
 from PIL import Image
 from bson import ObjectId
@@ -68,7 +69,11 @@ class BaseActivity(MADBase):
             (Allow, Manager, view_activity),
             (Allow, Manager, delete_activity),
             (Allow, Owner, view_activity),
-            (Allow, Owner, delete_activity)
+            (Allow, Owner, delete_activity),
+            (Allow, Manager, view_comments),
+            (Allow, Owner, view_comments),
+            (Allow, Manager, add_comment),
+            (Allow, Owner, add_comment)
         ]
 
         # When checking permissions directly on the object (For example when determining
@@ -420,6 +425,10 @@ class Activity(BaseActivity):
     schema['lastLike'] = {}
     schema['favorites'] = {'default': []}
     schema['favoritesCount'] = {'default': 0}
+
+    @property
+    def comments(self):
+        return CommentsTraverser(self)
 
     def _on_saving_object(self, oid):
         if not hasattr(self, 'lastComment'):
