@@ -150,8 +150,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_global_comments_stats(self):
         from .mockers import user_status, user_comment
         username = 'messi'
-        self.create_user(test_manager)
-        self.create_user(username)
+        self.create_user(test_manager)        self.create_user(username)
+
 
         for i in range(11):
             res = self.create_activity(username, user_status)
@@ -174,8 +174,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
 
         username = 'messi'
-        self.create_user(test_manager)
-        self.create_user(username)
+        self.create_user(test_manager)        self.create_user(username)
+
         self.create_context(create_context)
         self.create_context(create_contextA)
         self.admin_subscribe_user_to_context(username, subscribe_context)

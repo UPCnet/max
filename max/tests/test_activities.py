@@ -391,8 +391,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         activity_0_id = self.create_activity(username, user_status_context).json['id']
-        activity_1_id = self.create_activity(username, user_status_context).json['id']
-        activity_2_id = self.create_activity(username, user_status_context).json['id']
+        activity_1_id = self.create_activity(username, user_status_context, note='Second').json['id']
+        activity_2_id = self.create_activity(username, user_status_context, note='Third').json['id']
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
@@ -741,8 +741,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         activity_0_id = self.create_activity(username, user_status).json['id']
-        activity_1_id = self.create_activity(username, user_status).json['id']
-        activity_2_id = self.create_activity(username, user_status).json['id']
+        activity_1_id = self.create_activity(username, user_status, note="second").json['id']
+        activity_2_id = self.create_activity(username, user_status, note="third").json['id']
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/people/%s/timeline?sortBy=activities' % username, "", oauth2Header(username), status=200)

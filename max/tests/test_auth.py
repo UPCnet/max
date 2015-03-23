@@ -43,7 +43,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         mindundi = 'messi'
         self.create_user(mindundi)
-        self.create_user(test_manager)
         self.create_context(create_context, owner=mindundi)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi, token='bad token'), status=401)
@@ -64,7 +63,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers = oauth2Header(test_manager)
         headers['X-Oauth-Scope'] = 'Invalid scope'
         self.create_user(mindundi)
-        self.create_user(test_manager)
         self.create_context(create_context, owner=mindundi)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), headers, status=401)
@@ -75,7 +73,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
 
         mindundi = 'messi'
-        self.create_user(test_manager)
         self.create_context(create_context, owner=mindundi)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=400)

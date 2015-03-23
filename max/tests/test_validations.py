@@ -29,6 +29,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # BEGIN TESTS
 
     def test_add_public_context_with_valid_parameters_that_needs_formating(self):
@@ -38,7 +40,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         from .mockers import create_context_full
 
-        self.create_user(test_manager)
         new_context = dict(create_context_full)
         new_context['twitterUsername'] = '@%s ' % create_context_full['twitterUsername']
         new_context['twitterHashtag'] = '  #%s' % create_context_full['twitterHashtag']
@@ -54,7 +55,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context_full
         from hashlib import sha1
 
-        self.create_user(test_manager)
         res = self.testapp.post('/contexts', json.dumps(create_context_full), oauth2Header(test_manager), status=201)
         url_hash = sha1(create_context_full['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterUsername": "@maxupcnet", "twitterHashtag": "#atenea"}), oauth2Header(test_manager), status=200)

@@ -31,6 +31,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # BEGIN TESTS
 
     def test_post_message_to_conversation_does_not_exists_yet(self):
@@ -1067,7 +1069,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         from .mockers import group_message as creation_message
 
-        self.create_user(test_manager)
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
-
+from copy import deepcopy
 
 # ===============================================================
 # Format com deurien estar guardades les dades a la base de dades

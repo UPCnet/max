@@ -140,7 +140,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context, create_context
         username = 'messi'
         self.create_user(username)
-        self.create_user(test_manager)
         self.create_context(create_context)
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
@@ -157,7 +156,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         recipient = 'xavi'
         recipient2 = 'shakira'
 
-        self.create_user(test_manager)
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
@@ -261,7 +259,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_get_context_twitter_enabled(self):
         from .mockers import create_context, create_contextA
-        self.create_user(test_manager)
         self.create_context(create_context)
         self.create_context(create_contextA)
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
@@ -276,7 +273,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
 
         username = 'messi'
-        self.create_user(test_manager)
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)

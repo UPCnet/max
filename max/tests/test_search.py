@@ -133,7 +133,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)
-        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note="second")
         self.create_activity(username2, user_status_context)
 
         res = self.testapp.get('/contexts/%s/activities?actor=%s' % (context_query['context'], username), '', oauth2Header(username), status=200)
@@ -156,9 +156,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.admin_subscribe_user_to_context(username2, subscribe_context)
         self.create_activity(username, user_status_context)
-        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note="second")
         self.create_activity(username2, user_status_context)
-        self.create_activity(username2, user_status_context)
+        self.create_activity(username2, user_status_context, note="second")
 
         res = self.testapp.get('/people/%s/timeline?actor=%s' % (username, username), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
@@ -242,10 +242,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username2, subscribe_context)
         res = self.create_activity(username, user_status_context)
         activity1_id = res.json['id']
-        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note="second")
         res = self.create_activity(username2, user_status_context)
         activity3_id = res.json['id']
-        self.create_activity(username2, user_status_context)
+        self.create_activity(username2, user_status_context, note="second")
 
         self.favorite_activity(username, activity1_id)
         self.favorite_activity(username, activity3_id)

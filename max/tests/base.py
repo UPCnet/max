@@ -4,6 +4,7 @@ from max.tests.mock_image import image
 
 from pyramid.threadlocal import get_current_request
 from urllib import urlencode
+from copy import deepcopy
 
 import json
 import os
@@ -139,9 +140,13 @@ class MaxTestBase(object):
         res = self.testapp.put('/people/%s' % username, json.dumps(properties), oauth2Header(username))
         return res
 
-    def create_activity(self, username, activity, oauth_username=None, expect=201):
+    def create_activity(self, username, activity, oauth_username=None, expect=201, note=None):
         oauth_username = oauth_username is not None and oauth_username or username
-        res = self.testapp.post('/people/%s/activities' % username, json.dumps(activity), oauth2Header(oauth_username), status=expect)
+        new_activity = deepcopy(activity)
+        if note is not None:
+            new_activity['object']['content'] = note
+
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(new_activity), oauth2Header(oauth_username), status=expect)
         return res
 
     def like_activity(self, username, activity_id, expect=201):

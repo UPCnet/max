@@ -304,7 +304,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         from .mockers import subscribe_context
 
-        self.create_user(test_manager)
         url_hash = sha1(create_context['url']).hexdigest()
         username = 'messi'
         self.create_user(username)
@@ -327,7 +326,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         from .mockers import user_status_context
 
-        self.create_user(test_manager)
         url_hash = sha1(create_context['url']).hexdigest()
         username = 'messi'
         self.create_user(username)
@@ -349,7 +347,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         from .mockers import user_status_context
 
-        self.create_user(test_manager)
         url_hash = sha1(create_context['url']).hexdigest()
         username = 'messi'
         self.create_user(username)
@@ -372,7 +369,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         from .mockers import user_status_context
 
-        self.create_user(test_manager)
         url_hash = sha1(create_context['url']).hexdigest()
         username = 'messi'
         self.create_user(username)
@@ -395,7 +391,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import subscribe_context
         from .mockers import user_status_context
 
-        self.create_user(test_manager)
         url_hash = sha1(create_context['url']).hexdigest()
         username = 'messi'
         self.create_user(username)

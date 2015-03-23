@@ -184,7 +184,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
 
-        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=200)
@@ -199,7 +198,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         mindundi = 'messi'
         self.create_user(mindundi)
-        self.create_user(test_manager)
         self.create_context(create_context, owner=mindundi)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=200)
@@ -214,7 +212,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         mindundi = 'messi'
         self.create_user(mindundi)
-        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=403)
@@ -222,7 +219,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_modify_inexistent_context(self):
         """ doctest .. http:put:: /contexts/{hash} """
 
-        self.create_user(test_manager)
         url_hash = '0000000000000'
         self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=404)
 
@@ -231,7 +227,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
 
-        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"}), oauth2Header(test_manager), status=200)
@@ -303,7 +298,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context, subscribe_context
 
-        self.create_user(test_manager)
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted'))
@@ -317,7 +311,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
         from .mockers import create_context
 
-        self.create_user(test_manager)
         self.create_context(create_context)
         url_hash = sha1(create_context['url']).hexdigest()
         self.modify_context(create_context['url'], {"twitterHashtag": "assignatura1", "twitterUsername": "maxupcnet"})
