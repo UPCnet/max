@@ -34,3 +34,5 @@ unflag_activity = 'Unflag an activity'
 view_comments = 'View activity comments'
 add_comment = 'Add a comment to an activity'
 delete_comment = 'Remove a activity comment'
+
+view_server_settings = 'View detailed server settings'

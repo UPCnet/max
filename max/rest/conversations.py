@@ -3,8 +3,6 @@ from max import CONVERSATION_PARTICIPANTS_LIMIT
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.MADMax import MADMaxCollection
 from max.MADMax import MADMaxDB
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
 from max.exceptions import Forbidden
 from max.exceptions import ObjectNotFound
 from max.exceptions import Unauthorized
@@ -12,28 +10,17 @@ from max.exceptions import ValidationError
 from max.models import Activity
 from max.models import Conversation
 from max.models import Message
-from max.oauth2 import oauth2
 from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.utils import flatten
-from max.rest.utils import searchParams
-from max.rest.utils import get_avatar_folder
+from max.rest import endpoint
 
 from pyramid.httpexceptions import HTTPNoContent
-from pyramid.response import Response
-from pyramid.view import view_config
 
 from bson import ObjectId
-from pymongo import DESCENDING
-
-import os
 
 
-@view_config(route_name='conversations', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='conversations', request_method='GET')
 def getConversations(context, request):
     """
          /conversations
@@ -64,10 +51,7 @@ def getConversations(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='conversations', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='conversations', request_method='POST')
 def postMessage2Conversation(context, request):
     """
          /conversations
@@ -198,10 +182,7 @@ def postMessage2Conversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_conversation', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='user_conversation', request_method='GET')
 def getUserConversationSubscription(context, request):
     """
          /people/{username}/conversations/{id}
@@ -230,10 +211,7 @@ def getUserConversationSubscription(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='conversation', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='conversation', request_method='GET')
 def getConversation(context, request):
     """
          /conversations/{id}
@@ -253,10 +231,7 @@ def getConversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='conversation', request_method='PUT')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='conversation', request_method='PUT')
 def ModifyConversation(context, request):
     """
         /conversation/{id}
@@ -280,10 +255,7 @@ def ModifyConversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_conversation', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
+@endpoint(route_name='user_conversation', request_method='POST')
 def joinConversation(context, request):
     """
          /people/{username}/conversations/{id}
@@ -354,10 +326,7 @@ def joinConversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='conversation_owner', request_method='PUT')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
+@endpoint(route_name='conversation_owner', request_method='PUT')
 def trasnferConversationOwnership(context, request):
     """
     """
@@ -397,10 +366,7 @@ def trasnferConversationOwnership(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_conversation', request_method='DELETE')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False)
+@endpoint(route_name='user_conversation', request_method='DELETE')
 def leaveConversation(context, request):
     """
     """
@@ -445,9 +411,7 @@ def leaveConversation(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='conversation', request_method='DELETE')
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='conversation', request_method='DELETE')
 def DeleteConversation(context, request):
     """
     """
@@ -464,10 +428,7 @@ def DeleteConversation(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='conversations', request_method='DELETE', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=True)
+@endpoint(route_name='conversations', request_method='DELETE', restricted='Manager')
 def deleteConversations(context, request):
     """
     Deletes ALL the conversations from ALL users in max

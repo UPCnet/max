@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
 from max.models import Activity
-from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 
 from pyramid.httpexceptions import HTTPNotImplemented
@@ -24,9 +21,6 @@ def getFollowedUser(context, request):
 
 
 @view_config(route_name='follow', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
 def follow(context, request):
     """
         /people/{username}/follows/{followedUsername}'

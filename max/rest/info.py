@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
-from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max import RESOURCES
 from pyramid.view import view_config
@@ -12,7 +9,7 @@ import sys
 import json
 
 from max.resources import Root
-
+from max.security.permissions import view_server_settings
 from pyramid.response import Response
 
 
@@ -48,10 +45,7 @@ def getMaxPublicInfo(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='info_settings', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@view_config(route_name='info_settings', request_method='GET', permission=view_server_settings)
 def getMaxSettings(context, request):
     """
         /info/settings

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from max import ALLOWED_ROLES
 from max.MADMax import MADMaxDB
-from max.decorators import MaxResponse
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
 from max.resources import loadMAXSecurity

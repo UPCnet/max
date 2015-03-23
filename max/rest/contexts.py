@@ -144,8 +144,6 @@ def updateContextTags(context, request):
 
 
 @endpoint(route_name='context_tag', request_method='DELETE', permission=modify_context, requires_actor=True)
-@MaxResponse
-@oauth2(['widgetcli'])
 def removeContextTag(context, request):
     """
     """
