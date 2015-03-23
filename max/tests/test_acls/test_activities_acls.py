@@ -438,20 +438,20 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         """
            Given i'm a regular user
            When I try to delete another user activity on a context
-           And i've have been granted the permission to delete on that context
-           Then i suceed
+           And i'm the owner of the context
+           And i don't have explicit permission to delete
+           Then i get a Forbidden Exception
 
         """
         from max.tests.mockers import user_status_context
         from max.tests.mockers import subscribe_context, create_context
-        from hashlib import sha1
+
         username = 'sheldon'
         username_not_me = 'penny'
         self.create_user(username)
         self.create_user(username_not_me)
         self.create_context(create_context, owner=username)
-        chash = sha1(create_context['url']).hexdigest()
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         res = self.create_activity(username_not_me, user_status_context)
-        self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=204)
+        self.testapp.delete('/activities/%s' % res.json['id'], '', oauth2Header(username), status=403)

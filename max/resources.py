@@ -221,13 +221,14 @@ class Subscription(dict):
         ]
 
         # Grant ubsubscribe permission if the user subscription allows it
-        # but only if is trying to unsubscribe itself
+        # but only if is trying to unsubscribe itself.
         if 'unsubscribe' in self.get('permissions', []) and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
 
         # Grant add_activity permission if the user subscription allows it
-        # but only if is trying to unsubscribe itself
-        if 'write' in self.get('permissions', []):
+        # but only if is trying to post as himself. This avoids Context owners to create
+        # activity impersonating othe users
+        if 'write' in self.get('permissions', []) and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.add_activity))
 
         # Grant view_activities permission if the user subscription allows it

@@ -78,7 +78,8 @@ class BaseActivity(MADBase):
 
         # When checking permissions directly on the object (For example when determining
         # the visible fields), request.context.owner will be related to the owner of where we are posting the
-        # activity), so we need to provide permissions for the owner of the object itself, or the flatten will result empty...
+        # activity, for example, when posting to a context, the context), so we need to provide permissions
+        # for the owner of the object itself, or the flatten will result empty...
         if is_owner(self, self.request.authenticated_userid):
             acl.append((Allow, self.request.authenticated_userid, view_activity))
 
