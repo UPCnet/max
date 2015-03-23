@@ -711,7 +711,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity_ids = []
         # Create 7 activities to overpass limit of 5
         for i in range(7):
-            activity_ids.append(self.create_activity(username, user_status).json['id'])
+            activity_ids.append(self.create_activity(username, user_status, note=str(i)).json['id'])
         res = self.testapp.post('/activities/%s/comments' % str(activity_ids[0]), json.dumps(user_comment), oauth2Header(username), status=201)
         # Get first 5 results
         res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5' % username, "", oauth2Header(username), status=200)

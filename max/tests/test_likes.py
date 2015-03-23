@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_default_security
+from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
@@ -27,6 +28,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
+
+        self.create_user(test_manager)
 
     # BEGIN TESTS
 

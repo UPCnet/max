@@ -205,7 +205,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             username = 'user{}'.format(i)
             self.create_user(username)
             self.admin_subscribe_user_to_context(username, subscribe_context)
-            res = self.create_activity(username, user_status_context)
+            res = self.create_activity(username, user_status_context, note=str(i))
             activities.append(res.json['id'])
 
         # print '\n'.join([str(a) for a in activities])
@@ -256,7 +256,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         # Create 6 activity
         for i in range(1, 7):
-            res = self.create_activity(username, user_status_context)
+            res = self.create_activity(username, user_status_context, note=str(i))
             activities.append(res.json['id'])
 
         self.flag_activity(username, activities[0])
