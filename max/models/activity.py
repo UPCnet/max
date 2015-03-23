@@ -445,34 +445,6 @@ class Activity(BaseActivity):
             notifier = RabbitNotifications(self.request)
             notifier.notify_context_activity(self)
 
-    def _on_create_custom_validations(self):
-        """
-            Perform custom validations on the Activity Object
-
-            * If the actor is a person, check wether can write in all contexts
-            * If the actor is a context, check if the context is the same
-        """
-        collection = getattr(self.mdb_collection.database, self.context_collection)
-        contextsdb = MADMaxCollection(collection, query_key='hash')
-
-        # If we are updating, we already have all data on the object, so we read self directly
-        result = True
-        if isinstance(self.data['actor'], User):
-            wrapped_contexts = []
-            for context in self.data.get('contexts', []):
-                # Get hash from context or calculate it from the url
-                # XXX Too coupled ...
-                chash = context.get('hash', None)
-                if chash is None:
-                    chash = sha1(context['url']).hexdigest()
-                wrapped = contextsdb[chash]
-                wrapped_contexts.append(wrapped)
-
-            result = result and canWriteInContexts(self.data['actor'], wrapped_contexts)
-        if self.data.get('contexts', None) and isinstance(self.data['actor'], Context):
-            result = result and self.data['actor']['url'] == self.data.get('contexts')[0]
-        return result
-
     def _post_init_from_object(self, source):
         """
             * Set the deletable flag on the object. If user is the owner don't check anything else,

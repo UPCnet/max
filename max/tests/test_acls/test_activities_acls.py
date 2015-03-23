@@ -128,7 +128,7 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         from max.tests.mockers import create_context
         from max.tests.mockers import user_status_context
         self.create_context(create_context, permissions={'write': 'restricted'})
-        self.create_activity(test_manager, user_status_context, expect=403)
+        self.create_activity(test_manager, user_status_context, expect=201)
 
     def test_add_context_activity_as_manager_impersonating(self):
         """

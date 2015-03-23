@@ -5,6 +5,7 @@ from pyramid.security import Allow, Authenticated
 from max.exceptions import ObjectNotFound, Forbidden
 from max.security import Manager, is_self_operation, Owner, is_manager
 from max.security import permissions
+from max.rest.utils import getMaxModelByObjectType
 
 import pkg_resources
 import inspect
@@ -186,6 +187,20 @@ class Subscription(dict):
         real objects. In the (near) future, this should be migrated to models
         as a regular mongodb collecion object.
     """
+
+    def get_subscription(self, context):
+        """
+            Retrieves the subscription
+        """
+        ContextClass = getMaxModelByObjectType(context['objectType'])
+        temp_context = ContextClass()
+        temp_context.fromObject(context)
+        for subscription in self.actor.get(temp_context.user_subscription_storage, []):
+            if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
+                return subscription
+
+        return context
+
     def __init__(self, parent, request, chash, actor):
         from max.models import Context
         self.__parent__ = parent
@@ -194,7 +209,7 @@ class Subscription(dict):
         self.actor = actor
         self.context = Context()
         self.context.fromObject({'objectType': 'context', 'hash': chash})
-        subscription = actor.getSubscription({'hash': chash, 'objectType': 'context'})
+        subscription = self.get_subscription({'hash': chash, 'objectType': 'context'})
 
         # If a subscription is not found, we raise a Forbidden here, except that
         # the user authenticated is a Manager: in that case, a fake read-granted subscription is
@@ -218,6 +233,7 @@ class Subscription(dict):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_activity),
+            (Allow, Manager, permissions.view_activities),
         ]
 
         # Grant ubsubscribe permission if the user subscription allows it

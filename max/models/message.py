@@ -2,7 +2,7 @@
 from max.MADMax import MADMaxCollection
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
-from max.rest.utils import canWriteInContexts
+#from max.rest.utils import canWriteInContexts
 
 
 class Message(BaseActivity):

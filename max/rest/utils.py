@@ -529,27 +529,6 @@ def canWriteInContexts(actor, contexts):
     return True
 
 
-def canReadContext(actor, url):
-    """ DEPRECATED
-    """
-    # If no context filter defined, write/read is always allowed
-    if url == []:
-        return True
-
-    subscribed_contexts_urls = [a['object']['url'] for a in actor['subscribedTo'] if hasPermission(a['permissions'], 'read')]
-
-    if url not in subscribed_contexts_urls:
-
-        # Check recursive read: User is allowed to read recursively on an
-        # unsubscribed context if is subscribed to at least one child context
-        containments = [usc.startswith(url) for usc in subscribed_contexts_urls]
-        if True not in containments:
-            raise Unauthorized("You are not subscribed to this context: %s" % url)
-
-    #If we reached here, we have permission to read on all contexts
-    return True
-
-
 def rotate_image_by_EXIF(image):
     """
         Images with rotation will have a value in field 274. If we don't know how much

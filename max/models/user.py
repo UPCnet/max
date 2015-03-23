@@ -311,12 +311,8 @@ class User(MADBase):
     def getSubscription(self, context):
         """
         """
-        ContextClass = getMaxModelByObjectType(context['objectType'])
-        temp_context = ContextClass()
-        temp_context.fromObject(context)
-        for subscription in self[temp_context.user_subscription_storage]:
-            if subscription[temp_context.unique.lstrip('_')] == str(temp_context[temp_context.unique]):
-                return subscription
+        from max.resources import Subscription
+        return Subscription(None, self.request, context['hash'], self.request.actor)
 
     def addUserDevice(self, platform, token):
         self.add_to_list(platform + PLATFORM_FIELD_SUFFIX, token)
