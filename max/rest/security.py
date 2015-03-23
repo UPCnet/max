@@ -4,18 +4,14 @@ from max.MADMax import MADMaxDB
 from max.decorators import MaxResponse
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
-from max.oauth2 import oauth2
 from max.resources import loadMAXSecurity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.ResourceHandlers import JSONResourceEntity
-
-from pyramid.view import view_config
+from max.rest import endpoint
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@view_config(route_name='admin_security', request_method='GET', restricted="Manager")
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission="manage_security")
 def getSecurity(context, request):
     """
          /admin/security
@@ -25,7 +21,7 @@ def getSecurity(context, request):
          It's intended to be a protected by IP endpoint as we do not want
          eavesdroping on this information
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {}
     roles = mmdb.security.search(query, flatten=1)
 
@@ -33,9 +29,7 @@ def getSecurity(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_security_users', request_method='GET', restricted="Manager")
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission="manage_security")
 def getSecurityUsers(context, request):
     """
          /admin/security/users
@@ -45,7 +39,7 @@ def getSecurityUsers(context, request):
          It's intended to be a protected by IP endpoint as we do not want
          eavesdroping on this information
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {}
     security = mmdb.security.search(query, flatten=1)
 
@@ -61,9 +55,7 @@ def getSecurityUsers(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_security_role_user', request_method='GET', restricted="Manager")
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission="manage_security")
 def check_user_role(context, request):
     """
     """
@@ -71,7 +63,7 @@ def check_user_role(context, request):
     role = request.matchdict['role']
     user = request.matchdict['user']
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {}
     security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})
@@ -87,9 +79,7 @@ def check_user_role(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_security_role_user', request_method='POST', restricted="Manager")
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission="manage_security")
 def add_user_to_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}
@@ -102,7 +92,7 @@ def add_user_to_role(context, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {}
     security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})
@@ -119,9 +109,7 @@ def add_user_to_role(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='admin_security_role_user', request_method='DELETE', restricted="Manager")
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission="manage_security")
 def remove_user_from_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}
@@ -134,7 +122,7 @@ def remove_user_from_role(context, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {}
     security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})

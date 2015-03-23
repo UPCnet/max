@@ -198,27 +198,6 @@ def postMessage2Conversation(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='messages', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
-def getMessages(context, request):
-    """
-         /conversations/{id}/messages
-         Return all messages from a conversation
-    """
-    cid = request.matchdict['id']
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
-        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
-
-    mmdb = MADMaxDB(context.db)
-    query = {'contexts.id': cid}
-    messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
-    remaining = messages.remaining
-    handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
-    return handler.buildResponse()
-
-
 @view_config(route_name='user_conversation', request_method='GET')
 @MaxResponse
 @oauth2(['widgetcli'])
@@ -278,7 +257,7 @@ def getConversation(context, request):
 @MaxResponse
 @oauth2(['widgetcli'])
 @requirePersonActor
-def ModifyContext(context, request):
+def ModifyConversation(context, request):
     """
         /conversation/{id}
 
@@ -298,43 +277,6 @@ def ModifyContext(context, request):
     conversation.updateUsersSubscriptions()
     conversation.updateContextActivities()
     handler = JSONResourceEntity(conversation.flatten())
-    return handler.buildResponse()
-
-
-@view_config(route_name='messages', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
-def addMessage(context, request):
-    """
-         /conversations/{id}/messages
-         Post a message to 1 (one) existing conversation
-    """
-    cid = request.matchdict['id']
-    message_params = {'actor': request.actor,
-                      'verb': 'post',
-                      'contexts': [{'objectType': 'conversation',
-                                    'id': cid
-                                    }]
-                      }
-
-    # Initialize a Message (Activity) object from the request
-    newmessage = Message()
-    newmessage.fromRequest(request, rest_params=message_params)
-
-    if newmessage['object']['objectType'] == u'image' or \
-       newmessage['object']['objectType'] == u'file':
-        # Extract the file before saving object
-        message_file = newmessage.extract_file_from_activity()
-        message_oid = newmessage.insert()
-        newmessage['_id'] = ObjectId(message_oid)
-        newmessage.process_file(request, message_file)
-        newmessage.save()
-    else:
-        message_oid = newmessage.insert()
-        newmessage['_id'] = message_oid
-
-    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
     return handler.buildResponse()
 
 
@@ -522,23 +464,16 @@ def DeleteConversation(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='conversation_avatar', request_method='GET')
-def getConversationUserAvatar(context, request):
+@view_config(route_name='conversations', request_method='DELETE', restricted='Manager')
+@MaxResponse
+@oauth2(['widgetcli'])
+@requirePersonActor(force_own=False, exists=True)
+def deleteConversations(context, request):
     """
-        /conversation/{id}/avatar
-
-        Returns conversation avatar. Public endpoint.
+    Deletes ALL the conversations from ALL users in max
+    doing all the consequent unsubscriptions
     """
-    cid = request.matchdict['id']
-
-    base_folder = request.registry.settings.get('avatar_folder')
-    avatar_folder = get_avatar_folder('conversations', cid)
-
-    missing_avatar = os.path.join(base_folder, 'missing-conversation.png')
-    conversation_avatar = os.path.join(avatar_folder, cid)
-    filename = conversation_avatar if os.path.exists(conversation_avatar) else missing_avatar
-
-    data = open(filename).read()
-    image = Response(data, status_int=200)
-    image.content_type = 'image/png'
-    return image
+    conversations = MADMaxCollection(context.db.conversations)
+    for conversation in conversations.dump():
+        conversation.delete()
+    return HTTPNoContent()

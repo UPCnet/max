@@ -1,19 +1,40 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
-from max.decorators import MaxResponse
-from max.oauth2 import oauth2
+from max.rest import endpoint
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.decorators import requirePersonActor
-from pyramid.view import view_config
 from max.exceptions import ValidationError
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.exceptions import ObjectNotFound
 from pyramid.httpexceptions import HTTPNoContent
+from max.MADMax import MADMaxDB
+from max.rest.utils import searchParams
 
 
-@view_config(route_name='context_push_tokens', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
+@endpoint(route_name='pushtokens', request_method='GET', restricted='Manager')
+def getPushTokensForConversation(context, request):
+    """
+         /conversations/{id}/tokens
+         Return all relevant tokens for a given conversation
+    """
+
+    cid = request.matchdict['id']
+
+    mmdb = MADMaxDB(context.db)
+    query = {'talkingIn.id': cid}
+    users = mmdb.users.search(query, show_fields=["username", "iosDevices", "androidDevices"], sort_by_field="username", flatten=1, **searchParams(request))
+
+    result = []
+    for user in users:
+        for idevice in user.get('iosDevices', []):
+            result.append(dict(token=idevice, platform='iOS', username=user.get('username')))
+        for adevice in user.get('androidDevices', []):
+            result.append(dict(token=adevice, platform='android', username=user.get('username')))
+
+    handler = JSONResourceRoot(result)
+    return handler.buildResponse()
+
+
+@endpoint(route_name='context_push_tokens', request_method='GET', restricted='Manager')
 def getPushTokensForContext(context, request):
     """
          /contexts/{hash}/tokens
@@ -37,10 +58,7 @@ def getPushTokensForContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_device', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='user_device', request_method='POST')
 def addUserDevice(context, request):
     """ Adds a new user device to the user's profile.
     """
@@ -61,10 +79,7 @@ def addUserDevice(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='user_device', request_method='DELETE')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='user_device', request_method='DELETE')
 def deleteUserDevice(context, request):
     """ Delete an existing user device to the user's profile.
     """
@@ -84,10 +99,7 @@ def deleteUserDevice(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='user_platform_tokens', request_method='DELETE', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(exists=True, force_own=False)
+@endpoint(route_name='user_platform_tokens', request_method='DELETE', restricted='Manager')
 def deleteUserDevicesByPlatform(context, request):
     """ Delete an existing user device to the user's profile.
     """

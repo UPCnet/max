@@ -12,32 +12,10 @@ from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.view import view_config
 
 from bson.objectid import ObjectId
+from max.rest import endpoint
 
 
-@view_config(route_name='user_favorites', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
-def getUserFavoritedActivities(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@view_config(route_name='favorites', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
-def getActivityFavorites(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@view_config(route_name='favorites', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='favorites', request_method='POST', requires_actor=True)
 def favorite(context, request):
     """
     """
@@ -80,10 +58,7 @@ def favorite(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='favorite', request_method='DELETE')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='favorite', request_method='DELETE', requires_actor=True)
 def unfavorite(context, request):
     """
     """
@@ -121,3 +96,17 @@ def unfavorite(context, request):
     newactivity['object']['favorited'] = found_activity.has_favorite_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
     return handler.buildResponse()
+
+
+@endpoint(route_name='user_favorites', request_method='GET', requires_actor=True)
+def getUserFavoritedActivities(context, request):
+    """
+    """
+    return HTTPNotImplemented()  # pragma: no cover
+
+
+@endpoint(route_name='favorites', request_method='GET', requires_actor=True)
+def getActivityFavorites(context, request):
+    """
+    """
+    return HTTPNotImplemented()  # pragma: no cover

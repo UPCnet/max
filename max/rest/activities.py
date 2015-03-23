@@ -2,7 +2,6 @@
 from max.MADMax import MADMaxDB
 from max.exceptions import Forbidden
 from max.exceptions import ObjectNotFound
-from max.exceptions import Unauthorized
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot

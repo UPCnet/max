@@ -7,21 +7,18 @@ from max.rest.utils import get_twitter_api
 
 from pyramid.response import Response
 from pyramid.view import view_config
-from max.decorators import MaxResponse
 import os
 import time
 
 from PIL import Image
 from PIL import ImageOps
 
-from max.oauth2 import oauth2
-from max.decorators import requirePersonActor
-
+from max.rest import endpoint
 from max.exceptions import ValidationError
+
 
 @view_config(route_name='avatar', request_method='GET')
 @view_config(route_name='avatar_sizes', request_method='GET')
-@MaxResponse
 def getUserAvatar(context, request):
     """
         /people/{username}/avatar
@@ -61,10 +58,7 @@ def getUserAvatar(context, request):
     return image
 
 
-@view_config(route_name='avatar', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='avatar', request_method='POST', requires_actor=True)
 def postUserAvatar(context, request):
     """
         /people/{username}/avatar
@@ -143,6 +137,28 @@ def getContextAvatar(context, request):
         context_image_filename = '{}/missing-context.png'.format(base_folder)
 
     data = open(context_image_filename).read()
+    image = Response(data, status_int=200)
+    image.content_type = 'image/png'
+    return image
+
+
+@view_config(route_name='conversation_avatar', request_method='GET')
+def getConversationUserAvatar(context, request):
+    """
+        /conversation/{id}/avatar
+
+        Returns conversation avatar. Public endpoint.
+    """
+    cid = request.matchdict['id']
+
+    base_folder = request.registry.settings.get('avatar_folder')
+    avatar_folder = get_avatar_folder('conversations', cid)
+
+    missing_avatar = os.path.join(base_folder, 'missing-conversation.png')
+    conversation_avatar = os.path.join(avatar_folder, cid)
+    filename = conversation_avatar if os.path.exists(conversation_avatar) else missing_avatar
+
+    data = open(filename).read()
     image = Response(data, status_int=200)
     image.content_type = 'image/png'
     return image

@@ -1,22 +1,37 @@
 # -*- coding: utf-8 -*-
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
 from max.models import Message
-from max.oauth2 import oauth2
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
-from pyramid.view import view_config
-
+from max.rest import endpoint
+from max.exceptions import Unauthorized
+from max.rest.utils import searchParams, flatten
+from max.MADMax import MADMaxDB
+from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 from base64 import b64encode
 from bson import ObjectId
 
 
-@view_config(route_name='message_image', request_method='GET')
-@view_config(route_name='message_image_sizes', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='messages', request_method='GET', requires_actor=True)
+def getMessages(context, request):
+    """
+         /conversations/{id}/messages
+         Return all messages from a conversation
+    """
+    cid = request.matchdict['id']
+    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
+        raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
+
+    mmdb = MADMaxDB(context.db)
+    query = {'contexts.id': cid}
+    messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
+    remaining = messages.remaining
+    handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
+    return handler.buildResponse()
+
+
+@endpoint(route_name='message_image', request_method='GET', requires_actor=True)
+@endpoint(route_name='message_image_sizes', request_method='GET', requires_actor=True)
 def getMessageImageAttachment(context, request):
     """
         Returns an image or from local repository.
@@ -42,10 +57,7 @@ def getMessageImageAttachment(context, request):
     return response
 
 
-@view_config(route_name='message_file_download', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='message_file_download', request_method='GET', requires_actor=True)
 def getMessageFileAttachment(context, request):
     """
         Returns file from local repository.
@@ -65,3 +77,39 @@ def getMessageFileAttachment(context, request):
         response = HTTPGone()
 
     return response
+
+
+@endpoint(route_name='user_conversation_messages', request_method='POST', restricted='Manager', requires_actor=True)
+@endpoint(route_name='messages', request_method='POST', requires_actor=True)
+def add_message(context, request):
+    """
+         Adds a message to a conversation. The request.actor is the one "talking", either
+         if it was the authenticaded user, the rest username or the post body actor, in this order.
+    """
+    cid = request.matchdict['id']
+    message_params = {'actor': request.actor,
+                      'verb': 'post',
+                      'contexts': [{'objectType': 'conversation',
+                                    'id': cid
+                                    }]
+                      }
+
+    # Initialize a Message (Activity) object from the request
+    newmessage = Message()
+    newmessage.fromRequest(request, rest_params=message_params)
+
+    if newmessage['object']['objectType'] == u'image' or \
+       newmessage['object']['objectType'] == u'file':
+        # Extract the file before saving object
+        message_file = newmessage.extract_file_from_activity()
+        message_oid = newmessage.insert()
+        newmessage['_id'] = ObjectId(message_oid)
+        newmessage.process_file(request, message_file)
+        newmessage.save()
+    else:
+        message_oid = newmessage.insert()
+        newmessage['_id'] = message_oid
+
+    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+    return handler.buildResponse()
+

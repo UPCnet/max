@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
 from max.MADMax import MADMaxDB
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
-from max.exceptions import ObjectNotFound
-from max.exceptions import Unauthorized
 from max.models import Activity
-from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams

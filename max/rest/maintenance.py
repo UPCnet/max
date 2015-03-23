@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxDB
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
 from max.models import Context
 from max.models import Conversation
-from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
-
-from pyramid.view import view_config
+from max.rest import endpoint
 
 from bson import ObjectId
 
@@ -19,10 +15,7 @@ import re
 logger = logging.getLogger('exceptions')
 
 
-@view_config(route_name='maintenance_keywords', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_keywords', request_method='POST', requires_actor=False, permission='maintenance')
 def rebuildKeywords(context, request):
     """
          /maintenance/keywords
@@ -41,10 +34,7 @@ def rebuildKeywords(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_dates', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_dates', request_method='POST', requires_actor=False, permission='maintenance')
 def rebuildDates(context, request):
     """
          /maintenance/dates
@@ -67,10 +57,7 @@ def rebuildDates(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_subscriptions', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_subscriptions', request_method='POST', requires_actor=False, permission='maintenance')
 def rebuildSubscriptions(context, request):
     """
          /maintenance/subscriptions
@@ -102,10 +89,7 @@ def rebuildSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_conversations', request_method='POST')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_conversations', request_method='POST', requires_actor=False, permission='maintenance')
 def rebuildConversationSubscriptions(context, request):
     """
          /maintenance/conversations
@@ -151,7 +135,7 @@ def rebuildConversationSubscriptions(context, request):
                 user.removeSubscription(fake_deleted_conversation)
                 user['talkingIn'] = [a for a in user['talkingIn'] if a['id'] != subscription['id']]
             else:
-                #if subscription has an ancient plain username list, update and save it
+                # if subscription has an ancient plain username list, update and save it
                 if True not in [isinstance(a, dict) for a in subscription['participants']]:
                     subscription['participants'] = existing_conversations[subscription['id']]['participants']
         user.updateConversationParticipants(force_update=True)
@@ -160,10 +144,7 @@ def rebuildConversationSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_exception', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_exception', request_method='GET', restricted='Manager', requires_actor=False, permission='maintenance')
 def getException(context, request):
     """
          /maintenance/exceptions/{hash}
@@ -184,10 +165,7 @@ def getException(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_exceptions', request_method='GET', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_exceptions', request_method='GET', restricted='Manager', requires_actor=False, permission='maintenance')
 def getExceptions(context, request):
     """
          /maintenance/exceptions
@@ -203,10 +181,7 @@ def getExceptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='maintenance_users', request_method='POST', restricted='Manager')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor(force_own=False, exists=False)
+@endpoint(route_name='maintenance_users', request_method='POST', restricted='Manager', requires_actor=False, permission='maintenance')
 def rebuildUser(context, request):
     """
          Rebuilds user objects with defaults and consistency checks.

@@ -2,14 +2,9 @@
 from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 from max import LAST_AUTHORS_LIMIT
 from max.MADMax import MADMaxDB
-from max.decorators import MaxResponse
-from max.decorators import requirePersonActor
-from max.oauth2 import oauth2
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.utils import searchParams
 from max.rest.sorting import sorted_query
-
-from pyramid.view import view_config
+from max.rest import endpoint
 
 
 def timelineQuery(actor):
@@ -40,10 +35,7 @@ def timelineQuery(actor):
     return query
 
 
-@view_config(route_name='timeline', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='timeline', request_method='GET', requires_actor=True)
 def getUserTimeline(context, request):
     """
          /people/{username}/timeline
@@ -61,10 +53,7 @@ def getUserTimeline(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='timeline_authors', request_method='GET')
-@MaxResponse
-@oauth2(['widgetcli'])
-@requirePersonActor
+@endpoint(route_name='timeline_authors', request_method='GET', requires_actor=True)
 def getUserTimelineAuthors(context, request):
     """
          /people/{username}/timeline/authors
