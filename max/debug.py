@@ -15,5 +15,5 @@ def setup(config, settings):
         config.add_tween('max.tweens.browser_debug_factory', **sort_order)
 
     if asbool(settings['max.oauth_passtrough']):
-        import max.oauth2
-        max.oauth2.checkToken = patched_checkToken
+        import max.security.authentication
+        max.security.authentication.checkToken = patched_checkToken

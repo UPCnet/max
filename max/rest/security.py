@@ -7,10 +7,12 @@ from max.resources import loadMAXSecurity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest import endpoint
+from max.security.permissions import manage_security
+
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission="manage_security")
+@endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission=manage_security)
 def getSecurity(context, request):
     """
          /admin/security
@@ -28,7 +30,7 @@ def getSecurity(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission="manage_security")
+@endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission=manage_security)
 def getSecurityUsers(context, request):
     """
          /admin/security/users
@@ -54,7 +56,7 @@ def getSecurityUsers(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission="manage_security")
+@endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission=manage_security)
 def check_user_role(context, request):
     """
     """
@@ -78,7 +80,7 @@ def check_user_role(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission="manage_security")
+@endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission=manage_security)
 def add_user_to_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}
@@ -108,7 +110,7 @@ def add_user_to_role(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission="manage_security")
+@endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission=manage_security)
 def remove_user_from_role(context, request):
     """
          /admin/security/roles/{role}/users/{user}

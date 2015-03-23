@@ -5,7 +5,7 @@ from max.models import Conversation
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest import endpoint
-
+from max.security.permissions import do_maintenance
 from bson import ObjectId
 
 import logging
@@ -15,7 +15,7 @@ import re
 logger = logging.getLogger('exceptions')
 
 
-@endpoint(route_name='maintenance_keywords', request_method='POST', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_keywords', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildKeywords(context, request):
     """
          /maintenance/keywords
@@ -34,7 +34,7 @@ def rebuildKeywords(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_dates', request_method='POST', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_dates', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildDates(context, request):
     """
          /maintenance/dates
@@ -57,7 +57,7 @@ def rebuildDates(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_subscriptions', request_method='POST', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_subscriptions', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildSubscriptions(context, request):
     """
          /maintenance/subscriptions
@@ -89,7 +89,7 @@ def rebuildSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_conversations', request_method='POST', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_conversations', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildConversationSubscriptions(context, request):
     """
          /maintenance/conversations
@@ -144,7 +144,7 @@ def rebuildConversationSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_exception', request_method='GET', restricted='Manager', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_exception', request_method='GET', restricted='Manager', requires_actor=False, permission=do_maintenance)
 def getException(context, request):
     """
          /maintenance/exceptions/{hash}
@@ -165,7 +165,7 @@ def getException(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_exceptions', request_method='GET', restricted='Manager', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_exceptions', request_method='GET', restricted='Manager', requires_actor=False, permission=do_maintenance)
 def getExceptions(context, request):
     """
          /maintenance/exceptions
@@ -181,7 +181,7 @@ def getExceptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_users', request_method='POST', restricted='Manager', requires_actor=False, permission='maintenance')
+@endpoint(route_name='maintenance_users', request_method='POST', restricted='Manager', requires_actor=False, permission=do_maintenance)
 def rebuildUser(context, request):
     """
          Rebuilds user objects with defaults and consistency checks.

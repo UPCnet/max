@@ -21,6 +21,10 @@ class Conversation(BaseContext):
     schema['tags'] = {'default': []}
     schema['objectType'] = {'default': 'conversation'}
 
+    def __acl__(self):
+        acl = []
+        return acl
+
     def buildObject(self):
         super(Conversation, self).buildObject()
 

@@ -230,7 +230,11 @@ class Subscription(dict):
         """
             Proxy of the ownership of the underliying context
         """
-        return self.context._owner
+        try:
+            return self.context._owner
+        except:
+            # XXX Maybe we want to raise this directly form wake or alreadyExists ???
+            raise ObjectNotFound("There is no context with hash {}".format(self.hash))
 
     @property
     def __acl__(self):

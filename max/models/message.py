@@ -17,6 +17,10 @@ class Message(BaseActivity):
     schema = dict(BaseActivity.schema)
     schema['objectType'] = {'default': 'message'}
 
+    def __acl__(self):
+        acl = []
+        return acl
+
     def buildObject(self):
         """
             Updates the dict content with the activity structure,

@@ -6,6 +6,10 @@ class Security(MADBase):
     """
         The Security object representation
     """
+    def __acl__(self):
+        acl = []
+        return acl
+
     collection = 'security'
     unique = '_id'
     schema = {
