@@ -26,7 +26,7 @@ from max.request import get_request_actor_username
 from max.request import get_request_actor
 from max.request import get_authenticated_user_roles
 from max.request import get_database
-from max.request import extract_post_data
+from max.request import extract_post_data, get_oauth_headers
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.settings import asbool
@@ -73,6 +73,7 @@ def main(*args, **settings):
     config.add_request_method(get_authenticated_user_roles, name='roles', reify=True)
     config.add_request_method(get_database, name='db', reify=True)
     config.add_request_method(extract_post_data, name='decoded_payload', reify=True)
+    config.add_request_method(get_oauth_headers, name='auth_headers', reify=True)
 
     debug.setup(config, settings)
 

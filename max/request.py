@@ -3,7 +3,9 @@ from max.MADMax import MADMaxDB
 import json
 from bson import json_util
 from hashlib import sha1
-
+from max.exceptions import Unauthorized
+from max.resources import getMAXSettings
+from pyramid.settings import asbool
 
 def extract_post_data(request):
     """
@@ -82,6 +84,24 @@ def get_username_in_body(request):
 
 
 # Methods used to create cached request properties
+
+def get_oauth_headers(request):
+    """
+        Extracts oauth headers form request
+    """
+    oauth_token = request.headers.get('X-Oauth-Token', '')
+    username = request.headers.get('X-Oauth-Username', '')
+    scope = request.headers.get('X-Oauth-Scope', '')
+
+    if not oauth_token or not username:
+        # This is for mental sanity in case we miss the body part when writing tests
+        if 'X-Oauth-Username' in request.params.keys():
+            raise Unauthorized("Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...")
+
+        raise Unauthorized('No auth headers found.')
+
+    return oauth_token, username, scope
+
 
 def get_request_actor_username(request):
     """

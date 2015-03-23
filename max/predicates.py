@@ -52,7 +52,13 @@ class RequiredActorPredicate(object):
     phash = text
 
     def __call__(self, context, request):
-        if self.required and request.actor is None:
+
+        # Extraction of headers will raise exception here if headers missing
+        # We want this to happen here, to raise Unauthorized before any hipotetical
+        # other exception would raise (basically that the user in auth headers doesn't exists)
+        oauth_token, username, scope = request.auth_headers
+
+        if request.actor is None and self.required:
             raise UnknownUserError('Actor identified by: {} not found on database'.format(request.actor_username))
 
         return True

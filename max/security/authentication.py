@@ -50,22 +50,12 @@ class MaxAuthenticationPolicy(object):
 
             Method is reified to assure that is only called once per request.
         """
-        settings = getMAXSettings(request)
-
-        oauth_token = request.headers.get('X-Oauth-Token', '')
-        username = request.headers.get('X-Oauth-Username', '')
-        scope = request.headers.get('X-Oauth-Scope', '')
-
-        if not oauth_token or not username:
-            # This is for mental sanity in case we miss the body part when writing tests
-            if 'X-Oauth-Username' in request.params.keys():
-                raise Unauthorized("Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...")
-
-            raise Unauthorized('No auth headers found.')
+        oauth_token, username, scope = request.auth_headers
 
         if scope not in self.allowed_scopes:
             raise Unauthorized('The specified scope is not allowed for this resource.')
 
+        settings = getMAXSettings(request)
         valid = check_token(
             settings['max_oauth_check_endpoint'],
             username, oauth_token, scope,
