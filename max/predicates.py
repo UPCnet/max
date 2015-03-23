@@ -59,6 +59,6 @@ class RequiredActorPredicate(object):
         oauth_token, username, scope = request.auth_headers
 
         if request.actor is None and self.required:
-            raise UnknownUserError('Actor identified by: {} not found on database'.format(request.actor_username))
+            raise UnknownUserError('Unknown actor identified by username: {}'.format(request.actor_username))
 
         return True

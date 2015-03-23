@@ -29,6 +29,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # BEGIN TESTS
 
     def test_flag_activity(self):
