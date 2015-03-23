@@ -26,7 +26,7 @@ def getConversations(context, request):
          /conversations
          Return all conversations depending on the actor requester
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
 
     # List subscribed conversations, and use it to make the query
     # This way we can filter 2-people conversations that have been archived
@@ -59,7 +59,7 @@ def postMessage2Conversation(context, request):
     """
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
-    data = request.payload
+    data = request.decoded_payload
     ctxts = data.get('contexts', [])
     if len(ctxts) == 0:
         raise ValidationError('Empty contexts parameter')
@@ -80,7 +80,7 @@ def postMessage2Conversation(context, request):
     # Also store the definitive list that will be saved in participants field
 
     participants = {}
-    users = MADMaxCollection(context.db.users, query_key='username')
+    users = MADMaxCollection(request.db.users, query_key='username')
     for participant in request_participants:
         user = users[participant]
         if request.actor.username != user['username'] and not request.actor.isAllowedToSee(user):
@@ -91,7 +91,7 @@ def postMessage2Conversation(context, request):
     # Otherwise, assume is a group conversation and create a new one
     current_conversation = None
     if len(request_participants) == 2:
-        contexts = MADMaxCollection(context.db.conversations)
+        contexts = MADMaxCollection(request.db.conversations)
         conversations = contexts.search({
             'objectType': 'conversation',
             'participants': {
@@ -197,7 +197,7 @@ def getUserConversationSubscription(context, request):
 
     subscription = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
-    conversations_collection = MADMaxCollection(context.db.conversations)
+    conversations_collection = MADMaxCollection(request.db.conversations)
     conversation_object = conversations_collection[subscription['id']]
     conversation = conversation_object.flatten()
 
@@ -219,7 +219,7 @@ def getConversation(context, request):
     """
     cid = request.matchdict['id']
 
-    conversations = MADMaxCollection(context.db.conversations)
+    conversations = MADMaxCollection(request.db.conversations)
     conversation = conversations[cid]
 
     subscribed_conversations = [subscription.get('id') for subscription in request.actor.get('talkingIn', [])]
@@ -239,7 +239,7 @@ def ModifyConversation(context, request):
         Modify the given context.
     """
     cid = request.matchdict['id']
-    conversations = MADMaxCollection(context.db.conversations)
+    conversations = MADMaxCollection(request.db.conversations)
     conversation = conversations[cid]
 
     auth_user_is_conversation_owner = conversation._owner == request.creator
@@ -269,13 +269,13 @@ def joinConversation(context, request):
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
-        activities = MADMaxCollection(context.db.activity)
+        activities = MADMaxCollection(request.db.activity)
         query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
         # Register subscription to the actor
-        conversations = MADMaxCollection(context.db.conversations)
+        conversations = MADMaxCollection(request.db.conversations)
         conversation = conversations[cid]
 
         if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
@@ -284,7 +284,7 @@ def joinConversation(context, request):
         if 'group' not in conversation.get('tags', []):
             raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
-        users = MADMaxCollection(context.db.users, query_key='username')
+        users = MADMaxCollection(request.db.users, query_key='username')
         creator = users[request.creator]
 
         authenticated_user_is_owner = conversation._owner == request.creator
@@ -331,7 +331,7 @@ def trasnferConversationOwnership(context, request):
     """
     """
     actor = request.actor
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     cid = request.matchdict.get('id', None)
     subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
@@ -358,7 +358,7 @@ def trasnferConversationOwnership(context, request):
     request.actor.grantPermission(subscription, 'subscribe', permanent=True)
 
     # Revoke hability to add new users from the previous owner
-    users = MADMaxCollection(context.db.users, query_key='username')
+    users = MADMaxCollection(request.db.users, query_key='username')
     previous_owner = users[previous_owner_username]
     previous_owner.revokePermission(subscription, 'subscribe')
 
@@ -371,7 +371,7 @@ def leaveConversation(context, request):
     """
     """
     actor = request.actor
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     cid = request.matchdict.get('id', None)
     subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
@@ -415,7 +415,7 @@ def leaveConversation(context, request):
 def DeleteConversation(context, request):
     """
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     cid = request.matchdict.get('id', None)
     ctx = mmdb.conversations[cid]
 
@@ -434,7 +434,7 @@ def deleteConversations(context, request):
     Deletes ALL the conversations from ALL users in max
     doing all the consequent unsubscriptions
     """
-    conversations = MADMaxCollection(context.db.conversations)
+    conversations = MADMaxCollection(request.db.conversations)
     for conversation in conversations.dump():
         conversation.delete()
     return HTTPNoContent()

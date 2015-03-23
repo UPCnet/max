@@ -116,7 +116,7 @@ def getContextAvatar(context, request):
 
     api = get_twitter_api(request.registry)
     if not os.path.exists(context_image_filename):
-        mmdb = MADMaxDB(context.db)
+        mmdb = MADMaxDB(request.db)
         found_context = mmdb.contexts.getItemsByhash(chash)
         if len(found_context) > 0:
             twitter_username = found_context[0]['twitterUsername']
@@ -129,7 +129,7 @@ def getContextAvatar(context, request):
         modification_time = os.path.getmtime(context_image_filename)
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
         if hours_since_last_modification > 3:
-            mmdb = MADMaxDB(context.db)
+            mmdb = MADMaxDB(request.db)
             found_context = mmdb.contexts.getItemsByhash(chash)
             twitter_username = found_context[0]['twitterUsername']
             download_twitter_user_image(api, twitter_username, context_image_filename)

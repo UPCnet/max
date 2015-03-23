@@ -19,7 +19,7 @@ def getPushTokensForConversation(context, request):
 
     cid = request.matchdict['id']
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {'talkingIn.id': cid}
     users = mmdb.users.search(query, show_fields=["username", "iosDevices", "androidDevices"], sort_by_field="username", flatten=1, **searchParams(request))
 
@@ -42,7 +42,7 @@ def getPushTokensForContext(context, request):
     """
 
     cid = request.matchdict['hash']
-    contexts = MADMaxCollection(context.db.contexts, query_key='hash')
+    contexts = MADMaxCollection(request.db.contexts, query_key='hash')
     ctxt = contexts[cid]
 
     users = ctxt.subscribedUsers()

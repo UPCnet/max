@@ -185,6 +185,7 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         self.patched_get.start()
 
         self.testapp = MaxTestApp(self)
+        self.create_user(test_manager)
 
         self.avatar_folder = self.app.registry.settings['avatar_folder']
 

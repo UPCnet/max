@@ -290,9 +290,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         self.create_context(create_contextA)
-        res = self.create_activity(username, user_status_contextA, expect=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        self.create_activity(username, user_status_contextA, expect=403)
 
     def test_post_activity_not_me(self):
         from .mockers import user_status
@@ -300,9 +298,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username_not_me = 'xavi'
         self.create_user(username)
         self.create_user(username_not_me)
-        res = self.create_activity(username_not_me, user_status, oauth_username=username, expect=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        self.create_activity(username_not_me, user_status, oauth_username=username, expect=403)
 
     def test_post_activity_non_existent_user(self):
         from .mockers import user_status
@@ -310,14 +306,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.create_activity(username, user_status, expect=400)
         result = json.loads(res.text)
         self.assertEqual(result.get('error', None), 'UnknownUserError')
-
-    def test_post_activity_no_auth_headers(self):
-        from .mockers import user_status
-        username = 'messi'
-        self.create_user(username)
-        res = self.testapp.post('/people/%s/activities' % username, json.dumps(user_status), status=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
 
     def test_get_activity(self):
         """ doctest .. http:get:: /people/{username}/activities """
@@ -338,9 +326,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_user(username_not_me)
         self.create_activity(username_not_me, user_status)
-        res = self.testapp.get('/people/%s/activities' % username_not_me, "", oauth2Header(username), status=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        res = self.testapp.get('/people/%s/activities' % username_not_me, "", oauth2Header(username), status=403)
 
     def test_get_activities(self):
         from .mockers import context_query
@@ -710,7 +696,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity = activity.json
         res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username_not_me), status=201)
         comment_id = res.json['id']
-        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=401)
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=403)
 
     def test_timeline_order_sorted_by_last_comment_publish_date(self):
         """

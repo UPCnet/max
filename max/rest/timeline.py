@@ -43,7 +43,7 @@ def getUserTimeline(context, request):
          Retorna totes les activitats d'un usuari
     """
     actor = request.actor
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
 
     query = timelineQuery(actor)
 
@@ -63,7 +63,7 @@ def getUserTimelineAuthors(context, request):
     # Get the author limit from the request or set a default
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
     actor = request.actor
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
 
     query = timelineQuery(actor)
 

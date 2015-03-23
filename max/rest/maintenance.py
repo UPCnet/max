@@ -23,7 +23,7 @@ def rebuildKeywords(context, request):
          Rebuild keywords of all activities
 
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     activities = mmdb.activity.search({'verb': 'post'})
     for activity in activities:
         activity.object.setKeywords()
@@ -43,7 +43,7 @@ def rebuildDates(context, request):
          Now currently sets the lastComment id field
 
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     activities = mmdb.activity.search({'verb': 'post'})
     for activity in activities:
         # Remove ancient commented field
@@ -65,7 +65,7 @@ def rebuildSubscriptions(context, request):
          Rebuild subscriptions performing sanity checks
 
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     existing_contexts = {}
     contexts = mmdb.contexts.dump()
     for context in contexts:
@@ -97,7 +97,7 @@ def rebuildConversationSubscriptions(context, request):
          Rebuild conversation subscriptions performing sanity checks
 
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     existing_conversations = {}
     conversations = mmdb.conversations.dump()
     for conversation in conversations:
@@ -187,7 +187,7 @@ def rebuildUser(context, request):
          Rebuilds user objects with defaults and consistency checks.
          Currently checks that owner of the object must be the same user:
     """
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     users = mmdb.users.dump()
     for user in users:
         if user._owner != user.username:

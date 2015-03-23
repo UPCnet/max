@@ -80,3 +80,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         url_hash = sha1(create_context['url']).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(mindundi), status=400)
         self.assertEqual(res.json['error_description'], 'Unknown actor identified by username: messi')
+
+    def test_post_activity_no_auth_headers(self):
+        from .mockers import user_status
+        username = 'messi'
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, json.dumps(user_status), status=401)
+        result = json.loads(res.text)
+        self.assertEqual(result.get('error', None), 'Unauthorized')

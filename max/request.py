@@ -15,7 +15,7 @@ def extract_post_data(request):
            that will be injected on json data to normalize the processing in other layers.
 
         2. Requests on any other format, that contains a body, will be tried to decode as json. Json
-           payloads may contain a dict {} or a list{}.
+           payloads may contain a dict {} or a list [].
 
         All other situations or errors during extraction will return an empty dict {}.
     """
@@ -122,7 +122,8 @@ def get_context_author_url(request):
         Determine and return the url of the context specified as actor
     """
 
-    actor = extract_post_data(request).get('actor', {})
+    post_data = extract_post_data(request)
+    actor = post_data.get('actor', {}) if isinstance(post_data, dict) else {}
     return actor.get('url', '')
 
 

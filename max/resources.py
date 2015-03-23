@@ -41,6 +41,9 @@ class Root(dict):
     @property
     def __acl__(self):
         acl = [
+            (Allow, Manager, permissions.do_maintenance),
+            (Allow, Manager, permissions.view_server_settings),
+            (Allow, Manager, permissions.manage_security)
         ]
 
         # Grant the permission associated with the view to the authenticated user

@@ -22,7 +22,7 @@ def getMessages(context, request):
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not allowed to view this conversation'.format(request.actor.username))
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     query = {'contexts.id': cid}
     messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining

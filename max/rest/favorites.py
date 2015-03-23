@@ -17,13 +17,13 @@ def favorite(context, request):
     """
     activityid = request.matchdict['activity']
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     refering_activity = mmdb.activity[activityid]
 
     if refering_activity.has_favorite_from(request.actor):
         code = 200
 
-        activities = MADMaxCollection(context.db.activity)
+        activities = MADMaxCollection(request.db.activity)
         query = {'verb': 'favorite', 'object._id': refering_activity['_id'], 'actor.username': request.actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user favorited this activiry
 
@@ -60,7 +60,7 @@ def unfavorite(context, request):
     """
     activityid = request.matchdict['activity']
 
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     try:
         found_activity = mmdb.activity[activityid]
     except:

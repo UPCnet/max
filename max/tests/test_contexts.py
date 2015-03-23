@@ -29,6 +29,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # BEGIN TESTS
 
     def test_create_context(self):
@@ -111,9 +113,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        res = self.create_activity(username, user_status_context, expect=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        res = self.create_activity(username, user_status_context, expect=403)
 
     def test_add_public_context(self):
         from hashlib import sha1
@@ -476,9 +476,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        res = self.create_activity(username, user_status_context, expect=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        res = self.create_activity(username, user_status_context, expect=403)
 
     def test_post_on_subscribed_rw_context(self):
         from .mockers import create_context_private_rw, subscribe_context, user_status_context
@@ -531,9 +529,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         chash = sha1(create_context_private_r['url']).hexdigest()
         permission = 'write'
-        res = self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=401)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('error', None), 'Unauthorized')
+        self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=403)
 
     def test_grant_invalid_permission_on_subscribed_context(self):
         from .mockers import create_context_private_r, subscribe_context

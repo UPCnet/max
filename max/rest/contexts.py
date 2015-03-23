@@ -177,7 +177,7 @@ def getContextAuthors(context, request):
         /contexts/{hash}/activities/authors
     """
     chash = request.matchdict['hash']
-    mmdb = MADMaxDB(context.db)
+    mmdb = MADMaxDB(request.db)
     actor = request.actor
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
 
