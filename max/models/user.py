@@ -7,8 +7,9 @@ from max.rest.utils import flatten
 from max.rest.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
-from max.security import Owner, Manager, is_self_operation
-from max.security.permissions import view_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
+from pyramid.security import Authenticated
+from max.security import Owner, Manager
+from max.security.permissions import view_private_fields, view_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -29,14 +30,16 @@ class User(MADBase):
     unique = 'username'
     schema = {
         '_id': {
-            'edit': modify_immutable_fields
+            'edit': modify_immutable_fields,
+            'view': view_private_fields
         },
         '_creator': {
-            'edit': modify_immutable_fields
+            'edit': modify_immutable_fields,
+            'view': view_private_fields
         },
         '_owner': {
-            'edit': change_ownership
-
+            'edit': change_ownership,
+            'view': view_private_fields
         },
         'objectType': {
             'edit': modify_immutable_fields,
@@ -47,9 +50,13 @@ class User(MADBase):
         },
         'displayName': {
         },
-        'last_login': {},
+        'last_login': {
+            'view': view_private_fields,
+            'edit': modify_immutable_fields,
+        },
         'following': {
-            'edit': [],
+            'view': view_subscriptions,
+            'edit': modify_immutable_fields,
             'default': []
         },
         'subscribedTo': {
@@ -92,7 +99,12 @@ class User(MADBase):
             (Allow, Manager, view_subscriptions),
             (Allow, Owner, view_subscriptions),
             (Allow, Manager, view_comments),
-            (Allow, Owner, view_comments)
+            (Allow, Owner, view_comments),
+            (Allow, Authenticated, view_user_profile),
+            (Allow, Owner, manage_user_devices),
+            (Allow, Manager, manage_user_devices),
+            (Allow, Owner, view_private_fields),
+            (Allow, Manager, view_private_fields),
         ]
 
         return acl

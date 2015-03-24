@@ -65,7 +65,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_create_user_not_manager(self):
         username = 'messi'
-        self.testapp.post('/people/%s' % username, "", oauth2Header('imnotallowed'), status=401)
+        self.testapp.post('/people/%s' % username, "", oauth2Header('imnotallowed'), status=403)
 
     def test_user_exist(self):
         username = 'messi'
@@ -108,7 +108,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('username', result)
         self.assertIn('displayName', result)
         self.assertIn('objectType', result)
-        self.assertEqual(len(result.keys()), 3)
+        self.assertIn('published', result)
+        self.assertEqual(len(result.keys()), 4)
 
     def test_get_user_case_insensitive(self):
         """ Doctest .. http:get:: /people/{username} """
@@ -209,47 +210,3 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_create_own_user(self):
         username = 'messi'
         self.testapp.post('/people/%s' % username, "", oauth2Header(username), status=201)
-
-    def test_add_device_token(self):
-        username = 'messi'
-        platform = 'ios'
-        token = '12345678901234567890123456789012'
-        self.create_user(username)
-        res = self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('iosDevices', []), [token])
-
-        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
-        result = json.loads(res.text)
-        self.assertEqual(result.get('iosDevices', []), [token])
-
-    def test_add_device_token_android(self):
-        username = 'messi'
-        platform = 'android'
-        token = '12345678901234567890123456789012klhsdflajshdfkjashdfoq'
-        self.create_user(username)
-        res = self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
-        result = json.loads(res.text)
-        self.assertEqual(result.get('androidDevices', []), [token])
-
-        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
-        result = json.loads(res.text)
-        self.assertEqual(result.get('androidDevices', []), [token])
-
-    # def test_add_device_token_invalid_token(self):
-    #     username = 'messi'
-    #     platform = 'ios'
-    #     token = '1234'
-    #     self.create_user(username)
-    #     self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=400)
-
-    def test_delete_device_token(self):
-        username = 'messi'
-        platform = 'ios'
-        token = '12345678901234567890123456789012'
-        self.create_user(username)
-        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
-        self.testapp.delete('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=204)
-        res = self.testapp.get('/people/%s' % username, "", oauth2Header(username))
-        result = json.loads(res.text)
-        self.assertEqual(result.get('iosDevices'), [])

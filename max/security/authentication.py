@@ -48,7 +48,6 @@ class MaxAuthenticationPolicy(object):
             exceptions if failed. At the end the successfully authenticated
             username is returned.
 
-            Method is reified to assure that is only called once per request.
         """
         oauth_token, username, scope = request.auth_headers
 
@@ -68,8 +67,10 @@ class MaxAuthenticationPolicy(object):
 
     def authenticated_userid(self, request):
         """
-            Returns the oauth2 authenticated user. If anything fails during
-            validation raises an exception
+            Returns the oauth2 authenticated user.
+
+            On first acces, user is extracted from Oauth headers and validated. Extracted
+            user id is cached to future accesses to the property
         """
         return self._authenticated_userid if self._authenticated_userid else self._validate_user(request)
 

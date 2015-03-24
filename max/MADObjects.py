@@ -210,7 +210,7 @@ class MADBase(MADDict):
         self.request = get_current_request()
         # When called from outside a pyramyd app, we have no request
         try:
-            self.db = self.request.registry.max_store
+            self.db = self.request.db
             self.mdb_collection = self.db[self.collection]
         except:
             pass
@@ -454,15 +454,24 @@ class MADBase(MADDict):
     # Security Related methods and properties
     #
 
-    def has_field_permission(self, fieldName, permission_field):
+    def get_default_permission_for(self, mode):
+        """
+            Returns the default permission for a field access type (view, edit)
+        """
+        return getattr(self, 'default_field_{}_permission'.format(mode), None)
+
+    def get_field_permission_for(self, field, mode):
+        """
+            Returns the permission needed to have access to the field in the specified mode.
+        """
+        return self.schema[field].get(mode, self.get_default_permission_for(mode))
+
+    def has_field_permission(self, field, mode):
         """
             Returns the name of the permission needed to grant permission_field.
             param permission_field MUST be "view" or "edit.
         """
-        def default_permission():
-            return getattr(self, 'default_field_{}_permission'.format(permission_field), None)
-
-        permission_name = self.schema[fieldName].get(permission_field, default_permission())
+        permission_name = self.get_field_permission_for(field, mode)
         return isinstance(self.request.has_permission(permission_name, self), ACLAllowed)
 
     def get_visible_fields(self):
@@ -471,10 +480,37 @@ class MADBase(MADDict):
             the current authenticated user has permission to see
         """
         fields = []
-        for fieldName in self.schema:
-            if self.has_field_permission(fieldName, 'view'):
-                fields.append(fieldName.lstrip('_'))
+        for field in self.schema:
+            if self.has_field_permission(field, 'view'):
+                fields.append(field.lstrip('_'))
         return fields
+
+    # def get_visible_fields(self):
+    #     """
+    #         DEBUG VERSION, uncomment to debug field access
+    #         Returns the real fieldname (without leading _) that
+    #         the current authenticated user has permission to see
+    #     """
+    #     print
+    #     print "********* FIELD ACCESS DEBUG for {} {}************".format(
+    #         self.__class__.__name__,
+    #         self.get(self.unique, 'unknown')
+    #     )
+    #     print "Request: {} {}".format(self.request.method, self.request.path)
+    #     fields = []
+    #     for field in self.schema:
+    #         if self.has_field_permission(field, 'view'):
+    #             fields.append(field.lstrip('_'))
+    #         else:
+    #             print '  User {} has no permission "{}" '.format(
+    #                 self.request.authenticated_userid,
+    #                 self.get_field_permission_for(field, 'view'),
+    #                 '[DEFAULT]' if self.schema[field].get('view', None) else ''
+
+    #             )
+    #     print "*****************************************"
+    #     print
+    #     return fields
 
     def get_editable_fields(self):
         """

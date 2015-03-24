@@ -13,16 +13,7 @@ from pyramid.settings import asbool
 from pyramid.view import view_config
 from max.rest import endpoint
 
-from max.security.permissions import list_all_people, list_visible_people, add_people, view_user_profile, modify_user, delete_user
-
-
-@view_config(route_name='users', request_method='GET', permission=list_all_people, restricted='Manager', requires_actor=True)
-def getUsers(users, request):
-    """
-    """
-    found_users = users.search({}, flatten=1, **searchParams(request))
-    handler = JSONResourceRoot(found_users, remaining=found_users.remaining)
-    return handler.buildResponse()
+from max.security.permissions import list_visible_people, add_people, view_user_profile, modify_user, delete_user
 
 
 @view_config(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
@@ -34,12 +25,15 @@ def getVisibleUsers(users, request):
          a list of usernames. For UI use only.
     """
     query = {}
-    found_users = users.search(query, show_fields=["username", "displayName", "objectType", 'subscribedTo'], sort_by_field="username", flatten=0, **searchParams(request))
+
+    filter_fields = ["username", "displayName", "objectType", 'subscribedTo']
+    found_users = users.search(query, show_fields=filter_fields, sort_by_field="username", flatten=0, **searchParams(request))
     remaining = found_users.remaining
 
-    # Filter user results. Uer
+    # Filter user results. User
 
     filtered_users = [user for user in found_users if request.actor.isAllowedToSee(user)]
+
     handler = JSONResourceRoot(flatten(filtered_users, squash=['subscribedTo']), remaining=remaining)
     return handler.buildResponse()
 

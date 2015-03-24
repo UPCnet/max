@@ -7,9 +7,9 @@ view_context = 'View context'
 view_context_activity = 'View context activity'
 
 add_people = 'Add people'
-list_all_people = 'List all people'
 list_visible_people = 'List visible people'
 view_user_profile = 'View user profile'
+view_private_fields = 'View private fields'
 modify_user = 'Modify user profile'
 delete_user = 'Delete user'
 

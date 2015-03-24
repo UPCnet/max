@@ -4,8 +4,7 @@ import json
 from bson import json_util
 from hashlib import sha1
 from max.exceptions import Unauthorized
-from max.resources import getMAXSettings
-from pyramid.settings import asbool
+
 
 def extract_post_data(request):
     """
@@ -59,7 +58,7 @@ def get_username_in_uri(request):
 
         Returns None if parameter not found
     """
-    username = request.matchdict.get('username', '')
+    username = request.matchdict.get('username', '').lower()
     return username.lower() if username else None
 
 
@@ -77,9 +76,11 @@ def get_username_in_body(request):
         if not isinstance(decoded_data, dict):
             return None
 
-        plain_username = decoded_data.get('username', None)
-        actor_username = decoded_data.get('actor', {}).get('username', None)
-        return actor_username if actor_username else plain_username
+        plain_username = decoded_data.get('username', '')
+        actor_username = decoded_data.get('actor', {}).get('username', '')
+        username = actor_username if actor_username else plain_username
+        return username.lower() if username else None
+
     return None
 
 
@@ -100,7 +101,7 @@ def get_oauth_headers(request):
 
         raise Unauthorized('No auth headers found.')
 
-    return oauth_token, username, scope
+    return oauth_token, username.lower(), scope
 
 
 def get_request_actor_username(request):

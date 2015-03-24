@@ -2,7 +2,7 @@
 from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
-from max.exceptions import ObjectNotFound, Forbidden
+from max.exceptions import ObjectNotFound, Forbidden, UnknownUserError
 from max.security import Manager, is_self_operation, Owner, is_manager
 from max.security import permissions
 from max.rest.utils import getMaxModelByObjectType
@@ -153,10 +153,11 @@ class PeopleTraverser(MongoDBTraverser):
             If the userid doesn't match the request actor fallback to query database.
             If the actor doesn't exists, raise a not found.
         """
+        userid = userid.lower()
         if userid == self.request.actor_username:
             actor = self.request.actor
             if actor is None:
-                raise ObjectNotFound("Object with %s %s not found inside %s" % (self.query_key, userid, self.collection.name))
+                raise UnknownUserError("Object with %s %s not found inside %s" % (self.query_key, userid, self.collection.name))
             actor.__parent__ = self
             return actor
 
@@ -166,11 +167,10 @@ class PeopleTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_people),
-            (Allow, Manager, permissions.list_all_people),
+            (Allow, Manager, permissions.list_visible_people),
             (Allow, Manager, permissions.modify_user),
             (Allow, Manager, permissions.delete_user),
             (Allow, Authenticated, permissions.list_visible_people),
-            (Allow, Authenticated, permissions.view_user_profile),
             (Allow, Manager, permissions.view_subscriptions),
             (Allow, Owner, permissions.view_subscriptions),
         ]
