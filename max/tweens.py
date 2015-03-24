@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.exceptions.http import JSONHTTPPreconditionFailed
 from max.deprecations import check_deprecation
-from max.deprecations import DEPRECATIONS
+from max.deprecations import POST_DEPRECATIONS, DELETE_DEPRECATIONS
 
 
 def compatibility_checker_factory(handler, registry):
@@ -51,11 +51,15 @@ def post_tunneling_factory(handler, registry):
 def deprecation_wrapper_factory(handler, registry):
     def deprecation_wrapper_tween(request):
         if request.method == 'POST':
-            for pattern, action in DEPRECATIONS:
+            for pattern, action in POST_DEPRECATIONS:
                 matched = check_deprecation(request, pattern, action)
                 if matched:
                     break
-
+        elif request.method == 'DELETE':
+            for pattern, action in DELETE_DEPRECATIONS:
+                matched = check_deprecation(request, pattern, action)
+                if matched:
+                    break
         response = handler(request)
         return response
     return deprecation_wrapper_tween
