@@ -4,6 +4,7 @@ from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
+from max.tests import test_manager
 
 from functools import partial
 from mock import patch
@@ -29,6 +30,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
+
+        self.create_user(test_manager)
 
     def tearDown(self):
         self.patched_post.stop()
