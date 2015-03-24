@@ -21,7 +21,8 @@ view_subscriptions = 'View all subscriptions of user to a context'
 modify_immutable_fields = 'Modify immutable fields'
 change_ownership = "Change an object's owner"
 
-manage_user_devices = 'View and edit user device tokens'
+manage_push_tokens = 'Add and remove user device tokens'
+view_push_tokens = 'Query and view user device tokens'
 
 view_activities = 'View activities'
 view_activity = 'View activity'

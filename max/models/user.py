@@ -9,7 +9,7 @@ from max.rest.utils import getMaxModelByObjectType
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from max.security import Owner, Manager
-from max.security.permissions import view_private_fields, view_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_user_devices, view_activities, add_activity
+from max.security.permissions import view_private_fields, view_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_push_tokens, view_activities, add_activity, view_push_tokens
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -77,13 +77,13 @@ class User(MADBase):
             'validators': ['isValidTwitterUsername']
         },
         'iosDevices': {
-            'view': manage_user_devices,
-            'edit': manage_user_devices,
+            'view': view_push_tokens,
+            'edit': manage_push_tokens,
             'default': []
         },
         'androidDevices': {
-            'edit': manage_user_devices,
-            'view': manage_user_devices,
+            'edit': view_push_tokens,
+            'view': manage_push_tokens,
             'default': []
         },
     }
@@ -101,8 +101,10 @@ class User(MADBase):
             (Allow, Manager, view_comments),
             (Allow, Owner, view_comments),
             (Allow, Authenticated, view_user_profile),
-            (Allow, Owner, manage_user_devices),
-            (Allow, Manager, manage_user_devices),
+            (Allow, Owner, manage_push_tokens),
+            (Allow, Manager, manage_push_tokens),
+            (Allow, Owner, view_push_tokens),
+            (Allow, Manager, view_push_tokens),
             (Allow, Owner, view_private_fields),
             (Allow, Manager, view_private_fields),
         ]

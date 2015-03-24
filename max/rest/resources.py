@@ -4,8 +4,8 @@ PUBLIC_RESOURCES = {
     'avatar': dict(route='/people/{username}/avatar', filesystem=True, category='User', name='User avatar'),
     'avatar_sizes': dict(route='/people/{username}/avatar/{size}', filesystem=True, category='User', name='User avatar sizes'),
     'user_activities': dict(route='/people/{username}/activities', category='Activities', name='User activities', traverse='/people/{username}'),
-    'user_device': dict(route='/people/{username}/device/{platform}/{token}', category='User', name='User device tokens'),
-    'user_platform_tokens': dict(route='/people/{username}/device/{platform}', category='User', name='User device tokens by platform'),
+    'user_device': dict(route='/people/{username}/device/{platform}/{token}', category='User', name='User device tokens', traverse='/people/{username}'),
+    'user_platform_tokens': dict(route='/people/{username}/device/{platform}', category='User', name='User device tokens by platform', traverse='/people/{username}'),
 
 
     'activities': dict(route='/activities', category='Activities', name='Activities', traverse='/activities'),
@@ -45,7 +45,7 @@ PUBLIC_RESOURCES = {
     'conversation': dict(route='/conversations/{id}', category='Conversations', name='Conversation'),
     'conversation_owner': dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner'),
     'conversation_avatar': dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar'),
-    'pushtokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens'),
+    'conversation_push_tokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens'),
     'messages': dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages'),
     'message': dict(route='/conversations/{id}/messages/{activity}', category='Conversations', name='Conversation message'),
     'participants': dict(route='/conversations/{id}/participants', category='Conversations', name='Conversation participants'),
