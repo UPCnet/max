@@ -6,7 +6,6 @@ from max.rest.utils import get_avatar_folder
 from max.rest.utils import get_twitter_api
 
 from pyramid.response import Response
-from pyramid.view import view_config
 import os
 import time
 
@@ -17,8 +16,8 @@ from max.rest import endpoint
 from max.exceptions import ValidationError
 
 
-@view_config(route_name='avatar', request_method='GET')
-@view_config(route_name='avatar_sizes', request_method='GET')
+@endpoint(route_name='avatar', request_method='GET')
+@endpoint(route_name='avatar_sizes', request_method='GET')
 def getUserAvatar(context, request):
     """
         /people/{username}/avatar
@@ -99,7 +98,7 @@ def postUserAvatar(context, request):
     return Response("Uploaded", status_int=201)
 
 
-@view_config(route_name='context_avatar', request_method='GET')
+@endpoint(route_name='context_avatar', request_method='GET')
 def getContextAvatar(context, request):
     """
         /contexts/{hash}/avatar
@@ -142,7 +141,7 @@ def getContextAvatar(context, request):
     return image
 
 
-@view_config(route_name='conversation_avatar', request_method='GET')
+@endpoint(route_name='conversation_avatar', request_method='GET')
 def getConversationUserAvatar(context, request):
     """
         /conversation/{id}/avatar

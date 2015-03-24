@@ -24,24 +24,24 @@ class endpoint(object):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        def max_wrapper(func):
-            def replacement(*args, **kwargs):
-                return func(*args, **kwargs)
-            return replacement
+        # def max_wrapper(func):
+        #     def replacement(*args, **kwargs):
+        #         return func(*args, **kwargs)
+        #     return replacement
 
-        # pre-decorate original method before passing it to venusian
-        rewrapped = max_wrapper(wrapped)
+        # # pre-decorate original method before passing it to venusian
+        # rewrapped = max_wrapper(wrapped)
 
-        # patch decorated info to preserver name and doc
-        rewrapped.__name__ = wrapped.__name__
-        rewrapped.__doc__ = wrapped.__doc__
+        # # patch decorated info to preserver name and doc
+        # rewrapped.__name__ = wrapped.__name__
+        # rewrapped.__doc__ = wrapped.__doc__
 
         # effectively apply the @endpoint decorator
-        info = self.venusian.attach(rewrapped, callback, category='max',
+        info = self.venusian.attach(wrapped, callback, category='max',
                                     depth=depth + 1)
 
-        # Modify codeinfo to preserver original wrapper method name
-        info.codeinfo = info.codeinfo[:-1] + ('@endpoint.{}'.format(wrapped.__name__),)
+        # # Modify codeinfo to preserver original wrapper method name
+        # info.codeinfo = info.codeinfo[:-1] + ('@endpoint.{}'.format(wrapped.__name__),)
 
         if info.scope == 'class':
             # if the decorator was attached to a method in a class, or
@@ -51,4 +51,4 @@ class endpoint(object):
                 settings['attr'] = wrapped.__name__
 
         settings['_info'] = info.codeinfo  # fbo "action_method"
-        return rewrapped
+        return wrapped
