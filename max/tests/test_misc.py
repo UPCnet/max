@@ -29,6 +29,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # BEGIN TESTS
 
     def test_root(self):
@@ -44,7 +46,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             As this will only probably happen in tests, The error message is targeted so.
         """
         username = 'messi'
-        res = self.testapp.post('/people/%s' % username, oauth2Header(test_manager), status=401)
+        self.create_user(username)
+        res = self.testapp.post('/people/%s/activities' % username, oauth2Header(test_manager), status=401)
         self.assertEqual(res.json['error_description'], u'Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...')
 
     def test_bad_body_content_parsing(self):

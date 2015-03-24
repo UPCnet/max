@@ -32,6 +32,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     def test_maintenance_keywords(self):
         from .mockers import user_status
         username = 'messi'

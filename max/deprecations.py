@@ -9,6 +9,23 @@ people_subscription_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptio
 people_activities_resource_matcher = re.compile(r'/people/([^\/]+)/activities$').search
 
 
+def get_body(request, default=dict):
+    """
+        Extracts the request body, expecting a value of the same type
+        as the default. If the default value doesn't match this requirement
+        the default is returned.
+    """
+    try:
+        replacement_body = json.loads(request.body)
+    except:
+        replacement_body = default()
+    else:
+        if not isinstance(replacement_body, default):
+            replacement_body = default()
+
+    return replacement_body
+
+
 def fix_deprecated_create_user(request, match):
     """
         Adapts the deprecated way to create an user.
@@ -26,10 +43,7 @@ def fix_deprecated_create_user(request, match):
         any other user attribute
     """
     username = match.groups()[0]
-    try:
-        replacement_body = json.loads(request.body)
-    except:
-        replacement_body = {}
+    replacement_body = get_body(request)
     replacement_body['username'] = username
     request.body = json.dumps(replacement_body)
     request.path_info = '/people'
@@ -59,11 +73,7 @@ def fix_deprecated_subscribe_user(request, match):
         untouched
     """
     username = match.groups()[0]
-    try:
-        replacement_body = json.loads(request.body)
-    except:
-        replacement_body = {}
-
+    replacement_body = get_body(request)
     obj = replacement_body.pop('object', {})
     object_url = obj.get('url', None)
     url_hash = sha1(object_url).hexdigest() if object_url else ''
@@ -126,11 +136,7 @@ def fix_deprecated_create_context_activity(request, match):
         using username found in the url
     """
     username = match.groups()[0]
-    try:
-        replacement_body = json.loads(request.body)
-    except:
-        replacement_body = {}
-
+    replacement_body = get_body(request)
     contexts = replacement_body.pop('contexts', {})
     if contexts:
         context = contexts[0]

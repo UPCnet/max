@@ -22,6 +22,11 @@ def extract_post_data(request):
     """
     json_data = {}
 
+    try:
+        request_body = request.body
+    except:
+        request_body = None
+
     if 'multipart/form-data' in request.content_type:
         try:
             json_data = json.loads(request.params.get('json_data'), object_hook=json_util.object_hook)
@@ -30,11 +35,12 @@ def extract_post_data(request):
         except:
             pass
 
-    elif 'multipart/form-data' not in request.content_type and request.body:
+    elif 'multipart/form-data' not in request.content_type and request_body:
+
         # Usually look for JSON encoded body, catch the case it does not contain
         # valid JSON data, e.g when uploading a file
         try:
-            json_data = json.loads(request.body, object_hook=json_util.object_hook)
+            json_data = json.loads(request_body, object_hook=json_util.object_hook)
         except:
             pass
 
