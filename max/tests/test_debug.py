@@ -28,6 +28,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     def test_debugging_mode_does_not_break_normal_app(self):
         """
             Make a simple get in debug mode to test app's normal behaviour
@@ -58,7 +60,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             m='post'
         )
         qs = urllib.urlencode(debug_params)
-        self.testapp.get('/people/{}?{}'.format(username, qs), '', {}, status=401)
+        self.testapp.get('/people/{}?{}'.format(username, qs), '', {}, status=400)
 
     def test_make_post_as_get(self):
         """

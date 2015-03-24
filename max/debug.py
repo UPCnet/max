@@ -1,7 +1,7 @@
 from pyramid.settings import asbool
 
 
-def patched_checkToken(*args, **kwargs):
+def patched_check_token(*args, **kwargs):
     return True
 
 
@@ -16,4 +16,4 @@ def setup(config, settings):
 
     if asbool(settings['max.oauth_passtrough']):
         import max.security.authentication
-        max.security.authentication.checkToken = patched_checkToken
+        max.security.authentication.check_token = patched_check_token
