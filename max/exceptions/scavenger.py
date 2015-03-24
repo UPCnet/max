@@ -15,6 +15,7 @@ dump_requests = {'enabled': False}
 ERROR_TEMPLATE = """
 ------------------------------------------------
 BEGIN EXCEPTION REPORT: {hash}
+MATCHED_ROUTE: {matched_route}
 DATE: {time}
 REQUEST:
 
@@ -80,13 +81,15 @@ def saveException(request, error):  # pragma: no cover
          So, as the tests will not ever see this, we exlcude it from coverage
     """
     time = datetime.now().isoformat()
+    matched_route = request.matched_route.name if request.matched_route else 'No route matched'
+    matchdict = request.matchdict or []
 
     entry = dict(
         traceback=error,
         time=time,
         raw_request=format_raw_request(request),
-        matched_route=request.matched_route.name,
-        matchdict=request.matchdict,
+        matched_route=matched_route,
+        matchdict=matchdict,
     )
 
     dump = json.dumps(entry)
