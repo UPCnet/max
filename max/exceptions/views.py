@@ -50,9 +50,9 @@ def forbidden(exc, request):
     return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=exc.message))
 
 
-@notfound_view_config()
-def notfound(request):
-    return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description='Object {} not found'.format(request.exception.detail)))
+# @notfound_view_config()
+# def notfound(request):
+#     return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description='Object {} not found'.format(request.exception.detail)))
 
 
 @view_config(context=UnknownUserError)
