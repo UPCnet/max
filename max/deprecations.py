@@ -5,6 +5,7 @@ from hashlib import sha1
 
 people_resource_matcher = re.compile(r'/people/([^\/]+)$').search
 people_subscriptions_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptions$').search
+people_subscription_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptions/([^\/]+)$').search
 people_activities_resource_matcher = re.compile(r'/people/([^\/]+)/activities$').search
 
 
@@ -82,6 +83,30 @@ def fix_deprecated_subscribe_user(request, match):
     request.headers['Content-Type'] = 'application/json'
 
 
+def fix_deprecated_unsubscribe_user(request, match):
+    """
+        Adapts the deprecated way to unsubscribe an user to a context
+
+        Requests matching:
+
+            DELETE /people/{username}/subscriptions/{hash}
+
+        will be transformed into:
+
+            DELETE /contexts/{hash}/subscriptions/{username}
+
+        There are no substancial changes, only a simple rewrite of the url.
+    """
+    username = match.groups()[0]
+    chash = match.groups()[1]
+
+    new_path = '/contexts/{}/subscriptions/{}'.format(chash, username)
+    request.path_info = new_path
+
+    # Force headers needed to avoid body content quoting on tests
+    request.headers['Content-Type'] = 'application/json'
+
+
 def fix_deprecated_create_context_activity(request, match):
     """
 
@@ -139,8 +164,12 @@ def check_deprecation(request, pattern, action):
 # PLEASE! Construct depreaction list sorted by matching frequency, so deprecations expected
 # to happen more frequently that others go first. This is to minimize the number of deprecations tested
 
-DEPRECATIONS = [
+POST_DEPRECATIONS = [
     (people_activities_resource_matcher, fix_deprecated_create_context_activity),
     (people_subscriptions_resource_matcher, fix_deprecated_subscribe_user),
-    (people_resource_matcher, fix_deprecated_create_user),
+    (people_resource_matcher, fix_deprecated_create_user)
+]
+
+DELETE_DEPRECATIONS = [
+    (people_subscription_resource_matcher, fix_deprecated_unsubscribe_user),
 ]

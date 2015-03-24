@@ -81,6 +81,30 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(json_body['actor']['username'], 'sheldon')
         self.assertEqual(json_body['actor']['objectType'], 'person')
 
+    # Test deprecated unsubscribe user
+
+    def test_deprecated_unsubscribe_user(self):
+        """
+            Given a request to the deprecated DELETE /people/{username}/subscriptions
+            When the request is processed
+            Then the request is rewrited as DELETE /contexts/{hash}/subscriptions
+            And the actor now is in the body
+        """
+        from max.tests.mockers import create_context, subscribe_context
+        username = 'sheldon'
+
+        self.create_user(username)
+        res = self.create_context(create_context)
+        context_hash = res.json['hash']
+
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, context_hash), "", oauth2Header(test_manager), status=204)
+
+        rewrited_request = res.request
+        rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
+
+        self.assertEqual(rewrited_request_url, '/contexts/{}/subscriptions/{}'.format(context_hash, username))
+
     # Test deprecated create context activity
 
     def test_deprecated_user_post_activity_to_context(self):
