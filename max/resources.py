@@ -3,7 +3,7 @@ from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
 from max.exceptions import ObjectNotFound, Forbidden, UnknownUserError
-from max.security import Manager, is_self_operation, Owner, is_manager
+from max.security import Manager, is_self_operation, Owner, is_manager, is_owner
 from max.security import permissions
 from max.rest.utils import getMaxModelByObjectType
 
@@ -202,6 +202,7 @@ class Subscription(dict):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
                 return subscription
 
+        context['exists'] = False
         return context
 
     def __init__(self, parent, request, chash, actor):
@@ -217,11 +218,11 @@ class Subscription(dict):
         # If a subscription is not found, we raise a Forbidden here, except that
         # the user authenticated is a Manager: in that case, a fake read-granted subscription is
         # given in order to grant him the view_activities on this subscription's context
-        if subscription is None:
+        if not subscription.get('exists', True):
             current_user_is_manager = is_manager(self.request, self.request.authenticated_userid)
             if not current_user_is_manager:
                 raise Forbidden('{} is not subscribed to {}'.format(self.request.actor_username, self.hash))
-            subscription = {'permissions': ['read']}
+            subscription.update({'permissions': ['read']})
 
         self.update(subscription)
 
@@ -242,6 +243,10 @@ class Subscription(dict):
             (Allow, Manager, permissions.add_activity),
             (Allow, Manager, permissions.view_activities),
         ]
+
+        # Allow Owners and Managers to manage subscription permissions on real susbcriptions
+        if self.get('exists', True) and (is_manager(self.request, self.request.authenticated_userid) or is_owner(self, self.request.authenticated_userid)):
+            acl.append((Allow, self.request.authenticated_userid, permissions.manage_subcription_permissions))
 
         # Grant ubsubscribe permission if the user subscription allows it
         # but only if is trying to unsubscribe itself.
@@ -275,8 +280,6 @@ class SubscriptionsTraverser(object):
         acl = [
             (Allow, Manager, permissions.remove_subscription),
             (Allow, Owner, permissions.remove_subscription),
-            (Allow, Manager, permissions.manage_subcription_permissions),
-            (Allow, Owner, permissions.manage_subcription_permissions),
         ]
 
         return acl

@@ -95,6 +95,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='public', write='restricted', subscribe='restricted', invite='restricted'))
         self.testapp.post('/people/%s/subscriptions' % username, json.dumps(subscribe_context), oauth2Header(test_manager), status=201)
+
         res = self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=204)
 
         res = self.testapp.get('/people/%s/subscriptions' % username, json.dumps(subscribe_context), oauth2Header(username), status=200)

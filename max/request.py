@@ -58,6 +58,8 @@ def get_username_in_uri(request):
 
         Returns None if parameter not found
     """
+    if not request.matchdict:
+        return None
     username = request.matchdict.get('username', '').lower()
     return username.lower() if username else None
 

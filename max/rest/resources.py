@@ -37,8 +37,8 @@ PUBLIC_RESOURCES = {
     'context_activities_authors': dict(route='/contexts/{hash}/activities/authors', category='Activities', name='Context authors', traverse='/contexts/{hash}'),
     'context_subscriptions': dict(route='/contexts/{hash}/subscriptions', category='Contexts', name='Users subscribed to context', traverse='/contexts/{hash}'),
     'context_subscription': dict(route='/contexts/{hash}/subscriptions/{username}', category='Contexts', name='User subscription', traverse='/subscriptions/{hash}'),
-    'context_tags': dict(route='/contexts/{hash}/tags', category='Contexts', name='Context tags'),
-    'context_tag': dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag'),
+    'context_tags': dict(route='/contexts/{hash}/tags', category='Contexts', name='Context tags', traverse='/contexts/{hash}'),
+    'context_tag': dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag', traverse='/contexts/{hash}'),
 
     # MAX 3.0
     'conversations': dict(route='/conversations', category='Conversations', name='Conversations'),

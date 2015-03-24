@@ -398,7 +398,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         url_hash = sha1(create_context['url']).hexdigest()
         self.testapp.delete('/contexts/%s' % url_hash, "", oauth2Header(test_manager), status=204)
-        self.testapp.get('/contexts/%s/activities' % (context_query['context']), '',  oauth2Header(username), status=404)
+        self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=403)
 
     def test_user_cannot_see_own_activity_from_deleted_context_in_timeline(self):
         """
