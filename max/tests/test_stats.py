@@ -40,7 +40,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And a GET endpoint protected with Manager role
             When i try to call that endpoint with HEAD method
             Then i can access the results count
-            And the same endpoint with GET is undefined
+            And the same endpoint with GET returns a Forbidden
         """
         from .mockers import user_status
         username = 'messi'
@@ -48,7 +48,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         for i in range(11):
             self.create_activity(username, user_status, note=str(i))
-        res = self.testapp.get('/activities', '', oauth2Header(username), status=404)
+        res = self.testapp.get('/activities', '', oauth2Header(username), status=403)
         res = self.testapp.head('/activities', oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
 
@@ -239,7 +239,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # The last user to post will be the first-created user
         for usern in range(20)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/people/{}/timeline/authors'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 8)
@@ -268,7 +268,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # The last user to post will be the first-created user
         for usern in range(20)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context, note=str(i))
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/people/{}/timeline/authors?limit=3'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 3)
@@ -296,7 +296,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # The last user to post will be the first-created user
         for usern in range(3)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/people/{}/timeline/authors'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 3)
@@ -328,7 +328,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # Create 2 consecutive activities for each user
         for usern in range(20)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 8)
@@ -359,7 +359,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # Create 2 consecutive activities for each user
         for usern in range(20)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/contexts/{}/activities/authors?limit=3'.format(url_hash), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 3)
