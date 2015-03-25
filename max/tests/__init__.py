@@ -1,6 +1,10 @@
 test_manager = 'test_manager'
 test_manager2 = 'test_manager_2'
 
+test_default_security_single = {
+    'roles': {"Manager": [test_manager]}
+}
+
 test_default_security = {
     'roles': {"Manager": [test_manager, test_manager2]}
 }
