@@ -185,16 +185,14 @@ def addUserActivity(user, request):
     newactivity.fromRequest(request, rest_params=rest_params)
 
     # Search if there's any activity from the same user with
-    # the same actor in the last minute
+    # the same actor and without context
     mmdb = MADMaxDB(request.db)
     query = {
         'actor.username': request.actor.username,
         'object.content': newactivity['object'].get('content', ''),
-        'published': {'$gt': newactivity.published - timedelta(minutes=1)}
+        'published': {'$gt': newactivity.published - timedelta(minutes=1)},
+        'contexts': {'$exists': False}
     }
-
-    if newactivity.get('contexts', []):
-        query['contexts.hash'] = {'$in': [a['hash'] for a in newactivity.contexts]}
 
     duplicated = mmdb.activity.search(query)
 
