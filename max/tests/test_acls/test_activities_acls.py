@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_default_security
-from max.tests import test_manager, test_manager2
+from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
 from max.tests.base import mock_post

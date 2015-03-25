@@ -23,8 +23,9 @@ change_ownership = "Change an object's owner"
 manage_push_tokens = 'Add and remove user device tokens'
 view_push_tokens = 'Query and view user device tokens'
 
-view_activities = 'View activities'
 view_activity = 'View activity'
+view_activities = 'View activities'
+view_activities_unsubscribed = 'View activities without context subscription'
 modify_activity = 'Modify activity'
 add_activity = 'Add activity'
 delete_activity = 'Delete activity'

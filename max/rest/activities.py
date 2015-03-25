@@ -12,8 +12,9 @@ from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
+from pyramid.security import ACLAllowed
 from max.rest import endpoint
-from max.security.permissions import view_activities, add_activity, view_activity, modify_activity, delete_activity
+from max.security.permissions import view_activities_unsubscribed, view_activities, add_activity, view_activity, modify_activity, delete_activity
 from base64 import b64encode
 from bson import ObjectId
 from datetime import timedelta
@@ -58,49 +59,55 @@ def getContextActivities(context, request):
 
          :rest hash The hash of the context url where the activties where posted
     """
-    chash = request.matchdict.get('hash', None)
     mmdb = MADMaxDB(request.db)
-
-    # subscribed Uri contexts with read permission
-    subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
-
-    # get the defined read context
-    result_contexts = mmdb.contexts.getItemsByhash(chash)
-    if result_contexts:
-        rcontext = result_contexts[0]
-    else:
-        raise ObjectNotFound("Context with hash %s not found inside contexts" % (chash))
-    url = rcontext['url']
+    url = context['url']
 
     # regex query to find all contexts within url
     escaped = re.escape(url)
     url_regex = {'$regex': '^%s' % escaped}
 
-    # search all contexts with public read permissions within url
-    query = {'permissions.read': 'public', 'url': url_regex}
-    public = [result.url for result in mmdb.contexts.search(query, show_fields=['url'])]
-
+    # Search posts associated with contexts that have this context's
+    # url as prefix a.k.a "recursive contexts"
     query = {}                                                     # Search
     query.update({'verb': 'post'})                                 # 'post' activities
     query.update({'contexts.url': url_regex})                      # equal or child of url
 
     contexts_query = []
-    if subscribed_uris:
-        subscribed_query = {'contexts.url': {'$in': subscribed_uris}}  # that are subscribed contexts
-        contexts_query.append(subscribed_query)                    # with read permission
 
-    if public:                                                     # OR
-        public_query = {'contexts.url': {'$in': public}}
-        contexts_query.append(public_query)                        # pubic contexts
+    # Check if we have permission to unrestrictely view activities from recursive contexts:
+    can_view_activities_unsubscribed = isinstance(request.has_permission(view_activities_unsubscribed), ACLAllowed)
+
+    # If we can't view unsubcribed, filter from which contexts we get activities by listing
+    # the contexts that the user has read permission on his subscriptions. Public contexts
+    # will be added if this condition is met, as if we're unrestricted, main query already includes them all
+    if not can_view_activities_unsubscribed:
+        # XXX Filter subscriptions by url prefix PLEASE
+        subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
+        if subscribed_uris:
+            subscribed_query = {'contexts.url': {'$in': subscribed_uris}}
+            contexts_query.append(subscribed_query)
+
+        # We'll include also all contexts that are public whitin the url
+        query = {'permissions.read': 'public', 'url': url_regex}
+        public = [result.url for result in mmdb.contexts.search(query, show_fields=['url'])]
+
+        if public:
+            public_query = {'contexts.url': {'$in': public}}
+            contexts_query.append(public_query)
 
     if contexts_query:
         query.update({'$or': contexts_query})
 
-        activities = sorted_query(request, mmdb.activity, query, flatten=1)
+    activities = sorted_query(request, mmdb.activity, query, flatten=1)
 
+    if contexts_query or can_view_activities_unsubscribed:
+        activities = sorted_query(request, mmdb.activity, query, flatten=1)
     else:
-        # we have no public contexts and we are not subscribed to any context, so we
-        # won't get anything
+        # XXX Check in coverage as this probably don't raises ever, as the case of not having any subscription
+        # is covered now by the permission in the view
+
+        # Empty contexts_query means that we don't have any subsriptions to any recursive context
+        # included the root one, so we really are not meant to see anything here
         raise Forbidden("You don't have permission to see anyting in this context and it's child")
 
     is_head = request.method == 'HEAD'

@@ -321,6 +321,7 @@ class Context(BaseContext):
             (Allow, Manager, permissions.add_subscription),
             (Allow, Owner, permissions.add_subscription),
             (Allow, Manager, permissions.view_activities),
+            (Allow, Manager, permissions.view_activities_unsubscribed),
             (Allow, Owner, permissions.view_activities),
             (Allow, Manager, permissions.add_activity),
             (Allow, Manager, permissions.view_comments),
@@ -334,8 +335,8 @@ class Context(BaseContext):
         if self.subscription:
 
             # Grant permisions only available if subscription exists. Setting this permissions
-            # conditionalyy here, causes a Forbidden to be raised when trying to modify or delete
-            # an inexistent subscripton, event if you're a Owner or Manager.
+            # conditionally here, causes a Forbidden to be raised when trying to modify or delete
+            # an inexistent subscription, event if you're a Owner or Manager.
             acl.extend([
                 (Allow, Manager, permissions.manage_subcription_permissions),
                 (Allow, Owner, permissions.manage_subcription_permissions),

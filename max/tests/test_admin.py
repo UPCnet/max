@@ -152,6 +152,19 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_admin_get_all_activities_by_context(self):
         """
+
+
+
+
+        XXX This test was here to test the Manager endpoint that didn't search for recursive activities
+        now this is unified so this feature will have to be refactored to a preset or parameter to
+        disable recursivity.
+
+        The test now is fixed to pass with correct acitivity count asserts
+
+
+
+
         """
         from .mockers import user_status
         from .mockers import subscribe_context, subscribe_contextA
@@ -176,7 +189,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.get('/contexts/%s/activities' % url_hash, {}, oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result), 2)
 
         res = self.testapp.get('/contexts/%s/activities' % url_hashA, {}, oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
