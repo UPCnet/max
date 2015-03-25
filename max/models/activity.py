@@ -88,11 +88,13 @@ class BaseActivity(MADBase):
         # If we have an activity that has contexts, grant view_activity if the context
         # subscription provides the read permission.
         #
-        # There's a use case where the actor's that just posted the activity may not have a subscription.
-        # This can only be possible if a Manager is posting in a context where he's not subscribed. So,
-        # If the subscription is none don't grant any permission, because user should already have it.
+        # There's two use case where the actor's that just posted the activity may not have a subscription.
+        #  1. A Manager is posting in a context as himself (not impersonating) and he's not subscribed.
+        #     As we allow this in static acls, a manager will already have the permissions granted below.
+        #  2. A Manager is posting in a context as a context, so the context won't be subcribed in any way.
+        #     As the user authenticated wil be a manager, it will already have the permissions granted below.
 
-        if self.get('contexts', []):
+        if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             subscription = self.request.actor.getSubscription(self.contexts[0])
             if subscription:
                 if 'read' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):

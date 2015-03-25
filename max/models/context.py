@@ -305,9 +305,12 @@ class Context(BaseContext):
     @property
     def subscription(self):
         """
-            Retrieves the current actor susbcription to this context
+            Retrieves the current actor susbcription to this context.
+
+            If the actor is a context, don't return any subscription
         """
-        return self.request.actor.getSubscription(self)
+        if hasattr(self.request.actor, 'getSubscription'):
+            return self.request.actor.getSubscription(self)
 
     @property
     def __acl__(self):

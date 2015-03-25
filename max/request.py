@@ -168,7 +168,7 @@ def get_request_actor(request):
             url_hash = sha1(context_actor_url).hexdigest()
             mmdb = MADMaxDB(request.registry.max_store)
             actor = mmdb.contexts.getItemsByhash(url_hash)[0]
-            actor.setdefault('displayName', actor['username'])
+            actor.setdefault('displayName', '')
             return actor
         except:
             return None

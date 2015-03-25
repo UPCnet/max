@@ -233,6 +233,10 @@ user_status_as_context = {
         "objectType": "note",
         "content": "<p>[A] Testejant la creació d'un canvi d'estatus</p>"
     },
+    "actor": {
+        "objectType": "context",
+        "url": create_context['url'],
+    }
 }
 
 user_status_context_generator = {
