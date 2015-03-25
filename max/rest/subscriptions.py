@@ -50,10 +50,10 @@ def subscribe(context, request):
 
 
 @view_config(route_name='context_subscription', request_method='DELETE', requires_actor=True, permission=remove_subscription)
-def unsubscribe(subscription, request):
+def unsubscribe(context, request):
     """
     """
-    subscription.context.removeUserSubscriptions(users_to_delete=[request.actor_username])
+    context.removeUserSubscriptions(users_to_delete=[request.actor_username])
     return HTTPNoContent()
 
 
@@ -100,21 +100,21 @@ def getUserSubscriptions(user, request):
 
 
 @view_config(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
-def grantPermissionOnContext(subscription, request):
+def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
     if permission not in ['read', 'write', 'subscribe', 'invite', 'delete', 'flag']:
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
-    if permission in subscription.get('_grants', []):
+    if permission in context.subscription.get('_grants', []):
         # Already have the permission grant
         code = 200
     else:
         # Assign the permission
         code = 201
         subscription = request.actor.grantPermission(
-            subscription,
+            context.subscription,
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
 
@@ -123,7 +123,7 @@ def grantPermissionOnContext(subscription, request):
 
 
 @view_config(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
-def revokePermissionOnContext(subscription, request):
+def revokePermissionOnContext(context, request):
     """
     """
     permission = request.matchdict.get('permission', None)
@@ -131,13 +131,13 @@ def revokePermissionOnContext(subscription, request):
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     code = 200
-    if permission in subscription.get('_vetos', []):
+    if permission in context.subscription.get('_vetos', []):
         code = 200
         # Alredy vetted
     else:
         # We have the permission, let's delete it
         subscription = request.actor.revokePermission(
-            subscription,
+            context.subscription,
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
         code = 201
@@ -146,10 +146,10 @@ def revokePermissionOnContext(subscription, request):
 
 
 @view_config(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
-def resetPermissionsOnContext(subscription, request):
+def resetPermissionsOnContext(context, request):
     """
     """
 
-    subscription = request.actor.reset_permissions(subscription, subscription.context)
+    subscription = request.actor.reset_permissions(context.subscription, context)
     handler = JSONResourceEntity(subscription, status_code=200)
     return handler.buildResponse()

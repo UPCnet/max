@@ -17,7 +17,7 @@ from max.security.permissions import list_contexts
 from max.security.permissions import list_public_contexts
 from max.security.permissions import modify_context
 from max.security.permissions import view_context
-from max.security.permissions import view_context_activity
+from max.security.permissions import view_activities
 
 from pyramid.httpexceptions import HTTPNoContent
 from max.rest import endpoint
@@ -39,10 +39,9 @@ def addContext(contexts, request):
 
         Adds a context.
     """
-    request.actor = None
-
     # Initialize a Context object from the request
     newcontext = Context()
+
     newcontext.fromRequest(request)
 
     # If we have the _id setted, then the object already existed in the DB,
@@ -171,7 +170,7 @@ def getPublicContexts(contexts, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_activities_authors', request_method='GET', permission=view_context_activity, requires_actor=True)
+@endpoint(route_name='context_activities_authors', request_method='GET', permission=view_activities, requires_actor=True)
 def getContextAuthors(context, request):
     """
         /contexts/{hash}/activities/authors

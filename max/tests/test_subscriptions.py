@@ -122,7 +122,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
             Given a plain user
             When I try to get another user subscriptions list
-            Then i get an authorization error
+            Then i get an Forbidden error
         """
         from .mockers import create_context
         from .mockers import subscribe_context
@@ -132,20 +132,20 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username2)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
-        self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username2), status=401)
+        self.testapp.get('/people/%s/subscriptions' % username, {}, oauth2Header(username2), status=403)
 
     def test_subcribe_to_restricted_context_as_plain_user(self):
         """
             Given a plain user
             When I subscribe to a public subscription context
-            Then i get an authorization error
+            Then i get an Forbidden error
         """
         from .mockers import create_context
         from .mockers import subscribe_context
         username = 'messi'
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
-        self.user_subscribe_user_to_context(username, subscribe_context, expect=401)
+        self.user_subscribe_user_to_context(username, subscribe_context, expect=403)
 
     def test_subscribe_to_public_context_as_plain_user(self):
         """
@@ -206,7 +206,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         url_hash = sha1(create_context['url']).hexdigest()
-        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=404)
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=403)
 
     def test_unsubscribe_from_inexistent_subscription_as_admin(self):
         """
@@ -220,7 +220,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='public', invite='restricted'))
         url_hash = sha1(create_context['url']).hexdigest()
-        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=404)
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(test_manager), status=403)
 
     def test_unsubscribe_from_restricted_context_as_plain_user(self):
         """
@@ -235,7 +235,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context, permissions=dict(read='subscribed', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context, expect=201)
         url_hash = sha1(create_context['url']).hexdigest()
-        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=401)
+        self.testapp.delete('/people/%s/subscriptions/%s' % (username, url_hash), {}, oauth2Header(username), status=403)
 
     def test_unsubscribe_from_restricted_context_as_admin(self):
         """
@@ -335,7 +335,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['permissions']['read'], 'subscribed')
         self.assertEqual(res.json['permissions']['write'], 'restricted')
-        res = self.create_activity(username, user_status_context, expect=401)
+        res = self.create_activity(username, user_status_context, expect=403)
 
     def test_change_public_context_to_restricted_preserve_granted_write_permission(self):
         """
@@ -404,4 +404,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.put('/contexts/%s' % url_hash, data, oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['permissions']['read'], 'subscribed')
         self.assertEqual(res.json['permissions']['write'], 'subscribed')
-        res = self.create_activity(username, user_status_context, expect=401)
+        res = self.create_activity(username, user_status_context, expect=403)

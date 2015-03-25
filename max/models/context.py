@@ -303,6 +303,13 @@ class Context(BaseContext):
     schema['uploadURL'] = {}
 
     @property
+    def subscription(self):
+        """
+            Retrieves the current actor susbcription to this context
+        """
+        return self.request.actor.getSubscription(self)
+
+    @property
     def __acl__(self):
         acl = [
             (Allow, Authenticated, permissions.view_context),
@@ -311,13 +318,43 @@ class Context(BaseContext):
             (Allow, Manager, permissions.add_subscription),
             (Allow, Owner, permissions.add_subscription),
             (Allow, Manager, permissions.view_activities),
+            (Allow, Owner, permissions.view_activities),
             (Allow, Manager, permissions.add_activity),
-            (Allow, Manager, permissions.view_comments)
+            (Allow, Manager, permissions.view_comments),
         ]
 
-        # Grant subscribe permission to the user to subscribe itself if the context allows it
+        # Grant subscribe permission to the user to subscribe itself if the context policy allows it
         if self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.add_subscription))
+
+        # Granted permissions only if a subscription for the current actor exists
+        if self.subscription:
+
+            # Grant permisions only available if subscription exists. Setting this permissions
+            # conditionalyy here, causes a Forbidden to be raised when trying to modify or delete
+            # an inexistent subscripton, event if you're a Owner or Manager.
+            acl.extend([
+                (Allow, Manager, permissions.manage_subcription_permissions),
+                (Allow, Owner, permissions.manage_subcription_permissions),
+                (Allow, Manager, permissions.remove_subscription),
+                (Allow, Owner, permissions.remove_subscription),
+            ])
+
+            # Grant ubsubscribe permission if the user subscription allows it
+            # but only if is trying to unsubscribe itself.
+            if 'unsubscribe' in self.subscription.get('permissions', []) and is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
+
+            # Grant add_activity permission if the user subscription allows it
+            # but only if is trying to post as himself. This avoids Context owners to create
+            # activity impersonating othe users
+            if 'write' in self.subscription.get('permissions', []) and is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, permissions.add_activity))
+
+            # Grant view_activities permission if the user subscription allows it
+            if 'read' in self.subscription.get('permissions', []):
+                acl.append((Allow, self.request.authenticated_userid, permissions.view_activities))
+            return acl
 
         return acl
 

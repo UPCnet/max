@@ -33,6 +33,7 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         self.testapp = MaxTestApp(self)
 
         self.create_user(test_manager)
+
     # Add activity tests
 
     def test_add_activity_as_user(self):
@@ -283,6 +284,25 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         url_hash = self.create_context(create_context, permissions={'read': 'restricted'}).json['hash']
 
         self.testapp.get('/contexts/{}/activities'.format(url_hash), "", headers=oauth2Header(username), status=403)
+
+    # Get context activity authors
+
+    def test_get_context_activity_authors_as_subscribed(self):
+        """
+            Given i'm a regular user
+            When i try to get all context activities authors
+            And i'm subscribed to that context
+            And i have read permission on that context
+            I succeed
+        """
+        from max.tests.mockers import subscribe_context, create_context
+        username = 'sheldon'
+
+        self.create_user(username)
+        url_hash = self.create_context(create_context, permissions={'read': 'subscribed'}).json['hash']
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), "", headers=oauth2Header(username), status=200)
 
     # Get Activity. Image and file attachement are not tests as share the same permissions
     # as getting a single activity.

@@ -47,7 +47,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
 
         for i in range(11):
-            self.create_activity(username, user_status)
+            self.create_activity(username, user_status, note=str(i))
         res = self.testapp.get('/activities', '', oauth2Header(username), status=404)
         res = self.testapp.head('/activities', oauth2Header(username), status=200)
         self.assertEqual(res.headers.get('X-totalItems'), '11')
@@ -58,7 +58,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
 
         for i in range(11):
-            self.create_activity(username, user_status)
+            self.create_activity(username, user_status, note=str(i))
         res = self.testapp.get('/people/%s/activities' % username, '', oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 10)
         res = self.testapp.head('/people/%s/activities' % username, oauth2Header(username), status=200)
@@ -75,7 +75,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         old_activity['published'] = '2010-01-01T00:01:30.000Z'
 
         for i in range(11):
-            self.create_activity(username, old_activity)
+            self.create_activity(username, old_activity, note=str(i))
 
         res = self.testapp.get('/people/%s/activities?date_filter=2010' % username, '', oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 10)
@@ -97,7 +97,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
 
         for i in range(11):
-            self.create_activity(username, user_status)
+            self.create_activity(username, user_status, note=str(i))
 
         from .mockers import user_status_context
         from .mockers import create_context
@@ -127,7 +127,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
 
         for i in range(11):
-            self.create_activity(username, user_status_context)
+            self.create_activity(username, user_status_context, note=str(i))
 
         res = self.testapp.get('/contexts/%s/activities' % (url_hash), '', oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 10)
@@ -141,7 +141,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
 
         for i in range(11):
-            self.create_activity(username, user_status)
+            self.create_activity(username, user_status, note=str(i))
         res = self.testapp.get('/activities', '', oauth2Header(test_manager), status=200)
         self.assertEqual(len(res.json), 10)
         res = self.testapp.head('/activities', oauth2Header(test_manager), status=200)
@@ -150,11 +150,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_global_comments_stats(self):
         from .mockers import user_status, user_comment
         username = 'messi'
-        self.create_user(test_manager)
         self.create_user(username)
 
         for i in range(11):
-            res = self.create_activity(username, user_status)
+            res = self.create_activity(username, user_status, note=str(i))
             self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
         res = self.testapp.get('/activities', '', oauth2Header(test_manager), status=200)
         self.assertEqual(len(res.json), 10)
@@ -174,7 +173,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from hashlib import sha1
 
         username = 'messi'
-        self.create_user(test_manager)
         self.create_user(username)
 
         self.create_context(create_context)
@@ -186,11 +184,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         # These 2 comments MUST NOT be present on the results
         for i in range(2):
-            res = self.create_activity(username, user_status_contextA)
+            res = self.create_activity(username, user_status_contextA, note=str(i))
             self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
 
         for i in range(11):
-            res = self.create_activity(username, user_status_context)
+            res = self.create_activity(username, user_status_context, note=str(i))
             self.testapp.post('/activities/%s/comments' % res.json['id'], json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.head('/contexts/%s/comments' % url_hash, oauth2Header(test_manager), status=200)
@@ -270,7 +268,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # The last user to post will be the first-created user
         for usern in range(20)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note=str(i))
 
         res = self.testapp.get('/people/{}/timeline/authors?limit=3'.format('user-0'), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 3)
@@ -392,7 +390,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # Create 2 consecutive activities for each user
         for usern in range(3)[::-1]:
             for count in range(2):
-                self.create_activity('user-{}'.format(usern), user_status_context)
+                self.create_activity('user-{}'.format(usern), user_status_context, note='user {}, note {}'.format(usern, count))
 
         res = self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header('user-0'), status=200)
         self.assertEqual(len(res.json), 3)
@@ -404,7 +402,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             As a plain user
             When i query the last eight authors that published in a context
             And i'm not subscribed to that context
-            Then I get an error
+            Then I get a Forbidden error
         """
         from .mockers import create_context
         from hashlib import sha1
@@ -415,4 +413,4 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
 
-        self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header(username), status=401)
+        self.testapp.get('/contexts/{}/activities/authors'.format(url_hash), '', oauth2Header(username), status=403)

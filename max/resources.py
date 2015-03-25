@@ -62,7 +62,6 @@ class Root(dict):
         self.request = request
         self['contexts'] = ContextTraverser(self, request)
         self['people'] = PeopleTraverser(self, request)
-        self['subscriptions'] = SubscriptionsTraverser(self, request)
         self['activities'] = ActivitiesTraverser(self, request)
         self['comments'] = CommentsTraverser(self, request)
 
@@ -119,10 +118,11 @@ class ContextTraverser(MongoDBTraverser):
             (Allow, Manager, permissions.modify_context),
             (Allow, Manager, permissions.delete_context),
             (Allow, Manager, permissions.view_context),
-            (Allow, Manager, permissions.view_context_activity),
+            (Allow, Manager, permissions.view_activities),
             (Allow, Manager, permissions.view_subscriptions),
             (Allow, Owner, permissions.view_subscriptions)
         ]
+
         return acl
 
 
@@ -178,109 +178,6 @@ class PeopleTraverser(MongoDBTraverser):
         # Grant add permission if user is trying to create itself
         if self.request.authenticated_userid == self.request.actor_username:
             acl.append((Allow, self.request.authenticated_userid, permissions.add_people))
-
-        return acl
-
-
-class Subscription(dict):
-    """
-        Object representing a subscription.
-
-        This is temporary, to allow us to work assuming subscriptions are
-        real objects. In the (near) future, this should be migrated to models
-        as a regular mongodb collecion object.
-    """
-
-    def get_subscription(self, context):
-        """
-            Retrieves the subscription
-        """
-        ContextClass = getMaxModelByObjectType(context['objectType'])
-        temp_context = ContextClass()
-        temp_context.fromObject(context)
-        for subscription in self.actor.get(temp_context.user_subscription_storage, []):
-            if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
-                return subscription
-
-        context['exists'] = False
-        return context
-
-    def __init__(self, parent, request, chash, actor):
-        from max.models import Context
-        self.__parent__ = parent
-        self.request = request
-        self.hash = chash
-        self.actor = actor
-        self.context = Context()
-        self.context.fromObject({'objectType': 'context', 'hash': chash})
-        subscription = self.get_subscription({'hash': chash, 'objectType': 'context'})
-
-        # If a subscription is not found, we raise a Forbidden here, except that
-        # the user authenticated is a Manager: in that case, a fake read-granted subscription is
-        # given in order to grant him the view_activities on this subscription's context
-        if not subscription.get('exists', True):
-            current_user_is_manager = is_manager(self.request, self.request.authenticated_userid)
-            if not current_user_is_manager:
-                raise Forbidden('{} is not subscribed to {}'.format(self.request.actor_username, self.hash))
-            subscription.update({'permissions': ['read']})
-
-        self.update(subscription)
-
-    @property
-    def _owner(self):
-        """
-            Proxy of the ownership of the underliying context
-        """
-        try:
-            return self.context._owner
-        except:
-            # XXX Maybe we want to raise this directly form wake or alreadyExists ???
-            raise ObjectNotFound("There is no context with hash {}".format(self.hash))
-
-    @property
-    def __acl__(self):
-        acl = [
-            (Allow, Manager, permissions.add_activity),
-            (Allow, Manager, permissions.view_activities),
-        ]
-
-        # Allow Owners and Managers to manage subscription permissions on real susbcriptions
-        if self.get('exists', True) and (is_manager(self.request, self.request.authenticated_userid) or is_owner(self, self.request.authenticated_userid)):
-            acl.append((Allow, self.request.authenticated_userid, permissions.manage_subcription_permissions))
-
-        # Grant ubsubscribe permission if the user subscription allows it
-        # but only if is trying to unsubscribe itself.
-        if 'unsubscribe' in self.get('permissions', []) and is_self_operation(self.request):
-            acl.append((Allow, self.request.authenticated_userid, permissions.remove_subscription))
-
-        # Grant add_activity permission if the user subscription allows it
-        # but only if is trying to post as himself. This avoids Context owners to create
-        # activity impersonating othe users
-        if 'write' in self.get('permissions', []) and is_self_operation(self.request):
-            acl.append((Allow, self.request.authenticated_userid, permissions.add_activity))
-
-        # Grant view_activities permission if the user subscription allows it
-        if 'read' in self.get('permissions', []):
-            acl.append((Allow, self.request.authenticated_userid, permissions.view_activities))
-
-        return acl
-
-
-class SubscriptionsTraverser(object):
-    def __init__(self, parent, request):
-        self.request = request
-        self.db = request.registry.max_store
-        self.__parent__ = parent
-
-    def __getitem__(self, key):
-        return Subscription(self, self.request, key, self.request.actor)
-
-    @property
-    def __acl__(self):
-        acl = [
-            (Allow, Manager, permissions.remove_subscription),
-            (Allow, Owner, permissions.remove_subscription),
-        ]
 
         return acl
 

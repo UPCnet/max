@@ -222,12 +222,15 @@ class MADBase(MADDict):
 
             Wakes up objects from database when necessary.
         """
+        if key == '__acl__':
+            import ipdb;ipdb.set_trace()
+            self.__acl__
 
         try:
-            # Try to get the requested key as a native object attribute
-            return object.__getattribute__(self, key)
-        except AttributeError:
-            return self.__getitem__(key)
+            # Try to get the requested attribute as a object contained item
+            return self[key]
+        except AttributeError as exc:
+            raise exc
 
     def __getitem__(self, key):
         """

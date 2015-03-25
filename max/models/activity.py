@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from max.MADMax import MADMaxCollection
 from max.MADObjects import MADBase
 from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
 from max.resources import CommentsTraverser
-from max.rest.utils import canWriteInContexts
 from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
@@ -16,13 +14,17 @@ from max.security.permissions import view_activity, delete_activity, modify_acti
 from pyramid.security import Allow
 from PIL import Image
 from bson import ObjectId
-from hashlib import sha1
 
 import datetime
 import json
 import os
 import re
 import requests
+
+
+# Fields that we want to transfer from real context,
+# to the context reference stored on activ
+ACTIVITY_CONTEXT_FIELDS = ['displayName', 'tags', 'hash', 'url', 'objectType']
 
 
 class BaseActivity(MADBase):
@@ -84,13 +86,20 @@ class BaseActivity(MADBase):
             acl.append((Allow, self.request.authenticated_userid, view_activity))
 
         # If we have an activity that has contexts, grant view_activity if the context
-        # subscription provides the read permission
-        if self.get('contexts', []):
-            if 'read' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
-                acl.append((Allow, self.request.authenticated_userid, view_activity))
+        # subscription provides the read permission.
+        #
+        # There's a use case where the actor's that just posted the activity may not have a subscription.
+        # This can only be possible if a Manager is posting in a context where he's not subscribed. So,
+        # If the subscription is none don't grant any permission, because user should already have it.
 
-            if 'delete' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
-                acl.append((Allow, self.request.authenticated_userid, delete_activity))
+        if self.get('contexts', []):
+            subscription = self.request.actor.getSubscription(self.contexts[0])
+            if subscription:
+                if 'read' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
+                    acl.append((Allow, self.request.authenticated_userid, view_activity))
+
+                if 'delete' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
+                    acl.append((Allow, self.request.authenticated_userid, delete_activity))
 
         return acl
 
@@ -113,7 +122,6 @@ class BaseActivity(MADBase):
             Updates the dict content with the activity structure,
             with data parsed from the request
         """
-
         isPerson = isinstance(self.data['actor'], User)
         isContext = isinstance(self.data['actor'], Context)
 
@@ -136,30 +144,9 @@ class BaseActivity(MADBase):
         subobject = wrapper(self.data['object'])
         ob['object'] = subobject
 
-        if isPerson and 'contexts' in self.data:
-            # When a person posts an activity it can be targeted
-            # to multiple contexts. here we construct the basic info
-            # of each context and store them in contexts key
-            ob['contexts'] = []
-            for cobject in self.data['contexts']:
-                subscription = dict(self.data['actor'].getSubscription(cobject))
+        if 'contexts' in self.data:
+            ob['contexts'] = [self.data['contexts'][0].flatten(preserve=ACTIVITY_CONTEXT_FIELDS), ]
 
-                # Clean innecessary fields
-                non_needed_subscription_fields = ['published', 'permissions', 'id', '_vetos', '_grants']
-                for fieldname in non_needed_subscription_fields:
-                    if fieldname in subscription:
-                        del subscription[fieldname]
-                ob['contexts'].append(subscription)
-        if isContext:
-            # When a context posts an activity it can be posted only
-            # to itself, so add it directly
-            posted_context = dict(self.data['actor'])
-            non_needed_context_fields = ['published', 'permissions', '_id', '_owner', '_creator', 'twitterHashtag']
-            for fieldname in non_needed_context_fields:
-                if fieldname in posted_context:
-                    del posted_context[fieldname]
-
-            ob['contexts'] = [posted_context, ]
         self.update(ob)
 
         # Set date if specified

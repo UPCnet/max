@@ -52,7 +52,7 @@ def getGlobalActivities(context, request):
 
 
 @endpoint(route_name='context_activities', request_method='GET', requires_actor=True, permission=view_activities)
-def getContextActivities(subscription, request):
+def getContextActivities(context, request):
     """
          Returns all the activities posted on a context
 
@@ -109,7 +109,7 @@ def getContextActivities(subscription, request):
 
 
 @endpoint(route_name='context_activities', request_method='POST', requires_actor=True, permission=add_activity)
-def addContextActivity(subscription, request):
+def addContextActivity(context, request):
     """
          /contexts/{hash}/activities
 
@@ -119,7 +119,12 @@ def addContextActivity(subscription, request):
          the actor being a Person or a Context. If no actor specified on json payload, the current authenticated
          user will be taken as request.actor.
     """
-    rest_params = {'verb': 'post', 'contexts': [{'objectType': 'context', 'hash': subscription.hash}]}
+    rest_params = {
+        'verb': 'post',
+        'contexts': [
+            context
+        ]
+    }
     # Initialize a Activity object from the request
     newactivity = Activity()
     newactivity.fromRequest(request, rest_params=rest_params)
@@ -134,7 +139,7 @@ def addContextActivity(subscription, request):
         actor_id_key: actor_id_value,
         'object.content': newactivity['object']['content'],
         'published': {'$gt': newactivity.published - timedelta(minutes=1)},
-        'contexts.hash': subscription.hash
+        'contexts.hash': context.hash
     }
 
     mmdb = MADMaxDB(request.db)

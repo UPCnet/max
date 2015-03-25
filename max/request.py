@@ -175,7 +175,7 @@ def get_request_actor(request):
 
     username = get_request_actor_username(request)
     try:
-        mmdb = MADMaxDB(request.registry.max_store)
+        mmdb = MADMaxDB(request.db)
         actor = mmdb.users.getItemsByusername(username)[0]
         actor.setdefault('displayName', actor['username'])
         return actor
