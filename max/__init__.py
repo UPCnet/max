@@ -37,9 +37,12 @@ DEFAULT_CONTEXT_PERMISSIONS = dict(
     read='restricted',
     write='restricted',
     subscribe='restricted',
+    ubsubscribe='restricted',
     invite='restricted',
     delete='restricted',
-    flag='restricted')
+    flag='restricted'
+)
+
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
