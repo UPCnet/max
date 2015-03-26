@@ -341,6 +341,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         self.create_activity(username, user_status_context)
         self.create_activity(username_not_me, user_status_context)
+
         res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), '', oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result), 2)

@@ -88,12 +88,11 @@ def getContextActivities(context, request):
             contexts_query.append(subscribed_query)
 
         # We'll include also all contexts that are public whitin the url
-        query = {'permissions.read': 'public', 'url': url_regex}
-        public = [result.url for result in mmdb.contexts.search(query, show_fields=['url'])]
+        public_query = {'permissions.read': 'public', 'url': url_regex}
+        public_contexts = [result.url for result in mmdb.contexts.search(public_query, show_fields=['url'])]
 
-        if public:
-            public_query = {'contexts.url': {'$in': public}}
-            contexts_query.append(public_query)
+        if public_contexts:
+            contexts_query.append({'contexts.url': {'$in': public_contexts}})
 
     if contexts_query:
         query.update({'$or': contexts_query})
