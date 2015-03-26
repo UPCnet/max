@@ -34,7 +34,7 @@ unflag_activity = 'Unflag an activity'
 
 view_comments = 'View activity comments'
 add_comment = 'Add a comment to an activity'
-delete_comment = 'Remove a activity comment'
+delete_comment = 'Delete a activity comment'
 
 manage_security = 'Manage security settings'
 do_maintenance = 'Execute maintenance tasks'

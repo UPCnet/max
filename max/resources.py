@@ -85,17 +85,22 @@ class CommentsTraverser(object):
         This traverser will look for a comment inside an activty, assuming the parent
         object is an activity
     """
-    def __init__(self, parent, request):
+    def __init__(self, parent, request, activity=None):
         self.request = request
         self.db = request.registry.max_store
         self.__parent__ = parent
+        self.activity = activity
 
-    def __getitem__(self, key):
-        from max.models import Activity
+    def __getitem__(self, commentid):
+        from max.ASObjects import Comment
 
-        if isinstance(self.__parent__, Activity):
-            import ipdb;ipdb.set_trace()
-            return
+        if self.activity:
+            comment = self.activity.get_comment(commentid)
+            comment_object = Comment(comment, creating=False)
+            comment_object.__parent__ = self
+            return comment_object
+        else:
+            raise ObjectNotFound('Activity {} has no comment with id {}'.format(self.activity['_id'], commentid))
 
     @property
     def __acl__(self):

@@ -4,6 +4,10 @@ from max.rest.utils import findHashtags
 from max.rest.utils import findKeywords
 from max.rest.utils import formatMessageEntities
 
+from max.security import Manager, Owner, is_owner
+from max.security.permissions import delete_comment
+from pyramid.security import Allow
+
 from copy import deepcopy
 from hashlib import sha1
 
@@ -71,6 +75,7 @@ class Comment(ASObject):
     data = {}
     objectType = 'Comment'
     schema = {
+        'actor': {},
         '_id': {},
         'content': {
             'required': 1,
@@ -98,7 +103,49 @@ class Comment(ASObject):
             if hashtags:
                 self.data['_hashtags'] = hashtags
             self.setKeywords()
+        else:
+            existing_id = self.data.pop('id', None)
+            if existing_id:
+                self.data['_id'] = existing_id
+
         self.update(self.data)
+
+    def delete(self):
+        """
+            Proxy of the comment's activity delete_comment
+        """
+        self.__parent__.activity.delete_comment(self['_id'])
+
+    @property
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, delete_comment),
+            (Allow, Owner, delete_comment),
+        ]
+        activity = self.__parent__.activity
+
+        # If the user accessing the activity owns it, give it permission to delete
+        if is_owner(activity, activity.request.authenticated_userid):
+            acl.append((Allow, activity.request.authenticated_userid, delete_comment))
+
+        if activity.get('contexts', []) and hasattr(activity.request.actor, 'getSubscription'):
+            subscription = activity.request.actor.getSubscription(activity.contexts[0])
+            if subscription:
+                permissions = subscription.get('permissions', [])
+                if 'delete' in permissions:
+                    acl.append((Allow, activity.request.authenticated_userid, delete_comment))
+
+        return acl
+
+    @property
+    def _owner(self):
+        """
+            XXX Try to improve this ...
+
+            This wraps the actor username that posted the comment as _owner, to be able to check
+            ownership when using a Comment as a traversed object
+        """
+        return self.get('actor', {}).get('username', None)
 
     def setKeywords(self):
         self['_keywords'] = findKeywords(self.data['content'])

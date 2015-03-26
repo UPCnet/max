@@ -11,6 +11,7 @@ from max import DEFAULT_CONTEXT_PERMISSIONS
 from pyramid.security import Allow, Authenticated
 from max.security import Owner, Manager, is_self_operation
 from max.security import permissions
+from itertools import chain
 
 
 class BaseContext(MADBase):
@@ -101,21 +102,45 @@ class BaseContext(MADBase):
         subscription['permissions'] = user_permissions
         return subscription
 
-    def subscription_permissions(self, base=[]):
-        user_permissions = list(base)
-        if self.permissions.get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) in ['subscribed', 'public']:
-            user_permissions.append('read')
-        if self.permissions.get('write', DEFAULT_CONTEXT_PERMISSIONS['write']) in ['subscribed', 'public']:
-            user_permissions.append('write')
-        if self.permissions.get('invite', DEFAULT_CONTEXT_PERMISSIONS['invite']) in ['subscribed']:
-            user_permissions.append('invite')
-        unsubscribe_permission = self.permissions.get('unsubscribe', self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']))
-        if unsubscribe_permission in ['public']:
-            user_permissions.append('unsubscribe')
-        if self.permissions.get('delete', DEFAULT_CONTEXT_PERMISSIONS['delete'] in ['subscribed']):
-            user_permissions.append('delete')
+    def get_permission_policy(self, permission, default):
+        """
+            Returns the effective policy that will be used to grant the permisison
 
-        return list(set(user_permissions))
+            The unsubscribe policy has a special treatment:
+            - If the permission is explicitly specified, the context policy will be used
+            - If no unsubscribe policy is found, but the subscribe one is, subscribe policy will be used
+            - If neither unsubscribe or subscribe policy found, default unsubscribe policy will be used.
+        """
+        if permission == 'unsubscribe':
+            policy = self.permissions.get(permission, None)
+            if policy is None:
+                policy = self.get_permission_policy('subscribe', default)
+        else:
+            policy = self.permissions.get(permission, default)
+
+        return policy
+
+    def subscription_permissions(self, base=[]):
+        """
+            Return a list of granted permissions on this context.
+
+            To construct the list, three (maximum) possible sources will be looked up
+            in the following order. For each of max contexts existing permissions. Once
+            a value is found, the rest won't be looked up, and so not overriden.
+
+            1. Provided base permissions
+            2. Context permission policy for that permission, will grant it not restricted to.
+            2. Default policy for that permission, will grant it not restricted to.
+        """
+        user_permissions = list(base)
+
+        for permission, default in DEFAULT_CONTEXT_PERMISSIONS.items():
+            if permission not in user_permissions:
+                context_grants_permission = self.get_permission_policy(permission, default) != 'restricted'
+                if context_grants_permission:
+                    user_permissions.append(permission)
+
+        return user_permissions
 
     def updateContextActivities(self, force_update=False):
         """
@@ -358,6 +383,7 @@ class Context(BaseContext):
             # Grant view_activities permission if the user subscription allows it
             if 'read' in self.subscription.get('permissions', []):
                 acl.append((Allow, self.request.authenticated_userid, permissions.view_activities))
+                acl.append((Allow, self.request.authenticated_userid, permissions.view_comments))
             return acl
 
         return acl

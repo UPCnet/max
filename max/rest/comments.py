@@ -53,17 +53,6 @@ def getActivityComments(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='comments', request_method='GET', permission=view_comments, requires_actor=True)
-def getGlobalComments(comments, request):
-    """
-    """
-    mmdb = MADMaxDB(request.db)
-    is_head = request.method == 'HEAD'
-    activities = mmdb.activity.search({'verb': 'comment'}, flatten=1, count=is_head, **searchParams(request))
-    handler = JSONResourceRoot(activities, stats=is_head)
-    return handler.buildResponse()
-
-
 @endpoint(route_name='context_comments', request_method='GET', permission=view_comments, requires_actor=True)
 def getContextComments(context, request):
     """
@@ -80,6 +69,17 @@ def getContextComments(context, request):
 
     comments = mmdb.activity.search(query, flatten=1, count=is_head, **searchParams(request))
     handler = JSONResourceRoot(comments, stats=is_head)
+    return handler.buildResponse()
+
+
+@endpoint(route_name='comments', request_method='GET', permission=view_comments, requires_actor=True)
+def getGlobalComments(comments, request):
+    """
+    """
+    mmdb = MADMaxDB(request.db)
+    is_head = request.method == 'HEAD'
+    activities = mmdb.activity.search({'verb': 'comment'}, flatten=1, count=is_head, **searchParams(request))
+    handler = JSONResourceRoot(activities, stats=is_head)
     return handler.buildResponse()
 
 
@@ -128,25 +128,15 @@ def addActivityComment(activity, request):
 
 
 @endpoint(route_name='activity_comment', request_method='DELETE', permission=delete_comment)
-def deleteActivityComment(activity, request):
+def deleteActivityComment(comment, request):
     """
     """
-    commentid = request.matchdict.get('comment', None)
-
-    comment = activity.get_comment(commentid)
-    if not comment:
-        raise ObjectNotFound("There's no comment with id: %s" % commentid)
-
-    # if found_activity.deletable or request.actor_username == comment['actor']['username']:
-    #     found_activity.delete_comment(commentid)
-    # else:
-    #     raise Unauthorized("You're not allowed to delete this comment")
-
+    comment.delete()
     return HTTPNoContent()
 
 
 @endpoint(route_name='activity_comment', request_method='GET')
-def getActivityComment(context, request):
+def getActivityComment(activity, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover
@@ -160,7 +150,7 @@ def modifyActivityComments(context, request):
 
 
 @endpoint(route_name='comments', request_method='DELETE')
-def deleteActivityComments(context, request):
+def deleteActivityComments(activity, request):
     """
     """
     return HTTPNotImplemented()  # pragma: no cover

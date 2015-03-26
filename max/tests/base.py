@@ -149,6 +149,14 @@ class MaxTestBase(object):
         res = self.testapp.post('/people/%s/activities' % username, json.dumps(new_activity), oauth2Header(oauth_username), status=expect)
         return res
 
+    def comment_activity(self, username, activity_id, comment, expect=201):
+        res = self.testapp.post('/activities/%s/comments' % str(activity_id), json.dumps(comment), oauth2Header(username), status=expect)
+        return res
+
+    def delete_activity_comment(self, username, activity_id, comment_id, expect=204):
+        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity_id), comment_id), '', oauth2Header(username), status=expect)
+        return res
+
     def like_activity(self, username, activity_id, expect=201):
         res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=expect)
         return res
@@ -181,6 +189,14 @@ class MaxTestBase(object):
         from hashlib import sha1
         url_hash = sha1(context).hexdigest()
         res = self.testapp.put('/contexts/%s' % url_hash, json.dumps(properties), oauth2Header(test_manager), status=200)
+        return res
+
+    def revoke_permission(self, chash, username, permission, expect=201):
+        res = self.testapp.delete('/contexts/%s/permissions/%s/%s?permanent=1' % (chash, username, permission), "", oauth2Header(test_manager), status=expect)
+        return res
+
+    def grant_permission(self, chash, username, permission, expect=201):
+        res = self.testapp.put('/contexts/%s/permissions/%s/%s?permanent=1' % (chash, username, permission), "", oauth2Header(test_manager), status=expect)
         return res
 
     def admin_subscribe_user_to_context(self, username, context, expect=201):

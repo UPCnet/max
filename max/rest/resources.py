@@ -9,14 +9,14 @@ PUBLIC_RESOURCES = {
 
 
     'activities': dict(route='/activities', category='Activities', name='Activities', traverse='/activities'),
-    'comments': dict(route='/activities/comments', category='Comments', name='Comments (Global)'),
+    'comments': dict(route='/activities/comments', category='Comments', name='Comments (Global)', traverse='/comments'),
     'activity': dict(route='/activities/{activity}', category='Activities', name='Activity', traverse='/activities/{activity}'),
     'timeline': dict(route='/people/{username}/timeline', category='Activities', name='User Timeline'),
     'timeline_authors': dict(route='/people/{username}/timeline/authors', category='Activities', name='User Timeline authors'),
     'user_comments': dict(route='/people/{username}/comments', category='Comments', name='User comments', traverse='/people/{username}'),
 
     'activity_comments': dict(route='/activities/{activity}/comments', category='Comments', name='Activity comments', traverse="/activities/{activity}"),
-    'activity_comment': dict(route='/activities/{activity}/comments/{comment}', category='Comments', name='Activity comment', traverse="/activities/{activity}"),
+    'activity_comment': dict(route='/activities/{activity}/comments/{comment}', category='Comments', name='Activity comment', traverse='/activities/{activity}/comments/{comment}'),
 
     'subscriptions': dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}'),
     'subscription': dict(route='/people/{username}/subscriptions/{hash}', category='Subscriptions', name='User subscription'),
@@ -33,7 +33,7 @@ PUBLIC_RESOURCES = {
     'context_user_permission': dict(route='/contexts/{hash}/permissions/{username}/{permission}', category='Contexts', name='Context permission', traverse='/contexts/{hash}'),
     'context_activities': dict(route='/contexts/{hash}/activities', category='Activities', name='Context activities', traverse='/contexts/{hash}'),
     'context_push_tokens': dict(route='/contexts/{hash}/tokens', category='Contexts', name='Context tokens'),
-    'context_comments': dict(route='/contexts/{hash}/comments', category='Comments', name='Context comments'),
+    'context_comments': dict(route='/contexts/{hash}/comments', category='Comments', name='Context comments', traverse='/contexts/{hash}'),
     'context_activities_authors': dict(route='/contexts/{hash}/activities/authors', category='Activities', name='Context authors', traverse='/contexts/{hash}'),
     'context_subscriptions': dict(route='/contexts/{hash}/subscriptions', category='Contexts', name='Users subscribed to context', traverse='/contexts/{hash}'),
     'context_subscription': dict(route='/contexts/{hash}/subscriptions/{username}', category='Contexts', name='User subscription', traverse='/contexts/{hash}'),

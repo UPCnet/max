@@ -4,14 +4,14 @@ from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
-from max.resources import CommentsTraverser
 from max.rest.utils import getMaxModelByObjectType
 from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner
-from max.security.permissions import view_activity, delete_activity, modify_activity, view_comments, add_comment
-from pyramid.security import Allow
+from max.security.permissions import view_activity, delete_activity, modify_activity, view_comments, add_comment, delete_comment
+from max.resources import CommentsTraverser
+from pyramid.security import Allow, Authenticated
 from PIL import Image
 from bson import ObjectId
 
@@ -64,46 +64,6 @@ class BaseActivity(MADBase):
             'default': None
         },
     }
-
-    @property
-    def __acl__(self):
-        acl = [
-            (Allow, Manager, view_activity),
-            (Allow, Manager, delete_activity),
-            (Allow, Owner, view_activity),
-            (Allow, Owner, delete_activity),
-            (Allow, Manager, view_comments),
-            (Allow, Owner, view_comments),
-            (Allow, Manager, add_comment),
-            (Allow, Owner, add_comment)
-        ]
-
-        # When checking permissions directly on the object (For example when determining
-        # the visible fields), request.context.owner will be related to the owner of where we are posting the
-        # activity, for example, when posting to a context, the context), so we need to provide permissions
-        # for the owner of the object itself, or the flatten will result empty...
-        if is_owner(self, self.request.authenticated_userid):
-            acl.append((Allow, self.request.authenticated_userid, view_activity))
-
-        # If we have an activity that has contexts, grant view_activity if the context
-        # subscription provides the read permission.
-        #
-        # There's two use case where the actor's that just posted the activity may not have a subscription.
-        #  1. A Manager is posting in a context as himself (not impersonating) and he's not subscribed.
-        #     As we allow this in static acls, a manager will already have the permissions granted below.
-        #  2. A Manager is posting in a context as a context, so the context won't be subcribed in any way.
-        #     As the user authenticated wil be a manager, it will already have the permissions granted below.
-
-        if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
-            subscription = self.request.actor.getSubscription(self.contexts[0])
-            if subscription:
-                if 'read' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
-                    acl.append((Allow, self.request.authenticated_userid, view_activity))
-
-                if 'delete' in self.request.actor.getSubscription(self.contexts[0]).get('permissions', []):
-                    acl.append((Allow, self.request.authenticated_userid, delete_activity))
-
-        return acl
 
     def getOwner(self, request):
         """
@@ -206,7 +166,7 @@ class BaseActivity(MADBase):
             Adds a comment to an existing activity and updates refering activity keywords and hashtags
         """
 
-        #Clean innecessary fields
+        # Clean innecessary fields
         non_needed_actor_fields = ['talkingIn', 'androidDevices', 'iosDevices', 'subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
         for fieldname in non_needed_actor_fields:
             if fieldname in comment['actor']:
@@ -231,7 +191,7 @@ class BaseActivity(MADBase):
         """
         """
         self.delete_from_list('replies', {'id': commentid})
-        self.replies = [comment for comment in self.replies if comment['id'] != commentid]
+        self.replies = [comment for comment in self.replies if comment.get('id', comment.get('_id')) != commentid]
         self.setKeywords()
         self.save()
         # XXX TODO Update hastags
@@ -407,6 +367,7 @@ class Activity(BaseActivity):
     unique = '_id'
     schema = dict(BaseActivity.schema)
     schema['deletable'] = {}
+    schema['comments'] = {}
     schema['liked'] = {}
     schema['favorited'] = {}
     schema['flagged'] = {}
@@ -417,13 +378,74 @@ class Activity(BaseActivity):
     schema['favoritesCount'] = {'default': 0}
 
     @property
-    def comments(self):
-        return CommentsTraverser(self)
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, view_activity),
+            (Allow, Manager, delete_activity),
+            (Allow, Owner, view_activity),
+            (Allow, Owner, delete_activity),
+            (Allow, Manager, view_comments),
+            (Allow, Manager, add_comment),
+        ]
+
+        # When checking permissions directly on the object (For example when determining
+        # the visible fields), request.context.owner will be related to the owner of where we are posting the
+        # activity, for example, when posting to a context, the context), so we need to provide permissions
+        # for the owner of the object itself, or the flatten will result empty...
+        if is_owner(self, self.request.authenticated_userid):
+            acl.append((Allow, self.request.authenticated_userid, view_activity))
+
+        # If we have an activity that has contexts, grant view_activity if the context
+        # subscription provides the read permission.
+        #
+        # There's two use case where the actor's that just posted the activity may not have a subscription.
+        #  1. A Manager is posting in a context as himself (not impersonating) and he's not subscribed.
+        #     As we allow this in static acls, a manager will already have the permissions granted below.
+        #  2. A Manager is posting in a context as a context, so the context won't be subcribed in any way.
+        #     As the user authenticated wil be a manager, it will already have the permissions granted below.
+
+        if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
+            subscription = self.request.actor.getSubscription(self.contexts[0])
+            if subscription:
+                permissions = subscription.get('permissions', [])
+                if 'read' in permissions:
+                    acl.append((Allow, self.request.authenticated_userid, view_activity))
+                    acl.append((Allow, self.request.authenticated_userid, view_comments))
+
+                if 'delete' in permissions:
+                    acl.append((Allow, self.request.authenticated_userid, delete_activity))
+                    acl.append((Allow, self.request.authenticated_userid, delete_comment))
+
+                if 'write' in permissions:
+                    acl.append((Allow, self.request.authenticated_userid, add_comment))
+
+        # Activies without a context are considered public to all authenticated users, so commentable.
+        # Those activities commments also will be readable by all authenticated users.
+        # Owners of activities can delete them outside contexts.
+        else:
+            acl.extend([
+                (Allow, Authenticated, add_comment),
+                (Allow, Owner, delete_comment),
+                (Allow, Authenticated, view_comments),
+            ])
+
+        return acl
+
+    def flatten(self, *args, **kwargs):
+        self.pop('comments', None)
+        return super(Activity, self).flatten(*args, **kwargs)
 
     def _on_saving_object(self, oid):
         if not hasattr(self, 'lastComment'):
             self.lastComment = oid
-            self.save()
+
+    def _before_saving_object(self):
+        # Remove comments traverser before saving
+        self.pop('comments', None)
+
+    def _before_insert_object(self):
+        # Remove comments traverser before saving
+        self.pop('comments', None)
 
     def _on_insert_object(self, oid):
         # notify activity if the activity is from a context
@@ -461,6 +483,8 @@ class Activity(BaseActivity):
 
             self['favorited'] = self.has_favorite_from(self.request.actor)
             self['liked'] = self.has_like_from(self.request.actor)
+
+        self['comments'] = CommentsTraverser(None, self.request, self)
 
     def flag(self):
         """
