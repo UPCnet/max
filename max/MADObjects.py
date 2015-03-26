@@ -22,9 +22,30 @@ class MADDict(dict):
     """
     schema = {}
 
-    def __getitem__(self, key):
-        val = dict.__getitem__(self, key)
-        return val
+    def __getattr__(self, key):
+        """
+            Maps dict items access to attributes, while preserving access to class attributes.
+
+            Wakes up objects from database when necessary.
+        """
+        try:
+            # Try to get the requested attribute as a object contained item
+            return self[key]
+        except AttributeError as exc:
+            raise exc
+
+    # def __getattr__(self, key):
+    #     """
+    #         Maps dict items access to attributes, while preserving access to class attributes
+    #     """
+    #     try:
+    #         return object.__getattribute__(self, key)
+    #     except AttributeError:
+    #         return dict.__getitem__(self, key)
+
+    # def __getitem__(self, key):
+    #     val = dict.__getitem__(self, key)
+    #     return val
 
     def __setitem__(self, key, val):
         """
@@ -56,15 +77,6 @@ class MADDict(dict):
             self.__setitem__(key, value)
         else:
             object.__setattr__(self, key, value)
-
-    def __getattr__(self, key):
-        """
-            Maps dict items access to attributes, while preserving access to class attributes
-        """
-        try:
-            return object.__getattribute__(self, key)
-        except AttributeError:
-            return dict.__getitem__(self, key)
 
     def _on_create_custom_validations(self):
         return True
@@ -216,22 +228,6 @@ class MADBase(MADDict):
             pass
         self.data = RUDict({})
 
-    def __getattr__(self, key):
-        """
-            Maps dict items access to attributes, while preserving access to class attributes.
-
-            Wakes up objects from database when necessary.
-        """
-        if key == '__acl__':
-            import ipdb;ipdb.set_trace()
-            self.__acl__
-
-        try:
-            # Try to get the requested attribute as a object contained item
-            return self[key]
-        except AttributeError as exc:
-            raise exc
-
     def __getitem__(self, key):
         """
             Triggered when accessing to fields directly as keys
@@ -289,7 +285,13 @@ class MADBase(MADDict):
     def _post_init_from_object(self, source):
         return True
 
+    def _before_saving_object(self):
+        return True
+
     def _on_saving_object(self, oid):
+        return True
+
+    def _before_insert_object(self):
         return True
 
     def _on_insert_object(self, oid, **kwargs):
@@ -321,6 +323,7 @@ class MADBase(MADDict):
         """
             Inserts the item into his defined collection and returns its _id
         """
+        self._before_insert_object()
         oid = self.mdb_collection.insert(self)
         self._on_insert_object(oid, **kwargs)
         self._on_saving_object(oid)
@@ -330,6 +333,7 @@ class MADBase(MADDict):
         """
             Updates itself to the database
         """
+        self._before_saving_object()
         oid = self.mdb_collection.save(self)
         self._on_saving_object(oid)
         return str(oid)
