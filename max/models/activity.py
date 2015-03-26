@@ -424,6 +424,7 @@ class Activity(BaseActivity):
         # Owners of activities can delete them outside contexts.
         else:
             acl.extend([
+                (Allow, Authenticated, view_activity),
                 (Allow, Authenticated, add_comment),
                 (Allow, Owner, delete_comment),
                 (Allow, Authenticated, view_comments),
