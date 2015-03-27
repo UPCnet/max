@@ -263,9 +263,24 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
 
         self.create_user(test_manager)
         self.create_user(username)
-        res = self.create_context(create_context)
+        res = self.create_context(create_context, permissions={'read': 'subscribed'})
         chash = res.json['hash']
         self.testapp.get('/contexts/%s/activities/authors' % (chash,), "", oauth2Header(username), status=403)
+
+    def test_get_context_authors_as_non_manager_public_context(self):
+        """
+            Given a user that is not Manager
+            When i try to list context activity authors
+            I get a Forbidden
+        """
+        from max.tests.mockers import create_context
+        username = 'sheldon'
+
+        self.create_user(test_manager)
+        self.create_user(username)
+        res = self.create_context(create_context, permissions={'read': 'public'})
+        chash = res.json['hash']
+        self.testapp.get('/contexts/%s/activities/authors' % (chash,), "", oauth2Header(username), status=200)
 
     def test_get_count_context_authors_as_non_manager(self):
         """

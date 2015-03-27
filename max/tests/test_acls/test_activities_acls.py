@@ -307,6 +307,20 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
     # Get Activity. Image and file attachement are not tests as share the same permissions
     # as getting a single activity.
 
+    def test_get_activity_as_other(self):
+        """
+            Given i'm a regular user
+            When i try to get a contextless activity that i don't own
+            I succeed
+        """
+        from max.tests.mockers import user_status
+        username = 'sheldon'
+        other = 'penny'
+        self.create_user(username)
+        self.create_user(other)
+        activity_id = self.create_activity(username, user_status, expect=201).json['id']
+        self.testapp.get('/activities/{}'.format(activity_id), "", oauth2Header(other), status=200)
+
     def test_get_activity_as_manager(self):
         """
             Given i'm a Manager
@@ -378,17 +392,40 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
     def test_get_activity_as_non_owner_neither_subscribed(self):
         """
             Given i'm a regular user
-            When i try to get an activity that i don't own
+            When i try to get a context activity that i don't own
             And the activity is not from a context i'm subscribed to
             I get a Forbidden Exception
         """
-        from max.tests.mockers import user_status
+        from max.tests.mockers import subscribe_context, create_context
+        from max.tests.mockers import user_status_context
         username = 'sheldon'
         other = 'penny'
         self.create_user(username)
         self.create_user(other)
-        activity_id = self.create_activity(username, user_status, expect=201).json['id']
+        self.create_context(create_context, permissions={'write': 'subscribed', 'read': 'subscribed'})
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity_id = self.create_activity(username, user_status_context, expect=201).json['id']
+
         self.testapp.get('/activities/{}'.format(activity_id), "", oauth2Header(other), status=403)
+
+    def test_get_activity_as_non_owner_neither_subscribed_public_context(self):
+        """
+            Given i'm a regular user
+            When i try to get a context activity that i don't own
+            And the activity is not from a context i'm subscribed to
+            I get a Forbidden Exception
+        """
+        from max.tests.mockers import subscribe_context, create_context
+        from max.tests.mockers import user_status_context
+        username = 'sheldon'
+        other = 'penny'
+        self.create_user(username)
+        self.create_user(other)
+        self.create_context(create_context, permissions={'write': 'subscribed', 'read': 'public'})
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        activity_id = self.create_activity(username, user_status_context, expect=201).json['id']
+
+        self.testapp.get('/activities/{}'.format(activity_id), "", oauth2Header(other), status=200)
 
     # Delete activity tests
 

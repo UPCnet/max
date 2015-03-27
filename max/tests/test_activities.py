@@ -154,21 +154,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/activities/%s' % res.json['id'], '', oauth2Header(username2), status=200)
         self.assertEqual(res.json['deletable'], False)
 
-    def test_get_deletable_mark_for_own_comment(self):
-        """
-        """
-        pass
-
-    def test_get_deletable_mark_for_others_comment_in_own_activity(self):
-        """
-        """
-        pass
-
-    def test_get_deletable_mark_for_others_comment_in_others_activity(self):
-        """
-        """
-        pass
-
     def test_delete_inexistent_activity(self):
         """
             Given a plain user
@@ -177,7 +162,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         username = 'messi'
         self.create_user(username)
-        self.testapp.delete('/activities/%s' % 'fakeid', '', oauth2Header(username), status=404)
+        self.testapp.delete('/activities/%s' % '000000000000000000000000', '', oauth2Header(username), status=404)
+
+    def test_delete_activity_invalid_id(self):
+        """
+            Given a plain user
+            When I try to delete an inexistent activity
+            Then I get a notfound error
+        """
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.delete('/activities/%s' % 'invalidid', '', oauth2Header(username), status=400)
 
     def test_create_activity_check_impersonated_ownership(self):
         """
@@ -375,33 +370,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         self.testapp.get('/contexts/%s/activities'.format('01234567890abcdef01234567890abcdef012345'), '', oauth2Header(username), status=404)
 
-    def test_get_activities_order_sorted_by_last_comment_publish_date(self):
-        """
-            Given a plain user
-            When I post activities on a context
-            and I comment on an old activity
-            Then in the comment-sorted activities, the commented activity becomes the first
-        """
-        from .mockers import user_comment
-        from .mockers import user_status_context
-        from .mockers import subscribe_context, create_context
-        from .mockers import context_query
-
-        username = 'messi'
-        self.create_user(username)
-        self.create_context(create_context)
-        self.admin_subscribe_user_to_context(username, subscribe_context)
-        activity_0_id = self.create_activity(username, user_status_context).json['id']
-        activity_1_id = self.create_activity(username, user_status_context, note='Second').json['id']
-        activity_2_id = self.create_activity(username, user_status_context, note='Third').json['id']
-        res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
-
-        res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
-        self.assertEqual(len(res.json), 3)
-        self.assertEqual(res.json[0].get('id', None), activity_2_id)
-        self.assertEqual(res.json[1].get('id', None), activity_1_id)
-        self.assertEqual(res.json[2].get('id', None), activity_0_id)
-
     def test_get_activities_from_recursive_contexts(self):
         """
             Create 3 contexts, one parent and two childs
@@ -575,179 +543,3 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json), 1)
         self.assertNotIn('_keywords', res.json[0]['object'])
 
-    def test_post_comment_timeline(self):
-        """ doctest .. http:post:: /activities/{activity}/comments """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        self.create_user(username)
-        activity = self.create_activity(username, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        result = res.json
-        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
-        self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
-        self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
-
-    def test_post_comment_on_context(self):
-        """ doctest .. http:post:: /activities/{activity}/comments """
-        from .mockers import user_status_context, user_comment
-        from .mockers import subscribe_context, create_context
-        username = 'messi'
-        self.create_user(username)
-        self.create_context(create_context)
-        self.admin_subscribe_user_to_context(username, subscribe_context)
-        activity = self.create_activity(username, user_status_context)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        result = res.json
-        self.assertEqual(result.get('actor', None).get('username', None), 'messi')
-        self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
-        self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
-
-    def test_get_comments(self):
-        """ doctest .. http:get:: /activities/{activity}/comments """
-        from .mockers import user_status, user_comment
-        from .mockers import subscribe_context, create_context
-        username = 'messi'
-        self.create_user(username)
-        self.create_context(create_context)
-        self.admin_subscribe_user_to_context(username, subscribe_context)
-        activity = self.create_activity(username, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        res = self.testapp.get('/activities/%s/comments' % str(activity.get('id')), "", oauth2Header(username), status=200)
-        result = res.json
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result[0].get('objectType', None), 'comment')
-
-    def test_get_comments_for_user(self):
-        """
-            Test get all comments for a user, both timeline and context
-        """
-        from .mockers import user_status, user_comment
-        from .mockers import subscribe_context, create_context, user_status_context
-        username = 'messi'
-        self.create_user(username)
-        self.create_context(create_context)
-        self.admin_subscribe_user_to_context(username, subscribe_context)
-
-        activity = self.create_activity(username, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-
-        activity2 = self.create_activity(username, user_status_context)
-        activity2 = activity2.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity2.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-
-        res = self.testapp.get('/people/%s/comments' % username, "", oauth2Header(username), status=200)
-        result = res.json
-        self.assertEqual(len(result), 2)
-
-        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result[0].get('verb', None), 'comment')
-        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
-        self.assertEqual(result[1].get('verb', None), 'comment')
-
-    def test_delete_own_comment(self):
-        """
-            Given i'm plain user
-            When i comment an activity
-            Then i can delete it
-        """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        self.create_user(username)
-        activity = self.create_activity(username, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username), status=201)
-        comment_id = res.json['id']
-        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=204)
-
-    def test_delete_others_comment_in_own_activity(self):
-        """
-            Given i'm a plain user
-            When someone else commments on an activity of mine
-            Then I can delete it, 'cause the activity is mine
-        """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        username_not_me = 'xavi'
-        self.create_user(username)
-        self.create_user(username_not_me)
-
-        activity = self.create_activity(username, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username_not_me), status=201)
-        comment_id = res.json['id']
-        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=204)
-
-    def test_delete_others_comment_in_others_activity(self):
-        """
-            Given i'm a plain user
-            When someone else comments on someone else's activity
-            Then i can't delete it
-        """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        username_not_me = 'xavi'
-        self.create_user(username)
-        self.create_user(username_not_me)
-        activity = self.create_activity(username_not_me, user_status)
-        activity = activity.json
-        res = self.testapp.post('/activities/%s/comments' % str(activity.get('id')), json.dumps(user_comment), oauth2Header(username_not_me), status=201)
-        comment_id = res.json['id']
-        res = self.testapp.delete('/activities/%s/comments/%s' % (str(activity.get('id')), comment_id), '', oauth2Header(username), status=403)
-
-    def test_timeline_order_sorted_by_last_comment_publish_date(self):
-        """
-            Given a plain user
-            When I post activities
-            and I comment on an old activity
-            Then in the comment-sorted timeline, the commented activity becomes the first
-        """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        self.create_user(username)
-        activity_ids = []
-        # Create 7 activities to overpass limit of 5
-        for i in range(7):
-            activity_ids.append(self.create_activity(username, user_status, note=str(i)).json['id'])
-        res = self.testapp.post('/activities/%s/comments' % str(activity_ids[0]), json.dumps(user_comment), oauth2Header(username), status=201)
-        # Get first 5 results
-        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5' % username, "", oauth2Header(username), status=200)
-        self.assertEqual(len(res.json), 5)
-
-        self.assertEqual(res.json[0].get('id', None), activity_ids[0])
-        self.assertEqual(res.json[1].get('id', None), activity_ids[6])
-        self.assertEqual(res.json[2].get('id', None), activity_ids[5])
-        self.assertEqual(res.json[3].get('id', None), activity_ids[4])
-        self.assertEqual(res.json[4].get('id', None), activity_ids[3])
-
-        # get next 2 results
-        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5&before=%s' % (username, activity_ids[3]), "", oauth2Header(username), status=200)
-        self.assertEqual(len(res.json), 2)
-
-        self.assertEqual(res.json[0].get('id', None), activity_ids[2])
-        self.assertEqual(res.json[1].get('id', None), activity_ids[1])
-
-    def test_timeline_order_sorted_by_activity_publish_date(self):
-        """
-            Given a plain user
-            When I post activities
-            and I comment on an old activity
-            Then in the activities-sorted timeline, the order equals the activity order
-        """
-        from .mockers import user_status, user_comment
-        username = 'messi'
-        self.create_user(username)
-        activity_0_id = self.create_activity(username, user_status).json['id']
-        activity_1_id = self.create_activity(username, user_status, note="second").json['id']
-        activity_2_id = self.create_activity(username, user_status, note="third").json['id']
-        res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
-
-        res = self.testapp.get('/people/%s/timeline?sortBy=activities' % username, "", oauth2Header(username), status=200)
-        self.assertEqual(len(res.json), 3)
-        self.assertEqual(res.json[0].get('id', None), activity_2_id)
-        self.assertEqual(res.json[1].get('id', None), activity_1_id)
-        self.assertEqual(res.json[2].get('id', None), activity_0_id)
