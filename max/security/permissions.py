@@ -11,7 +11,7 @@ view_user_profile = 'View user profile'
 view_private_fields = 'View private fields'
 modify_user = 'Modify user profile'
 delete_user = 'Delete user'
-
+modify_avatar = "Modify a user's avatar"
 add_subscription = 'Subscribe an user to a context'
 remove_subscription = 'Unsubscribe an user to a context'
 manage_subcription_permissions = 'Grant or revoke permissions on a subscription'

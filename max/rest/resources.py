@@ -1,8 +1,8 @@
 PUBLIC_RESOURCES = {
     'users': dict(route='/people', category='User', name='Users', traverse='/people'),
     'user': dict(route='/people/{username}', category='User', name='User', traverse='/people/{username}'),
-    'avatar': dict(route='/people/{username}/avatar', filesystem=True, category='User', name='User avatar'),
-    'avatar_sizes': dict(route='/people/{username}/avatar/{size}', filesystem=True, category='User', name='User avatar sizes'),
+    'avatar': dict(route='/people/{username}/avatar', filesystem=True, category='User', name='User avatar', traverse='/people/{username}'),
+    'avatar_sizes': dict(route='/people/{username}/avatar/{size}', filesystem=True, category='User', name='User avatar sizes', traverse='/people/{username}'),
     'user_activities': dict(route='/people/{username}/activities', category='Activities', name='User activities', traverse='/people/{username}'),
     'user_device': dict(route='/people/{username}/device/{platform}/{token}', category='User', name='User device tokens', traverse='/people/{username}'),
     'user_platform_tokens': dict(route='/people/{username}/device/{platform}', category='User', name='User device tokens by platform', traverse='/people/{username}'),

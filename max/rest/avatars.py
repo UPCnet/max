@@ -14,6 +14,48 @@ from PIL import ImageOps
 
 from max.rest import endpoint
 from max.exceptions import ValidationError
+from max.security.permissions import modify_avatar
+
+
+@endpoint(route_name='avatar', request_method='POST', requires_actor=True, permission=modify_avatar)
+def postUserAvatar(user, request):
+    """
+        /people/{username}/avatar
+
+        Upload user avatar.
+    """
+    base_folder = request.registry.settings.get('avatar_folder')
+    AVATAR_SIZE = (48, 48)
+    LARGE_SIZE = (250, 250)
+
+    username = request.matchdict['username']
+
+    if request.content_type != 'multipart/form-data' and \
+       len(request.POST.keys()) != 1:
+        raise ValidationError('Not supported upload method.')
+
+    file_key = request.POST.keys()[0]
+    input_file = request.POST[file_key].file
+
+    # Saving the standard avatar image in png format, resize if needed
+    regular_avatar_folder = get_avatar_folder(base_folder, 'people', username)
+    file_path = os.path.join(regular_avatar_folder, username)
+    input_file.seek(0)
+    image = Image.open(input_file)
+
+    avatar = ImageOps.fit(image, AVATAR_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
+    avatar.save(file_path, 'PNG')
+
+    # Saving the large avatar image in png format, resize if needed
+    large_avatar_folder = get_avatar_folder(base_folder, 'people', username, size='large')
+    file_path = os.path.join(large_avatar_folder, username)
+    input_file.seek(0)
+    image = Image.open(input_file)
+
+    medium = ImageOps.fit(image, LARGE_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
+    medium.save(file_path, 'PNG')
+
+    return Response("Uploaded", status_int=201)
 
 
 @endpoint(route_name='avatar', request_method='GET')
@@ -55,47 +97,6 @@ def getUserAvatar(context, request):
     image = Response(data, status_int=200)
     image.content_type = 'image/png'
     return image
-
-
-@endpoint(route_name='avatar', request_method='POST', requires_actor=True)
-def postUserAvatar(context, request):
-    """
-        /people/{username}/avatar
-
-        Upload user avatar.
-    """
-    base_folder = request.registry.settings.get('avatar_folder')
-    AVATAR_SIZE = (48, 48)
-    LARGE_SIZE = (250, 250)
-
-    username = request.matchdict['username']
-
-    if request.content_type != 'multipart/form-data' and \
-       len(request.POST.keys()) != 1:
-        raise ValidationError('Not supported upload method.')
-
-    file_key = request.POST.keys()[0]
-    input_file = request.POST[file_key].file
-
-    # Saving the standard avatar image in png format, resize if needed
-    regular_avatar_folder = get_avatar_folder(base_folder, 'people', username)
-    file_path = os.path.join(regular_avatar_folder, username)
-    input_file.seek(0)
-    image = Image.open(input_file)
-
-    avatar = ImageOps.fit(image, AVATAR_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
-    avatar.save(file_path, 'PNG')
-
-    # Saving the large avatar image in png format, resize if needed
-    large_avatar_folder = get_avatar_folder(base_folder, 'people', username, size='large')
-    file_path = os.path.join(large_avatar_folder, username)
-    input_file.seek(0)
-    image = Image.open(input_file)
-
-    medium = ImageOps.fit(image, LARGE_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
-    medium.save(file_path, 'PNG')
-
-    return Response("Uploaded", status_int=201)
 
 
 @endpoint(route_name='context_avatar', request_method='GET')

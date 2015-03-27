@@ -4,6 +4,7 @@ from max.tests import test_cloudapis
 from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
+from max.tests.base import MaxAvatarsTestBase
 from max.tests.base import mock_get
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
@@ -21,9 +22,6 @@ import shutil
 import tempfile
 import tweepy
 import unittest
-
-from io import BytesIO
-from PIL import Image
 
 
 def http_mock_twitter_user_image(image):
@@ -163,7 +161,7 @@ class AvatarFolderTests(unittest.TestCase, MaxTestBase):
         self.assertFileExists(expected_folder)
 
 
-class AvatarTests(unittest.TestCase, MaxTestBase):
+class AvatarTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
     """
         Tests to check the uploading, downlading and retrieving of all
         avatar types used in max, included the ones coming from twitter.
@@ -187,16 +185,7 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         self.testapp = MaxTestApp(self)
         self.create_user(test_manager)
 
-        self.avatar_folder = self.app.registry.settings['avatar_folder']
-
-        if not os.path.exists(self.avatar_folder):  # pragma: no cover
-            os.mkdir(self.avatar_folder)
-
-        # Generate default avatar images
-        shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing.png'.format(self.avatar_folder))
-        shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-people.png'.format(self.avatar_folder))
-        shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-context.png'.format(self.avatar_folder))
-        shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-people-large.png'.format(self.avatar_folder))
+        MaxAvatarsTestBase.setUp(self)
 
     def tearDown(self):
         """
@@ -204,49 +193,7 @@ class AvatarTests(unittest.TestCase, MaxTestBase):
         """
         self.patched_post.stop()
         self.patched_get.stop()
-        shutil.rmtree(self.avatar_folder)
-
-    def get_image_dimensions_from(self, response):
-        """
-            Returns the (width, height) of an image found in a request response.
-        """
-        return Image.open(BytesIO(response.body)).size
-
-    def get_context_avatar_modification_time(self, context):
-        """
-            Returns the (width, height) of an image for a especifi user, located
-            in the designated folder for that user.
-        """
-        avatar_folder = get_avatar_folder(self.avatar_folder, 'contexts', context)
-        filename = '{}/{}'.format(avatar_folder, context)
-        return os.path.getmtime(filename)
-
-    def rewind_context_avatar_mod_time(self, context, hours):
-        """
-            Changes the contex's avatar file modifcation time x hours back in time
-        """
-        avatar_folder = get_avatar_folder(self.avatar_folder, 'contexts', context)
-        filename = '{}/{}'.format(avatar_folder, context)
-        modification_time = os.path.getmtime(filename)
-        new_time = modification_time - (hours * 60 * 60)
-        os.utime(filename, (new_time, new_time))
-
-    def get_user_avatar_dimensions(self, username, size=''):
-        """
-            Returns the (width, height) of an image for a especifi user, located
-            in the designated folder for that user.
-        """
-        avatar_folder = get_avatar_folder(self.avatar_folder, 'people', username, size=size)
-        return Image.open('{}/{}'.format(avatar_folder, username)).size
-
-    def upload_user_avatar(self, username, filename):
-        """
-            Uploads the file specified in filename, to become the avatar for
-            username.
-        """
-        avatar_file = open(os.path.join(self.conf_dir, filename), "rb")
-        files = [('image', filename, avatar_file.read(), 'image/png')]
-        self.testapp.post('/people/{}/avatar'.format(username), '', headers=oauth2Header(username), upload_files=files, status=201)
+        MaxAvatarsTestBase.tearDown(self)
 
     # BEGIN TESTS
 
