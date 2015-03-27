@@ -11,7 +11,6 @@ from max import DEFAULT_CONTEXT_PERMISSIONS
 from pyramid.security import Allow, Authenticated
 from max.security import Owner, Manager, is_self_operation
 from max.security import permissions
-from itertools import chain
 
 
 class BaseContext(MADBase):
@@ -345,16 +344,19 @@ class Context(BaseContext):
             (Allow, Owner, permissions.delete_context),
             (Allow, Manager, permissions.add_subscription),
             (Allow, Owner, permissions.add_subscription),
-            (Allow, Manager, permissions.view_activities),
-            (Allow, Manager, permissions.view_activities_unsubscribed),
-            (Allow, Owner, permissions.view_activities),
+            (Allow, Manager, permissions.list_activities),
+            (Allow, Manager, permissions.list_activities_unsubscribed),
+            (Allow, Owner, permissions.list_activities),
             (Allow, Manager, permissions.add_activity),
-            (Allow, Manager, permissions.view_comments),
+            (Allow, Manager, permissions.list_comments),
         ]
-
         # Grant subscribe permission to the user to subscribe itself if the context policy allows it
         if self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.add_subscription))
+
+        # Grant view activities
+        if self.permissions.get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
+            acl.append((Allow, self.request.authenticated_userid, permissions.list_activities))
 
         # Granted permissions only if a subscription for the current actor exists
         if self.subscription:
@@ -380,10 +382,10 @@ class Context(BaseContext):
             if 'write' in self.subscription.get('permissions', []) and is_self_operation(self.request):
                 acl.append((Allow, self.request.authenticated_userid, permissions.add_activity))
 
-            # Grant view_activities permission if the user subscription allows it
+            # Grant list_activities permission if the user subscription allows it
             if 'read' in self.subscription.get('permissions', []):
-                acl.append((Allow, self.request.authenticated_userid, permissions.view_activities))
-                acl.append((Allow, self.request.authenticated_userid, permissions.view_comments))
+                acl.append((Allow, self.request.authenticated_userid, permissions.list_activities))
+                acl.append((Allow, self.request.authenticated_userid, permissions.list_comments))
             return acl
 
         return acl

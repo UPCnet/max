@@ -105,7 +105,7 @@ class CommentsTraverser(object):
     @property
     def __acl__(self):
         acl = [
-            (Allow, Manager, permissions.view_comments)
+            (Allow, Manager, permissions.list_comments)
         ]
         return acl
 
@@ -123,7 +123,7 @@ class ContextTraverser(MongoDBTraverser):
             (Allow, Manager, permissions.modify_context),
             (Allow, Manager, permissions.delete_context),
             (Allow, Manager, permissions.view_context),
-            (Allow, Manager, permissions.view_activities),
+            (Allow, Manager, permissions.list_activities),
             (Allow, Manager, permissions.view_subscriptions),
             (Allow, Owner, permissions.view_subscriptions)
         ]
@@ -138,7 +138,7 @@ class ActivitiesTraverser(MongoDBTraverser):
     @property
     def __acl__(self):
         acl = [
-            (Allow, Manager, permissions.view_activities),
+            (Allow, Manager, permissions.list_activities),
         ]
         return acl
 

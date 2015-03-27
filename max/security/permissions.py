@@ -24,15 +24,15 @@ manage_push_tokens = 'Add and remove user device tokens'
 view_push_tokens = 'Query and view user device tokens'
 
 view_activity = 'View activity'
-view_activities = 'View activities'
-view_activities_unsubscribed = 'View activities without context subscription'
+list_activities = 'View activities'
+list_activities_unsubscribed = 'View activities without context subscription'
 modify_activity = 'Modify activity'
 add_activity = 'Add activity'
 delete_activity = 'Delete activity'
 flag_activity = 'Flag an activity'
 unflag_activity = 'Unflag an activity'
 
-view_comments = 'View activity comments'
+list_comments = 'View activity comments'
 add_comment = 'Add a comment to an activity'
 delete_comment = 'Delete a activity comment'
 

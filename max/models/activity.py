@@ -9,12 +9,12 @@ from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner
-from max.security.permissions import view_activity, delete_activity, modify_activity, view_comments, add_comment, delete_comment
+from max.security.permissions import view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment
 from max.resources import CommentsTraverser
 from pyramid.security import Allow, Authenticated
 from PIL import Image
 from bson import ObjectId
-
+from max import DEFAULT_CONTEXT_PERMISSIONS
 import datetime
 import json
 import os
@@ -384,7 +384,7 @@ class Activity(BaseActivity):
             (Allow, Manager, delete_activity),
             (Allow, Owner, view_activity),
             (Allow, Owner, delete_activity),
-            (Allow, Manager, view_comments),
+            (Allow, Manager, list_comments),
             (Allow, Manager, add_comment),
         ]
 
@@ -405,12 +405,16 @@ class Activity(BaseActivity):
         #     As the user authenticated wil be a manager, it will already have the permissions granted below.
 
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
-            subscription = self.request.actor.getSubscription(self.contexts[0])
+            from max.models import Context
+            context = Context()
+            context.fromDatabase(self.contexts[0]['hash'])
+
+            subscription = self.request.actor.getSubscription(context)
             if subscription:
                 permissions = subscription.get('permissions', [])
                 if 'read' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, view_activity))
-                    acl.append((Allow, self.request.authenticated_userid, view_comments))
+                    acl.append((Allow, self.request.authenticated_userid, list_comments))
 
                 if 'delete' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, delete_activity))
@@ -418,6 +422,10 @@ class Activity(BaseActivity):
 
                 if 'write' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, add_comment))
+
+            # If no susbcription found, check context policy
+            if context.get('permissions', ).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
+                acl.append((Allow, self.request.authenticated_userid, view_activity))
 
         # Activies without a context are considered public to all authenticated users, so commentable.
         # Those activities commments also will be readable by all authenticated users.
@@ -427,7 +435,7 @@ class Activity(BaseActivity):
                 (Allow, Authenticated, view_activity),
                 (Allow, Authenticated, add_comment),
                 (Allow, Owner, delete_comment),
-                (Allow, Authenticated, view_comments),
+                (Allow, Authenticated, list_comments),
             ])
 
         return acl

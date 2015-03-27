@@ -34,19 +34,6 @@ class MADDict(dict):
         except AttributeError as exc:
             raise exc
 
-    # def __getattr__(self, key):
-    #     """
-    #         Maps dict items access to attributes, while preserving access to class attributes
-    #     """
-    #     try:
-    #         return object.__getattribute__(self, key)
-    #     except AttributeError:
-    #         return dict.__getitem__(self, key)
-
-    # def __getitem__(self, key):
-    #     val = dict.__getitem__(self, key)
-    #     return val
-
     def __setitem__(self, key, val):
         """
             Allow only fields defined in schema to be inserted in the dict
@@ -227,23 +214,6 @@ class MADBase(MADDict):
         except:
             pass
         self.data = RUDict({})
-
-    def __getitem__(self, key):
-        """
-            Triggered when accessing to fields directly as keys
-        """
-        try:
-            # If not found, try to get the key as a dict container
-            return dict.__getitem__(self, key)
-        except KeyError as exc:
-            # If not found, before raising the catched exception,
-            # Try to wake up the object from the database. We're deteecting
-            # if the object is already waken up if it has a _id key. if the
-            # object can't be retrieved, a KeyError will raise.
-            if key in self.schema and '_id' not in self:
-                self.wake()
-                return dict.__getitem__(self, key)
-            raise exc
 
     def field_changed(self, field):
         return self.get(field, None) != self.old.get(field, None)

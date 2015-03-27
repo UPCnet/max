@@ -17,7 +17,7 @@ from max.security.permissions import list_contexts
 from max.security.permissions import list_public_contexts
 from max.security.permissions import modify_context
 from max.security.permissions import view_context
-from max.security.permissions import view_activities
+from max.security.permissions import list_activities
 
 from pyramid.httpexceptions import HTTPNoContent
 from max.rest import endpoint
@@ -170,21 +170,14 @@ def getPublicContexts(contexts, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_activities_authors', request_method='GET', permission=view_activities, requires_actor=True)
+@endpoint(route_name='context_activities_authors', request_method='GET', permission=list_activities, requires_actor=True)
 def getContextAuthors(context, request):
     """
         /contexts/{hash}/activities/authors
     """
     chash = request.matchdict['hash']
     mmdb = MADMaxDB(request.db)
-    actor = request.actor
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
-
-    is_subscribed = chash in [subscription['hash'] for subscription in actor.subscribedTo]
-
-    is_manager = 'Manager' in request.roles
-    if not is_subscribed and not is_manager:
-        raise Unauthorized("You're not allowed to access this context")
 
     query = {}
     query['contexts.hash'] = chash
