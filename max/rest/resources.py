@@ -56,8 +56,8 @@ PUBLIC_RESOURCES = {
     'likes': dict(route='/activities/{activity}/likes', category='Activities'),
     'like': dict(route='/activities/{activity}/likes/{username}', category='Activities'),
     'user_likes': dict(route='/people/{username}/likes', category='User', name='User liked activity'),
-    'favorites': dict(route='/activities/{activity}/favorites', category='Activities'),
-    'favorite': dict(route='/activities/{activity}/favorites/{username}', category='Activities'),
+    'favorites': dict(route='/activities/{activity}/favorites', category='Activities', traverse='/activities/{activity}'),
+    'favorite': dict(route='/activities/{activity}/favorites/{username}', category='Activities', traverse='/activities/{activity}'),
     'user_favorites': dict(route='/people/{username}/favorites', category='User', name='User favorited activities'),
 
     'activity_image': dict(route='/activities/{activity}/image', category='Activities', name='Image', traverse='/activities/{activity}'),

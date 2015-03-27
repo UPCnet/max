@@ -9,7 +9,7 @@ from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner
-from max.security.permissions import view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment
+from max.security.permissions import favorite, unfavorite, view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment
 from max.resources import CommentsTraverser
 from pyramid.security import Allow, Authenticated
 from PIL import Image
@@ -386,7 +386,11 @@ class Activity(BaseActivity):
             (Allow, Owner, delete_activity),
             (Allow, Manager, list_comments),
             (Allow, Manager, add_comment),
+            (Allow, Authenticated, favorite),
         ]
+
+        if self.has_favorite_from(self.request.actor):
+            acl.append((Allow, Authenticated, unfavorite))
 
         # When checking permissions directly on the object (For example when determining
         # the visible fields), request.context.owner will be related to the owner of where we are posting the

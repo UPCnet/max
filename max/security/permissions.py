@@ -39,3 +39,6 @@ delete_comment = 'Delete a activity comment'
 manage_security = 'Manage security settings'
 do_maintenance = 'Execute maintenance tasks'
 view_server_settings = 'View detailed server settings'
+
+favorite = 'Favorite an activity'
+unfavorite = 'Unfavorite an activity'

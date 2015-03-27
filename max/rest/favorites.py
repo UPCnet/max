@@ -7,24 +7,21 @@ from max.rest.ResourceHandlers import JSONResourceEntity
 
 from pyramid.httpexceptions import HTTPNotImplemented
 
+from max.security.permissions import favorite, unfavorite
 from bson.objectid import ObjectId
 from max.rest import endpoint
 
 
-@endpoint(route_name='favorites', request_method='POST', requires_actor=True)
-def favorite(context, request):
+@endpoint(route_name='favorites', request_method='POST', requires_actor=True, permission=favorite)
+def favorite(activity, request):
     """
     """
-    activityid = request.matchdict['activity']
 
-    mmdb = MADMaxDB(request.db)
-    refering_activity = mmdb.activity[activityid]
-
-    if refering_activity.has_favorite_from(request.actor):
+    if activity.has_favorite_from(request.actor):
         code = 200
 
         activities = MADMaxCollection(request.db.activity)
-        query = {'verb': 'favorite', 'object._id': refering_activity['_id'], 'actor.username': request.actor.username}
+        query = {'verb': 'favorite', 'object._id': activity['_id'], 'actor.username': request.actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user favorited this activiry
 
     else:
@@ -33,8 +30,8 @@ def favorite(context, request):
         rest_params = {
             'verb': 'favorite',
             'object': {
-                '_id': ObjectId(activityid),
-                'objectType': refering_activity['objectType'],
+                '_id': ObjectId(activity['_id']),
+                'objectType': activity['objectType'],
             }
         }
 
@@ -45,36 +42,25 @@ def favorite(context, request):
         newactivity_oid = newactivity.insert()
         newactivity['_id'] = newactivity_oid
 
-        refering_activity.add_favorite_from(request.actor)
+        activity.add_favorite_from(request.actor)
 
-    newactivity['object']['favorites'] = refering_activity['favorites']  # Return the current favorites of the activity
-    newactivity['object']['favoritesCount'] = refering_activity['favoritesCount']
-    newactivity['object']['favorited'] = refering_activity.has_favorite_from(request.actor)
+    newactivity['object']['favorites'] = activity['favorites']  # Return the current favorites of the activity
+    newactivity['object']['favoritesCount'] = activity['favoritesCount']
+    newactivity['object']['favorited'] = activity.has_favorite_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 
-@endpoint(route_name='favorite', request_method='DELETE', requires_actor=True)
-def unfavorite(context, request):
+@endpoint(route_name='favorite', request_method='DELETE', requires_actor=True, permission=unfavorite)
+def unfavorite(activity, request):
     """
     """
-    activityid = request.matchdict['activity']
-
-    mmdb = MADMaxDB(request.db)
-    try:
-        found_activity = mmdb.activity[activityid]
-    except:
-        raise ObjectNotFound("There's no activity with id: %s" % activityid)
-
-    if not found_activity.has_favorite_from(request.actor):
-        raise ObjectNotFound("You didn't previously favorited this activity: %s" % activityid)
-
     # Prepare rest parameters to be merged with post data
     rest_params = {
         'verb': 'unfavorite',
         'object': {
-            '_id': ObjectId(activityid),
-            'objectType': found_activity['objectType'],
+            '_id': ObjectId(activity['_id']),
+            'objectType': activity['objectType'],
         }
     }
 
@@ -85,11 +71,11 @@ def unfavorite(context, request):
     newactivity_oid = newactivity.insert()
     newactivity['_id'] = newactivity_oid
 
-    found_activity.delete_favorite_from(request.actor)
+    activity.delete_favorite_from(request.actor)
 
-    newactivity['object']['favorites'] = found_activity['favorites']
-    newactivity['object']['favoritesCount'] = found_activity['favoritesCount']
-    newactivity['object']['favorited'] = found_activity.has_favorite_from(request.actor)
+    newactivity['object']['favorites'] = activity['favorites']
+    newactivity['object']['favoritesCount'] = activity['favoritesCount']
+    newactivity['object']['favorited'] = activity.has_favorite_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
     return handler.buildResponse()
 
