@@ -2,11 +2,10 @@
 from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
-from max.exceptions import ObjectNotFound, Forbidden, UnknownUserError
-from max.security import Manager, is_self_operation, Owner, is_manager, is_owner
+from max.exceptions import ObjectNotFound, UnknownUserError
+from max.security import Manager, Owner
 from max.security import permissions
-from max.rest.utils import getMaxModelByObjectType
-
+from pyramid.decorator import reify
 import pkg_resources
 import inspect
 
@@ -38,7 +37,7 @@ def get_pyramid_authorization_frame():
 class Root(dict):
     __parent__ = __name__ = None
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.do_maintenance),
@@ -102,7 +101,7 @@ class CommentsTraverser(object):
         else:
             raise ObjectNotFound('Activity {} has no comment with id {}'.format(self.activity['_id'], commentid))
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.list_comments)
@@ -114,7 +113,7 @@ class ContextTraverser(MongoDBTraverser):
     collection_name = 'contexts'
     query_key = 'hash'
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_context),
@@ -135,7 +134,7 @@ class ActivitiesTraverser(MongoDBTraverser):
     collection_name = 'activity'
     query_key = '_id'
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.list_activities),
@@ -168,7 +167,7 @@ class PeopleTraverser(MongoDBTraverser):
 
         return MADMaxCollection.__getitem__(self, userid)
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_people),

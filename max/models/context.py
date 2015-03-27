@@ -11,7 +11,7 @@ from max import DEFAULT_CONTEXT_PERMISSIONS
 from pyramid.security import Allow, Authenticated
 from max.security import Owner, Manager, is_self_operation
 from max.security import permissions
-
+from pyramid.decorator import reify
 
 class BaseContext(MADBase):
     """
@@ -336,7 +336,7 @@ class Context(BaseContext):
         if hasattr(self.request.actor, 'getSubscription'):
             return self.request.actor.getSubscription(self)
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Authenticated, permissions.view_context),

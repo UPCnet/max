@@ -13,7 +13,7 @@ from max.security.permissions import modify_avatar, view_private_fields, list_co
 
 from bson import ObjectId
 from pyramid.settings import asbool
-
+from pyramid.decorator import reify
 import datetime
 
 
@@ -88,7 +88,7 @@ class User(MADBase):
         },
     }
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Owner, modify_user),

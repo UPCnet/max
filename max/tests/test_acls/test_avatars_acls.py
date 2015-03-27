@@ -6,7 +6,6 @@ from max.tests.base import MaxTestBase
 from max.tests.base import MaxAvatarsTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
-from max.rest.utils import get_avatar_folder
 
 from max.tests.test_avatars import http_mock_twitter_user_image
 from functools import partial
@@ -111,7 +110,7 @@ class AvatarsACLTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
             I succeed
         """
         from hashlib import sha1
-        from .mockers import create_context_full
+        from max.tests.mockers import create_context_full
 
         avatar_image = os.path.join(self.conf_dir, "avatar.png")
         http_mock_twitter_user_image(avatar_image)

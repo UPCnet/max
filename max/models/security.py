@@ -3,12 +3,14 @@ from max.MADObjects import MADBase
 from max.security.permissions import manage_security
 from max.security import Manager
 from pyramid.security import Allow
+from pyramid.decorator import reify
 
 
 class Security(MADBase):
     """
         The Security object representation
     """
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, manage_security)

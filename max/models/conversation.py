@@ -4,6 +4,7 @@ from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
 
 from pymongo import DESCENDING
+from pyramid.decorator import reify
 
 
 class Conversation(BaseContext):
@@ -21,6 +22,7 @@ class Conversation(BaseContext):
     schema['tags'] = {'default': []}
     schema['objectType'] = {'default': 'conversation'}
 
+    @reify
     def __acl__(self):
         acl = []
         return acl

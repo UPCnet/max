@@ -7,7 +7,7 @@ from max.rest.utils import formatMessageEntities
 from max.security import Manager, Owner, is_owner
 from max.security.permissions import delete_comment
 from pyramid.security import Allow
-
+from pyramid.decorator import reify
 from copy import deepcopy
 from hashlib import sha1
 
@@ -116,7 +116,7 @@ class Comment(ASObject):
         """
         self.__parent__.activity.delete_comment(self['_id'])
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, delete_comment),

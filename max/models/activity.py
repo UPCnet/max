@@ -20,7 +20,7 @@ import json
 import os
 import re
 import requests
-
+from pyramid.decorator import reify
 
 # Fields that we want to transfer from real context,
 # to the context reference stored on activ
@@ -377,7 +377,7 @@ class Activity(BaseActivity):
     schema['favorites'] = {'default': []}
     schema['favoritesCount'] = {'default': 0}
 
-    @property
+    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, view_activity),

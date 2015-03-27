@@ -2,7 +2,7 @@
 from max.MADMax import MADMaxCollection
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
-#from max.rest.utils import canWriteInContexts
+from pyramid.decorator import reify
 
 
 class Message(BaseActivity):
@@ -17,6 +17,7 @@ class Message(BaseActivity):
     schema = dict(BaseActivity.schema)
     schema['objectType'] = {'default': 'message'}
 
+    @reify
     def __acl__(self):
         acl = []
         return acl
