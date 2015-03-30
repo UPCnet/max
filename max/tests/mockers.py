@@ -487,6 +487,13 @@ message3 = {
     }
 }
 
+message4 = {
+    "actor": 'xavi',
+    "object": {
+        "objectType": "note",
+        "content": "M'agrada Taradell!",
+    }
+}
 
 group_message = {
     "object": {

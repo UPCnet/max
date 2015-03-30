@@ -39,10 +39,25 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
     def test_add_message_to_conversation(self):
         """
             Given i'm a regular user
+            And I'm a participant in the conversation
             When i try to add a message to a conversation
             Then i succeed
         """
-        pass
+        from .mockers import group_message as creation_message
+        from .mockers import message2
+
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(recipient2), status=201)
 
     def test_add_message_to_conversation_not_participant(self):
         """
@@ -51,7 +66,21 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to add a message to a conversation
             Then i get a Forbidden Exception
         """
-        pass
+        from .mockers import message
+        from .mockers import message2
+
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(recipient2), status=403)
 
     def test_add_message_to_conversation_impersonating(self):
         """
@@ -60,7 +89,21 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i get a Forbidden Exception
         """
-        pass
+        from .mockers import group_message as creation_message
+        from .mockers import message4
+
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message4), oauth2Header(recipient2), status=403)
 
     def test_add_message_to_conversation_as_owner_impersonating(self):
         """
@@ -70,7 +113,19 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i get a Forbidden Exception
         """
-        pass
+        from .mockers import message
+        from .mockers import message4
+
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message4), oauth2Header(sender), status=403)
 
     def test_add_message_to_conversation_as_manager_impersonating(self):
         """
@@ -79,6 +134,19 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i succeed
         """
+        from .mockers import message
+        from .mockers import message4
+
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message4), oauth2Header(test_manager), status=201)
 
     # Get conversation messages list tests
 
@@ -88,7 +156,17 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i succeed
         """
-        pass
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        self.testapp.get('/conversations/{}/messages'.format(cid), '', oauth2Header(test_manager), status=200)
 
     def test_get_messages_as_participant(self):
         """
@@ -97,7 +175,17 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i succeed
         """
-        pass
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        self.testapp.get('/conversations/{}/messages'.format(cid), '', oauth2Header(recipient), status=200)
 
     def test_get_messages_as_non_participant(self):
         """
@@ -106,6 +194,19 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i get a Forbidden Exception
         """
+        from .mockers import message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        self.testapp.get('/conversations/{}/messages'.format(cid), '', oauth2Header(recipient2), status=403)
 
     # Get message attachment tests
 
@@ -160,4 +261,3 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             Then i get a Forbidden Exception
         """
         pass
-
