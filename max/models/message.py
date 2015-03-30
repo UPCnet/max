@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from max.MADMax import MADMaxCollection
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
 from pyramid.decorator import reify
-from max.security import Manager, Owner
+from max.security import Manager
 from pyramid.security import Allow
 from max.security.permissions import view_message
+
+MESSAGE_CONTEXT_FIELDS = ['displayName', '_id', 'objectType']
 
 
 class Message(BaseActivity):
@@ -60,20 +61,7 @@ class Message(BaseActivity):
             ob['object']['_keywords'].append(self.data['actor']['username'])
 
         if 'contexts' in self.data:
-            # When a person posts an activity it can be targeted
-            # to multiple contexts. here we construct the basic info
-            # of each context and store them in contexts key
-            ob['contexts'] = []
-            for cobject in self.data['contexts']:
-                subscription = dict(self.data['actor'].getSubscription(cobject))
-
-                # Clean innecessary fields
-                non_needed_subscription_fields = ['tags', 'published', 'permissions', 'participants']
-                for fieldname in non_needed_subscription_fields:
-                    if fieldname in subscription:
-                        del subscription[fieldname]
-
-                ob['contexts'].append(subscription)
+            ob['contexts'] = [self.data['contexts'][0].flatten(preserve=MESSAGE_CONTEXT_FIELDS)]
         self.update(ob)
 
         # Set defaults
@@ -87,25 +75,3 @@ class Message(BaseActivity):
             elif 'default' in value.keys():
                 properties[key] = default
         self.update(properties)
-
-    def _on_create_custom_validations(self):
-        """
-            Perform custom validations on the Activity Object
-
-            * If the actor is a person, check wether can write in all contexts
-            * If the actor is a context, check if the context is the same
-        """
-        collection = getattr(self.mdb_collection.database, self.context_collection)
-        contextsdb = MADMaxCollection(collection, query_key='_id')
-
-        # If we are updating, we already have all data on the object, so we read self directly
-        result = True
-        wrapped_contexts = []
-        for context in self.data.get('contexts', []):
-            # Get hash from context or calculate it from the url
-            # XXX Too coupled ...
-            wrapped = contextsdb[context['id']]
-            wrapped_contexts.append(wrapped)
-
-        result = result and canWriteInContexts(self.data['actor'], wrapped_contexts)
-        return result

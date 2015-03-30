@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import InvalidSearchParams
-from max.exceptions import Unauthorized
 
 from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
@@ -495,38 +494,6 @@ def hasPermission(subscription, permission):
     has_granted_permission = permission in subscription.get('_grants', [])
     has_revoked_permission = permission in subscription.get('_grants', [])
     return (has_plain_permission and not has_revoked_permission) or has_granted_permission
-
-
-def canWriteInContexts(actor, contexts):
-    """
-    """
-    # If no context filter defined, write/read is always allowed
-    if contexts == []:
-        return True
-
-    subscriptions = {}
-
-    from max.exceptions import Forbidden
-    for context in contexts:
-        subscription = subscriptions.get(context.getIdentifier(), None)
-        if subscription is None:
-            # update subscriptions dict
-            u_field = context.unique.lstrip('_')
-            subsc = dict([(a[u_field], a) for a in actor.get(context.user_subscription_storage, {})])
-            subscriptions.update(subsc)
-            subscription = subscriptions.get(context.getIdentifier(), None)
-            if subscription is None:
-                raise Forbidden("You are not subscribed to this context : %s" % context.getIdentifier())
-
-        # If user is trying to post on a subscribed context/s
-        # Check that has write permission in all the contexts
-
-        allowed_to_write = hasPermission(subscription, 'write')
-        if not allowed_to_write:
-            raise Forbidden("You are not allowed to post to this context : %s" % context.getIdentifier())
-
-    # If we reached here, we have permission to post on all contexts
-    return True
 
 
 def rotate_image_by_EXIF(image):
