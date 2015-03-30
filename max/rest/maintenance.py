@@ -2,6 +2,7 @@
 from max.MADMax import MADMaxDB
 from max.models import Context
 from max.models import Conversation
+from max.exceptions import ObjectNotFound
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest import endpoint
@@ -144,44 +145,7 @@ def rebuildConversationSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_exception', request_method='GET', restricted='Manager', requires_actor=False, permission=do_maintenance)
-def getException(context, request):
-    """
-         /maintenance/exceptions/{hash}
-
-         Get an exception from the log
-    """
-    ehash = request.matchdict['hash']
-    logfile = logger.handlers[0].baseFilename
-    regex = r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash)
-    date, http_request, traceback = re.search(regex, open(logfile).read(), re.DOTALL).groups()
-
-    result = {
-        'date': date,
-        'request': http_request,
-        'traceback': traceback
-    }
-    handler = JSONResourceEntity(result)
-    return handler.buildResponse()
-
-
-@endpoint(route_name='maintenance_exceptions', request_method='GET', restricted='Manager', requires_actor=False, permission=do_maintenance)
-def getExceptions(context, request):
-    """
-         /maintenance/exceptions
-
-         Get exceptions list from the log
-    """
-    logfile = logger.handlers[0].baseFilename
-    regex = r'BEGIN EXCEPTION REPORT: (\w+)\nDATE: (.*?)\n'
-    matches = re.findall(regex, open(logfile).read(), re.DOTALL)
-    exceptions = [{'id': exception_id, 'date': exception_date} for exception_id, exception_date in matches]
-
-    handler = JSONResourceRoot(exceptions)
-    return handler.buildResponse()
-
-
-@endpoint(route_name='maintenance_users', request_method='POST', restricted='Manager', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_users', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildUser(context, request):
     """
          Rebuilds user objects with defaults and consistency checks.
@@ -195,4 +159,45 @@ def rebuildUser(context, request):
             user.save()
 
     handler = JSONResourceRoot([])
+    return handler.buildResponse()
+
+
+@endpoint(route_name='maintenance_exception', request_method='GET', requires_actor=False, permission=do_maintenance)
+def getException(context, request):
+    """
+         /maintenance/exceptions/{hash}
+
+         Get an exception from the log
+    """
+    ehash = request.matchdict['hash']
+    logfile = logger.handlers[0].baseFilename
+    regex = r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash)
+    match = re.search(regex, open(logfile).read(), re.DOTALL)
+    if not match:
+        raise ObjectNotFound("There is no logged exception with this hash")
+
+    date, http_request, traceback = match.groups()
+
+    result = {
+        'date': date,
+        'request': http_request,
+        'traceback': traceback
+    }
+    handler = JSONResourceEntity(result)
+    return handler.buildResponse()
+
+
+@endpoint(route_name='maintenance_exceptions', request_method='GET', requires_actor=False, permission=do_maintenance)
+def getExceptions(context, request):
+    """
+         /maintenance/exceptions
+
+         Get exceptions list from the log
+    """
+    logfile = logger.handlers[0].baseFilename
+    regex = r'BEGIN EXCEPTION REPORT: (\w+)\nDATE: (.*?)\n'
+    matches = re.findall(regex, open(logfile).read(), re.DOTALL)
+    exceptions = [{'id': exception_id, 'date': exception_date} for exception_id, exception_date in matches]
+
+    handler = JSONResourceRoot(exceptions)
     return handler.buildResponse()
