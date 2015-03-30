@@ -110,6 +110,7 @@ def postMessage2Conversation(conversations, request):
                                                 'unsubscribe': 'subscribed'})
         if ctxts[0].get('displayName', False):
             conversation_params['displayName'] = ctxts[0]['displayName']
+        import ipdb;ipdb.set_trace()
         newconversation = Conversation()
         newconversation.fromRequest(request, rest_params=conversation_params)
 
@@ -140,9 +141,7 @@ def postMessage2Conversation(conversations, request):
     # We have to re-get the actor, in order to have the subscription updated
     updated_user = users[request.actor['username']]
     message_params = {'actor': updated_user,
-                      'contexts': [{'objectType': 'conversation',
-                                    'id': current_conversation.getIdentifier()
-                                    }],
+                      'contexts': [current_conversation],
                       'verb': 'post'}
 
     # Initialize a Message (Activity) object from the request
@@ -150,6 +149,7 @@ def postMessage2Conversation(conversations, request):
     try:
         newmessage.fromRequest(request, rest_params=message_params)
     except Exception as catched:
+        newmessage.fromRequest(request, rest_params=message_params)
         # In case we coulnd't post the message, rollback conversation creation
         current_conversation.delete()
         raise catched

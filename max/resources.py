@@ -158,9 +158,7 @@ class ConversationsTraverser(MongoDBTraverser):
             (Allow, Authenticated, permissions.list_conversations),
             (Allow, Authenticated, permissions.add_conversation),
             (Allow, Manager, permissions.add_conversation_for_others),
-            (Allow, Manager, permissions.list_conversations_unsubscribed),
         ]
-
         return acl
 
 

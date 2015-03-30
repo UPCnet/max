@@ -42,7 +42,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to create a new conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -57,7 +57,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             And i'm not in the participants list
             Then I get a Forbidden Exception
         """
-        from .mockers import message_oneself
+        from max.tests.mockers import message_oneself
         sender = 'xavi'
         self.create_user(sender)
 
@@ -70,7 +70,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             And i'm not in the participants list
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -86,13 +86,13 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(test_manager), status=200)
@@ -104,7 +104,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -122,7 +122,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -140,7 +140,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -161,7 +161,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation subscription
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -179,7 +179,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation subscription
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -197,7 +197,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view my conversation subscription
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -215,7 +215,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view other's conversation subscription
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -233,7 +233,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to view an existing conversation subscription
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -255,7 +255,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to list all conversations
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -273,7 +273,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to modify a conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -291,7 +291,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to modify a conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -309,7 +309,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to modify a conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -327,7 +327,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to modify a conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -348,7 +348,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -366,7 +366,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -384,7 +384,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -402,7 +402,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -423,7 +423,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to purge all existing conversations
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -439,7 +439,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to purge all existing conversations
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -457,7 +457,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -477,7 +477,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -497,7 +497,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -516,7 +516,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add myself as a new participant to an existing conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -537,7 +537,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a new participant from an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -555,7 +555,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a new participant from an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -575,7 +575,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a participant from an existing conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -592,7 +592,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to leave an existing conversation
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -609,7 +609,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to leave an existing conversation
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -628,7 +628,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -646,7 +646,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -664,7 +664,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         self.create_user(sender)
@@ -682,7 +682,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'

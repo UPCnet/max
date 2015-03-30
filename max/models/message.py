@@ -2,9 +2,9 @@
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
 from pyramid.decorator import reify
-from max.security import Manager
+from max.security import Manager, Owner
 from pyramid.security import Allow
-from max.security.permissions import view_message
+from max.security.permissions import view_message, modify_message
 
 MESSAGE_CONTEXT_FIELDS = ['displayName', '_id', 'objectType']
 
@@ -13,6 +13,8 @@ class Message(BaseActivity):
     """
         An activity
     """
+    default_field_view_permission = view_message
+    default_field_edit_permission = modify_message
     collection = 'messages'
     context_collection = 'conversations'
     context_class = Conversation
@@ -24,9 +26,9 @@ class Message(BaseActivity):
     @reify
     def __acl__(self):
         acl = [
-            (Allow, Manager, view_message)
+            (Allow, Manager, view_message),
+            (Allow, Owner, view_message)
         ]
-
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Conversation
             conversation = Conversation()
