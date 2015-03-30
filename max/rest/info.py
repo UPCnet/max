@@ -61,7 +61,7 @@ def getMaxSettings(context, request):
 
 
 @view_config(route_name='info_api', request_method='GET')
-def endpoints_view(request):
+def endpoints_view(context, request):
     """
     """
     views = request.registry.introspector.get_category('views')
