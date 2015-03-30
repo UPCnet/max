@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max import maxlogger
-from max.MADMax import MADMaxCollection
+from max.MADMax import MADMaxCollection, MADMaxDB
 from pyramid.security import Allow, Authenticated
 from max.exceptions import ObjectNotFound, UnknownUserError
 from max.security import Manager, Owner
@@ -65,6 +65,14 @@ class Root(dict):
         self['comments'] = CommentsTraverser(self, request)
         self['conversations'] = ConversationsTraverser(self, request)
         self['messages'] = MessagesTraverser(self, request)
+        self['security'] = get_security_object(self, request)
+
+
+def get_security_object(root, request):
+        mmdb = MADMaxDB(request.registry.max_store)
+        security_settings = mmdb.security.search({})
+        security_settings.__parent__ = root
+        return security_settings[0]
 
 
 class MongoDBTraverser(MADMaxCollection):
@@ -77,6 +85,13 @@ class MongoDBTraverser(MADMaxCollection):
         self.__parent__ = parent
         self.collection = self.request.registry.max_store[self.collection_name]
         self.show_fields = None
+
+
+class SecurityTraverser(object):
+    def __init__(self, parent, request):
+        self.request = request
+        self.db = request.registry.max_store
+        self.__parent__ = parent
 
 
 class CommentsTraverser(object):

@@ -37,8 +37,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def test_get_security(self):
         res = self.testapp.get('/admin/security', "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].get('roles', None).get('Manager')[0], 'test_manager')
+        self.assertEqual(result.get('roles', None).get('Manager')[0], 'test_manager')
 
     def test_security_add_user_to_role(self):
         username = 'messi'

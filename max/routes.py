@@ -89,10 +89,10 @@ INFO_RESOURCES = {
 
 RESTRICTED_RESOURCES = {
 
-    'admin_security': dict(route='/admin/security', category='Management', name='Security settings'),
-    'admin_security_role': dict(route='/admin/security/roles/{role}', category='Management', name='Role users'),
-    'admin_security_role_user': dict(route='/admin/security/roles/{role}/users/{user}', category='Management', name='User role'),
-    'admin_security_users': dict(route='/admin/security/users', category='Management', name='Users with security'),
+    'admin_security': dict(route='/admin/security', category='Management', name='Security settings', traverse="/security"),
+    'admin_security_role': dict(route='/admin/security/roles/{role}', category='Management', name='Role users', traverse="/security/"),
+    'admin_security_role_user': dict(route='/admin/security/roles/{role}/users/{user}', category='Management', name='User role', traverse="/security/"),
+    'admin_security_users': dict(route='/admin/security/users', category='Management', name='Users with security', traverse="/security/"),
     'maintenance_keywords': dict(route='/admin/maintenance/keywords', category='Management', name='Keywords maintenance'),
     'maintenance_dates': dict(route='/admin/maintenance/dates', category='Management', name='Dates maintenance'),
     'maintenance_subscriptions': dict(route='/admin/maintenance/subscriptions', category='Management', name='Subscriptions maintenance'),

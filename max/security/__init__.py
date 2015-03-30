@@ -15,7 +15,10 @@ def is_owner(context, userid):
 
         If the object has no ownership information, returns False.
     """
-    return getattr(context, '_owner', None) == userid
+    try:
+        return getattr(context, '_owner') == userid
+    except:
+        return False
 
 
 def is_self_operation(request):

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from max import ALLOWED_ROLES
-from max.MADMax import MADMaxDB
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
 from max.resources import loadMAXSecurity
@@ -8,12 +7,11 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest import endpoint
 from max.security.permissions import manage_security
-
 from pyramid.httpexceptions import HTTPNoContent
 
 
 @endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission=manage_security)
-def getSecurity(context, request):
+def getSecurity(security, request):
     """
          /admin/security
 
@@ -22,16 +20,12 @@ def getSecurity(context, request):
          It's intended to be a protected by IP endpoint as we do not want
          eavesdroping on this information
     """
-    mmdb = MADMaxDB(request.db)
-    query = {}
-    roles = mmdb.security.search(query, flatten=1)
-
-    handler = JSONResourceRoot(roles)
+    handler = JSONResourceRoot(security.flatten())
     return handler.buildResponse()
 
 
 @endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission=manage_security)
-def getSecurityUsers(context, request):
+def getSecurityUsers(security, request):
     """
          /admin/security/users
 
@@ -40,13 +34,9 @@ def getSecurityUsers(context, request):
          It's intended to be a protected by IP endpoint as we do not want
          eavesdroping on this information
     """
-    mmdb = MADMaxDB(request.db)
-    query = {}
-    security = mmdb.security.search(query, flatten=1)
-
     users = {}
     for role in ALLOWED_ROLES:
-        for username in security[0]['roles'].get(role, []):
+        for username in security['roles'].get(role, []):
             users.setdefault(username, {})
             users[username][role] = True
 
@@ -57,16 +47,13 @@ def getSecurityUsers(context, request):
 
 
 @endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission=manage_security)
-def check_user_role(context, request):
+def check_user_role(security, request):
     """
     """
 
     role = request.matchdict['role']
     user = request.matchdict['user']
 
-    mmdb = MADMaxDB(request.db)
-    query = {}
-    security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})
     security['roles'].setdefault(role, [])
 
@@ -81,7 +68,7 @@ def check_user_role(context, request):
 
 
 @endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission=manage_security)
-def add_user_to_role(context, request):
+def add_user_to_role(security, request):
     """
          /admin/security/roles/{role}/users/{user}
 
@@ -93,9 +80,6 @@ def add_user_to_role(context, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    mmdb = MADMaxDB(request.db)
-    query = {}
-    security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})
     security['roles'].setdefault(role, [])
     status_code = 200
@@ -111,7 +95,7 @@ def add_user_to_role(context, request):
 
 
 @endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission=manage_security)
-def remove_user_from_role(context, request):
+def remove_user_from_role(security, request):
     """
          /admin/security/roles/{role}/users/{user}
 
@@ -123,9 +107,6 @@ def remove_user_from_role(context, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    mmdb = MADMaxDB(request.db)
-    query = {}
-    security = mmdb.security.search(query)[0]
     security.setdefault('roles', {})
     security['roles'].setdefault(role, [])
     if user not in security['roles'][role]:
