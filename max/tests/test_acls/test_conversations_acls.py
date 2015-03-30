@@ -32,6 +32,8 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
 
+        self.create_user(test_manager)
+
     # Add conversations tests
 
     def test_create_new_conversation(self):
