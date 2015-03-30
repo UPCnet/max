@@ -64,6 +64,7 @@ class Root(dict):
         self['activities'] = ActivitiesTraverser(self, request)
         self['comments'] = CommentsTraverser(self, request)
         self['conversations'] = ConversationsTraverser(self, request)
+        self['messages'] = MessagesTraverser(self, request)
 
 
 class MongoDBTraverser(MADMaxCollection):
@@ -139,6 +140,7 @@ class ConversationsTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_conversation),
+            (Allow, Authenticated, permissions.list_conversations),
             (Allow, Authenticated, permissions.add_conversation),
             (Allow, Manager, permissions.add_conversation_for_others),
             (Allow, Manager, permissions.list_conversations_unsubscribed),
@@ -155,6 +157,18 @@ class ActivitiesTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.list_activities),
+        ]
+        return acl
+
+
+class MessagesTraverser(MongoDBTraverser):
+    collection_name = 'messages'
+    query_key = '_id'
+
+    @reify
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.list_messages),
         ]
         return acl
 

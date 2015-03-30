@@ -3,6 +3,9 @@ from max.MADMax import MADMaxCollection
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
 from pyramid.decorator import reify
+from max.security import Manager, Owner
+from pyramid.security import Allow
+from max.security.permissions import view_message
 
 
 class Message(BaseActivity):
@@ -19,7 +22,20 @@ class Message(BaseActivity):
 
     @reify
     def __acl__(self):
-        acl = []
+        acl = [
+            (Allow, Manager, view_message)
+        ]
+
+        if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
+            from max.models import Conversation
+            conversation = Conversation()
+            conversation.fromDatabase(self.contexts[0]['_id'])
+            subscription = self.request.actor.getSubscription(conversation)
+            if subscription:
+                permissions = subscription.get('permissions', [])
+                if 'read' in permissions:
+                    acl.append((Allow, self.request.authenticated_userid, view_message))
+
         return acl
 
     def buildObject(self):

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from max import CONVERSATION_PARTICIPANTS_LIMIT
-from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.MADMax import MADMaxCollection
-from max.MADMax import MADMaxDB
 from max.exceptions import Forbidden
 from max.exceptions import ObjectNotFound
 from max.exceptions import Unauthorized
@@ -14,7 +12,7 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest import endpoint
-from max.security.permissions import list_conversations, list_conversations_unsubscribed, add_conversation, view_conversation, view_conversation_subscription, modify_conversation, delete_conversation, purge_conversations, add_conversation_participant, delete_conversation_participant
+from max.security.permissions import add_conversation_for_others, list_conversations, add_conversation, view_conversation, view_conversation_subscription, modify_conversation, delete_conversation, purge_conversations, add_conversation_participant, delete_conversation_participant
 from pyramid.httpexceptions import HTTPNoContent
 
 from bson import ObjectId
@@ -26,21 +24,16 @@ def getConversations(conversations, request):
          /conversations
          Return all conversations owned by the requesting actor
     """
+    # List subscribed conversations, and use it to make the query
+    # This way we can filter 2-people conversations that have been archived
+    subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
 
-    if request.has_permission(list_conversations_unsubscribed):
-        conversations_search = conversations.dump()
+    query = {'participants.username': request.actor['username'],
+             'objectType': 'conversation',
+             '_id': {'$in': subscribed_conversations}
+             }
 
-    else:
-        # List subscribed conversations, and use it to make the query
-        # This way we can filter 2-people conversations that have been archived
-        subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
-
-        query = {'participants.username': request.actor['username'],
-                 'objectType': 'conversation',
-                 '_id': {'$in': subscribed_conversations}
-                 }
-
-        conversations_search = conversations.search(query, sort_by_field="published")
+    conversations_search = conversations.search(query, sort_by_field="published")
 
     conversations_info = []
     for conversation in conversations_search:
@@ -73,9 +66,9 @@ def postMessage2Conversation(conversations, request):
     if len(request_participants) != len(list(set(request_participants))):
         raise ValidationError('One or more users duplicated in participants list')
     if len(request_participants) == 1 and request_participants[0] == request.actor.username:
-        raise ValidationError('Cannot start a convesation with oneself')
+        raise ValidationError('Cannot start a conversation with oneself')
 
-    if request.actor.username not in request_participants:
+    if request.actor.username not in request_participants or request.has_permission(add_conversation_for_others):
         raise ValidationError('Actor must be part of the participants list.')
 
     # Loop trough all participants, if there's one that doesn't exists, an exception will raise
@@ -87,7 +80,7 @@ def postMessage2Conversation(conversations, request):
     for participant in request_participants:
         user = users[participant]
         if request.actor.username != user['username'] and not request.actor.isAllowedToSee(user):
-            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(request.actor.username, user['username']))
+            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.actor.username, user['username']))
         participants[participant] = user
 
     # If there are only two participants in the conversation, try to get an existing conversation
@@ -156,10 +149,10 @@ def postMessage2Conversation(conversations, request):
     newmessage = Message()
     try:
         newmessage.fromRequest(request, rest_params=message_params)
-    except Exception as Catched:
+    except Exception as catched:
         # In case we coulnd't post the message, rollback conversation creation
         current_conversation.delete()
-        raise Catched
+        raise catched
 
     # Grant subscribe permission to the user creating the conversation, only if the conversation
     # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
@@ -199,16 +192,9 @@ def getUserConversationSubscription(conversation, request):
          /people/{username}/conversations/{id}
          Return Conversation subscription
     """
-    if request.actor.username != request.creator:
-        raise Unauthorized('User {} is not allowed to view this conversation subscription'.format(request.actor.username))
+    subscription = conversation.subscription
 
-    cid = request.matchdict['id']
-    if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
-        raise Unauthorized('User {} is not subscriped to any conversation with id {}'.format(request.actor.username, cid))
-
-    subscription = request.actor.getSubscription(conversation)
-
-    conversations_collection = MADMaxCollection(request.db.conversations)
+    conversations_collection = conversation.__parent__
     conversation_object = conversations_collection[subscription['id']]
     conversation = conversation_object.flatten()
 
@@ -265,8 +251,7 @@ def joinConversation(conversation, request):
     cid = request.matchdict['id']
 
     # Check if user is already subscribed
-    current_conversations = [a['id'] for a in actor.talkingIn]
-    if cid in current_conversations:
+    if conversation.subscription:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
@@ -275,10 +260,6 @@ def joinConversation(conversation, request):
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
-        # Register subscription to the actor
-        conversations = MADMaxCollection(request.db.conversations)
-        conversation = conversations[cid]
-
         if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
@@ -287,14 +268,6 @@ def joinConversation(conversation, request):
 
         users = MADMaxCollection(request.db.users, query_key='username')
         creator = users[request.creator]
-
-        authenticated_user_is_owner = conversation._owner == request.creator
-        only_owner_can_subscribe = conversation.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'restricted'
-        authenticated_user_can_subscribe = 'subscribe' in creator.getSubscription(conversation)['permissions']
-        # The owner of the conversation must be the same as the request creator to subscribe people to restricted conversations
-
-        if only_owner_can_subscribe and (not authenticated_user_is_owner or not authenticated_user_can_subscribe):
-            raise Unauthorized('User {0} cannot subscribe people to this conversation'.format(actor['username']))
 
         if not creator.isAllowedToSee(actor):
             raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(creator.username, actor.username))
@@ -332,42 +305,25 @@ def leaveConversation(conversation, request):
     """
     """
     actor = request.actor
-    mmdb = MADMaxDB(request.db)
-    cid = request.matchdict.get('id', None)
-    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-
-    if subscription is None:
-        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
-
-    found_context = mmdb.conversations[cid]
-
-    auth_user_is_conversation_owner = found_context._owner == request.creator
-    auth_user_is_leaving = request.creator == actor.username
-
-    if auth_user_is_conversation_owner and auth_user_is_leaving:
-        raise Forbidden('User {0} is the owner of the conversation, leaving is not allowed, only deleting'.format(actor.username))
-
-    if not auth_user_is_leaving and not auth_user_is_conversation_owner:
-        raise Unauthorized('Only conversation owner can force participants out')
 
     # Unsubscribe leaving participant ALWAYS
-    actor.removeSubscription(found_context)
+    actor.removeSubscription(conversation)
 
     save_context = False
     # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
-    if len(found_context.participants) >= 2 and 'group' in found_context.get('tags', []):
-        found_context.participants = [user for user in found_context.participants if user['username'] != actor.username]
+    if len(conversation.participants) >= 2 and 'group' in conversation.get('tags', []):
+        conversation.participants = [user for user in conversation.participants if user['username'] != actor.username]
         save_context = True
 
     # Tag conversations that will be left as 1 participant only as archived
-    if len(found_context.participants) == 2:
-        found_context.setdefault('tags', [])
-        if 'archive' not in found_context['tags']:
-            found_context['tags'].append('archive')
+    if len(conversation.participants) == 2:
+        conversation.setdefault('tags', [])
+        if 'archive' not in conversation['tags']:
+            conversation['tags'].append('archive')
             save_context = True
 
     if save_context:
-        found_context.save()
+        conversation.save()
 
     return HTTPNoContent()
 
@@ -377,18 +333,8 @@ def transferConversationOwnership(conversation, request):
     """
     """
     actor = request.actor
-    mmdb = MADMaxDB(request.db)
     cid = request.matchdict.get('id', None)
-    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-
-    if subscription is None:
-        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
-
-    found_context = mmdb.conversations[cid]
-    auth_user_is_conversation_owner = found_context._owner == request.creator
-
-    if not auth_user_is_conversation_owner:
-        raise Unauthorized('Only conversation owner can transfer conversation ownership')
+    subscription = conversation.subscription
 
     # Check if the targeted new owner is on the conversation
     request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
@@ -396,9 +342,9 @@ def transferConversationOwnership(conversation, request):
     if subscription is None:
         raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
 
-    previous_owner_username = found_context._owner
-    found_context._owner = request.actor.username
-    found_context.save()
+    previous_owner_username = conversation._owner
+    conversation._owner = request.actor.username
+    conversation.save()
 
     # Give hability to add new users to the new owner
     request.actor.grantPermission(subscription, 'subscribe', permanent=True)
@@ -408,5 +354,5 @@ def transferConversationOwnership(conversation, request):
     previous_owner = users[previous_owner_username]
     previous_owner.revokePermission(subscription, 'subscribe')
 
-    handler = JSONResourceEntity(found_context.flatten())
+    handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()

@@ -272,6 +272,16 @@ class BaseContext(MADBase):
         }
         activitydb.remove(which_to_delete, logical=logical)
 
+    @property
+    def subscription(self):
+        """
+            Retrieves the current actor susbcription to this context.
+
+            If the actor is a context, don't return any subscription
+        """
+        if hasattr(self.request.actor, 'getSubscription'):
+            return self.request.actor.getSubscription(self)
+
     def getInfo(self):
         context = self.flatten()
         context.setdefault('permissions', {})
@@ -325,16 +335,6 @@ class Context(BaseContext):
     }
 
     schema['uploadURL'] = {}
-
-    @property
-    def subscription(self):
-        """
-            Retrieves the current actor susbcription to this context.
-
-            If the actor is a context, don't return any subscription
-        """
-        if hasattr(self.request.actor, 'getSubscription'):
-            return self.request.actor.getSubscription(self)
 
     @reify
     def __acl__(self):

@@ -46,8 +46,8 @@ PUBLIC_RESOURCES = {
     'conversation_owner': dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner', traverse='/conversations/{id}'),
     'conversation_avatar': dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar', traverse='/conversations/{id}'),
     'conversation_push_tokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens', traverse='/conversations/{id}'),
-    'messages': dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages'),
-    'message': dict(route='/conversations/{id}/messages/{activity}', category='Conversations', name='Conversation message'),
+    'messages': dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages', traverse='/conversations/{id}'),
+    'message': dict(route='/conversations/{id}/messages/{activity}', category='Conversations', name='Conversation message', traverse='/messages/{activity}'),
     'participants': dict(route='/conversations/{id}/participants', category='Conversations', name='Conversation participants'),
     'participant': dict(route='/conversations/{id}/participant', category='Conversations', name='Conversation participant'),
 
@@ -64,9 +64,9 @@ PUBLIC_RESOURCES = {
     'activity_image_sizes': dict(route='/activities/{activity}/image/{size}', category='Activities', name='Named size Image', traverse='/activities/{activity}'),
     'activity_file_download': dict(route='/activities/{activity}/file/download', category='Activities', name='File', traverse='/activities/{activity}'),
 
-    'message_image': dict(route='/messages/{id}/image', category='Messages', name='Image'),
-    'message_image_sizes': dict(route='/messages/{id}/image/{size}', category='Messages', name='Named size Image'),
-    'message_file_download': dict(route='/messages/{id}/file/download', category='Messages', name='File'),
+    'message_image': dict(route='/messages/{id}/image', category='Messages', name='Image', traverse='/messages/{activity}'),
+    'message_image_sizes': dict(route='/messages/{id}/image/{size}', category='Messages', name='Named size Image', traverse='/messages/{activity}'),
+    'message_file_download': dict(route='/messages/{id}/file/download', category='Messages', name='File', traverse='/messages/{activity}'),
 
     # MAX 4.0
     'user_shares': dict(route='/people/{username}/shares'),

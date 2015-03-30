@@ -2,7 +2,7 @@
 from max.MADMax import MADMaxCollection
 from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
-from max.security.permissions import purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
+from max.security.permissions import add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
 from max.security import Manager, Owner, is_self_operation
 from pyramid.security import Allow
 from pymongo import DESCENDING
@@ -48,6 +48,9 @@ class Conversation(BaseContext):
 
             if 'read' in subscription.get('permissions', []):
                 acl.append(Allow, self.request.authenticated_userid, view_conversation)
+
+            if 'write' in subscription.get('permissions', []):
+                acl.append(Allow, self.request.authenticated_userid, add_message)
 
             if 'subscribe' in subscription.get('permissions', []):
                 acl.append(Allow, self.request.authenticated_userid, add_conversation_participant)
