@@ -42,3 +42,15 @@ view_server_settings = 'View detailed server settings'
 
 favorite = 'Favorite an activity'
 unfavorite = 'Unfavorite an activity'
+
+list_conversations = 'List conversations'
+list_conversations_unsubscribed = 'List conversations without being a participant'
+add_conversation = 'Add conversation'
+add_conversation_for_others = 'Add conversation without oneself'
+view_conversation = 'View conversation'
+view_conversation_subscription = 'View conversation subscription'
+modify_conversation = 'Modify conversation'
+delete_conversation = 'Delete conversation'
+purge_conversations = "Delete everyone's conversations"
+add_conversation_participant = 'Add a participant to a existing conversation'
+delete_conversation_participant = 'Delete a participant to a existing conversation'

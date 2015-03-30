@@ -2,7 +2,9 @@
 from max.MADMax import MADMaxCollection
 from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
-
+from max.security.permissions import purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
+from max.security import Manager, Owner, is_self_operation
+from pyramid.security import Allow
 from pymongo import DESCENDING
 from pyramid.decorator import reify
 
@@ -24,7 +26,35 @@ class Conversation(BaseContext):
 
     @reify
     def __acl__(self):
-        acl = []
+        acl = [
+            (Allow, Manager, view_conversation),
+            (Allow, Owner, view_conversation),
+            (Allow, Manager, view_conversation_subscription),
+            (Allow, Owner, view_conversation_subscription),
+            (Allow, Manager, modify_conversation),
+            (Allow, Owner, modify_conversation),
+            (Allow, Manager, delete_conversation),
+            (Allow, Owner, delete_conversation),
+            (Allow, Manager, purge_conversations),
+            (Allow, Manager, add_conversation_participant),
+            (Allow, Manager, delete_conversation_participant),
+        ]
+
+        subscription = self.request.actor.getSubscription(self)
+        if subscription:
+            # Allow user to view only its own subscription
+            if is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, view_conversation_subscription))
+
+            if 'read' in subscription.get('permissions', []):
+                acl.append(Allow, self.request.authenticated_userid, view_conversation)
+
+            if 'subscribe' in subscription.get('permissions', []):
+                acl.append(Allow, self.request.authenticated_userid, add_conversation_participant)
+
+            if 'unsubscribe' in subscription.get('permissions', []):
+                acl.append(Allow, self.request.authenticated_userid, delete_conversation_participant)
+
         return acl
 
     def buildObject(self):

@@ -21,8 +21,8 @@ PUBLIC_RESOURCES = {
     'subscriptions': dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}'),
     'subscription': dict(route='/people/{username}/subscriptions/{hash}', category='Subscriptions', name='User subscription'),
 
-    'user_conversations': dict(route='/people/{username}/conversations', category='Conversations', name='User conversations'),
-    'user_conversation': dict(route='/people/{username}/conversations/{id}', category='Conversations', name='User conversation'),
+    'user_conversations': dict(route='/people/{username}/conversations', category='Conversations', name='User conversations', traverse='/conversations'),
+    'user_conversation': dict(route='/people/{username}/conversations/{id}', category='Conversations', name='User conversation', traverse='/conversations/{id}'),
     'user_conversation_messages': dict(route='/people/{username}/conversations/{id}/messages', category='Conversations', name='User conversation messages'),
 
     'contexts': dict(route='/contexts', category='Contexts', name='Contexts', traverse='/contexts'),
@@ -41,11 +41,11 @@ PUBLIC_RESOURCES = {
     'context_tag': dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag', traverse='/contexts/{hash}'),
 
     # MAX 3.0
-    'conversations': dict(route='/conversations', category='Conversations', name='Conversations'),
-    'conversation': dict(route='/conversations/{id}', category='Conversations', name='Conversation'),
-    'conversation_owner': dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner'),
-    'conversation_avatar': dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar'),
-    'conversation_push_tokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens'),
+    'conversations': dict(route='/conversations', category='Conversations', name='Conversations', traverse='/conversations'),
+    'conversation': dict(route='/conversations/{id}', category='Conversations', name='Conversation', traverse='/conversations/{id}'),
+    'conversation_owner': dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner', traverse='/conversations/{id}'),
+    'conversation_avatar': dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar', traverse='/conversations/{id}'),
+    'conversation_push_tokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens', traverse='/conversations/{id}'),
     'messages': dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages'),
     'message': dict(route='/conversations/{id}/messages/{activity}', category='Conversations', name='Conversation message'),
     'participants': dict(route='/conversations/{id}/participants', category='Conversations', name='Conversation participants'),

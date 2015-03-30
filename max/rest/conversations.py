@@ -14,33 +14,36 @@ from max.rabbitmq import RabbitNotifications
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest import endpoint
-
+from max.security.permissions import list_conversations, list_conversations_unsubscribed, add_conversation, view_conversation, view_conversation_subscription, modify_conversation, delete_conversation, purge_conversations, add_conversation_participant, delete_conversation_participant
 from pyramid.httpexceptions import HTTPNoContent
 
 from bson import ObjectId
 
 
-@endpoint(route_name='conversations', request_method='GET')
-def getConversations(context, request):
+@endpoint(route_name='conversations', request_method='GET', requires_actor=True, permission=list_conversations)
+def getConversations(conversations, request):
     """
          /conversations
-         Return all conversations depending on the actor requester
+         Return all conversations owned by the requesting actor
     """
-    mmdb = MADMaxDB(request.db)
 
-    # List subscribed conversations, and use it to make the query
-    # This way we can filter 2-people conversations that have been archived
-    subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
+    if request.has_permission(list_conversations_unsubscribed):
+        conversations_search = conversations.dump()
 
-    query = {'participants.username': request.actor['username'],
-             'objectType': 'conversation',
-             '_id': {'$in': subscribed_conversations}
-             }
+    else:
+        # List subscribed conversations, and use it to make the query
+        # This way we can filter 2-people conversations that have been archived
+        subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
 
-    conversations = mmdb.conversations.search(query, sort_by_field="published")
+        query = {'participants.username': request.actor['username'],
+                 'objectType': 'conversation',
+                 '_id': {'$in': subscribed_conversations}
+                 }
+
+        conversations_search = conversations.search(query, sort_by_field="published")
 
     conversations_info = []
-    for conversation in conversations:
+    for conversation in conversations_search:
 
         conversation_info = conversation.getInfo(request.actor.username)
         conversations_info.append(conversation_info)
@@ -51,8 +54,8 @@ def getConversations(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversations', request_method='POST')
-def postMessage2Conversation(context, request):
+@endpoint(route_name='conversations', request_method='POST', requires_actor=True, permission=add_conversation)
+def postMessage2Conversation(conversations, request):
     """
          /conversations
          Post message to a conversation
@@ -91,8 +94,7 @@ def postMessage2Conversation(context, request):
     # Otherwise, assume is a group conversation and create a new one
     current_conversation = None
     if len(request_participants) == 2:
-        contexts = MADMaxCollection(request.db.conversations)
-        conversations = contexts.search({
+        conversations_search = conversations.search({
             'objectType': 'conversation',
             'participants': {
                 '$size': 2},
@@ -101,8 +103,8 @@ def postMessage2Conversation(context, request):
                 '$all': request_participants}
         })
 
-        if conversations:
-            current_conversation = conversations[0]
+        if conversations_search:
+            current_conversation = conversations_search[0]
 
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
@@ -112,8 +114,7 @@ def postMessage2Conversation(context, request):
                                    permissions={'read': 'subscribed',
                                                 'write': 'subscribed',
                                                 'subscribe': 'restricted',
-                                                'unsubscribe': 'public',
-                                                'invite': 'restricted'})
+                                                'unsubscribe': 'subscribed'})
         if ctxts[0].get('displayName', False):
             conversation_params['displayName'] = ctxts[0]['displayName']
         newconversation = Conversation()
@@ -182,8 +183,18 @@ def postMessage2Conversation(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_conversation', request_method='GET')
-def getUserConversationSubscription(context, request):
+@endpoint(route_name='conversation', request_method='GET', requires_actor=True, permission=view_conversation)
+def getConversation(conversation, request):
+    """
+         /conversations/{id}
+         Return Conversation
+    """
+    handler = JSONResourceEntity(conversation.getInfo(request.actor.username))
+    return handler.buildResponse()
+
+
+@endpoint(route_name='user_conversation', request_method='GET', requires_actor=True, permission=view_conversation_subscription)
+def getUserConversationSubscription(conversation, request):
     """
          /people/{username}/conversations/{id}
          Return Conversation subscription
@@ -195,7 +206,7 @@ def getUserConversationSubscription(context, request):
     if cid not in [ctxt.get("id", '') for ctxt in request.actor.talkingIn]:
         raise Unauthorized('User {} is not subscriped to any conversation with id {}'.format(request.actor.username, cid))
 
-    subscription = request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
+    subscription = request.actor.getSubscription(conversation)
 
     conversations_collection = MADMaxCollection(request.db.conversations)
     conversation_object = conversations_collection[subscription['id']]
@@ -211,42 +222,13 @@ def getUserConversationSubscription(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversation', request_method='GET')
-def getConversation(context, request):
-    """
-         /conversations/{id}
-         Return Conversation
-    """
-    cid = request.matchdict['id']
-
-    conversations = MADMaxCollection(request.db.conversations)
-    conversation = conversations[cid]
-
-    subscribed_conversations = [subscription.get('id') for subscription in request.actor.get('talkingIn', [])]
-
-    if cid not in subscribed_conversations:
-        raise Unauthorized("You're not a participant in this conversation")
-
-    handler = JSONResourceEntity(conversation.getInfo(request.actor.username))
-    return handler.buildResponse()
-
-
-@endpoint(route_name='conversation', request_method='PUT')
-def ModifyConversation(context, request):
+@endpoint(route_name='conversation', request_method='PUT', requires_actor=True, permission=modify_conversation)
+def ModifyConversation(conversation, request):
     """
         /conversation/{id}
 
         Modify the given context.
     """
-    cid = request.matchdict['id']
-    conversations = MADMaxCollection(request.db.conversations)
-    conversation = conversations[cid]
-
-    auth_user_is_conversation_owner = conversation._owner == request.creator
-
-    if not auth_user_is_conversation_owner:
-        raise Unauthorized('Only the owner modify conversation properties')
-
     properties = conversation.getMutablePropertiesFromRequest(request)
     conversation.modifyContext(properties)
     conversation.updateUsersSubscriptions()
@@ -255,8 +237,27 @@ def ModifyConversation(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_conversation', request_method='POST')
-def joinConversation(context, request):
+@endpoint(route_name='conversation', request_method='DELETE', requires_actor=True, permission=delete_conversation)
+def DeleteConversation(conversation, request):
+    """
+    """
+    conversation.delete()
+    return HTTPNoContent()
+
+
+@endpoint(route_name='conversations', request_method='DELETE', requires_actor=True, permission=purge_conversations)
+def deleteConversations(conversations, request):
+    """
+    Deletes ALL the conversations from ALL users in max
+    doing all the consequent unsubscriptions
+    """
+    for conversation in conversations.dump():
+        conversation.delete()
+    return HTTPNoContent()
+
+
+@endpoint(route_name='user_conversation', request_method='POST', requires_actor=True, permission=add_conversation_participant)
+def joinConversation(conversation, request):
     """
          /people/{username}/conversations/{id}
     """
@@ -326,48 +327,8 @@ def joinConversation(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversation_owner', request_method='PUT')
-def trasnferConversationOwnership(context, request):
-    """
-    """
-    actor = request.actor
-    mmdb = MADMaxDB(request.db)
-    cid = request.matchdict.get('id', None)
-    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-
-    if subscription is None:
-        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
-
-    found_context = mmdb.conversations[cid]
-    auth_user_is_conversation_owner = found_context._owner == request.creator
-
-    if not auth_user_is_conversation_owner:
-        raise Unauthorized('Only conversation owner can transfer conversation ownership')
-
-    # Check if the targeted new owner is on the conversation
-    request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-
-    if subscription is None:
-        raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
-
-    previous_owner_username = found_context._owner
-    found_context._owner = request.actor.username
-    found_context.save()
-
-    # Give hability to add new users to the new owner
-    request.actor.grantPermission(subscription, 'subscribe', permanent=True)
-
-    # Revoke hability to add new users from the previous owner
-    users = MADMaxCollection(request.db.users, query_key='username')
-    previous_owner = users[previous_owner_username]
-    previous_owner.revokePermission(subscription, 'subscribe')
-
-    handler = JSONResourceEntity(found_context.flatten())
-    return handler.buildResponse()
-
-
-@endpoint(route_name='user_conversation', request_method='DELETE')
-def leaveConversation(context, request):
+@endpoint(route_name='user_conversation', request_method='DELETE', requires_actor=True, permission=delete_conversation_participant)
+def leaveConversation(conversation, request):
     """
     """
     actor = request.actor
@@ -411,30 +372,41 @@ def leaveConversation(context, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='conversation', request_method='DELETE')
-def DeleteConversation(context, request):
+@endpoint(route_name='conversation_owner', request_method='PUT', requires_actor=True, permission=modify_conversation)
+def transferConversationOwnership(conversation, request):
     """
     """
+    actor = request.actor
     mmdb = MADMaxDB(request.db)
     cid = request.matchdict.get('id', None)
-    ctx = mmdb.conversations[cid]
+    subscription = actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
-    auth_user_is_conversation_owner = ctx._owner == request.creator
+    if subscription is None:
+        raise ObjectNotFound("User {0} is not in conversation {1}".format(actor.username, cid))
+
+    found_context = mmdb.conversations[cid]
+    auth_user_is_conversation_owner = found_context._owner == request.creator
 
     if not auth_user_is_conversation_owner:
-        raise Unauthorized('Only the owner can delete the conversation')
+        raise Unauthorized('Only conversation owner can transfer conversation ownership')
 
-    ctx.delete()
-    return HTTPNoContent()
+    # Check if the targeted new owner is on the conversation
+    request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
+    if subscription is None:
+        raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
 
-@endpoint(route_name='conversations', request_method='DELETE', restricted='Manager')
-def deleteConversations(context, request):
-    """
-    Deletes ALL the conversations from ALL users in max
-    doing all the consequent unsubscriptions
-    """
-    conversations = MADMaxCollection(request.db.conversations)
-    for conversation in conversations.dump():
-        conversation.delete()
-    return HTTPNoContent()
+    previous_owner_username = found_context._owner
+    found_context._owner = request.actor.username
+    found_context.save()
+
+    # Give hability to add new users to the new owner
+    request.actor.grantPermission(subscription, 'subscribe', permanent=True)
+
+    # Revoke hability to add new users from the previous owner
+    users = MADMaxCollection(request.db.users, query_key='username')
+    previous_owner = users[previous_owner_username]
+    previous_owner.revokePermission(subscription, 'subscribe')
+
+    handler = JSONResourceEntity(found_context.flatten())
+    return handler.buildResponse()

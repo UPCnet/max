@@ -9,6 +9,7 @@ from max.rest.utils import searchParams
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.view import view_config
 from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
+from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.exceptions import InvalidPermission
 from max.security.permissions import add_subscription, remove_subscription, manage_subcription_permissions, view_subscriptions
 
@@ -104,7 +105,7 @@ def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
     permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'subscribe', 'invite', 'delete', 'flag']:
+    if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     if permission in context.subscription.get('_grants', []):
@@ -127,7 +128,7 @@ def revokePermissionOnContext(context, request):
     """
     """
     permission = request.matchdict.get('permission', None)
-    if permission not in ['read', 'write', 'subscribe', 'invite', 'flag']:
+    if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
     code = 200
