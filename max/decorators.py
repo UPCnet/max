@@ -2,7 +2,6 @@
 from max.exceptions import ConnectionError
 from max.exceptions.http import JSONHTTPInternalServerError
 from max.exceptions.http import JSONHTTPServiceUnavailable
-from max.rest.resources import RESOURCES
 from max.exceptions.scavenger import format_raw_request, format_raw_response
 
 from pymongo.errors import AutoReconnect

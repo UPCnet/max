@@ -18,7 +18,7 @@ from max.resources import loadCloudAPISettings
 from max.resources import loadMAXSecurity
 from max.resources import loadMAXSettings
 from max.resources import Root
-from max.rest.resources import RESOURCES
+from max.routes import RESOURCES
 from max.security.authentication import MaxAuthenticationPolicy
 from maxutils import mongodb
 from max.request import get_request_creator
