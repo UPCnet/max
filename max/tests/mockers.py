@@ -488,7 +488,7 @@ message3 = {
 }
 
 message4 = {
-    "actor": 'xavi',
+    "actor": {'username': 'xavi', 'objectType': 'person'},
     "object": {
         "objectType": "note",
         "content": "M'agrada Taradell!",

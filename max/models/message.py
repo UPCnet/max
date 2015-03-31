@@ -4,6 +4,7 @@ from max.models.conversation import Conversation
 from pyramid.decorator import reify
 from max.security import Manager, Owner
 from pyramid.security import Allow
+from max.rest.utils import flatten
 from max.security.permissions import view_message, modify_message
 
 MESSAGE_CONTEXT_FIELDS = ['displayName', '_id', 'objectType']
@@ -63,7 +64,7 @@ class Message(BaseActivity):
             ob['object']['_keywords'].append(self.data['actor']['username'])
 
         if 'contexts' in self.data:
-            ob['contexts'] = [self.data['contexts'][0].flatten(preserve=MESSAGE_CONTEXT_FIELDS)]
+            ob['contexts'] = [flatten(self.data['contexts'][0], preserve=MESSAGE_CONTEXT_FIELDS)]
         self.update(ob)
 
         # Set defaults

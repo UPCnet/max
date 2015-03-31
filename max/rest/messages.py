@@ -36,9 +36,7 @@ def add_message(conversation, request):
     """
     message_params = {'actor': request.actor,
                       'verb': 'post',
-                      'contexts': [{'objectType': 'conversation',
-                                    'id': conversation['_id']
-                                    }]
+                      'contexts': [conversation]
                       }
 
     # Initialize a Message (Activity) object from the request
