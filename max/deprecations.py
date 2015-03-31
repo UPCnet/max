@@ -7,6 +7,7 @@ people_resource_matcher = re.compile(r'/people/([^\/]+)$').search
 people_subscriptions_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptions$').search
 people_subscription_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptions/([^\/]+)$').search
 people_activities_resource_matcher = re.compile(r'/people/([^\/]+)/activities$').search
+people_conversation_resource_matcher = re.compile(r'/people/([^\/]+)/conversations/([^\/]+)$').search
 
 
 def get_body(request, default=dict):
@@ -158,6 +159,75 @@ def fix_deprecated_create_context_activity(request, match):
         request.headers['Content-Type'] = 'application/json'
 
 
+def fix_deprecated_join_conversation(request, match):
+    """
+        Adapts the deprecated way to subscribe an user to a conversation
+
+        Requests matching:
+
+            POST /people/{user}/conversations/{id}
+
+        will be transformed into:
+
+            POST /conversations/{id}/participants
+
+        id will be extracted from the url on the json body,
+        and a actor parameter will be injected into the json body,
+        using username found in the url.
+
+        Original request body will be ignored, as the original request format
+        didn't expect any input from it.
+
+    """
+    username = match.groups()[0]
+    conversation_id = match.groups()[1]
+    replacement_body = {}
+    new_path = '/conversations/{}/participants'.format(conversation_id)
+    request.path_info = new_path
+
+    replacement_body.update({
+        "actor": {
+            "objectType": "person",
+            "username": username
+        }
+    })
+
+    request.body = json.dumps(replacement_body)
+
+    # Force headers needed to avoid body content quoting on tests
+    request.headers['Content-Type'] = 'application/json'
+
+
+def fix_deprecated_leave_conversation(request, match):
+    """
+        Adapts the deprecated way to subscribe an user to a conversation
+
+        Requests matching:
+
+            DELETE /people/{username}/conversations/{id}
+
+        will be transformed into:
+
+            DELETE /conversations/{id}/participants/{username}
+
+        id will be extracted from the url on the json body,
+        and a actor parameter will be injected into the json body,
+        using username found in the url.
+
+        Original request body will be ignored, as the original request format
+        didn't expect any input from it.
+
+    """
+    username = match.groups()[0]
+    conversation_id = match.groups()[1]
+
+    new_path = '/conversations/{}/participants/{}'.format(conversation_id, username)
+    request.path_info = new_path
+
+    # Force headers needed to avoid body content quoting on tests
+    request.headers['Content-Type'] = 'application/json'
+
+
 def check_deprecation(request, pattern, action):
     """
         Applies a deprecation fix
@@ -173,9 +243,11 @@ def check_deprecation(request, pattern, action):
 POST_DEPRECATIONS = [
     (people_activities_resource_matcher, fix_deprecated_create_context_activity),
     (people_subscriptions_resource_matcher, fix_deprecated_subscribe_user),
-    (people_resource_matcher, fix_deprecated_create_user)
+    (people_resource_matcher, fix_deprecated_create_user),
+    (people_conversation_resource_matcher, fix_deprecated_join_conversation)
 ]
 
 DELETE_DEPRECATIONS = [
     (people_subscription_resource_matcher, fix_deprecated_unsubscribe_user),
+    (people_conversation_resource_matcher, fix_deprecated_leave_conversation)
 ]

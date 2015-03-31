@@ -120,7 +120,7 @@ class User(MADBase):
             Oneself will be always owner of oneself. If not found,
             look for data being processed and finally default to creator.
         """
-        return self.get('username', self.data.get('username', request.creator))
+        return self.get('username', self.data.get('username', request.authenticated_userid))
 
     def buildObject(self):
         """

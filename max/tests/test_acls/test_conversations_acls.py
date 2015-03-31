@@ -50,19 +50,6 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
-    def test_create_new_conversation_without_oneself(self):
-        """
-            Given i'm a regular user
-            When I try to create a new conversation
-            And i'm not in the participants list
-            Then I get a Forbidden Exception
-        """
-        from max.tests.mockers import message_oneself
-        sender = 'xavi'
-        self.create_user(sender)
-
-        self.testapp.post('/conversations', json.dumps(message_oneself), oauth2Header(sender), status=403)
-
     def test_create_new_conversation_as_manager(self):
         """
             Given i'm a Manager
@@ -110,7 +97,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(sender), status=200)
@@ -128,7 +115,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(recipient), status=200)
@@ -148,7 +135,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(recipient2), status=403)
@@ -167,7 +154,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(test_manager), status=200)
@@ -185,7 +172,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(sender), status=200)
@@ -203,7 +190,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(recipient), status=200)
@@ -221,7 +208,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(recipient), status=403)
@@ -241,7 +228,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.get('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(recipient2), status=403)
@@ -261,9 +248,9 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
-        self.testapp.get('/people/{}/conversations'.format(sender), '', oauth2Header(sender), status=200)
+        self.testapp.get('/conversations', '', oauth2Header(sender), status=200)
 
     # Modify conversation tests
 
@@ -279,7 +266,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}'.format(cid), '{"displayName": "Nou nom"}', oauth2Header(test_manager), status=200)
@@ -297,7 +284,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}'.format(cid), '{"displayName": "Nou nom"}', oauth2Header(sender), status=200)
@@ -315,7 +302,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}'.format(cid), '{"displayName": "Nou nom"}', oauth2Header(recipient), status=403)
@@ -335,7 +322,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}'.format(cid), '{"displayName": "Nou nom"}', oauth2Header(recipient2), status=403)
@@ -354,7 +341,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/conversations/{}'.format(cid), '', oauth2Header(test_manager), status=204)
@@ -372,7 +359,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/conversations/{}'.format(cid), '', oauth2Header(sender), status=204)
@@ -390,7 +377,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/conversations/{}'.format(cid), '', oauth2Header(recipient), status=403)
@@ -410,7 +397,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/conversations/{}'.format(cid), '', oauth2Header(recipient2), status=403)
@@ -429,7 +416,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
         self.testapp.delete('/conversations', '', oauth2Header(test_manager), status=204)
 
@@ -445,7 +432,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
         self.testapp.delete('/conversations', '', oauth2Header(sender), status=403)
 
@@ -457,18 +444,20 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+        recipient3 = 'melendi'
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
+        self.create_user(recipient3)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(test_manager), status=201)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(test_manager), status=201)
 
     def test_add_participant_as_owner(self):
         """
@@ -477,18 +466,20 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+        recipient3 = 'melendi'
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
+        self.create_user(recipient3)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(sender), status=201)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(sender), status=201)
 
     def test_add_participant_as_participant(self):
         """
@@ -497,18 +488,20 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add a new participant to an existing conversation
             Then I get a Forbidden Exception
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+        recipient3 = 'melendi'
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
+        self.create_user(recipient3)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(recipient), status=403)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(recipient), status=403)
 
     def test_auto_join(self):
         """
@@ -516,18 +509,20 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to add myself as a new participant to an existing conversation
             Then I get a Forbidden Exception
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
+        recipient3 = 'melendi'
         self.create_user(sender)
         self.create_user(recipient)
         self.create_user(recipient2)
+        self.create_user(recipient3)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(recipient2), status=403)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(recipient2), status=403)
 
     # Delete participant to conversation tests
 
@@ -537,13 +532,14 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a new participant from an existing conversation
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
-
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        self.create_user(recipient2)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(test_manager), status=204)
@@ -552,10 +548,10 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         """
             Given i'm a regular user
             And i'm the owner of the conversation
-            When I try to delete a new participant from an existing conversation
+            When I try to delete a participant from an existing conversation
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -563,7 +559,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(sender), status=204)
@@ -575,13 +571,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to delete a participant from an existing conversation
             Then I get a Forbidden Exception
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(recipient), status=403)
@@ -592,13 +590,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to leave an existing conversation
             Then I get a Forbidden Exception
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(sender), status=403)
@@ -609,13 +609,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to leave an existing conversation
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(recipient), status=204)
@@ -628,13 +630,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}/owner'.format(cid), json.dumps({'actor': {'username': recipient}}), oauth2Header(test_manager), status=200)
@@ -646,13 +650,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}/owner'.format(cid), json.dumps({'actor': {'username': recipient}}), oauth2Header(sender), status=200)
@@ -664,13 +670,15 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I succeed
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
+        recipient2 = 'shakira'
         self.create_user(sender)
         self.create_user(recipient)
+        self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}/owner'.format(cid), json.dumps({'actor': {'username': recipient}}), oauth2Header(recipient), status=403)
@@ -682,7 +690,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
             When I try to transfer a conversation to another user
             Then I get a Forbidden Exception
         """
-        from max.tests.mockers import message
+        from max.tests.mockers import group_message as message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'
@@ -690,7 +698,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
         self.create_user(recipient2)
 
-        res = self.testapp.get('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.put('/conversations/{}/owner'.format(cid), json.dumps({'actor': {'username': recipient}}), oauth2Header(recipient2), status=403)

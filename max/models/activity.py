@@ -77,7 +77,7 @@ class BaseActivity(MADBase):
         if isPerson:
             return request.actor['username']
         elif isContext:
-            return request.creator
+            return request.authenticated_userid
 
     def buildObject(self):
         """

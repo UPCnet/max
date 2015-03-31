@@ -39,6 +39,7 @@ DEFAULT_CONTEXT_PERMISSIONS = dict(
     subscribe='restricted',
     unsubscribe='restricted',
     invite='restricted',
+    kick='restricted',
     delete='restricted',
     flag='restricted'
 )

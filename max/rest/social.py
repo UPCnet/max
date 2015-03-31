@@ -7,13 +7,13 @@ from max.rest import endpoint
 
 from max.MADMax import MADMaxCollection
 from max.models import Activity
-from max.security.permissions import like_activity, unlike_activity, flag_activity, unflag_activity
+from max.security.permissions import like, unlike, flag, unflag
 from pyramid.httpexceptions import HTTPNotImplemented
 
 from bson.objectid import ObjectId
 
 
-@endpoint(route_name='likes', request_method='POST', requires_actor=True, permission=like_activity)
+@endpoint(route_name='likes', request_method='POST', requires_actor=True, permission=like)
 def like(activity, request):
     """
     """
@@ -51,7 +51,7 @@ def like(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='like', request_method='DELETE', requires_actor=True, permission=unlike_activity)
+@endpoint(route_name='like', request_method='DELETE', requires_actor=True, permission=unlike)
 def unlike(activity, request):
     """
     """
@@ -81,7 +81,7 @@ def unlike(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='flag', request_method='POST', requires_actor=True, permission=flag_activity)
+@endpoint(route_name='flag', request_method='POST', requires_actor=True, permission=flag)
 def flagActivity(activity, request):
     """
          Sets the flagged mark on an activity
@@ -98,7 +98,7 @@ def flagActivity(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='flag', request_method='DELETE', requires_actor=True, permission=unflag_activity)
+@endpoint(route_name='flag', request_method='DELETE', requires_actor=True, permission=unflag)
 def unflagActivity(activity, request):
     """
          Unsets the flagged mark on an activity

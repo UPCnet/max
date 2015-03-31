@@ -222,7 +222,7 @@ class MADBase(MADDict):
         self['published'] = datetime.datetime.utcnow()
 
     def getOwner(self, request):
-        return request['creator']
+        return request.authenticated_userid
 
     def fromRequest(self, request, rest_params={}):
         self.data.update(self.request.decoded_payload)
@@ -235,7 +235,7 @@ class MADBase(MADDict):
 
         # Who is actually doing this?
         # - The one that is authenticated
-        self.data['_creator'] = request.creator
+        self.data['_creator'] = request.authenticated_userid
         self.data['_owner'] = self.getOwner(request)
 
         self.processFields()
@@ -286,8 +286,19 @@ class MADBase(MADDict):
             self.old = deepcopy(flatten(self.old))
 
     def fromDatabase(self, key):
-        self.data[self.unique] = key
+        self.data[self.unique] = key if isinstance(key, ObjectId) else ObjectId(key)
         self.wake()
+
+    def reload(self):
+        unique = self.unique
+        value = self.get(unique)
+        if value:
+            query = {unique: value}
+            reloaded = self.mdb_collection.find_one(query)
+            self.update(reloaded)
+
+    def reload__acl__(self):
+        self.__acl__ = self.__class__.__acl__.wrapped(self)
 
     def insert(self, **kwargs):
         """

@@ -155,9 +155,10 @@ class ConversationsTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.add_conversation),
-            (Allow, Authenticated, permissions.list_conversations),
             (Allow, Authenticated, permissions.add_conversation),
             (Allow, Manager, permissions.add_conversation_for_others),
+            (Allow, Authenticated, permissions.list_conversations),
+            (Allow, Manager, permissions.purge_conversations)
         ]
         return acl
 

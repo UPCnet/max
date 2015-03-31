@@ -32,7 +32,7 @@ class Message(BaseActivity):
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Conversation
             conversation = Conversation()
-            conversation.fromDatabase(self.contexts[0]['_id'])
+            conversation.fromDatabase(self.contexts[0]['id'])
             subscription = self.request.actor.getSubscription(conversation)
             if subscription:
                 permissions = subscription.get('permissions', [])

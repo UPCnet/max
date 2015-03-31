@@ -48,8 +48,8 @@ PUBLIC_RESOURCES = {
     'conversation_push_tokens': dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens', traverse='/conversations/{id}'),
     'messages': dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages', traverse='/conversations/{id}'),
     'message': dict(route='/conversations/{id}/messages/{activity}', category='Conversations', name='Conversation message', traverse='/messages/{activity}'),
-    'participants': dict(route='/conversations/{id}/participants', category='Conversations', name='Conversation participants'),
-    'participant': dict(route='/conversations/{id}/participant', category='Conversations', name='Conversation participant'),
+    'participants': dict(route='/conversations/{id}/participants', category='Conversations', name='Conversation participants', traverse='/conversations/{id}'),
+    'participant': dict(route='/conversations/{id}/participants/{username}', category='Conversations', name='Conversation participant', traverse='/conversations/{id}'),
 
     # MAX 3.6
     'flag': dict(route='/activities/{activity}/flag', category='Activities', traverse='/activities/{activity}'),

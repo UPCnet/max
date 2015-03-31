@@ -68,7 +68,7 @@ def postMessage2Conversation(conversations, request):
     if len(request_participants) == 1 and request_participants[0] == request.actor.username:
         raise ValidationError('Cannot start a conversation with oneself')
 
-    if request.actor.username not in request_participants or request.has_permission(add_conversation_for_others):
+    if request.actor.username not in request_participants and not request.has_permission(add_conversation_for_others):
         raise ValidationError('Actor must be part of the participants list.')
 
     # Loop trough all participants, if there's one that doesn't exists, an exception will raise
@@ -110,7 +110,7 @@ def postMessage2Conversation(conversations, request):
                                                 'unsubscribe': 'subscribed'})
         if ctxts[0].get('displayName', False):
             conversation_params['displayName'] = ctxts[0]['displayName']
-        import ipdb;ipdb.set_trace()
+
         newconversation = Conversation()
         newconversation.fromRequest(request, rest_params=conversation_params)
 
@@ -138,9 +138,12 @@ def postMessage2Conversation(conversations, request):
 
         current_conversation = newconversation
 
-    # We have to re-get the actor, in order to have the subscription updated
-    updated_user = users[request.actor['username']]
-    message_params = {'actor': updated_user,
+    # We need to reload the actor, in order to have the subscription updated
+    # We need to reload reified acl's, so then new actor subscription will be visible by __acl__
+    request.actor.reload()
+    current_conversation.reload__acl__()
+
+    message_params = {'actor': request.actor,
                       'contexts': [current_conversation],
                       'verb': 'post'}
 
@@ -157,8 +160,12 @@ def postMessage2Conversation(conversations, request):
     # Grant subscribe permission to the user creating the conversation, only if the conversation
     # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
     # Will not be able to grow
+
     if len(current_conversation.participants) > 2:
-        updated_user.grantPermission(updated_user.getSubscription(current_conversation), 'subscribe', permanent=True)
+        subscription = request.actor.getSubscription(current_conversation)
+        request.actor.grantPermission(subscription, 'invite', permanent=False)
+        request.actor.grantPermission(subscription, 'kick', permanent=False)
+        request.actor.revokePermission(subscription, 'unsubscribe', permanent=False)
 
     message_oid = newmessage.insert()
     newmessage['_id'] = message_oid
@@ -242,10 +249,10 @@ def deleteConversations(conversations, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='user_conversation', request_method='POST', requires_actor=True, permission=add_conversation_participant)
+@endpoint(route_name='participants', request_method='POST', requires_actor=True, permission=add_conversation_participant)
 def joinConversation(conversation, request):
     """
-         /people/{username}/conversations/{id}
+
     """
     actor = request.actor
     cid = request.matchdict['id']
@@ -266,11 +273,8 @@ def joinConversation(conversation, request):
         if 'group' not in conversation.get('tags', []):
             raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
-        users = MADMaxCollection(request.db.users, query_key='username')
-        creator = users[request.creator]
-
-        if not creator.isAllowedToSee(actor):
-            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(creator.username, actor.username))
+        if not request.creator.isAllowedToSee(actor):
+            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(request.creator.username, actor.username))
 
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
         actor.addSubscription(conversation)
@@ -300,7 +304,7 @@ def joinConversation(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_conversation', request_method='DELETE', requires_actor=True, permission=delete_conversation_participant)
+@endpoint(route_name='participant', request_method='DELETE', requires_actor=True, permission=delete_conversation_participant)
 def leaveConversation(conversation, request):
     """
     """
@@ -347,12 +351,16 @@ def transferConversationOwnership(conversation, request):
     conversation.save()
 
     # Give hability to add new users to the new owner
-    request.actor.grantPermission(subscription, 'subscribe', permanent=True)
+    request.actor.grantPermission(subscription, 'invite', permanent=True)
+    request.actor.grantPermission(subscription, 'kick', permanent=True)
+    request.actor.revokePermission(subscription, 'unsubscribe', permanent=True)
 
     # Revoke hability to add new users from the previous owner
     users = MADMaxCollection(request.db.users, query_key='username')
     previous_owner = users[previous_owner_username]
-    previous_owner.revokePermission(subscription, 'subscribe')
+    previous_owner.revokePermission(subscription, 'invite')
+    previous_owner.revokePermission(subscription, 'kick')
+    previous_owner.grantPermission(subscription, 'unsubscribe')
 
     handler = JSONResourceEntity(conversation.flatten())
     return handler.buildResponse()

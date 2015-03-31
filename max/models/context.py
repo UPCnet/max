@@ -13,6 +13,7 @@ from max.security import Owner, Manager, is_self_operation
 from max.security import permissions
 from pyramid.decorator import reify
 
+
 class BaseContext(MADBase):
     """
         A max Context object representation
@@ -49,7 +50,7 @@ class BaseContext(MADBase):
             If not found,look for data being processed wiht param "owner"
             and finally default to creator.
         """
-        return self.get('_owner', self.data.get('owner', request.creator))
+        return self.get('_owner', self.data.get('owner', request.authenticated_userid))
 
     def getIdentifier(self):
         return str(self[self.unique])

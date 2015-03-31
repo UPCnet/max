@@ -4,6 +4,7 @@ from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
 from max.security.permissions import add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
 from max.security import Manager, Owner, is_self_operation
+from max.rest.utils import flatten
 from pyramid.security import Allow
 from pymongo import DESCENDING
 from pyramid.decorator import reify
@@ -14,6 +15,8 @@ class Conversation(BaseContext):
         A conversation between people. This are normal contexts but stored in
         another collection
     """
+    default_field_view_permission = view_conversation
+    default_field_edit_permission = modify_conversation
     updatable_fields = ['permissions', 'displayName', 'tags', 'participants']
     collection = 'conversations'
     unique = '_id'
@@ -28,35 +31,42 @@ class Conversation(BaseContext):
     def __acl__(self):
         acl = [
             (Allow, Manager, view_conversation),
-            (Allow, Owner, view_conversation),
             (Allow, Manager, view_conversation_subscription),
-            (Allow, Owner, view_conversation_subscription),
             (Allow, Manager, modify_conversation),
-            (Allow, Owner, modify_conversation),
             (Allow, Manager, delete_conversation),
-            (Allow, Owner, delete_conversation),
             (Allow, Manager, purge_conversations),
             (Allow, Manager, add_conversation_participant),
             (Allow, Manager, delete_conversation_participant),
+
+            (Allow, Owner, view_conversation),
+            (Allow, Owner, view_conversation_subscription),
+            (Allow, Owner, modify_conversation),
+            (Allow, Owner, delete_conversation),
         ]
 
-        subscription = self.request.actor.getSubscription(self)
+        # Grant extra permissions mapped to the authenticated user's
+        # defined conversation subscription permissions
+
+        subscription = self.request.creator.getSubscription(self)
         if subscription:
             # Allow user to view only its own subscription
             if is_self_operation(self.request):
                 acl.append((Allow, self.request.authenticated_userid, view_conversation_subscription))
 
             if 'read' in subscription.get('permissions', []):
-                acl.append(Allow, self.request.authenticated_userid, view_conversation)
+                acl.append((Allow, self.request.authenticated_userid, view_conversation))
 
             if 'write' in subscription.get('permissions', []):
-                acl.append(Allow, self.request.authenticated_userid, add_message)
+                acl.append((Allow, self.request.authenticated_userid, add_message))
 
-            if 'subscribe' in subscription.get('permissions', []):
-                acl.append(Allow, self.request.authenticated_userid, add_conversation_participant)
+            if 'unsubscribe' in subscription.get('permissions', []) and is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, delete_conversation_participant))
 
-            if 'unsubscribe' in subscription.get('permissions', []):
-                acl.append(Allow, self.request.authenticated_userid, delete_conversation_participant)
+            if 'invite' in subscription.get('permissions', []):
+                acl.append((Allow, self.request.authenticated_userid, add_conversation_participant))
+
+            if 'kick' in subscription.get('permissions', []) and not is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, delete_conversation_participant))
 
         return acl
 
@@ -72,7 +82,7 @@ class Conversation(BaseContext):
         fields_to_squash = ['published', 'owner', 'creator', 'participants', 'tags', 'displayName']
         if '_id' != self.unique:
             fields_to_squash.append('_id')
-        subscription = self.flatten(squash=fields_to_squash)
+        subscription = flatten(self, squash=fields_to_squash)
 
         # If we are subscribing the user, read permission is granted
         user_permissions = ['read']

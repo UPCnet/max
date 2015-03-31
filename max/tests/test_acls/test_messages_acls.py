@@ -43,8 +43,8 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to add a message to a conversation
             Then i succeed
         """
-        from .mockers import group_message as creation_message
-        from .mockers import message2
+        from max.tests.mockers import group_message as creation_message
+        from max.tests.mockers import message2
 
         sender = 'messi'
         recipient = 'xavi'
@@ -66,8 +66,8 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to add a message to a conversation
             Then i get a Forbidden Exception
         """
-        from .mockers import message
-        from .mockers import message2
+        from max.tests.mockers import message
+        from max.tests.mockers import message2
 
         sender = 'messi'
         recipient = 'xavi'
@@ -89,8 +89,8 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i get a Forbidden Exception
         """
-        from .mockers import group_message as creation_message
-        from .mockers import message4
+        from max.tests.mockers import group_message as creation_message
+        from max.tests.mockers import message4
 
         sender = 'messi'
         recipient = 'xavi'
@@ -113,8 +113,8 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i get a Forbidden Exception
         """
-        from .mockers import message
-        from .mockers import message4
+        from max.tests.mockers import message
+        from max.tests.mockers import message4
 
         sender = 'messi'
         recipient = 'xavi'
@@ -134,8 +134,8 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             And i'm impersonating as another user
             Then i succeed
         """
-        from .mockers import message
-        from .mockers import message4
+        from max.tests.mockers import message
+        from max.tests.mockers import message4
 
         sender = 'messi'
         recipient = 'xavi'
@@ -156,7 +156,7 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
 
@@ -175,7 +175,7 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i succeed
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
 
@@ -194,7 +194,7 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to list a conversation's messages
             Then i get a Forbidden Exception
         """
-        from .mockers import message
+        from max.tests.mockers import message
         sender = 'messi'
         recipient = 'xavi'
         recipient2 = 'shakira'

@@ -185,9 +185,16 @@ def get_request_actor(request):
 
 def get_request_creator(request):
     """
-        Returns the authenticated user, to be used as the creator of objects
+        Returns the object representing the creator, a.k.a. the authenticated user
     """
-    return get_username_in_oauth(request)
+    username = get_username_in_oauth(request)
+    try:
+        mmdb = MADMaxDB(request.db)
+        actor = mmdb.users.getItemsByusername(username)[0]
+        actor.setdefault('displayName', actor['username'])
+        return actor
+    except:
+        return None
 
 
 def get_authenticated_user_roles(request):
