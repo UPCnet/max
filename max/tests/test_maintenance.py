@@ -144,7 +144,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['talkingIn'][0]['participants'][0]['username'], 'messi')
         self.assertEqual(res.json['talkingIn'][0]['participants'][1]['username'], 'xavi')
         self.assertEqual(res.json['talkingIn'][0]['participants'][2]['username'], 'shakira')
-        self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe', 'subscribe'])
+        self.assertListEqual(res.json['talkingIn'][0]['permissions'], ['read', 'unsubscribe'])
         self.assertListEqual(res.json['talkingIn'][0]['tags'], ['group'])
         conversation_id = res.json['talkingIn'][0]['id']
 
