@@ -9,7 +9,7 @@ from max.rest.utils import hasPermission
 from max.rest.utils import rfc3339_parse
 from max.rest.utils import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner, is_self_operation
-from max.security.permissions import favorite, unfavorite, view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment
+from max.security.permissions import favorite, unfavorite, view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment, like, unlike, flag, unflag
 from max.resources import CommentsTraverser
 from pyramid.security import Allow, Authenticated
 from PIL import Image
@@ -423,6 +423,10 @@ class Activity(BaseActivity):
                 if 'read' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, view_activity))
                     acl.append((Allow, self.request.authenticated_userid, list_comments))
+                    acl.append((Allow, self.request.authenticated_userid, like))
+
+                if 'flag' in permissions:
+                    acl.append((Allow, self.request.authenticated_userid, flag))
 
                 if 'delete' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, delete_activity))
@@ -433,7 +437,17 @@ class Activity(BaseActivity):
 
             # If no susbcription found, check context policy
             if context.get('permissions', ).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
-                acl.append((Allow, self.request.authenticated_userid, view_activity))
+                acl.extend([
+                    (Allow, self.request.authenticated_userid, view_activity)
+                    (Allow, self.authenticated_userid, like),
+                ])
+
+            # Only context activites can be flagged/unflagged, so we give permissions to
+            # Manager here, as it don't make sense to do it globally
+            acl.extend([
+                (Allow, Manager, flag),
+                (Allow, Manager, unflag)
+            ])
 
         # Activies without a context are considered public to all authenticated users, so commentable.
         # Those activities commments also will be readable by all authenticated users.
@@ -444,7 +458,12 @@ class Activity(BaseActivity):
                 (Allow, Authenticated, add_comment),
                 (Allow, Owner, delete_comment),
                 (Allow, Authenticated, list_comments),
+                (Allow, Authenticated, like),
             ])
+
+        # Dont allow to remove likes from an unliked activity
+        if self.has_like_from(self.request.actor):
+            acl.append((Allow, self.authenticated_userid, unlike))
 
         return acl
 

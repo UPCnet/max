@@ -52,9 +52,9 @@ PUBLIC_RESOURCES = {
     'participant': dict(route='/conversations/{id}/participant', category='Conversations', name='Conversation participant'),
 
     # MAX 3.6
-    'flag': dict(route='/activities/{activity}/flag', category='Activities'),
-    'likes': dict(route='/activities/{activity}/likes', category='Activities'),
-    'like': dict(route='/activities/{activity}/likes/{username}', category='Activities'),
+    'flag': dict(route='/activities/{activity}/flag', category='Activities', traverse='/activities/{activity}'),
+    'likes': dict(route='/activities/{activity}/likes', category='Activities', traverse='/activities/{activity}'),
+    'like': dict(route='/activities/{activity}/likes/{username}', category='Activities', traverse='/activities/{activity}'),
     'user_likes': dict(route='/people/{username}/likes', category='User', name='User liked activity'),
     'favorites': dict(route='/activities/{activity}/favorites', category='Activities', traverse='/activities/{activity}'),
     'favorite': dict(route='/activities/{activity}/favorites/{username}', category='Activities', traverse='/activities/{activity}'),
