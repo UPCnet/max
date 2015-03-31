@@ -58,6 +58,6 @@ add_conversation_participant = 'Add a participant to a conversation'
 delete_conversation_participant = 'Delete a participant from a conversation'
 
 add_message = 'Add a message to a conversation'
-view_messages = 'View all conversation messages'
+list_messages = 'View all conversation messages'
 view_message = 'View a conversation message and attachments'
 modify_message = 'Modify a message'

@@ -418,6 +418,9 @@ class Context(BaseContext):
         if self.get(self.unique, None) is None:
             self[self.unique] = self.getIdentifier()
 
+    def format_unique(self, key):
+        return key
+
     def getIdentifier(self):
         """
             Resolves a valid identifier from this context. Different attemps will be

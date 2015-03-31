@@ -438,8 +438,8 @@ class Activity(BaseActivity):
             # If no susbcription found, check context policy
             if context.get('permissions', ).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
                 acl.extend([
-                    (Allow, self.request.authenticated_userid, view_activity)
-                    (Allow, self.authenticated_userid, like),
+                    (Allow, self.request.authenticated_userid, view_activity),
+                    (Allow, self.request.authenticated_userid, like),
                 ])
 
             # Only context activites can be flagged/unflagged, so we give permissions to

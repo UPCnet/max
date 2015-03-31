@@ -182,7 +182,6 @@ class MessagesTraverser(MongoDBTraverser):
     @reify
     def __acl__(self):
         acl = [
-            (Allow, Manager, permissions.list_messages),
         ]
         return acl
 

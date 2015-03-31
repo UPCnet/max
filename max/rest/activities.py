@@ -167,7 +167,7 @@ def addContextActivity(context, request):
             newactivity.save()
         else:
             activity_oid = newactivity.insert()
-            newactivity['_id'] = activity_oid
+            newactivity['_id'] = ObjectId(activity_oid)
 
     handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()

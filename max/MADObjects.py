@@ -285,8 +285,11 @@ class MADBase(MADDict):
             self.old.update(obj)
             self.old = deepcopy(flatten(self.old))
 
+    def format_unique(self, key):
+        return key if isinstance(key, ObjectId) else ObjectId(key)
+
     def fromDatabase(self, key):
-        self.data[self.unique] = key if isinstance(key, ObjectId) else ObjectId(key)
+        self.data[self.unique] = self.format_unique(key)
         self.wake()
 
     def reload(self):

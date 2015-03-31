@@ -10,10 +10,10 @@ from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 from base64 import b64encode
 from bson import ObjectId
 
-from max.security.permissions import view_messages, view_message, add_message
+from max.security.permissions import list_messages, view_message, add_message
 
 
-@endpoint(route_name='messages', request_method='GET', requires_actor=True, permission=view_messages)
+@endpoint(route_name='messages', request_method='GET', requires_actor=True, permission=list_messages)
 def getMessages(conversation, request):
     """
          /conversations/{id}/messages
