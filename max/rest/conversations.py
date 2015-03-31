@@ -152,7 +152,6 @@ def postMessage2Conversation(conversations, request):
     try:
         newmessage.fromRequest(request, rest_params=message_params)
     except Exception as catched:
-        newmessage.fromRequest(request, rest_params=message_params)
         # In case we coulnd't post the message, rollback conversation creation
         current_conversation.delete()
         raise catched

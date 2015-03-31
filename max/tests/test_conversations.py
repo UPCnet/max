@@ -128,7 +128,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         cid = str(res.json['contexts'][0]['id'])
 
         resp = self.testapp.get('/conversations/{}'.format(cid), '', oauth2Header(sender), status=200)
-        permissions = {'read': 'subscribed', 'write': 'subscribed', 'subscribe': 'restricted', 'unsubscribe': 'public', 'invite': 'restricted'}
+        permissions = {
+            'read': 'subscribed',
+            'write': 'subscribed',
+            'subscribe': 'restricted',
+            'unsubscribe': 'subscribed'}
         self.assertEqual(resp.json.get("participants", None)[0]['username'], sender)
         self.assertEqual(resp.json.get("participants", None)[1]['username'], recipient)
         self.assertEqual(resp.json.get("objectType", None), "conversation")
@@ -278,7 +282,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
         self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
-        self.testapp.get('/conversations/%s' % cid, "", oauth2Header(external), status=401)
+        self.testapp.get('/conversations/%s' % cid, "", oauth2Header(external), status=403)
 
     def test_get_messages_from_a_conversation_for_user_not_in_participants(self):
         from .mockers import message, message2
@@ -293,7 +297,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         cid = str(res.json['contexts'][0]['id'])
         self.testapp.post('/conversations/%s/messages' % cid, json.dumps(message2), oauth2Header(sender), status=201)
 
-        res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(external), status=401)
+        res = self.testapp.get('/conversations/%s/messages' % cid, "", oauth2Header(external), status=403)
 
     def test_get_conversations_for_an_user(self):
         """ doctest .. http:get:: /conversations """
@@ -420,7 +424,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient)
 
         conversation_id = '0123456789abcdef01234567'
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=400)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=404)
 
     def test_add_participant_to_inexistent_conversation(self):
         """
@@ -529,7 +533,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, conversation_id), '', oauth2Header(recipient), status=401)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient3, conversation_id), '', oauth2Header(recipient), status=403)
 
     def test_conversation_participant_limit(self):
         """
@@ -582,7 +586,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient), status=200)
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(sender), status=200)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 3)
 
@@ -829,7 +833,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.put('/conversations/{}/owner'.format(conversation_id), json.dumps({'actor': {'username': recipient}}), oauth2Header(recipient), status=401)
+        res = self.testapp.put('/conversations/{}/owner'.format(conversation_id), json.dumps({'actor': {'username': recipient}}), oauth2Header(recipient), status=403)
 
     def test_non_conversation_participant_cannot_leave_conversation(self):
         """
@@ -852,7 +856,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.delete('/people/{}/conversations/{}'.format(external, conversation_id), '', oauth2Header(sender), status=404)
+        res = self.testapp.delete('/people/{}/conversations/{}'.format(external, conversation_id), '', oauth2Header(external), status=403)
 
     def test_user_leaves_conversation_other_participants_keep_seeing_messages(self):
         """
@@ -906,7 +910,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(recipient2), status=201)
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
-        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient2), status=401)
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient2), status=403)
 
     def test_conversation_owner_kicks_user(self):
         """
@@ -964,7 +968,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient2), status=401)
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient2), status=403)
 
     def test_conversation_owner_deletes_conversation(self):
         """
@@ -1057,7 +1061,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=401)
+        res = self.testapp.delete('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=403)
 
     def test_conversation_owner_changes_conversation_displayName(self):
         """
@@ -1102,7 +1106,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
-        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(recipient), status=401)
+        self.testapp.put('/conversations/{}'.format(conversation_id), '{"displayName": "Nou nom"}', oauth2Header(recipient), status=403)
 
     def test_two_people_conversation_displayName_is_partner_displayName(self):
         """

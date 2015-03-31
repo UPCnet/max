@@ -20,7 +20,7 @@ def getMessages(conversation, request):
          Return all messages from a conversation
     """
     mmdb = MADMaxDB(request.db)
-    query = {'contexts.id': conversation['_id']}
+    query = {'contexts.id': str(conversation['_id'])}
     messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining
     handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
