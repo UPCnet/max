@@ -22,6 +22,18 @@ requests_get = requests.get
 requests_post = requests.post
 
 
+def impersonate_payload(source, username):
+    """
+        Adds an actor to a payload, to impersonate it
+    """
+    base = deepcopy(source)
+    base['actor'] = {
+        'objectType': 'person',
+        'username': username
+    }
+    return base
+
+
 class mock_requests_obj(object):
 
     def __init__(self, *args, **kwargs):

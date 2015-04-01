@@ -93,7 +93,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
            Given a plain user
            and a regular context
            When i post an activity in a context
-           Then someone else can remove previously like mark from this activity
+           Then i can remove previously like mark from this activity
         """
         from .mockers import user_status_context
         from .mockers import subscribe_context, create_context
@@ -106,13 +106,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username_not_me, subscribe_context)
         res = self.create_activity(username, user_status_context)
         activity_id = res.json['id']
-        res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username_not_me), status=201)
-        res = self.testapp.delete('/activities/%s/likes/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=200)
+        self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username_not_me), status=201)
+        self.testapp.delete('/activities/%s/likes/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=204)
         activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
-
-        self.assertEqual(res.json['object']['likes'], [])
-        self.assertEqual(res.json['object']['liked'], False)
-        self.assertEqual(res.json['object']['likesCount'], 0)
 
         self.assertEqual(activity.json['likes'], [])
         self.assertEqual(activity.json['liked'], False)
@@ -168,11 +164,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity_id = res.json['id']
         res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username_not_me), status=201)
         res = self.testapp.post('/activities/%s/likes' % activity_id, '', oauth2Header(username), status=201)
-        res = self.testapp.delete('/activities/%s/likes/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=200)
+        res = self.testapp.delete('/activities/%s/likes/%s' % (activity_id, username_not_me), '', oauth2Header(username_not_me), status=204)
 
-        self.assertEqual(res.json['object']['likes'][0]['username'], username)
-        self.assertEqual(res.json['object']['liked'], False)
-        self.assertEqual(res.json['object']['likesCount'], 1)
+        activity = self.testapp.get('/activities/%s' % activity_id, '', oauth2Header(username), status=200)
+
+        self.assertEqual(activity.json['likes'][0]['username'], username)
+        self.assertEqual(activity.json['liked'], True)
+        self.assertEqual(activity.json['likesCount'], 1)
 
     def test_likes_sorting_1(self):
         """

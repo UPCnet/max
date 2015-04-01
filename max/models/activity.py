@@ -346,12 +346,15 @@ class Activity(BaseActivity):
         acl = [
             (Allow, Manager, view_activity),
             (Allow, Manager, delete_activity),
-            (Allow, Owner, view_activity),
-            (Allow, Owner, delete_activity),
             (Allow, Manager, list_comments),
             (Allow, Manager, add_comment),
             (Allow, Manager, favorite),
             (Allow, Manager, unfavorite),
+            (Allow, Manager, like),
+
+            (Allow, Owner, view_activity),
+            (Allow, Owner, delete_activity),
+
         ]
 
         if is_self_operation(self.request):
@@ -387,10 +390,14 @@ class Activity(BaseActivity):
                 if 'read' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, view_activity))
                     acl.append((Allow, self.request.authenticated_userid, list_comments))
-                    acl.append((Allow, self.request.authenticated_userid, like))
+
+                    # Allow like on non impersonated requests
+                    if is_self_operation(self.request):
+                        acl.append((Allow, self.request.authenticated_userid, like))
 
                 if 'flag' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, flag))
+                    acl.append((Allow, self.request.authenticated_userid, unflag))
 
                 if 'delete' in permissions:
                     acl.append((Allow, self.request.authenticated_userid, delete_activity))
@@ -401,10 +408,9 @@ class Activity(BaseActivity):
 
             # If no susbcription found, check context policy
             if context.get('permissions', ).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
-                acl.extend([
-                    (Allow, self.request.authenticated_userid, view_activity),
-                    (Allow, self.request.authenticated_userid, like),
-                ])
+                acl.append((Allow, self.request.authenticated_userid, view_activity))
+                if is_self_operation(self.request):
+                    acl.append((Allow, self.request.authenticated_userid, like))
 
             # Only context activites can be flagged/unflagged, so we give permissions to
             # Manager here, as it don't make sense to do it globally
@@ -422,12 +428,16 @@ class Activity(BaseActivity):
                 (Allow, Authenticated, add_comment),
                 (Allow, Owner, delete_comment),
                 (Allow, Authenticated, list_comments),
-                (Allow, Authenticated, like),
             ])
+            if is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, like))
 
-        # Dont allow to remove likes from an unliked activity
+        # Allow unlike only if actor has a like on this activity.
+        # Allow Managers to unlike likes from other users
         if self.has_like_from(self.request.actor):
-            acl.append((Allow, self.authenticated_userid, unlike))
+            acl.append((Allow, Manager, unlike))
+            if is_self_operation(self.request):
+                acl.append((Allow, self.request.authenticated_userid, unlike))
 
         return acl
 

@@ -147,7 +147,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.create_activity(username, user_status_context)
         activity_id = res.json['id']
-        res = self.testapp.post('/activities/%s/flag' % activity_id, '', oauth2Header(username), status=401)
+        res = self.testapp.post('/activities/%s/flag' % activity_id, '', oauth2Header(username), status=403)
 
     def test_reflag_activity(self):
         """

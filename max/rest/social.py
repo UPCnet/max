@@ -74,11 +74,7 @@ def unlike(activity, request):
 
     activity.delete_like_from(request.actor)
 
-    newactivity['object']['likes'] = activity['likes']
-    newactivity['object']['likesCount'] = activity['likesCount']
-    newactivity['object']['liked'] = activity.has_like_from(request.actor)
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
-    return handler.buildResponse()
+    return HTTPNoContent()
 
 
 @endpoint(route_name='flag', request_method='POST', requires_actor=True, permission=flag)
