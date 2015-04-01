@@ -5,6 +5,7 @@ from max.models.conversation import Conversation
 from max.models.message import Message
 from max.models.user import User
 from max.models.security import Security
+from max.models.token import Token
 
 import inspect
 

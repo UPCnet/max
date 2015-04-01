@@ -3,7 +3,7 @@ from max import maxlogger
 from max.MADMax import MADMaxCollection, MADMaxDB
 from pyramid.security import Allow, Authenticated
 from max.exceptions import ObjectNotFound, UnknownUserError
-from max.security import Manager, Owner
+from max.security import Manager, Owner, is_self_operation, is_owner
 from max.security import permissions
 from pyramid.decorator import reify
 import pkg_resources
@@ -66,6 +66,7 @@ class Root(dict):
         self['conversations'] = ConversationsTraverser(self, request)
         self['messages'] = MessagesTraverser(self, request)
         self['security'] = get_security_object(self, request)
+        self['tokens'] = TokensTraverser(self, request)
 
 
 def get_security_object(root, request):
@@ -183,6 +184,27 @@ class MessagesTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
         ]
+        return acl
+
+
+class TokensTraverser(MongoDBTraverser):
+    collection_name = 'tokens'
+    query_key = 'token'
+
+    @reify
+    def __acl__(self):
+        acl = [
+            (Allow, Manager, permissions.list_tokens),
+            (Allow, Manager, permissions.add_token),
+            (Allow, Manager, permissions.delete_token),
+            (Allow, Manager, permissions.view_token),
+
+            (Allow, Owner, permissions.view_token),
+            (Allow, Owner, permissions.delete_token)
+        ]
+        if is_self_operation(self.request):
+            acl.append((Allow, self.request.authenticated_userid, permissions.add_token))
+
         return acl
 
 

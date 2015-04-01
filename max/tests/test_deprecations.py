@@ -28,6 +28,7 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
         self.app.registry.max_store.drop_collection('security')
         self.app.registry.max_store.drop_collection('conversations')
         self.app.registry.max_store.drop_collection('messages')
+        self.app.registry.max_store.drop_collection('tokens')
         self.app.registry.max_store.security.insert(test_default_security)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
@@ -163,5 +164,103 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(rewrited_request_url, '/people/sheldon/activities'.format(context_hash))
         self.assertNotIn('actor', json_body)
 
+    # Test depreacted join conversation
 
+    def test_deprecated_join_conversation(self):
+        """
+            Given a request to the deprecated POST /people/{user}/conversations/{id}
+            When the request is processed
+            Then the request is rewrited as DELETE /conversations/{id}/participants
+            And the actor is in the body
+        """
+        from max.tests.mockers import group_message as message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+        recipient3 = 'melendi'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+        self.create_user(recipient3)
 
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        res = self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(test_manager), status=201)
+
+        rewrited_request = res.request
+        rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
+        json_body = json.loads(res.request.body)
+
+        self.assertEqual(rewrited_request_url, '/conversations/{}/participants'.format(cid))
+        self.assertEqual(json_body['actor']['username'], recipient3)
+        self.assertEqual(json_body['actor']['objectType'], 'person')
+
+    def test_deprecated_leave_conversation(self):
+        """
+            Given a request to the deprecated DELETE /people/{user}/conversations/{id}
+            When the request is processed
+            Then the request is rewrited as DELETE /conversations/{id}/participants/{username}
+            And the url parameters are remapped
+        """
+        from max.tests.mockers import group_message as message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        res = self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, cid), '', oauth2Header(test_manager), status=204)
+
+        rewrited_request = res.request
+        rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
+
+        self.assertEqual(rewrited_request_url, '/conversations/{}/participants/{}'.format(cid, recipient2))
+
+    def test_deprecated_add_token(self):
+        """
+            Given a request to the deprecated POST /people/{user}/device/{platform}/{token}
+            When the request is processed
+            Then the request is rewrited as POST /tokens
+            And the token is injected in the body
+            And the platform is injected in the body
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        token = '000000000000000000'
+        platform = 'ios'
+
+        res = self.testapp.post('/people/{}/device/{}/{}'.format(username, platform, token), '', headers=oauth2Header(username), status=201)
+
+        rewrited_request = res.request
+        rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
+        json_body = json.loads(res.request.body)
+
+        self.assertEqual(rewrited_request_url, '/tokens')
+        self.assertEqual(json_body['token'], token)
+        self.assertEqual(json_body['platform'], platform)
+
+    def test_deprecated_delete_token(self):
+        """
+            Given a request to the deprecated DELETE /people/{user}/device/{platform}/{token}
+            When the request is processed
+            Then the request is rewrited as DELETE /tokens/{token}
+            And the token is injected in the body
+            And the platform is injected in the body
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        token = '000000000000000000'
+        platform = 'ios'
+
+        self.testapp.post('/people/{}/device/{}/{}'.format(username, platform, token), '', headers=oauth2Header(username), status=201)
+        res = self.testapp.delete('/people/{}/device/{}/{}'.format(username, platform, token), '', headers=oauth2Header(username), status=204)
+
+        rewrited_request = res.request
+        rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
+
+        self.assertEqual(rewrited_request_url, '/tokens/{}'.format(token))

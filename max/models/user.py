@@ -9,15 +9,12 @@ from max.rest.utils import getMaxModelByObjectType
 from pyramid.security import Allow
 from pyramid.security import Authenticated
 from max.security import Owner, Manager
-from max.security.permissions import modify_avatar, view_private_fields, list_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, manage_push_tokens, list_activities, add_activity, view_push_tokens
+from max.security.permissions import delete_token, modify_avatar, view_private_fields, list_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, list_activities, add_activity
 
 from bson import ObjectId
 from pyramid.settings import asbool
 from pyramid.decorator import reify
 import datetime
-
-
-PLATFORM_FIELD_SUFFIX = 'Devices'
 
 
 class User(MADBase):
@@ -76,39 +73,29 @@ class User(MADBase):
             'formatters': ['stripTwitterUsername'],
             'validators': ['isValidTwitterUsername']
         },
-        'iosDevices': {
-            'view': view_push_tokens,
-            'edit': manage_push_tokens,
-            'default': []
-        },
-        'androidDevices': {
-            'edit': view_push_tokens,
-            'view': manage_push_tokens,
-            'default': []
-        },
     }
 
     @reify
     def __acl__(self):
         acl = [
-            (Allow, Owner, modify_user),
             (Allow, Manager, list_activities),
-            (Allow, Owner, list_activities),
-            (Allow, Owner, add_activity),
             (Allow, Manager, add_activity),
             (Allow, Manager, view_subscriptions),
-            (Allow, Owner, view_subscriptions),
             (Allow, Manager, list_comments),
-            (Allow, Owner, list_comments),
-            (Allow, Authenticated, view_user_profile),
-            (Allow, Owner, manage_push_tokens),
-            (Allow, Manager, manage_push_tokens),
-            (Allow, Owner, view_push_tokens),
-            (Allow, Manager, view_push_tokens),
-            (Allow, Owner, view_private_fields),
             (Allow, Manager, view_private_fields),
             (Allow, Manager, modify_avatar),
+            (Allow, Manager, delete_token),
+
+            (Allow, Owner, modify_user),
+            (Allow, Owner, list_activities),
+            (Allow, Owner, add_activity),
+            (Allow, Owner, view_subscriptions),
+            (Allow, Owner, list_comments),
+            (Allow, Owner, view_private_fields),
             (Allow, Owner, modify_avatar),
+            (Allow, Owner, delete_token),
+
+            (Allow, Authenticated, view_user_profile),
         ]
 
         return acl
@@ -335,15 +322,19 @@ class User(MADBase):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
                 return subscription
 
-    def addUserDevice(self, platform, token):
-        self.add_to_list(platform + PLATFORM_FIELD_SUFFIX, token)
+    def delete_tokens(self, platform=None):
+        """
+            Deletes tokens from a user, according to filter options
+        """
+        tokens = MADMaxCollection(self.request.db.tokens)
+        query = {
+            '_owner': self._owner,
+        }
 
-    def deleteUserDevice(self, platform, token):
-        self.delete_from_list(platform + PLATFORM_FIELD_SUFFIX, token)
+        if platform is not None:
+            query['platform'] = platform
 
-    def deleteUserDevices(self, platform):
-        self[platform + PLATFORM_FIELD_SUFFIX] = []
-        self.save()
+        tokens.remove(query)
 
     def isAllowedToSee(self, user):
         """

@@ -20,9 +20,6 @@ view_subscriptions = 'View all subscriptions of user to a context'
 modify_immutable_fields = 'Modify immutable fields'
 change_ownership = "Change an object's owner"
 
-manage_push_tokens = 'Add and remove user device tokens'
-view_push_tokens = 'Query and view user device tokens'
-
 view_activity = 'View activity'
 list_activities = 'View activities'
 list_activities_unsubscribed = 'View activities without context subscription'
@@ -61,3 +58,9 @@ add_message = 'Add a message to a conversation'
 list_messages = 'View all conversation messages'
 view_message = 'View a conversation message and attachments'
 modify_message = 'Modify a message'
+
+add_token = 'Add a new device token'
+view_token = 'View a device token'
+modify_token = 'Modify a device token'
+delete_token = 'Delete a device token'
+list_tokens = 'List and query tokens'

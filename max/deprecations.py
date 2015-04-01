@@ -8,6 +8,7 @@ people_subscriptions_resource_matcher = re.compile(r'/people/([^\/]+)/subscripti
 people_subscription_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptions/([^\/]+)$').search
 people_activities_resource_matcher = re.compile(r'/people/([^\/]+)/activities$').search
 people_conversation_resource_matcher = re.compile(r'/people/([^\/]+)/conversations/([^\/]+)$').search
+people_device_token_resource_matcher = re.compile(r'/people/([^\/]+)/device/([^\/]+)/([^\/]+)$').search
 
 
 def get_body(request, default=dict):
@@ -228,6 +229,70 @@ def fix_deprecated_leave_conversation(request, match):
     request.headers['Content-Type'] = 'application/json'
 
 
+def fix_deprecated_add_token(request, match):
+    """
+        Adapts the deprecated way to add a token
+
+        Requests matching:
+
+            POST /people/{username}/device/{platform}/{token}
+
+        will be transformed into:
+
+            POST /tokens
+
+        platform and token will be extracted from the url on the json body,
+        and a conveninent request body will be generated using those params.
+
+        Original request body will be ignored, as the original request format
+        didn't expect any input from it. The original request format neither accepted
+        impersonation, so we'll ignore username in the url, and use the authenticated one.
+
+    """
+    platform = match.groups()[1]
+    token = match.groups()[2]
+
+    replacement_body = {
+        'platform': platform,
+        'token': token
+    }
+    new_path = '/tokens'
+    request.path_info = new_path
+    request.body = json.dumps(replacement_body)
+
+    # Force headers needed to avoid body content quoting on tests
+    request.headers['Content-Type'] = 'application/json'
+
+
+def fix_deprecated_delete_token(request, match):
+    """
+        Adapts the deprecated way to add a token
+
+        Requests matching:
+
+            DELETE /people/{username}/device/{platform}/{token}
+
+        will be transformed into:
+
+            DELETE /tokens/{id}
+
+        token will be extracted from the url on the json body,
+        and remapped to its new url location.
+
+        Original request body will be ignored, as the original request format
+        didn't expect any input from it. The original request format neither accepted
+        impersonation, so we'll ignore username in the url, and use the authenticated one.
+        Platform is also ignored, as we'll identify the token by itself.
+
+    """
+    token = match.groups()[2]
+    new_path = '/tokens/{}'.format(token)
+    request.path_info = new_path
+
+    # Force headers needed to avoid body content quoting on tests
+    request.headers['Content-Type'] = 'application/json'
+
+
 def check_deprecation(request, pattern, action):
     """
         Applies a deprecation fix
@@ -244,10 +309,12 @@ POST_DEPRECATIONS = [
     (people_activities_resource_matcher, fix_deprecated_create_context_activity),
     (people_subscriptions_resource_matcher, fix_deprecated_subscribe_user),
     (people_resource_matcher, fix_deprecated_create_user),
-    (people_conversation_resource_matcher, fix_deprecated_join_conversation)
+    (people_conversation_resource_matcher, fix_deprecated_join_conversation),
+    (people_device_token_resource_matcher, fix_deprecated_add_token)
 ]
 
 DELETE_DEPRECATIONS = [
     (people_subscription_resource_matcher, fix_deprecated_unsubscribe_user),
-    (people_conversation_resource_matcher, fix_deprecated_leave_conversation)
+    (people_conversation_resource_matcher, fix_deprecated_leave_conversation),
+    (people_device_token_resource_matcher, fix_deprecated_delete_token)
 ]

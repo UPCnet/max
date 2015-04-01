@@ -493,11 +493,12 @@ class MADBase(MADDict):
     #         if self.has_field_permission(field, 'view'):
     #             fields.append(field.lstrip('_'))
     #         else:
-    #             print '  User {} has no permission "{}" '.format(
+    #             print '  User {} has no permission "{}{}" for field "{}" @ {}'.format(
     #                 self.request.authenticated_userid,
     #                 self.get_field_permission_for(field, 'view'),
-    #                 '[DEFAULT]' if self.schema[field].get('view', None) else ''
-
+    #                 ' [default]' if self.schema[field].get('view', None) is None else '',
+    #                 field,
+    #                 self.request.context.__class__.__name__
     #             )
     #     print "*****************************************"
     #     print
