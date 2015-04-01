@@ -8,8 +8,8 @@ from max.rest.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
 from pyramid.security import Authenticated
-from max.security import Owner, Manager
-from max.security.permissions import delete_token, modify_avatar, view_private_fields, list_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, list_activities, add_activity
+from max.security import Owner, Manager, is_self_operation
+from max.security.permissions import list_tokens, delete_token, modify_avatar, view_private_fields, list_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, list_activities, add_activity
 
 from bson import ObjectId
 from pyramid.settings import asbool
@@ -85,6 +85,7 @@ class User(MADBase):
             (Allow, Manager, view_private_fields),
             (Allow, Manager, modify_avatar),
             (Allow, Manager, delete_token),
+            (Allow, Manager, list_tokens),
 
             (Allow, Owner, modify_user),
             (Allow, Owner, list_activities),
@@ -98,6 +99,8 @@ class User(MADBase):
             (Allow, Authenticated, view_user_profile),
         ]
 
+        if is_self_operation(self.request):
+            acl.append((Allow, self.request.authenticated_userid, list_tokens))
         return acl
 
     def getOwner(self, request):
@@ -322,9 +325,30 @@ class User(MADBase):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
                 return subscription
 
+    def get_tokens(self, platform=None):
+        """
+            Returns all the tokens from a user, filtered by platform if any
+        """
+
+        tokens = MADMaxCollection(self.request.db.tokens)
+        query = {
+            '_owner': self._owner,
+        }
+
+        if platform is not None:
+            query['platform'] = platform
+
+        user_tokens = tokens.search(query)
+
+        result = []
+        for token in user_tokens:
+            result.append(dict(token=token['token'], platform=token['platform'], username=token['_owner']))
+
+        return result
+
     def delete_tokens(self, platform=None):
         """
-            Deletes tokens from a user, according to filter options
+            Deletes tokens from a user, filtered by platform if any
         """
         tokens = MADMaxCollection(self.request.db.tokens)
         query = {

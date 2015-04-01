@@ -324,7 +324,7 @@ class MADBase(MADDict):
 
     def _before_delete(self):
         """
-            Executed after an object removal
+            Executed before an object removal
             Override to provide custom behaviour on delete
         """
         pass
@@ -341,7 +341,7 @@ class MADBase(MADDict):
             Removes the object from the DB
         """
         self._before_delete()
-        self.mdb_collection.remove({'_id': ObjectId(self._id)})
+        self.mdb_collection.remove({self.unique: self.format_unique(self[self.unique])})
         self._after_delete()
 
     def add_to_list(self, field, obj, allow_duplicates=False, safe=True):

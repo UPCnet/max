@@ -64,6 +64,9 @@ class Token(MADBase):
         },
     }
 
+    def format_unique(self, key):
+        return key
+
     def buildObject(self):
         """
             Updates the dict content with the user structure,

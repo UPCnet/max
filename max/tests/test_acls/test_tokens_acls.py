@@ -79,6 +79,76 @@ class TokenACLTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/tokens', json.dumps(impersonate_payload(token, username)), headers=oauth2Header(username2), status=403)
 
+    # Get all tokens tests
+
+    def test_get_user_tokens(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I succeed
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        self.testapp.get('/people/{}/tokens'.format(username), '', headers=oauth2Header(username), status=200)
+
+    def test_get_user_tokens_as_manager(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I succeed
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        self.testapp.get('/people/{}/tokens'.format(username), '', headers=oauth2Header(test_manager), status=200)
+
+    def test_get_user_tokens_as_other(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I get a Forbidden Exception
+        """
+        username = 'sheldon'
+        other = 'penny'
+        self.create_user(username)
+        self.create_user(other)
+
+        self.testapp.get('/people/{}/tokens'.format(username), '', headers=oauth2Header(other), status=403)
+
+    # Get all tokens by platform tests
+
+    def test_get_user_platform_tokens(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I succeed
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'ios'), '', headers=oauth2Header(username), status=200)
+
+    def test_get_user_platform_tokens_as_manager(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I succeed
+        """
+        username = 'sheldon'
+        self.create_user(username)
+        self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'ios'), '', headers=oauth2Header(test_manager), status=200)
+
+    def test_get_user_platform_tokens_as_other(self):
+        """
+            Given i'm a regular user
+            When i try to get al my tokens
+            I get a Forbidden Exception
+        """
+        username = 'sheldon'
+        other = 'penny'
+        self.create_user(username)
+        self.create_user(other)
+
+        self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'ios'), '', headers=oauth2Header(other), status=403)
+
     # Delete token test
 
     def test_delete_token(self):
