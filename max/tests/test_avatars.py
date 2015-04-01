@@ -170,11 +170,7 @@ class AvatarTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
     def setUp(self):
         self.conf_dir = os.path.dirname(__file__)
         self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
-        self.app.registry.max_store.drop_collection('users')
-        self.app.registry.max_store.drop_collection('activity')
-        self.app.registry.max_store.drop_collection('contexts')
-        self.app.registry.max_store.drop_collection('security')
-        self.app.registry.max_store.drop_collection('cloudapis')
+        self.reset_database(self.app)
         self.app.registry.max_store.security.insert(test_default_security)
         self.app.registry.max_store.cloudapis.insert(test_cloudapis)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))

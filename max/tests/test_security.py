@@ -20,12 +20,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     def setUp(self):
         conf_dir = os.path.dirname(__file__)
         self.app = loadapp('config:tests.ini', relative_to=conf_dir)
-        self.app.registry.max_store.drop_collection('users')
-        self.app.registry.max_store.drop_collection('activity')
-        self.app.registry.max_store.drop_collection('contexts')
-        self.app.registry.max_store.drop_collection('security')
-        self.app.registry.max_store.drop_collection('conversations')
-        self.app.registry.max_store.drop_collection('messages')
+        self.reset_database(self.app)
         self.app.registry.max_store.security.insert(test_default_security_single)
         self.app.registry.max_security = test_default_security_single
         self.patched_post = patch('requests.post', new=partial(mock_post, self))

@@ -198,6 +198,16 @@ class MaxTestBase(object):
     def __init__(self, testapp):
         self.testapp = testapp
 
+    def reset_database(self, app):
+        self.app.registry.max_store.drop_collection('users')
+        self.app.registry.max_store.drop_collection('activity')
+        self.app.registry.max_store.drop_collection('contexts')
+        self.app.registry.max_store.drop_collection('conversations')
+        self.app.registry.max_store.drop_collection('messages')
+        self.app.registry.max_store.drop_collection('security')
+        self.app.registry.max_store.drop_collection('tokens')
+        self.app.registry.max_store.drop_collection('cloudapis')
+
     def assertFileExists(self, path):
         self.assertTrue(os.path.exists(path))
 
