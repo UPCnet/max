@@ -20,7 +20,7 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
         self.conf_dir = os.path.dirname(os.path.dirname(__file__))
-
+        self.repository = os.path.join(self.conf_dir, 'repository')
         self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
@@ -36,9 +36,7 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(test_manager)
 
     def tearDown(self):
-        shutil.rmtree(os.path.join(self.conf_dir, 'repository'))
-
-    # Add conversation message test
+        shutil.rmtree(self.repository, ignore_errors=True)
 
     def test_add_message_to_conversation(self):
         """
