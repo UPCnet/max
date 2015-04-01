@@ -103,6 +103,9 @@ class User(MADBase):
             acl.append((Allow, self.request.authenticated_userid, list_tokens))
         return acl
 
+    def format_unique(self, key):
+        return key
+
     def getOwner(self, request):
         """
             Overrides the getOwner method to set the
