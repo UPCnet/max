@@ -225,24 +225,6 @@ class BaseActivity(MADBase):
         if self.object['objectType'] != 'file':
             return None
 
-        collection_item_storage = self.context_class.user_subscription_storage
-        collection_item_key = self.context_class.unique.lstrip('_')
-
-        if self.get('contexts', []):
-            readable_contexts_urls = [a[collection_item_key] for a in self.request.actor[collection_item_storage] if 'read' in a['permissions']]
-
-            can_read = False
-            for context in self['contexts']:
-                if context[collection_item_key] in readable_contexts_urls:
-                    can_read = True
-        else:
-            # Sure ??? Do we have to check if the activity is ours, or from a followed user?
-            # Try to unify this criteria with the criteria used in geting the timeline activities
-            can_read = True
-
-        if not can_read:
-            raise Unauthorized("You are not allowed to read this activity: %s" % str(self._id))
-
         image_file = self.getBlob()
 
         if image_file is None:
@@ -258,25 +240,7 @@ class BaseActivity(MADBase):
         if self.object['objectType'] != 'image':
             return None
 
-        collection_item_storage = self.context_class.user_subscription_storage
-        collection_item_key = self.context_class.unique.lstrip('_')
-
         file_extension = size if size != 'full' else ''
-
-        if self.get('contexts', []):
-            readable_contexts_urls = [a[collection_item_key] for a in self.request.actor[collection_item_storage] if 'read' in a['permissions']]
-
-            can_read = False
-            for context in self['contexts']:
-                if context[collection_item_key] in readable_contexts_urls:
-                    can_read = True
-        else:
-            # Sure ??? Do we have to check if the activity is ours, or from a followed user?
-            # Try to unify this criteria with the criteria used in geting the timeline activities
-            can_read = True
-
-        if not can_read:
-            raise Unauthorized("You are not allowed to read this activity: %s" % str(self._id))
 
         image_file = self.getBlob(extension=file_extension)
 

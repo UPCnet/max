@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_default_security
-from max.tests import test_manager, test_manager2
+from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
@@ -13,14 +13,15 @@ from paste.deploy import loadapp
 import json
 import os
 import unittest
+import shutil
 
 
 class MessagesACLTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
-        conf_dir = os.path.dirname(os.path.dirname(__file__))
+        self.conf_dir = os.path.dirname(os.path.dirname(__file__))
 
-        self.app = loadapp('config:tests.ini', relative_to=conf_dir)
+        self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
         self.app.registry.max_store.drop_collection('users')
         self.app.registry.max_store.drop_collection('activity')
         self.app.registry.max_store.drop_collection('contexts')
@@ -33,6 +34,9 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
         self.testapp = MaxTestApp(self)
 
         self.create_user(test_manager)
+
+    def tearDown(self):
+        shutil.rmtree(os.path.join(self.conf_dir, 'repository'))
 
     # Add conversation message test
 
@@ -216,7 +220,24 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to view a message image attachment
             Then i succeed
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_image
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "avatar.png"), "rb")
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_image)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/image' % (message_id), headers=oauth2Header(test_manager), status=200)
 
     def test_get_message_image_as_participant(self):
         """
@@ -225,7 +246,24 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to view a message image attachment
             Then i succeed
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_image
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "avatar.png"), "rb")
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_image)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/image' % (message_id), headers=oauth2Header(recipient), status=200)
 
     def test_get_message_image_as_non_participant(self):
         """
@@ -234,30 +272,103 @@ class MessagesACLTests(unittest.TestCase, MaxTestBase):
             When i try to view a message image attachment
             Then i get a Forbidden Exception
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_image
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "avatar.png"), "rb")
+        files = [('file', 'avatar.png', thefile.read(), 'image/png')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_image)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/image' % (message_id), headers=oauth2Header(recipient2), status=403)
 
     def test_get_message_file_as_manager(self):
         """
             Given i'm a Manager
-            When i try to view a file image attachment
+            When i try to view a file attachment
             Then i succeed
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_file
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_file)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/file/download' % (message_id), headers=oauth2Header(test_manager), status=200)
 
     def test_get_message_file_as_participant(self):
         """
             Given i'm a regular user
             And i'm a conversation participant
-            When i try to view a file image attachment
+            When i try to view a file attachment
             Then i succeed
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_file
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_file)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/file/download' % (message_id), headers=oauth2Header(recipient), status=200)
 
     def test_get_message_file_as_non_participant(self):
         """
             Given i'm nota regular user
             And i'm not a conversation participant
-            When i try to view a file image attachment
+            When i try to view a file attachment
             Then i get a Forbidden Exception
         """
-        pass
+        from max.tests.mockers import message
+        from max.tests.mockers import message_with_file
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = res.json['contexts'][0]['id']
+
+        thefile = open(os.path.join(self.conf_dir, "map.pdf"), "rb")
+        files = [('file', 'map.pdf', thefile.read(), 'application/pdf')]
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+        message_id = self.testapp.post('/conversations/%s/messages' % cid, dict(json_data=json.dumps(message_with_file)), oauth2Header(sender), upload_files=files, status=201).json['id']
+        self.testapp.get('/messages/%s/file/download' % (message_id), headers=oauth2Header(recipient2), status=403)
+

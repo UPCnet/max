@@ -64,9 +64,9 @@ PUBLIC_RESOURCES = {
     'activity_image_sizes': dict(route='/activities/{activity}/image/{size}', category='Activities', name='Named size Image', traverse='/activities/{activity}'),
     'activity_file_download': dict(route='/activities/{activity}/file/download', category='Activities', name='File', traverse='/activities/{activity}'),
 
-    'message_image': dict(route='/messages/{id}/image', category='Messages', name='Image', traverse='/messages/{activity}'),
-    'message_image_sizes': dict(route='/messages/{id}/image/{size}', category='Messages', name='Named size Image', traverse='/messages/{activity}'),
-    'message_file_download': dict(route='/messages/{id}/file/download', category='Messages', name='File', traverse='/messages/{activity}'),
+    'message_image': dict(route='/messages/{id}/image', category='Messages', name='Image', traverse='/messages/{id}'),
+    'message_image_sizes': dict(route='/messages/{id}/image/{size}', category='Messages', name='Named size Image', traverse='/messages/{id}'),
+    'message_file_download': dict(route='/messages/{id}/file/download', category='Messages', name='File', traverse='/messages/{id}'),
 
     # MAX 4.0
     'user_shares': dict(route='/people/{username}/shares'),
