@@ -258,13 +258,13 @@ class MADBase(MADDict):
     def _before_saving_object(self):
         return True
 
-    def _on_saving_object(self, oid):
+    def _after_saving_object(self, oid):
         return True
 
     def _before_insert_object(self):
         return True
 
-    def _on_insert_object(self, oid, **kwargs):
+    def _after_insert_object(self, oid, **kwargs):
         return True
 
     def fromObject(self, source, collection=None):
@@ -309,7 +309,7 @@ class MADBase(MADDict):
         """
         self._before_insert_object()
         oid = self.mdb_collection.insert(self)
-        self._on_insert_object(oid, **kwargs)
+        self._after_insert_object(oid, **kwargs)
         return str(oid)
 
     def save(self):
@@ -318,7 +318,7 @@ class MADBase(MADDict):
         """
         self._before_saving_object()
         oid = self.mdb_collection.save(self)
-        self._on_saving_object(oid)
+        self._after_saving_object(oid)
         return str(oid)
 
     def _before_delete(self):
