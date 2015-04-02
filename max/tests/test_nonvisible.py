@@ -42,7 +42,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     #  Tests for NonVisible users WITH restricted_user_visibility live in test_restricted_user_visibility.py, wich uses a different .ini
     #
     #  The tests on this file are the same tests on test_restricted_user_visibility.py but WITHOUT excluding the ones that test
-    #  Users with shared contexts, And with different asserst, as here we have the restricted_user_visibility disabled, and shared subscriptions doesn't affect us
+    #  Users with shared contexts, And with different asserts, as here we have the restricted_user_visibility disabled,
+    #  and shared subscriptions doesn't affect us
     #
     ##############################################################################################################################
 
@@ -181,5 +182,5 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=403)
 

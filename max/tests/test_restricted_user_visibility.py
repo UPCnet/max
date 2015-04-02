@@ -35,7 +35,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     # ############################################################################################################################
     #
-    #  !!! IMPORTANT INFO !!! All this tests are run with the max.restricted_user_visibility_mode=True in set the .ini
+    #  !!! IMPORTANT INFO !!! All this tests are run with the max.restricted_user_visibility_mode=True set in the .ini
     #  Tests for NonVisible users without restricted_user_visibility live in test_nonvisible.py, wich uses a different .ini
     #
     ##############################################################################################################################
@@ -174,7 +174,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_nonvisible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_nonvisible1), status=403)
 
     def test_start_conversation_with_nonvisible_as_nonvisible_without_sharing_contexts(self):
         from .mockers import message
@@ -196,7 +196,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible2), "", oauth2Header(test_manager), status=201)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_nonvisible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_nonvisible1), status=403)
 
     def test_start_conversation_with_visible_as_visible_without_sharing_contexts(self):
         from .mockers import message
@@ -215,7 +215,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         message = deepcopy(message)
         message['contexts'][0]['participants'] = [username_visible2, username_visible1]
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=403)
 
     def test_start_conversation_with_nonvisible_as_visible_without_sharing_contexts(self):
         from .mockers import message
@@ -236,7 +236,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=403)
 
     # Tests for start Conversations sharing contexts (4 tests)
 
@@ -341,5 +341,5 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/admin/security/roles/%s/users/%s' % ('NonVisible', username_nonvisible1), "", oauth2Header(test_manager), status=201)
 
-        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=401)
+        self.testapp.post('/conversations', json.dumps(message), oauth2Header(username_visible1), status=403)
 
