@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from max.MADMax import MADMaxDB
 from max.models import Context
 from max.models import Conversation
 from max.exceptions import ObjectNotFound
@@ -24,8 +23,7 @@ def rebuildKeywords(context, request):
          Rebuild keywords of all activities
 
     """
-    mmdb = MADMaxDB(request.db)
-    activities = mmdb.activity.search({'verb': 'post'})
+    activities = request.db.activity.search({'verb': 'post'})
     for activity in activities:
         activity.object.setKeywords()
         activity.setKeywords()
@@ -44,8 +42,7 @@ def rebuildDates(context, request):
          Now currently sets the lastComment id field
 
     """
-    mmdb = MADMaxDB(request.db)
-    activities = mmdb.activity.search({'verb': 'post'})
+    activities = request.db.activity.search({'verb': 'post'})
     for activity in activities:
         # Remove ancient commented field
         if 'commented' in activity:
@@ -66,20 +63,19 @@ def rebuildSubscriptions(context, request):
          Rebuild subscriptions performing sanity checks
 
     """
-    mmdb = MADMaxDB(request.db)
     existing_contexts = {}
-    contexts = mmdb.contexts.dump()
+    contexts = request.db.contexts.dump()
     for context in contexts:
         context.updateUsersSubscriptions(force_update=True)
         context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
-    users = mmdb.users.search({'subscribedTo.0': {'$exists': True}})
+    users = request.db.users.search({'subscribedTo.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
                 print user.username, subscription["displayName"]
-                fake_deleted_context = Context.from_object(subscription)
+                fake_deleted_context = Context.from_object(request, subscription)
                 user.removeSubscription(fake_deleted_context)
             else:
                 subscription.pop('vetos', None)
@@ -97,9 +93,8 @@ def rebuildConversationSubscriptions(context, request):
          Rebuild conversation subscriptions performing sanity checks
 
     """
-    mmdb = MADMaxDB(request.db)
     existing_conversations = {}
-    conversations = mmdb.conversations.dump()
+    conversations = request.db.conversations.dump()
     for conversation in conversations:
 
         # if we found an ancient plain username list, we migrate it
@@ -126,11 +121,11 @@ def rebuildConversationSubscriptions(context, request):
 
         existing_conversations[str(conversation['_id'])] = conversation
 
-    users = mmdb.users.search({'talkingIn.0': {'$exists': True}})
+    users = request.db.users.search({'talkingIn.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('talkingIn', []):
             if subscription['id'] not in existing_conversations:
-                fake_deleted_conversation = Conversation.from_object(subscription)
+                fake_deleted_conversation = Conversation.from_object(request, subscription)
                 user.removeSubscription(fake_deleted_conversation)
                 user['talkingIn'] = [a for a in user['talkingIn'] if a['id'] != subscription['id']]
             else:
@@ -149,8 +144,7 @@ def rebuildUser(context, request):
          Rebuilds user objects with defaults and consistency checks.
          Currently checks that owner of the object must be the same user:
     """
-    mmdb = MADMaxDB(request.db)
-    users = mmdb.users.dump()
+    users = request.db.users.dump()
     for user in users:
         if user._owner != user.username:
             user._owner = user.username

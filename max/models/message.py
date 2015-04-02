@@ -32,7 +32,7 @@ class Message(BaseActivity):
         ]
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Conversation
-            conversation = Conversation.from_database(self.contexts[0]['id'])
+            conversation = Conversation.from_database(self.request, self.contexts[0]['id'])
             subscription = self.request.actor.getSubscription(conversation)
             if subscription:
                 permissions = subscription.get('permissions', [])
@@ -55,7 +55,7 @@ class Message(BaseActivity):
               }
 
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
-        subobject = wrapper(self.data['object'])
+        subobject = wrapper(self.request, self.data['object'])
         ob['object'] = subobject
 
         # Append actor as username if object has keywords and actor is a Person

@@ -5,7 +5,6 @@ from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
 from max.rest import endpoint
 from max.rest.utils import searchParams, flatten
-from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
 from base64 import b64encode
 from bson import ObjectId
@@ -19,9 +18,8 @@ def getMessages(conversation, request):
          /conversations/{id}/messages
          Return all messages from a conversation
     """
-    mmdb = MADMaxDB(request.db)
     query = {'contexts.id': str(conversation['_id'])}
-    messages = mmdb.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
+    messages = request.db.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining
     handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
     return handler.buildResponse()
@@ -40,8 +38,7 @@ def add_message(conversation, request):
                       }
 
     # Initialize a Message (Activity) object from the request
-    newmessage = Message()
-    newmessage.fromRequest(request, rest_params=message_params)
+    newmessage = Message.from_request(request, rest_params=message_params)
 
     if newmessage['object']['objectType'] == u'image' or \
        newmessage['object']['objectType'] == u'file':

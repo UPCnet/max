@@ -52,8 +52,7 @@ def addUser(users, request):
     rest_params = {'username': username.lower()}
 
     # Initialize a User object from the request
-    newuser = User()
-    newuser.fromRequest(request, rest_params=rest_params)
+    newuser = User.from_request(request, rest_params=rest_params)
 
     # If we have the _id setted, then the object already existed in the DB,
     # otherwise, proceed to insert it into the DB

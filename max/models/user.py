@@ -231,10 +231,13 @@ class User(MADBase):
         # Get a dummy context from subscription to determine the fields to update
         ContextClass = getMaxModelByObjectType(subscription['objectType'])
         context_unique_field = ContextClass.unique.lstrip('_')
-        temp_context = ContextClass.from_object({
-            context_unique_field: subscription[context_unique_field],
-            'objectType': subscription['objectType']
-        })
+        temp_context = ContextClass.from_object(
+            self.request,
+            {
+                context_unique_field: subscription[context_unique_field],
+                'objectType': subscription['objectType']
+            }
+        )
 
         context_storage_field = temp_context.user_subscription_storage
         subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
@@ -287,10 +290,13 @@ class User(MADBase):
         # Get a dummy context from subscription to determine the fields to update
         ContextClass = getMaxModelByObjectType(subscription['objectType'])
         context_unique_field = ContextClass.unique.lstrip('_')
-        temp_context = ContextClass.from_object({
-            context_unique_field: subscription[context_unique_field],
-            'objectType': subscription['objectType']
-        })
+        temp_context = ContextClass.from_object(
+            self.request,
+            {
+                context_unique_field: subscription[context_unique_field],
+                'objectType': subscription['objectType']
+            }
+        )
 
         context_storage_field = temp_context.user_subscription_storage
         subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
@@ -319,7 +325,7 @@ class User(MADBase):
         """
         """
         ContextClass = getMaxModelByObjectType(context['objectType'])
-        temp_context = ContextClass.from_object(context)
+        temp_context = ContextClass.from_object(self.request, context)
 
         for subscription in self.get(temp_context.user_subscription_storage, []):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
@@ -330,7 +336,7 @@ class User(MADBase):
             Returns all the tokens from a user, filtered by platform if any
         """
 
-        tokens = MADMaxCollection(self.request.db.tokens)
+        tokens = MADMaxCollection(self.request, 'tokens')
         query = {
             '_owner': self._owner,
         }
@@ -350,7 +356,7 @@ class User(MADBase):
         """
             Deletes tokens from a user, filtered by platform if any
         """
-        tokens = MADMaxCollection(self.request.db.tokens)
+        tokens = MADMaxCollection(self.request, 'tokens')
         query = {
             '_owner': self._owner,
         }
@@ -401,7 +407,7 @@ class User(MADBase):
         actor = self.flatten()
         if self.has_field_permission('talkingIn', 'view'):
             actor.setdefault('talkingIn', [])
-            conversations_collection = MADMaxCollection(self.db.conversations)
+            conversations_collection = MADMaxCollection(self.request, 'conversations')
             conversations = conversations_collection.search({'_id': {'$in': [ObjectId(conv['id']) for conv in actor['talkingIn']]}})
             conversations_by_id = {str(conv['_id']): conv for conv in conversations}
             for subscription in actor['talkingIn']:

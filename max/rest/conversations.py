@@ -76,7 +76,7 @@ def postMessage2Conversation(conversations, request):
     # Also store the definitive list that will be saved in participants field
 
     participants = {}
-    users = MADMaxCollection(request.db.users, query_key='username')
+    users = MADMaxCollection(request, 'users', query_key='username')
     for participant in request_participants:
         user = users[participant]
         if request.actor.username != user['username'] and not request.actor.is_allowed_to_see(user):
@@ -111,8 +111,7 @@ def postMessage2Conversation(conversations, request):
         if ctxts[0].get('displayName', False):
             conversation_params['displayName'] = ctxts[0]['displayName']
 
-        newconversation = Conversation()
-        newconversation.fromRequest(request, rest_params=conversation_params)
+        newconversation = Conversation.from_request(request, rest_params=conversation_params)
 
         # New conversation
         contextid = newconversation.insert()
@@ -131,8 +130,7 @@ def postMessage2Conversation(conversations, request):
                            'contexts': []  # Override contexts from request
 
                            }
-            newactivity = Activity()
-            newactivity.fromRequest(request, rest_params=rest_params)
+            newactivity = Activity.from_request(request, rest_params=rest_params)
             newactivity_oid = newactivity.insert()  # Insert a subscribe activity
             newactivity['_id'] = newactivity_oid
 
@@ -147,11 +145,9 @@ def postMessage2Conversation(conversations, request):
                       'contexts': [current_conversation],
                       'verb': 'post'}
 
-    # Initialize a Message (Activity) object from the request
-    newmessage = Message()
-
     try:
-        newmessage.fromRequest(request, rest_params=message_params)
+        # Initialize a Message (Activity) object from the request
+        newmessage = Message.from_request(request, rest_params=message_params)
     except Exception as catched:
         # In case we coulnd't post the message, rollback conversation creation
         current_conversation.delete()
@@ -262,7 +258,7 @@ def joinConversation(conversation, request):
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
-        activities = MADMaxCollection(request.db.activity)
+        activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
@@ -296,8 +292,7 @@ def joinConversation(conversation, request):
                                   'participants': conversation.participants}
                        }
 
-        newactivity = Activity()
-        newactivity.fromRequest(request, rest_params=rest_params)
+        newactivity = Activity.from_request(request, rest_params=rest_params)
         newactivity_oid = newactivity.insert()  # Insert a subscribe activity
         newactivity['_id'] = newactivity_oid
     handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
@@ -356,7 +351,7 @@ def transferConversationOwnership(conversation, request):
     request.actor.revokePermission(subscription, 'unsubscribe', permanent=True)
 
     # Revoke hability to add new users from the previous owner
-    users = MADMaxCollection(request.db.users, query_key='username')
+    users = MADMaxCollection(request, 'users', query_key='username')
     previous_owner = users[previous_owner_username]
     previous_owner.revokePermission(subscription, 'invite')
     previous_owner.revokePermission(subscription, 'kick')

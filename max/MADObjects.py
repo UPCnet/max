@@ -6,7 +6,6 @@ from max.exceptions import ValidationError
 from max.rest.utils import RUDict
 from max.rest.utils import flatten
 from pyramid.security import ACLAllowed
-from pyramid.threadlocal import get_current_request
 
 from bson import ObjectId
 from cgi import FieldStorage
@@ -209,27 +208,59 @@ class MADBase(MADDict):
     data = {}
     __parent__ = None
 
-    def __init__(self):
+    def __init__(self, request):
         self.old = {}
-        self.request = get_current_request()
+        self.request = request
         # When called from outside a pyramyd app, we have no request
         try:
-            self.db = self.request.db
+            self.db = self.request.db.db
             self.mdb_collection = self.db[self.collection]
         except:
             pass
         self.data = RUDict({})
 
     @classmethod
-    def from_database(cls, key):
-        instance = cls()
+    def from_request(cls, request, rest_params={}):
+        instance = cls(request)
+        instance.data.update(instance.request.decoded_payload)
+        instance.data.update(rest_params)
+
+        # Since we are building from a request,
+        # overwrite actor with the validated one from the request in source
+        if 'actor' not in rest_params.keys():
+            instance.data['actor'] = request.actor
+
+        # Who is actually doing this?
+        # - The one that is authenticated
+        instance.data['_creator'] = request.authenticated_userid
+        instance.data['_owner'] = instance.getOwner(request)
+
+        instance.processFields()
+
+        # check if the object we pretend to create already exists
+        existing_object = instance.alreadyExists()
+        if not existing_object:
+            # if we are creating a new object, set the object dates.
+            # It uses MADBase.setDates as default, override to set custom dates
+            instance.setDates()
+            instance._on_create_custom_validations()
+            instance.buildObject()
+        else:
+            # if it's already on the DB, just populate with the object data
+            instance.update(existing_object)
+
+        return instance
+
+    @classmethod
+    def from_database(cls, request, key):
+        instance = cls(request)
         instance.data[instance.unique] = instance.format_unique(key)
         instance.wake()
         return instance
 
     @classmethod
-    def from_object(cls, source, collection=None):
-        instance = cls()
+    def from_object(cls, request, source):
+        instance = cls(request)
         instance.update(source)
         instance.old.update(source)
         instance.old = deepcopy(flatten(instance.old))
@@ -246,34 +277,6 @@ class MADBase(MADDict):
 
     def getOwner(self, request):
         return request.authenticated_userid
-
-    def fromRequest(self, request, rest_params={}):
-        self.data.update(self.request.decoded_payload)
-        self.data.update(rest_params)
-
-        # Since we are building from a request,
-        # overwrite actor with the validated one from the request in source
-        if 'actor' not in rest_params.keys():
-            self.data['actor'] = request.actor
-
-        # Who is actually doing this?
-        # - The one that is authenticated
-        self.data['_creator'] = request.authenticated_userid
-        self.data['_owner'] = self.getOwner(request)
-
-        self.processFields()
-
-        # check if the object we pretend to create already exists
-        existing_object = self.alreadyExists()
-        if not existing_object:
-            # if we are creating a new object, set the object dates.
-            # It uses MADBase.setDates as default, override to set custom dates
-            self.setDates()
-            self._on_create_custom_validations()
-            self.buildObject()
-        else:
-            # if it's already on the DB, just populate with the object data
-            self.update(existing_object)
 
     def _post_init_from_object(self, source):
         return True

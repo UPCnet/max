@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 from max import LAST_AUTHORS_LIMIT
-from max.MADMax import MADMaxDB
 from max.exceptions import ObjectNotFound
-from max.exceptions import Unauthorized
 from max.exceptions import ValidationError
 from max.models import Context
 from max.rest.ResourceHandlers import JSONResourceEntity
@@ -40,9 +38,7 @@ def addContext(contexts, request):
         Adds a context.
     """
     # Initialize a Context object from the request
-    newcontext = Context()
-
-    newcontext.fromRequest(request)
+    newcontext = Context.from_request(request)
 
     # If we have the _id setted, then the object already existed in the DB,
     # otherwise, proceed to insert it into the DB
@@ -176,7 +172,6 @@ def getContextAuthors(context, request):
         /contexts/{hash}/activities/authors
     """
     chash = request.matchdict['hash']
-    mmdb = MADMaxDB(request.db)
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
 
     query = {}
@@ -200,7 +195,7 @@ def getContextAuthors(context, request):
     while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
         if not activities:
             extra = {'before': before} if before else {}
-            activities = sorted_query(request, mmdb.activity, query, **extra)
+            activities = sorted_query(request, request.db.activity, query, **extra)
             activities_count = activities if isinstance(activities, int) else len(activities)
             queries += 1
             still_has_activities = activities_count > 0

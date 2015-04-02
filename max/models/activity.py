@@ -103,7 +103,7 @@ class BaseActivity(MADBase):
             ob['actor']['url'] = self.data['actor']['url']
 
         wrapper = self.getObjectWrapper(self.data['object']['objectType'])
-        subobject = wrapper(self.data['object'])
+        subobject = wrapper(self.request, self.data['object'])
         ob['object'] = subobject
 
         if 'contexts' in self.data:
@@ -264,7 +264,7 @@ class BaseActivity(MADBase):
             context = self.get('contexts')[0]
             ContextClass = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
             identifier = context[ContextClass.unique] if ContextClass.unique in context else context[ContextClass.unique.lstrip('_')]
-            context = ContextClass.from_database(identifier)
+            context = ContextClass.from_database(self.request, identifier)
             uploadURL = context.get('uploadURL', '')
 
         if uploadURL:
@@ -378,7 +378,7 @@ class Activity(BaseActivity):
 
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Context
-            context = Context.from_database(self.contexts[0]['hash'])
+            context = Context.from_database(self.request, self.contexts[0]['hash'])
 
             subscription = self.request.actor.getSubscription(context)
             if subscription:

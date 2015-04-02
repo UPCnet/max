@@ -2,13 +2,9 @@
 from max.MADMax import MADMaxCollection
 from max.rest import endpoint
 from max.rest.ResourceHandlers import JSONResourceRoot
-from max.exceptions import ValidationError
 from max.rest.ResourceHandlers import JSONResourceEntity
-from max.exceptions import ObjectNotFound
 from pyramid.httpexceptions import HTTPNoContent
-from max.MADMax import MADMaxDB
 from max.rest.utils import searchParams
-from pymongo.errors import DuplicateKeyError
 from max.models import Token
 from max.security.permissions import list_tokens, add_token, delete_token
 
@@ -20,12 +16,11 @@ def getPushTokensForConversation(tokens, request):
          Return all relevant tokens for a given conversation
     """
     cid = request.matchdict['id']
-    mmdb = MADMaxDB(request.db)
     query = {'talkingIn.id': cid}
 
     result = []
 
-    users = mmdb.users.search(query, show_fields=["username"], sort_by_field="username", flatten=1)
+    users = request.db.users.search(query, show_fields=["username"], sort_by_field="username", flatten=1)
     usernames = [user['username'] for user in users]
 
     if usernames:
@@ -46,7 +41,7 @@ def getPushTokensForContext(tokens, request):
     """
 
     cid = request.matchdict['hash']
-    contexts = MADMaxCollection(request.db.contexts, query_key='hash')
+    contexts = MADMaxCollection(request, 'contexts', query_key='hash')
     ctxt = contexts[cid]
 
     result = []
@@ -69,13 +64,11 @@ def add_device_token(tokens, request):
     """ Adds a new user device linked to a user. If the token already exists for any user, we'll assume that the new
         user is using the old user's device, so we'll delete all the previous tokens and replace them with the new one.
     """
-    newtoken = Token()
-    newtoken.fromRequest(request)
+    newtoken = Token.from_request(request)
 
     if '_id' in newtoken:
         newtoken.delete()
-        newtoken = Token()
-        newtoken.fromRequest(request)
+        newtoken = Token.from_request(request)
 
     # insert the token always
     newtoken.insert()

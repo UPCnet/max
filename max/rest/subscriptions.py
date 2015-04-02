@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
-from max.MADMax import MADMaxDB
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 from max.rest.ResourceHandlers import JSONResourceRoot
@@ -26,8 +25,7 @@ def subscribe(context, request):
                    'verb': 'subscribe'}
 
     # Initialize a Activity object from the request
-    newactivity = Activity()
-    newactivity.fromRequest(request, rest_params=rest_params)
+    newactivity = Activity.from_request(request, rest_params=rest_params)
 
     # Check if user is already subscribed
     subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo]
@@ -35,7 +33,7 @@ def subscribe(context, request):
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
-        activities = MADMaxCollection(request.db.activity)
+        activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'subscribe', 'object.url': newactivity.object['url'], 'actor.username': actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
@@ -62,8 +60,7 @@ def unsubscribe(context, request):
 def getContextSubscriptions(context, request):
     """
     """
-    mmdb = MADMaxDB(request.db)
-    found_users = mmdb.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
+    found_users = request.db.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
     for user in found_users:
         subscription = user['subscribedTo'][0]
         del user['subscribedTo']

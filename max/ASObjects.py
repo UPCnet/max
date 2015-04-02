@@ -22,9 +22,10 @@ class ASObject(MADDict):
     schema = {}
     objectType = ''
 
-    def __init__(self, data, creating=True):
+    def __init__(self, request, data, creating=True):
         """
         """
+        self.request = request
         self.data = data
         if creating:
             self.processFields()
@@ -50,14 +51,15 @@ class Note(ASObject):
         '_keywords': {},
     }
 
-    def __init__(self, data, creating=True):
+    def __init__(self, request, data, creating=True):
         """
         """
+        self.request = request
         self.creating = creating
         self.data = data
         if creating:
             self.processFields()
-            self.data['content'] = formatMessageEntities(self.data.get('content', ''))
+            self.data['content'] = formatMessageEntities(request, self.data.get('content', ''))
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
@@ -91,14 +93,15 @@ class Comment(ASObject):
         '_keywords': {},
     }
 
-    def __init__(self, data, creating=True):
+    def __init__(self, request, data, creating=True):
         """
         """
+        self.request = request
         self.creating = creating
         self.data = data
         if creating:
             self.processFields()
-            self.data['content'] = formatMessageEntities(self.data.get('content', ''))
+            self.data['content'] = formatMessageEntities(self.request, self.data.get('content', ''))
             hashtags = findHashtags(self.data['content'])
             if hashtags:
                 self.data['_hashtags'] = hashtags
@@ -236,9 +239,10 @@ class File(Note):
         An activitystrea.ms File Object
     """
 
-    def __init__(self, data, creating=True):
+    def __init__(self, request, data, creating=True):
         """
         """
+        self.request = request
         self.data = data
         self.processFields()
         self.update(data)

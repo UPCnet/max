@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import InvalidSearchParams
 from pyramid.settings import asbool
-from pyramid.threadlocal import get_current_request
 
 from bson import json_util
 from bson.objectid import ObjectId
@@ -438,12 +437,11 @@ def flatten(data, **kwargs):
     return data
 
 
-def formatMessageEntities(text):
+def formatMessageEntities(request, text):
     """
         function that shearches for elements in the text that have to be formatted.
         Currently shortens urls.
     """
-    request = get_current_request()
 
     def shorten(matchobj):
         url = matchobj.group(0)

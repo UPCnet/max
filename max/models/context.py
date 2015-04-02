@@ -189,7 +189,7 @@ class BaseContext(MADBase):
 
         if must_update_fields:
             for user in self.subscribedUsers():
-                user_object = User.from_object(user)
+                user_object = User.from_object(self.request, user)
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 
@@ -253,7 +253,7 @@ class BaseContext(MADBase):
             Removes all users subscribed to the context, or only specifiyed
             user if userd_to_delete is provided
         """
-        usersdb = MADMaxCollection(self.mdb_collection.database.users)
+        usersdb = MADMaxCollection(self.request, 'users')
         criteria = {'{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
         users = usersdb.search(criteria)
 
@@ -266,7 +266,7 @@ class BaseContext(MADBase):
             Removes all activity posted to a context. If logical is set to True
             Activities are not actually deleted, only marked as not visible
         """
-        activitydb = MADMaxCollection(getattr(self.mdb_collection.database, self.activity_storage))
+        activitydb = MADMaxCollection(self.request, self.activity_storage)
         which_to_delete = {
             'contexts.{}'.format(self.unique.lstrip('_')): self.getIdentifier()
         }

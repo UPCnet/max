@@ -37,15 +37,17 @@ class MADMaxCollection(object):
         Wrapper for accessing collections
     """
 
-    def __init__(self, collection, query_key='_id', field_filter=None):
+    def __init__(self, request, collection, query_key='_id', field_filter=None):
         """
             Wrapper for accessig a collection. Acces to items can be performed dict-like using "_id" as
             key for finding items, or any field specified in "query_key". Anything passed in query_key must have unique values
             as we will perform find_one queries for dict-like access
         """
-        self.collection = collection
+        self.request = request
         self.query_key = query_key
         self.show_fields = field_filter
+
+        self.collection = getattr(request.db.db, collection, None)
 
     def setQueryKey(self, key):
         """
@@ -223,11 +225,12 @@ class MADMaxCollection(object):
         """
         CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
         model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[self.collection.name], None)
-        wrapped = model.from_object(item, collection=self.collection)
+        wrapped = model.from_object(self.request, item)
 
         # Also wrap subobjects, only if we are not flattening
         if not flatten and 'object' in wrapped:
-            wrapped['object'] = wrapped.getObjectWrapper(wrapped['object']['objectType'])(wrapped['object'], creating=False)
+            WrapperClass = wrapped.getObjectWrapper(wrapped['object']['objectType'])
+            wrapped['object'] = WrapperClass(self.request, wrapped['object'], creating=False)
 
         if flatten:
             return wrapped.flatten(**kwargs)
@@ -292,27 +295,14 @@ class MADMaxDB(object):
         usage: MADMaxDB.<name_of_the_collection>
     """
 
-    def __init__(self, db):
+    def __init__(self, request, db):
         """
         """
+        self.request = request
         self.db = db
 
-    def __getattr__(self, name, default=UNDEF):
+    def __getattr__(self, name):
         """
             Returns a MADMaxCollection wrapper or a class attribute. Raises AttributeError if nothing found
         """
-        #First we try to access a colleccion named "name"
-        collection = getattr(self.db, name, None)
-        if collection:
-            return MADMaxCollection(collection)
-        else:
-            #If no collection found, try to get a class attribute
-            try:
-                attr = getattr(self, name)
-            except:
-                #If failed and user didn't pass a default value
-                if default == UNDEF:
-                    raise AttributeError(name)
-                else:
-                    attr = default
-            return attr
+        return MADMaxCollection(self.request, name)

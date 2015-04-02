@@ -166,7 +166,7 @@ def get_request_actor(request):
     if context_actor_url:
         try:
             url_hash = sha1(context_actor_url).hexdigest()
-            mmdb = MADMaxDB(request.registry.max_store)
+            mmdb = request.db
             actor = mmdb.contexts.getItemsByhash(url_hash)[0]
             actor.setdefault('displayName', '')
             return actor
@@ -175,7 +175,7 @@ def get_request_actor(request):
 
     username = get_request_actor_username(request)
     try:
-        mmdb = MADMaxDB(request.db)
+        mmdb = request.db
         actor = mmdb.users.getItemsByusername(username)[0]
         actor.setdefault('displayName', actor['username'])
         return actor
@@ -189,7 +189,7 @@ def get_request_creator(request):
     """
     username = get_username_in_oauth(request)
     try:
-        mmdb = MADMaxDB(request.db)
+        mmdb = request.db
         actor = mmdb.users.getItemsByusername(username)[0]
         actor.setdefault('displayName', actor['username'])
         return actor
@@ -211,4 +211,4 @@ def get_database(request):
     """
         Returns the global database object
     """
-    return request.registry.max_store
+    return MADMaxDB(request, request.registry.max_store)

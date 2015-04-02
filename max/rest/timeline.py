@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 from max import LAST_AUTHORS_LIMIT
-from max.MADMax import MADMaxDB
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.sorting import sorted_query
 from max.rest import endpoint
@@ -43,11 +42,10 @@ def getUserTimeline(context, request):
          Retorna totes les activitats d'un usuari
     """
     actor = request.actor
-    mmdb = MADMaxDB(request.db)
 
     query = timelineQuery(actor)
 
-    activities = sorted_query(request, mmdb.activity, query, flatten=1)
+    activities = sorted_query(request, request.db.activity, query, flatten=1)
 
     handler = JSONResourceRoot(activities)
     return handler.buildResponse()
@@ -63,8 +61,6 @@ def getUserTimelineAuthors(context, request):
     # Get the author limit from the request or set a default
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
     actor = request.actor
-    mmdb = MADMaxDB(request.db)
-
     query = timelineQuery(actor)
 
     still_has_activities = True
@@ -81,7 +77,7 @@ def getUserTimelineAuthors(context, request):
     while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
         if not activities:
             extra = {'before': before} if before else {}
-            activities = sorted_query(request, mmdb.activity, query, **extra)
+            activities = sorted_query(request, request.db.activity, query, **extra)
             activities_count = activities if isinstance(activities, int) else len(activities)
             queries += 1
             still_has_activities = activities_count > 0

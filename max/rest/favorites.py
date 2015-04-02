@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
-from max.MADMax import MADMaxDB
-from max.exceptions import ObjectNotFound
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 
@@ -20,7 +18,7 @@ def favorite(activity, request):
     if activity.has_favorite_from(request.actor):
         code = 200
 
-        activities = MADMaxCollection(request.db.activity)
+        activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'favorite', 'object._id': activity['_id'], 'actor.username': request.actor.username}
         newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user favorited this activiry
 
@@ -36,8 +34,7 @@ def favorite(activity, request):
         }
 
         # Initialize a Activity object from the request
-        newactivity = Activity()
-        newactivity.fromRequest(request, rest_params=rest_params)
+        newactivity = Activity.from_request(request, rest_params=rest_params)
 
         newactivity_oid = newactivity.insert()
         newactivity['_id'] = newactivity_oid
@@ -65,8 +62,7 @@ def unfavorite(activity, request):
     }
 
     # Initialize a Activity object from the request
-    newactivity = Activity()
-    newactivity.fromRequest(request, rest_params=rest_params)
+    newactivity = Activity.from_request(request, rest_params=rest_params)
 
     newactivity_oid = newactivity.insert()
     newactivity['_id'] = newactivity_oid
