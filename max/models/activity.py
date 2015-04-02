@@ -262,7 +262,7 @@ class BaseActivity(MADBase):
         if self.get('contexts', False):
             # Look if we need to upload to an external URL
             context = self.get('contexts')[0]
-            ContextClass = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
+            ContextClass = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])
             identifier = context[ContextClass.unique] if ContextClass.unique in context else context[ContextClass.unique.lstrip('_')]
             context = ContextClass.from_database(self.request, identifier)
             uploadURL = context.get('uploadURL', '')
