@@ -10,13 +10,12 @@ from max.rest.utils import searchParams
 from pyramid.httpexceptions import HTTPNoContent
 
 from pyramid.settings import asbool
-from pyramid.view import view_config
 from max.rest import endpoint
 
 from max.security.permissions import list_visible_people, add_people, view_user_profile, modify_user, delete_user
 
 
-@view_config(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
+@endpoint(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
 def getVisibleUsers(users, request):
     """
          /people
@@ -41,7 +40,7 @@ def getVisibleUsers(users, request):
 @endpoint(route_name='users', request_method='POST', permission=add_people, requires_actor=False)
 def addUser(users, request):
     """
-        /people/{username}
+        /people
 
         [RESTRICTED] Creates a system user.
     """
