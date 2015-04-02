@@ -197,16 +197,6 @@ def get_request_creator(request):
         return None
 
 
-def get_authenticated_user_roles(request):
-    """
-        Gets the roles owned by the current authenticated user
-    """
-    username = get_username_in_oauth(request)
-    security = request.registry.max_security
-    user_roles = [role for role, users in security.get("roles", {}).items() if username in users]
-    return user_roles + ['Authenticated']
-
-
 def get_database(request):
     """
         Returns the global database object
