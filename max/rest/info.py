@@ -76,8 +76,6 @@ def endpoints_view(context, request):
             if related:
                 route = related[0].get('object', None)
                 if route is not None:
-                    if route.name == 'users':
-                        import ipdb;ipdb.set_trace()
                     if route.name in RESOURCES and \
                        route.name != 'info_api' and \
                        view['introspectable'].action_info.src.startswith('@endpoint'):
