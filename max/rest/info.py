@@ -76,9 +76,11 @@ def endpoints_view(context, request):
             if related:
                 route = related[0].get('object', None)
                 if route is not None:
+                    if route.name == 'users':
+                        import ipdb;ipdb.set_trace()
                     if route.name in RESOURCES and \
                        route.name != 'info_api' and \
-                       view['introspectable'].action_info.src.startswith('@endpoint.'):
+                       view['introspectable'].action_info.src.startswith('@endpoint'):
                             yield view, route
 
     def view_permission(view):
@@ -117,7 +119,6 @@ def endpoints_view(context, request):
     resources_by_route = {}
 
     # Group all views by route and request method
-
     for view, route in max_views():
         view_settings = view['introspectable']
         resource_info = {
@@ -133,9 +134,10 @@ def endpoints_view(context, request):
         # Import the method implementing the endpoint to get the docstring
         module_fqdn = re.search(r'(?:max|\.egg)/(max/.*)\.py$', view_settings.action_info.file).groups()[0].replace('/', '.')
         module_namespace, module_name = re.search(r'(.*?)\.([^\.]+$)', module_fqdn).groups()
-        method_name = re.search(r'@endpoint\.(.*)', view_settings.action_info.src).groups()[0]
-        method = getattr(sys.modules[module_fqdn], method_name)
+
+        method_name = re.search(r'([^.]+)$', view_settings.title).groups()[0]
         module = getattr(sys.modules[module_namespace], module_name)
+        method = getattr(sys.modules[module_fqdn], method_name)
 
         is_head = False
         if view_settings['request_methods'] == 'GET':
