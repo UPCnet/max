@@ -28,6 +28,7 @@ def fix_deprecated_create_user(request, match):
     """
     username = match.groups()[0]
     payload = request.decoded_payload
+    payload = payload if isinstance(payload, dict) else {}
     payload['username'] = username
     request.path_info = '/people'
 
@@ -57,6 +58,7 @@ def fix_deprecated_subscribe_user(request, match):
     """
     username = match.groups()[0]
     payload = request.decoded_payload
+    payload = payload if isinstance(payload, dict) else {}
     obj = payload.pop('object', {})
     object_url = obj.get('url', None)
     url_hash = sha1(object_url).hexdigest() if object_url else ''
@@ -118,6 +120,7 @@ def fix_deprecated_create_context_activity(request, match):
     """
     username = match.groups()[0]
     payload = request.decoded_payload
+    payload = payload if isinstance(payload, dict) else {}
     contexts = payload.pop('contexts', {})
     if contexts:
         context = contexts[0]
@@ -160,6 +163,7 @@ def fix_deprecated_join_conversation(request, match):
     username = match.groups()[0]
     conversation_id = match.groups()[1]
     payload = request.decoded_payload
+    payload = payload if isinstance(payload, dict) else {}
     payload.clear()
 
     new_path = '/conversations/{}/participants'.format(conversation_id)
@@ -230,6 +234,7 @@ def fix_deprecated_add_token(request, match):
     token = match.groups()[2]
 
     payload = request.decoded_payload
+    payload = payload if isinstance(payload, dict) else {}
     payload.clear()
 
     payload.update({
