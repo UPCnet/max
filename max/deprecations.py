@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import json
 from hashlib import sha1
 
 people_resource_matcher = re.compile(r'/people/([^\/]+)$').search
@@ -9,23 +8,6 @@ people_subscription_resource_matcher = re.compile(r'/people/([^\/]+)/subscriptio
 people_activities_resource_matcher = re.compile(r'/people/([^\/]+)/activities$').search
 people_conversation_resource_matcher = re.compile(r'/people/([^\/]+)/conversations/([^\/]+)$').search
 people_device_token_resource_matcher = re.compile(r'/people/([^\/]+)/device/([^\/]+)/([^\/]+)$').search
-
-
-def get_body(request, default=dict):
-    """
-        Extracts the request body, expecting a value of the same type
-        as the default. If the default value doesn't match this requirement
-        the default is returned.
-    """
-    try:
-        replacement_body = json.loads(request.body)
-    except:
-        replacement_body = default()
-    else:
-        if not isinstance(replacement_body, default):
-            replacement_body = default()
-
-    return replacement_body
 
 
 def fix_deprecated_create_user(request, match):
@@ -45,9 +27,8 @@ def fix_deprecated_create_user(request, match):
         any other user attribute
     """
     username = match.groups()[0]
-    replacement_body = get_body(request)
-    replacement_body['username'] = username
-    request.body = json.dumps(replacement_body)
+    payload = request.decoded_payload
+    payload['username'] = username
     request.path_info = '/people'
 
     # Force headers needed to avoid body content quoting on tests
@@ -75,21 +56,19 @@ def fix_deprecated_subscribe_user(request, match):
         untouched
     """
     username = match.groups()[0]
-    replacement_body = get_body(request)
-    obj = replacement_body.pop('object', {})
+    payload = request.decoded_payload
+    obj = payload.pop('object', {})
     object_url = obj.get('url', None)
     url_hash = sha1(object_url).hexdigest() if object_url else ''
     new_path = '/contexts/{}/subscriptions'.format(url_hash)
     request.path_info = new_path
 
-    replacement_body.update({
+    payload.update({
         "actor": {
             "objectType": "person",
             "username": username
         }
     })
-
-    request.body = json.dumps(replacement_body)
 
     # Force headers needed to avoid body content quoting on tests
     request.headers['Content-Type'] = 'application/json'
@@ -138,8 +117,8 @@ def fix_deprecated_create_context_activity(request, match):
         using username found in the url
     """
     username = match.groups()[0]
-    replacement_body = get_body(request)
-    contexts = replacement_body.pop('contexts', {})
+    payload = request.decoded_payload
+    contexts = payload.pop('contexts', {})
     if contexts:
         context = contexts[0]
         context_url = context.get('url', None)
@@ -147,14 +126,12 @@ def fix_deprecated_create_context_activity(request, match):
         new_path = '/contexts/{}/activities'.format(url_hash)
         request.path_info = new_path
 
-        replacement_body.update({
+        payload.update({
             "actor": {
                 "objectType": "person",
                 "username": username
             }
         })
-
-        request.body = json.dumps(replacement_body)
 
         # Force headers needed to avoid body content quoting on tests
         request.headers['Content-Type'] = 'application/json'
@@ -182,18 +159,18 @@ def fix_deprecated_join_conversation(request, match):
     """
     username = match.groups()[0]
     conversation_id = match.groups()[1]
-    replacement_body = {}
+    payload = request.decoded_payload
+    payload.clear()
+
     new_path = '/conversations/{}/participants'.format(conversation_id)
     request.path_info = new_path
 
-    replacement_body.update({
+    payload.update({
         "actor": {
             "objectType": "person",
             "username": username
         }
     })
-
-    request.body = json.dumps(replacement_body)
 
     # Force headers needed to avoid body content quoting on tests
     request.headers['Content-Type'] = 'application/json'
@@ -252,13 +229,15 @@ def fix_deprecated_add_token(request, match):
     platform = match.groups()[1]
     token = match.groups()[2]
 
-    replacement_body = {
+    payload = request.decoded_payload
+    payload.clear()
+
+    payload.update({
         'platform': platform,
         'token': token
-    }
+    })
     new_path = '/tokens'
     request.path_info = new_path
-    request.body = json.dumps(replacement_body)
 
     # Force headers needed to avoid body content quoting on tests
     request.headers['Content-Type'] = 'application/json'
