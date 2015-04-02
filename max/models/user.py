@@ -230,9 +230,8 @@ class User(MADBase):
 
         # Get a dummy context from subscription to determine the fields to update
         ContextClass = getMaxModelByObjectType(subscription['objectType'])
-        temp_context = ContextClass()
-        context_unique_field = temp_context.unique.lstrip('_')
-        temp_context.fromObject({
+        context_unique_field = ContextClass.unique.lstrip('_')
+        temp_context = ContextClass.from_object({
             context_unique_field: subscription[context_unique_field],
             'objectType': subscription['objectType']
         })
@@ -287,9 +286,8 @@ class User(MADBase):
 
         # Get a dummy context from subscription to determine the fields to update
         ContextClass = getMaxModelByObjectType(subscription['objectType'])
-        temp_context = ContextClass()
-        context_unique_field = temp_context.unique.lstrip('_')
-        temp_context.fromObject({
+        context_unique_field = ContextClass.unique.lstrip('_')
+        temp_context = ContextClass.from_object({
             context_unique_field: subscription[context_unique_field],
             'objectType': subscription['objectType']
         })
@@ -321,8 +319,7 @@ class User(MADBase):
         """
         """
         ContextClass = getMaxModelByObjectType(context['objectType'])
-        temp_context = ContextClass()
-        temp_context.fromObject(context)
+        temp_context = ContextClass.from_object(context)
 
         for subscription in self.get(temp_context.user_subscription_storage, []):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
@@ -407,16 +404,13 @@ class User(MADBase):
             conversations_collection = MADMaxCollection(self.db.conversations)
             conversations = conversations_collection.search({'_id': {'$in': [ObjectId(conv['id']) for conv in actor['talkingIn']]}})
             conversations_by_id = {str(conv['_id']): conv for conv in conversations}
-            for conversation in actor['talkingIn']:
-                conversation_object = conversations_by_id[conversation['id']]
-                conversation_object.fromObject(conversation)
-                conversation['displayName'] = conversation_object.realDisplayName(self.username)
-                conversation['lastMessage'] = conversation_object.lastMessage()
-
-                conversation['participants'] = conversation_object.participants
-                conversation['tags'] = conversation_object.tags
-
-                conversation['messages'] = 0
+            for subscription in actor['talkingIn']:
+                conversation_object = conversations_by_id[subscription['id']]
+                subscription['displayName'] = conversation_object.realDisplayName(self.username)
+                subscription['lastMessage'] = conversation_object.lastMessage()
+                subscription['participants'] = conversation_object.participants
+                subscription['tags'] = conversation_object.tags
+                subscription['messages'] = 0
 
             actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 

@@ -189,8 +189,7 @@ class BaseContext(MADBase):
 
         if must_update_fields:
             for user in self.subscribedUsers():
-                user_object = User()
-                user_object.fromObject(user)
+                user_object = User.from_object(user)
                 criteria = {'_id': user['_id'], '{}.{}'.format(self.user_subscription_storage, self.unique.lstrip('_')): self.getIdentifier()}
                 updates = {}
 

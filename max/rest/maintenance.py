@@ -79,8 +79,7 @@ def rebuildSubscriptions(context, request):
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
                 print user.username, subscription["displayName"]
-                fake_deleted_context = Context()
-                fake_deleted_context.fromObject(subscription)
+                fake_deleted_context = Context.from_object(subscription)
                 user.removeSubscription(fake_deleted_context)
             else:
                 subscription.pop('vetos', None)
@@ -131,8 +130,7 @@ def rebuildConversationSubscriptions(context, request):
     for user in users:
         for subscription in user.get('talkingIn', []):
             if subscription['id'] not in existing_conversations:
-                fake_deleted_conversation = Conversation()
-                fake_deleted_conversation.fromObject(subscription)
+                fake_deleted_conversation = Conversation.from_object(subscription)
                 user.removeSubscription(fake_deleted_conversation)
                 user['talkingIn'] = [a for a in user['talkingIn'] if a['id'] != subscription['id']]
             else:

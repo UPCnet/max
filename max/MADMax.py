@@ -223,8 +223,7 @@ class MADMaxCollection(object):
         """
         CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
         model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[self.collection.name], None)
-        wrapped = model()
-        wrapped.fromObject(item, collection=self.collection)
+        wrapped = model.from_object(item, collection=self.collection)
 
         # Also wrap subobjects, only if we are not flattening
         if not flatten and 'object' in wrapped:

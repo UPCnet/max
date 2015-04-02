@@ -220,6 +220,24 @@ class MADBase(MADDict):
             pass
         self.data = RUDict({})
 
+    @classmethod
+    def from_database(cls, key):
+        instance = cls()
+        instance.data[instance.unique] = instance.format_unique(key)
+        instance.wake()
+        return instance
+
+    @classmethod
+    def from_object(cls, source, collection=None):
+        instance = cls()
+        instance.update(source)
+        instance.old.update(source)
+        instance.old = deepcopy(flatten(instance.old))
+        if 'id' in source:
+            instance['_id'] = source['id']
+        instance._post_init_from_object(source)
+        return instance
+
     def field_changed(self, field):
         return self.get(field, None) != self.old.get(field, None)
 
@@ -272,14 +290,6 @@ class MADBase(MADDict):
     def _after_insert_object(self, oid, **kwargs):
         return True
 
-    def fromObject(self, source, collection=None):
-        self.update(source)
-        self.old.update(source)
-        self.old = deepcopy(flatten(self.old))
-        if 'id' in source:
-            self['_id'] = source['id']
-        self._post_init_from_object(source)
-
     def wake(self):
         """
             Tries to recover a lazy object from the database
@@ -292,10 +302,6 @@ class MADBase(MADDict):
 
     def format_unique(self, key):
         return key if isinstance(key, ObjectId) else ObjectId(key)
-
-    def fromDatabase(self, key):
-        self.data[self.unique] = self.format_unique(key)
-        self.wake()
 
     def reload(self):
         unique = self.unique

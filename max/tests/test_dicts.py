@@ -74,8 +74,7 @@ class FunctionalTests(unittest.TestCase):
         from max.rest.utils import deepcopy
         from max.models import User
 
-        actor = User()
-        actor.fromObject({'username': 'sheldon', 'displayName': 'Sheldon'})
+        actor = User.from_object({'username': 'sheldon', 'displayName': 'Sheldon'})
 
         old_dict = {
             'level1_key': {
@@ -111,8 +110,7 @@ class FunctionalTests(unittest.TestCase):
         from max.rest.utils import RUDict
         from max.models import User
 
-        actor = User()
-        actor.fromObject({'username': 'sheldon', 'displayName': 'Sheldon'})
+        actor = User.from_object({'username': 'sheldon', 'displayName': 'Sheldon'})
 
         old_dict = {
             'level1_key': {

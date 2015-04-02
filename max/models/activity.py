@@ -261,14 +261,11 @@ class BaseActivity(MADBase):
         # Look if the activity belongs to an specific context
         if self.get('contexts', False):
             # Look if we need to upload to an external URL
-            if self.get('contexts')[0]['objectType'] == 'context':
-                context = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
-                context.fromDatabase(self.get('contexts')[0]['hash'])
-                uploadURL = context.get('uploadURL', '')
-            else:
-                context = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
-                context.fromDatabase(ObjectId(self.get('contexts')[0]['id']))
-                uploadURL = context.get('uploadURL', '')
+            context = self.get('contexts')[0]
+            ContextClass = getMaxModelByObjectType(self.get('contexts')[0]['objectType'])()
+            identifier = context[ContextClass.unique] if ContextClass.unique in context else context[ContextClass.unique.lstrip('_')]
+            context = ContextClass.from_database(identifier)
+            uploadURL = context.get('uploadURL', '')
 
         if uploadURL:
             headers = {'X-Oauth-Scope': request.headers.get('X-Oauth-Scope'),
@@ -381,8 +378,7 @@ class Activity(BaseActivity):
 
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Context
-            context = Context()
-            context.fromDatabase(self.contexts[0]['hash'])
+            context = Context.from_database(self.contexts[0]['hash'])
 
             subscription = self.request.actor.getSubscription(context)
             if subscription:
