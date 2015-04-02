@@ -77,15 +77,24 @@ def getContextActivities(context, request):
     # Check if we have permission to unrestrictely view activities from recursive contexts:
     can_list_activities_unsubscribed = isinstance(request.has_permission(list_activities_unsubscribed), ACLAllowed)
 
-    # If we can't view unsubcribed, filter from which contexts we get activities by listing
+    # If we can't view unsubcribed contexts, filter from which contexts we get activities by listing
     # the contexts that the user has read permission on his subscriptions. Public contexts
     # will be added if this condition is met, as if we're unrestricted, main query already includes them all
+
     if not can_list_activities_unsubscribed:
-        # XXX Filter subscriptions by url prefix PLEASE
-        subscribed_uris = [ctxt['url'] for ctxt in request.actor.subscribedTo if 'read' in ctxt.get('permissions', []) and ctxt['objectType'] == 'context']
-        if subscribed_uris:
-            subscribed_query = {'contexts.url': {'$in': subscribed_uris}}
-            contexts_query.append(subscribed_query)
+
+        def get_valid_subscriptions():
+            subscriptions = []
+            for subscription in request.actor.subscribedTo:
+                if 'read' in subscription.get('permissions', []) \
+                   and subscription['objectType'] == 'context'\
+                   and subscription['url'].startswith(url):
+                    subscriptions.append(subscription['url'])
+            return subscriptions
+
+        # XXX Filter subscriptions by url prefix PLEASE:
+        subscribed_query = {'contexts.url': {'$in': get_valid_subscriptions()}}
+        contexts_query.append(subscribed_query)
 
         # We'll include also all contexts that are public whitin the url
         public_query = {'permissions.read': 'public', 'url': url_regex}
