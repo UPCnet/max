@@ -363,7 +363,7 @@ class User(MADBase):
 
         tokens.remove(query)
 
-    def isAllowedToSee(self, user):
+    def is_allowed_to_see(self, user):
         """
         NonVisible People can see Visible and NonVisible people
         Visible People only can see Visible People

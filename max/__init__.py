@@ -73,7 +73,6 @@ def main(*args, **settings):
     config.add_request_method(get_request_actor_username, name='actor_username', reify=True)
     config.add_request_method(get_request_actor, name='actor', reify=True)
     config.add_request_method(get_request_creator, name='creator', reify=True)
-    config.add_request_method(get_authenticated_user_roles, name='roles', reify=True)
     config.add_request_method(get_database, name='db', reify=True)
     config.add_request_method(extract_post_data, name='decoded_payload', reify=True)
     config.add_request_method(get_oauth_headers, name='auth_headers', reify=True)

@@ -32,7 +32,7 @@ def getVisibleUsers(users, request):
 
     # Filter user results. User
 
-    filtered_users = [user for user in found_users if request.actor.isAllowedToSee(user)]
+    filtered_users = [user for user in found_users if request.actor.is_allowed_to_see(user)]
 
     handler = JSONResourceRoot(flatten(filtered_users, squash=['subscribedTo']), remaining=remaining)
     return handler.buildResponse()

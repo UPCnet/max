@@ -79,7 +79,7 @@ def postMessage2Conversation(conversations, request):
     users = MADMaxCollection(request.db.users, query_key='username')
     for participant in request_participants:
         user = users[participant]
-        if request.actor.username != user['username'] and not request.actor.isAllowedToSee(user):
+        if request.actor.username != user['username'] and not request.actor.is_allowed_to_see(user):
             raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.actor.username, user['username']))
         participants[participant] = user
 
@@ -273,7 +273,7 @@ def joinConversation(conversation, request):
         if 'group' not in conversation.get('tags', []):
             raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
-        if not request.creator.isAllowedToSee(actor):
+        if not request.creator.is_allowed_to_see(actor):
             raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(request.creator.username, actor.username))
 
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
