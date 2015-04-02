@@ -8,7 +8,7 @@ from max.security import Manager, Owner, is_owner
 from max.security.permissions import delete_comment
 from pyramid.security import Allow
 from pyramid.decorator import reify
-from copy import deepcopy
+from max.rest.utils import deepcopy
 from hashlib import sha1
 
 

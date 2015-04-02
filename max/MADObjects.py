@@ -10,7 +10,7 @@ from pyramid.threadlocal import get_current_request
 
 from bson import ObjectId
 from cgi import FieldStorage
-from copy import deepcopy
+from max.rest.utils import deepcopy
 
 import datetime
 import sys
@@ -21,6 +21,11 @@ class MADDict(dict):
         A simple vitaminated dict for holding a MongoBD arbitrary object
     """
     schema = {}
+
+    def __deepcopy__(self, item):
+        """
+        """
+        return self
 
     def __getattr__(self, key):
         """

@@ -68,6 +68,43 @@ class FunctionalTests(unittest.TestCase):
             dict.__getitem__(md, 'myattribute')
         self.assertRaises(KeyError, getAsIfItWasAnitem)
 
+    def test_deepcopy(self):
+        """
+        """
+        from max.rest.utils import deepcopy
+        from max.models import User
+
+        actor = User()
+        actor.fromObject({'username': 'sheldon', 'displayName': 'Sheldon'})
+
+        old_dict = {
+            'level1_key': {
+                'level2_key': {
+                    'level3_key': {},
+                    'level3_value': 54
+                },
+                'level2_value': [
+                    {'inner': 'item'}
+                ]
+            },
+            'actor': actor
+        }
+
+        dict_copy = deepcopy(old_dict)
+
+        # Dicts and lists get copied
+        self.assertNotEqual(id(old_dict), id(dict_copy))
+        self.assertNotEqual(id(old_dict['level1_key']), id(dict_copy['level1_key']))
+        self.assertNotEqual(id(old_dict['level1_key']['level2_key']), id(dict_copy['level1_key']['level2_key']))
+        self.assertNotEqual(id(old_dict['level1_key']['level2_value']), id(dict_copy['level1_key']['level2_value']))
+        self.assertNotEqual(id(old_dict['level1_key']['level2_key']['level3_key']), id(dict_copy['level1_key']['level2_key']['level3_key']))
+        self.assertNotEqual(id(old_dict['level1_key']['level2_value'][0]), id(dict_copy['level1_key']['level2_value'][0]))
+
+        # Primitives and objects remain referenced
+        self.assertEqual(id(old_dict['actor']), id(dict_copy['actor']))
+        self.assertEqual(id(old_dict['level1_key']['level2_key']['level3_value']), id(dict_copy['level1_key']['level2_key']['level3_value']))
+        self.assertEqual(id(old_dict['level1_key']['level2_value'][0]['inner']), id(dict_copy['level1_key']['level2_value'][0]['inner']))
+
     def test_recursive_update_dict(self):
         """
         """

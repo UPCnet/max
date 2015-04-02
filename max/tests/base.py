@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_manager
-from max.tests.mock_image import image
 
-from pyramid.threadlocal import get_current_request
 from urllib import urlencode
-from copy import deepcopy
+from max.rest.utils import deepcopy
 from max.rest.utils import get_avatar_folder
 
 import json

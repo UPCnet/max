@@ -6,7 +6,6 @@ from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 
-from copy import deepcopy
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp

@@ -32,6 +32,44 @@ EXIF_ROTATIONS = {
 }
 
 
+def deepcopy(original):
+    """
+        Faster deepcopy doing only the copy stuff and custom checks.
+    """
+    from max.MADObjects import MADDict
+
+    def recurse_list(obj):
+        out = list()
+        for item in obj:
+            out.append(process(item))
+        return out
+
+    def recurse_dict(obj):
+        out = dict().fromkeys(obj)
+        for k, v in obj.iteritems():
+            out[k] = process(v)
+        return out
+
+    def process(obj):
+        if isinstance(obj, MADDict):
+            return obj
+        elif isinstance(obj, dict):
+            return recurse_dict(obj)
+        elif isinstance(obj, list):
+            return recurse_list(obj)
+        else:
+            try:
+                return obj.copy()   # dicts, sets
+            except AttributeError:
+                try:
+                    return obj[:]   # lists, tuples, strings, unicode
+                except:
+                    return obj  # ints
+        return obj  # other uncatched
+
+    return process(original)
+
+
 def getMaxModelByObjectType(objectType):
     return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 

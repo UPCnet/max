@@ -6,7 +6,7 @@ from max.exceptions import ObjectNotFound
 from bson.objectid import ObjectId
 from pymongo import DESCENDING
 
-from copy import deepcopy
+from max.rest.utils import deepcopy
 
 import sys
 
@@ -78,7 +78,6 @@ class MADMaxCollection(object):
                 object_tags: A list of tags to filter context activities
                 twitter_enabled: Boolean for returning objects Twitter attributes
         """
-
         search_query = deepcopy(query)
 
         # Extract known params from kwargs
