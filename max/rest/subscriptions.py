@@ -6,14 +6,14 @@ from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.utils import searchParams
 
 from pyramid.httpexceptions import HTTPNoContent
-from pyramid.view import view_config
+from max.rest import endpoint
 from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.exceptions import InvalidPermission
 from max.security.permissions import add_subscription, remove_subscription, manage_subcription_permissions, view_subscriptions
 
 
-@view_config(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
+@endpoint(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
 def subscribe(context, request):
     """
         /context/{hash}/subscriptions
@@ -48,7 +48,7 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_subscription', request_method='DELETE', requires_actor=True, permission=remove_subscription)
+@endpoint(route_name='context_subscription', request_method='DELETE', requires_actor=True, permission=remove_subscription)
 def unsubscribe(context, request):
     """
     """
@@ -56,7 +56,7 @@ def unsubscribe(context, request):
     return HTTPNoContent()
 
 
-@view_config(route_name='context_subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
+@endpoint(route_name='context_subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
 def getContextSubscriptions(context, request):
     """
     """
@@ -72,7 +72,7 @@ def getContextSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
+@endpoint(route_name='subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
 def getUserSubscriptions(user, request):
     """
         /people/{username}/subscriptions
@@ -97,7 +97,7 @@ def getUserSubscriptions(user, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
 def grantPermissionOnContext(context, request):
     """ [RESTRICTED]
     """
@@ -120,7 +120,7 @@ def grantPermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
 def revokePermissionOnContext(context, request):
     """
     """
@@ -143,7 +143,7 @@ def revokePermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@view_config(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
 def resetPermissionsOnContext(context, request):
     """
     """
