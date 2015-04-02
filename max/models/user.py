@@ -422,7 +422,7 @@ class User(MADBase):
 
         return actor
 
-    def _on_insert_object(self, oid, notifications=True):
+    def _after_insert_object(self, oid, notifications=True):
         """
             Create user exchanges just after user creation on the database
         """
