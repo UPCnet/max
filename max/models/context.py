@@ -481,6 +481,11 @@ class Context(BaseContext):
 
         self.save()
 
+    def _on_insert_object(self, oid):
+        if self.field_changed('twitterUsername'):
+            notifier = RabbitNotifications(self.request)
+            notifier.restart_tweety()
+
     def _on_saving_object(self, oid):
         if self.field_changed('twitterUsername'):
             notifier = RabbitNotifications(self.request)

@@ -310,7 +310,6 @@ class MADBase(MADDict):
         self._before_insert_object()
         oid = self.mdb_collection.insert(self)
         self._on_insert_object(oid, **kwargs)
-        self._on_saving_object(oid)
         return str(oid)
 
     def save(self):

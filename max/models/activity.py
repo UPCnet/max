@@ -446,8 +446,7 @@ class Activity(BaseActivity):
         return super(Activity, self).flatten(*args, **kwargs)
 
     def _on_saving_object(self, oid):
-        if not hasattr(self, 'lastComment'):
-            self.lastComment = oid
+        self.setdefault('lastComment', oid)
 
     def _before_saving_object(self):
         # Remove comments traverser before saving
@@ -460,6 +459,8 @@ class Activity(BaseActivity):
     def _on_insert_object(self, oid):
         # notify activity if the activity is from a context
         # with enabled notifications
+
+        self.setdefault('lastComment', oid)
 
         notify = self.get('contexts', [{}])[0].get('notifications', False)
         if notify in ['posts', 'comments', True]:
