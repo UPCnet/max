@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import InvalidSearchParams
-
 from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 
@@ -18,7 +17,7 @@ import requests
 import sys
 import tweepy
 import urllib2
-
+from copy import copy
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
@@ -282,29 +281,27 @@ class RUDict(dict):
     def __init__(self, *args, **kw):
         super(RUDict, self).__init__(*args, **kw)
 
-    def update(self, E=None, **F):
-        if E is not None:
-            if 'keys' in dir(E) and callable(getattr(E, 'keys')):
-                for k in E:
-                    if k in self:  # existing ...must recurse into both sides
-                        self.r_update(k, E)
-                    else:  # doesn't currently exist, just update
-                        self[k] = E[k]
-            else:
-                for (k, v) in E:
-                    self.r_update(k, {k: v})
+    def update(self, new):
+        """
+        """
+        from max.MADObjects import MADDict
 
-        for k in F:
-            self.r_update(k, {k: F[k]})
+        def recursive_update(old, new):
+            for key, value in new.items():
+                # If We found a key on new that is
+                # present on old, and the key's value
+                # is a dict we must recurse the child keys
+                # Any other case replaces or adds the new value
+                is_plain_dict = isinstance(value, dict) and not isinstance(value, MADDict)
+                if key in old and is_plain_dict:
 
-    def r_update(self, key, other_dict):
-        if isinstance(self[key], dict) and isinstance(other_dict[key], dict):
-            od = RUDict(self[key])
-            nd = other_dict[key]
-            od.update(nd)
-            self[key] = od
-        else:
-            self[key] = other_dict[key]
+                    recursive_update(old[key], value)
+                else:
+                    old[key] = value if not is_plain_dict else copy(value)
+            old = copy(old)
+
+        if new:
+            recursive_update(self, new)
 
 
 def decodeBSONEntity(di, key):

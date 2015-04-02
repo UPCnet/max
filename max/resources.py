@@ -37,7 +37,6 @@ def get_pyramid_authorization_frame():
 class Root(dict):
     __parent__ = __name__ = None
 
-    @reify
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.do_maintenance),

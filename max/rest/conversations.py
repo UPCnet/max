@@ -149,6 +149,7 @@ def postMessage2Conversation(conversations, request):
 
     # Initialize a Message (Activity) object from the request
     newmessage = Message()
+
     try:
         newmessage.fromRequest(request, rest_params=message_params)
     except Exception as catched:

@@ -67,3 +67,50 @@ class FunctionalTests(unittest.TestCase):
         def getAsIfItWasAnitem():
             dict.__getitem__(md, 'myattribute')
         self.assertRaises(KeyError, getAsIfItWasAnitem)
+
+    def test_recursive_update_dict(self):
+        """
+        """
+        from max.rest.utils import RUDict
+        from max.models import User
+
+        actor = User()
+        actor.fromObject({'username': 'sheldon', 'displayName': 'Sheldon'})
+
+        old_dict = {
+            'level1_key': {
+                'level2_key': {
+                    'level3_key': {},
+                    'level3_value': 54
+                },
+                'level2_value': []
+            },
+            'actor': {}
+        }
+
+        new_dict = {
+            'level1_key': {
+                'level2_key': {
+                    'level3_key': {
+                        'new_value': 'new'
+                    },
+                },
+                'level2_key2': {'value': 3}
+            },
+            'actor': actor
+        }
+
+        rdict = RUDict(old_dict)
+        rdict.update(new_dict)
+
+        self.assertIsInstance(rdict['actor'], User)
+        self.assertEqual(rdict['level1_key']['level2_value'], [])
+        self.assertEqual(rdict['level1_key']['level2_key']['level3_value'], 54)
+        self.assertEqual(rdict['level1_key']['level2_key']['level3_key']['new_value'], 'new')
+        self.assertEqual(rdict['level1_key']['level2_key2']['value'], 3)
+
+        self.assertNotEqual(id(rdict['level1_key']), id(new_dict['level1_key']['level2_key']))
+        self.assertNotEqual(id(rdict['level1_key']['level2_key']), id(new_dict['level1_key']['level2_key']))
+        self.assertNotEqual(id(rdict['level1_key']['level2_key2']), id(new_dict['level1_key']['level2_key2']))
+        self.assertEqual(id(rdict['level1_key']['level2_key']['level3_key']['new_value']), id(new_dict['level1_key']['level2_key']['level3_key']['new_value']))
+        self.assertEqual(id(rdict['actor']), id(new_dict['actor']))

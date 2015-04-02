@@ -80,7 +80,7 @@ def get_username_in_body(request):
         Returns None if any user found on body
     """
     if request.method in ['POST', 'PUT']:
-        decoded_data = extract_post_data(request)
+        decoded_data = request.decoded_payload
         if not isinstance(decoded_data, dict):
             return None
 

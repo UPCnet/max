@@ -24,7 +24,7 @@ from pyramid.decorator import reify
 
 # Fields that we want to transfer from real context,
 # to the context reference stored on activ
-ACTIVITY_CONTEXT_FIELDS = ['displayName', 'tags', 'hash', 'url', 'objectType']
+ACTIVITY_CONTEXT_FIELDS = ['displayName', 'tags', 'hash', 'url', 'objectType', 'notifications']
 
 
 class BaseActivity(MADBase):
@@ -71,8 +71,8 @@ class BaseActivity(MADBase):
             actor as owner instead of the creator whenever
             the actor is a person
         """
-        isPerson = isinstance(self.data['actor'], User)
-        isContext = isinstance(self.data['actor'], Context)
+        isPerson = self.data['actor']['objectType'] == 'person'
+        isContext = self.data['actor']['objectType'] == 'context'
 
         if isPerson:
             return request.actor['username']

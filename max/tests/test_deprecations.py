@@ -44,11 +44,10 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/people')
-        self.assertEqual(json_body['username'], 'sheldon')
-        self.assertEqual(json_body['displayName'], 'Sheldon')
+        self.assertEqual(res.json['username'], 'sheldon')
+        self.assertEqual(res.json['displayName'], 'Sheldon')
 
     # Test deprecated subscribe user
 
@@ -70,11 +69,10 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/contexts/{}/subscriptions'.format(context_hash))
-        self.assertEqual(json_body['actor']['username'], 'sheldon')
-        self.assertEqual(json_body['actor']['objectType'], 'person')
+        self.assertEqual(res.json['actor']['username'], 'sheldon')
+        self.assertEqual(res.json['actor']['objectType'], 'person')
 
     # Test deprecated unsubscribe user
 
@@ -125,12 +123,11 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/contexts/{}/activities'.format(context_hash))
-        self.assertEqual(json_body['actor']['username'], 'sheldon')
-        self.assertEqual(json_body['actor']['objectType'], 'person')
-        self.assertIn('object', json_body)
+        self.assertEqual(res.json['actor']['username'], 'sheldon')
+        self.assertEqual(res.json['actor']['objectType'], 'person')
+        self.assertIn('object', res.json)
 
     def test_deprecated_user_post_activity_to_context_without_context(self):
         """
@@ -153,10 +150,9 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/people/sheldon/activities'.format(context_hash))
-        self.assertNotIn('actor', json_body)
+        self.assertNotIn('contexts', res.json)
 
     # Test depreacted join conversation
 
@@ -184,11 +180,10 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/conversations/{}/participants'.format(cid))
-        self.assertEqual(json_body['actor']['username'], recipient3)
-        self.assertEqual(json_body['actor']['objectType'], 'person')
+        self.assertEqual(res.json['actor']['username'], recipient3)
+        self.assertEqual(res.json['actor']['objectType'], 'person')
 
     def test_deprecated_leave_conversation(self):
         """
@@ -232,11 +227,10 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
 
         rewrited_request = res.request
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
-        json_body = json.loads(res.request.body)
 
         self.assertEqual(rewrited_request_url, '/tokens')
-        self.assertEqual(json_body['token'], token)
-        self.assertEqual(json_body['platform'], platform)
+        self.assertEqual(res.json['token'], token)
+        self.assertEqual(res.json['platform'], platform)
 
     def test_deprecated_delete_token(self):
         """

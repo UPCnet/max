@@ -31,9 +31,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def tearDown(self):
         import pyramid.testing
-        children_dir = os.listdir(self.app.registry.settings['file_repository'])
-        if len(children_dir) > 0:
-            shutil.rmtree(self.app.registry.settings['file_repository'] + '/' + children_dir[0])
+        shutil.rmtree(self.app.registry.settings['file_repository'], ignore_errors=True)
         pyramid.testing.tearDown()
 
     # BEGIN TESTS
