@@ -13,7 +13,6 @@ else:
 from max import debug
 from max.decorators import set_signal
 from max.predicates import RequiredActorPredicate
-from max.predicates import RestrictedPredicate
 from max.resources import loadCloudAPISettings
 from max.resources import loadMAXSecurity
 from max.resources import loadMAXSettings
@@ -121,7 +120,6 @@ def main(*args, **settings):
 
     config.scan('max', ignore=['max.tests', 'max.scripts'])
 
-    config.add_view_predicate('restricted', RestrictedPredicate)
     config.add_view_predicate('requires_actor', RequiredActorPredicate)
     set_signal()
     return config.make_wsgi_app()
