@@ -285,7 +285,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username2 = 'thor'
         self.create_user(username)
         self.create_user(username2)
-        self.create_context(create_context)
+        self.create_context(create_context, permissions={'read': 'subscribed'})
         self.admin_subscribe_user_to_context(username, subscribe_context)
 
         thefile = open(os.path.join(os.path.dirname(__file__), "map.pdf"), "rb")
@@ -293,10 +293,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files, status=201)
 
-        res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username), status=200)
-        response = res.json
+        activity_id = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username), status=200).json[0]['id']
 
-        res = self.testapp.get('/activities/{}/file/download'.format(response[0]['id']), '', oauth2Header(username2), status=401)
+        self.testapp.get('/activities/{}/file/download'.format(activity_id), '', oauth2Header(username2), status=403)
 
     def test_get_thumb_image_activity_file_with_context(self):
         """

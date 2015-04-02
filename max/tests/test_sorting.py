@@ -53,6 +53,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
         res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
+
         self.assertEqual(len(res.json), 3)
         self.assertEqual(res.json[0].get('id', None), activity_2_id)
         self.assertEqual(res.json[1].get('id', None), activity_1_id)

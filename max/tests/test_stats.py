@@ -404,7 +404,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         from .mockers import create_context
         from hashlib import sha1
 
-        self.create_context(create_context)
+        self.create_context(create_context, permissions={'read': 'subscribed'})
         url_hash = sha1(create_context['url']).hexdigest()
 
         username = 'messi'

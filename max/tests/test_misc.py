@@ -54,7 +54,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             trying to extract actor information from the body.
         """
         username = 'messi'
-        self.testapp.post('/people/%s' % username, '[]', oauth2Header(test_manager), status=201)
+        self.testapp.post('/people/%s' % username, '[]', oauth2Header(username), status=201)
 
     def test_post_tunneling_on_delete(self):
         """

@@ -19,4 +19,5 @@ test_cloudapis = {
     }
 }
 
-
+import warnings
+warnings.filterwarnings("ignore")

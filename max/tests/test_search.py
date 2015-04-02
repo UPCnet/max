@@ -48,6 +48,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username2, displayName="Xavi Hernandez")
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
         activity = self.create_activity(username, user_status_context).json
         res = self.testapp.post('/activities/%s/comments' % str(activity['id']), json.dumps(user_comment), oauth2Header(username2), status=201)
         res = self.testapp.get('/activities/%s' % str(activity['id']), json.dumps({}), oauth2Header(username), status=200)
@@ -69,6 +70,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username2, displayName="Xavi Hernandez")
         self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
         self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
         activity = self.create_activity(username, user_status_context).json
         res = self.testapp.post('/activities/%s/comments' % str(activity['id']), json.dumps(user_comment), oauth2Header(username2), status=201)
         comment_id = res.json['id']
