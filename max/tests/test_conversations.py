@@ -783,7 +783,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        res = self.testapp.put('/conversations/{}/owner'.format(conversation_id), json.dumps({'actor': {'username': outsider}}), oauth2Header(sender), status=404)
+        res = self.testapp.put('/conversations/{}/owner'.format(conversation_id), json.dumps({'actor': {'username': outsider}}), oauth2Header(sender), status=403)
 
     def test_conversation_owner_transfers_ownership_to_inexistent_user(self):
         """

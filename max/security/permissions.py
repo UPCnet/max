@@ -42,7 +42,6 @@ manage_security = 'Manage security settings'
 do_maintenance = 'Execute maintenance tasks'
 view_server_settings = 'View detailed server settings'
 
-
 list_conversations = 'List conversations'
 add_conversation = 'Add conversation'
 add_conversation_for_others = 'Add conversation without oneself'
@@ -53,6 +52,7 @@ delete_conversation = 'Delete conversation'
 purge_conversations = "Delete everyone's conversations"
 add_conversation_participant = 'Add a participant to a conversation'
 delete_conversation_participant = 'Delete a participant from a conversation'
+transfer_ownership = 'Transfer a conversation to another user'
 
 add_message = 'Add a message to a conversation'
 list_messages = 'View all conversation messages'

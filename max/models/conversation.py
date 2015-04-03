@@ -2,7 +2,7 @@
 from max.MADMax import MADMaxCollection
 from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
-from max.security.permissions import list_messages, add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
+from max.security.permissions import transfer_ownership, list_messages, add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
 from max.security import Manager, Owner, is_self_operation
 from max.rest.utils import flatten
 from pyramid.security import Allow
@@ -46,6 +46,11 @@ class Conversation(BaseContext):
             (Allow, Owner, delete_conversation),
         ]
 
+        if self.subscription:
+            acl.extend([
+                (Allow, Manager, transfer_ownership),
+                (Allow, Owner, transfer_ownership),
+            ])
         # Grant extra permissions mapped to the authenticated user's
         # defined conversation subscription permissions
 

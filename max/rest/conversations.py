@@ -18,6 +18,7 @@ from max.security.permissions import delete_conversation_participant
 from max.security.permissions import list_conversations
 from max.security.permissions import modify_conversation
 from max.security.permissions import purge_conversations
+from max.security.permissions import transfer_ownership
 from max.security.permissions import view_conversation
 from max.security.permissions import view_conversation_subscription
 
@@ -335,11 +336,12 @@ def leaveConversation(conversation, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='conversation_owner', request_method='PUT', requires_actor=True, permission=modify_conversation)
+@endpoint(route_name='conversation_owner', request_method='PUT', requires_actor=True, permission=transfer_ownership)
 def transferConversationOwnership(conversation, request):
     """
     """
     cid = request.matchdict.get('id', None)
+
     subscription = conversation.subscription
 
     # Check if the targeted new owner is on the conversation
