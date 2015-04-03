@@ -59,7 +59,7 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
             Then get the tweepy wrapper object
             And the expected methods are there
         """
-        from max.rest.utils import get_twitter_api
+        from max.utils.twitter import get_twitter_api
         api = get_twitter_api(self.app.registry)
         self.assertTrue(hasattr(api, 'verify_credentials'))
         self.assertTrue(hasattr(api, 'get_user'))
@@ -72,8 +72,8 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
             Then get a user object
             And the expected properties are there
         """
-        from max.rest.utils import get_twitter_api
-        from max.rest.utils import get_userid_from_twitter
+        from max.utils.twitter import get_twitter_api
+        from max.utils.twitter import get_userid_from_twitter
 
         api = get_twitter_api(self.app.registry)
         userid = get_userid_from_twitter(api, 'maxupcnet')
@@ -88,8 +88,8 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
             Then get a user object
             And the expected properties are there
         """
-        from max.rest.utils import get_twitter_api
-        from max.rest.utils import download_twitter_user_image
+        from max.utils.twitter import get_twitter_api
+        from max.utils.twitter import download_twitter_user_image
 
         api = get_twitter_api(self.app.registry)
         imagefile = os.path.join(self.tempfolder, 'twitter.png')

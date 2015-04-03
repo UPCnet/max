@@ -71,7 +71,7 @@ class FunctionalTests(unittest.TestCase):
     def test_deepcopy(self):
         """
         """
-        from max.rest.utils import deepcopy
+        from max.utils.dicts import deepcopy
         from max.models import User
 
         actor = User.from_object(None, {'username': 'sheldon', 'displayName': 'Sheldon'})
@@ -107,7 +107,7 @@ class FunctionalTests(unittest.TestCase):
     def test_recursive_update_dict(self):
         """
         """
-        from max.rest.utils import RUDict
+        from max.utils.dicts import RUDict
         from max.models import User
 
         actor = User.from_object(None, {'username': 'sheldon', 'displayName': 'Sheldon'})

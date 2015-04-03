@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from max.rest.utils import date_filter_parser
+from max.utils.dates import date_filter_parser
 
 
 class FunctionalTests(unittest.TestCase):

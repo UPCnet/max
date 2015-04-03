@@ -4,7 +4,7 @@ from max.models.conversation import Conversation
 from pyramid.decorator import reify
 from max.security import Manager, Owner
 from pyramid.security import Allow
-from max.rest.utils import flatten
+from max.utils.dicts import flatten
 from max.security.permissions import view_message, modify_message
 
 MESSAGE_CONTEXT_FIELDS = ['displayName', '_id', 'objectType']

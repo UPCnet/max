@@ -3,13 +3,13 @@ from max.exceptions import DuplicatedItemError
 from max.exceptions import MissingField
 from max.exceptions import ObjectNotSupported
 from max.exceptions import ValidationError
-from max.rest.utils import RUDict
-from max.rest.utils import flatten
+from max.utils.dicts import RUDict
+from max.utils.dicts import flatten
 from pyramid.security import ACLAllowed
 
 from bson import ObjectId
 from cgi import FieldStorage
-from max.rest.utils import deepcopy
+from max.utils.dicts import deepcopy
 
 import datetime
 import sys

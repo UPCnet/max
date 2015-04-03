@@ -3,8 +3,8 @@ from max.MADMax import MADMaxCollection
 from max.MADObjects import MADBase
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
-from max.rest.utils import get_twitter_api
-from max.rest.utils import get_userid_from_twitter
+from max.utils.twitter import get_twitter_api
+from max.utils.twitter import get_userid_from_twitter
 
 from hashlib import sha1
 from max import DEFAULT_CONTEXT_PERMISSIONS

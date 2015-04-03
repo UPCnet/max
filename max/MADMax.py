@@ -6,7 +6,7 @@ from max.exceptions import ObjectNotFound
 from bson.objectid import ObjectId
 from pymongo import DESCENDING
 
-from max.rest.utils import deepcopy
+from max.utils.dicts import deepcopy
 
 import sys
 

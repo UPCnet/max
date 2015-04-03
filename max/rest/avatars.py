@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import ValidationError
 from max.rest import endpoint
-from max.rest.utils import download_twitter_user_image
-from max.rest.utils import get_avatar_folder
-from max.rest.utils import get_twitter_api
+from max.utils.twitter import download_twitter_user_image
+from max.utils.image import get_avatar_folder
+from max.utils.twitter import get_twitter_api
 from max.security.permissions import modify_avatar
 
 from pyramid.response import Response

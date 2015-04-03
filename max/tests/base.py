@@ -2,8 +2,8 @@
 from max.tests import test_manager
 
 from urllib import urlencode
-from max.rest.utils import deepcopy
-from max.rest.utils import get_avatar_folder
+from max.utils.dicts import deepcopy
+from max.utils.image import get_avatar_folder
 
 import json
 import os

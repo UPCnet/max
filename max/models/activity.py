@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
-from max.exceptions import Unauthorized
 from max.models.context import Context
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
-from max.rest.utils import getMaxModelByObjectType
-from max.rest.utils import hasPermission
-from max.rest.utils import rfc3339_parse
-from max.rest.utils import rotate_image_by_EXIF
+from max.utils import getMaxModelByObjectType
+from max.utils import hasPermission
+from max.utils.dates import rfc3339_parse
+from max.utils.image import rotate_image_by_EXIF
 from max.security import Manager, Owner, is_owner, is_self_operation
 from max.security.permissions import favorite, unfavorite, view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment, like, unlike, flag, unflag
 from max.resources import CommentsTraverser

@@ -5,8 +5,8 @@ from max.rabbitmq import RabbitNotifications
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
-from max.rest.utils import flatten
-from max.rest.utils import searchParams
+from max.utils.dicts import flatten
+from max.utils import searchParams
 from max.security.permissions import add_people
 from max.security.permissions import delete_user
 from max.security.permissions import list_visible_people

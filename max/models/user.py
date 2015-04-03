@@ -3,8 +3,8 @@ from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
 from max.rabbitmq import RabbitNotifications
-from max.rest.utils import flatten
-from max.rest.utils import getMaxModelByObjectType
+from max.utils.dicts import flatten
+from max.utils import getMaxModelByObjectType
 
 from pyramid.security import Allow
 from pyramid.security import Authenticated

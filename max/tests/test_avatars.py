@@ -9,7 +9,7 @@ from max.tests.base import mock_get
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 
-from max.rest.utils import get_avatar_folder
+from max.utils.image import get_avatar_folder
 
 from functools import partial
 from mock import patch

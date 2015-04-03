@@ -7,7 +7,7 @@ from max.models import Activity
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
-from max.rest.utils import searchParams
+from max.utils import searchParams
 from max.security.permissions import add_subscription
 from max.security.permissions import manage_subcription_permissions
 from max.security.permissions import remove_subscription

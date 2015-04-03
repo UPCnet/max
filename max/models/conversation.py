@@ -4,7 +4,7 @@ from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
 from max.security.permissions import transfer_ownership, list_messages, add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
 from max.security import Manager, Owner, is_self_operation
-from max.rest.utils import flatten
+from max.utils.dicts import flatten
 from pyramid.security import Allow
 from pymongo import DESCENDING
 from pyramid.decorator import reify

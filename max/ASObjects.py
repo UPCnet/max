@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADDict
-from max.rest.utils import findHashtags
-from max.rest.utils import findKeywords
-from max.rest.utils import formatMessageEntities
+from max.utils.formatting import findHashtags
+from max.utils.formatting import findKeywords
+from max.utils.formatting import formatMessageEntities
 
 from max.security import Manager, Owner, is_owner
 from max.security.permissions import delete_comment
 from pyramid.security import Allow
 from pyramid.decorator import reify
-from max.rest.utils import deepcopy
+from max.utils.dicts import deepcopy
 from hashlib import sha1
 
 

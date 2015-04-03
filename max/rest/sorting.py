@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from max.rest.utils import searchParams
+from max.utils import searchParams
 
 from pymongo import DESCENDING
 

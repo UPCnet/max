@@ -3,8 +3,8 @@ from max.models import Message
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
-from max.rest.utils import flatten
-from max.rest.utils import searchParams
+from max.utils.dicts import flatten
+from max.utils import searchParams
 from max.security.permissions import add_message
 from max.security.permissions import list_messages
 from max.security.permissions import view_message

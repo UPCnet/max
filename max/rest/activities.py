@@ -4,7 +4,7 @@ from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.rest.sorting import sorted_query
-from max.rest.utils import searchParams
+from max.utils import searchParams
 from max.security.permissions import add_activity
 from max.security.permissions import delete_activity
 from max.security.permissions import list_activities
