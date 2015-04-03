@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+from max.exceptions import ObjectNotFound
 from max.models import Context
 from max.models import Conversation
-from max.exceptions import ObjectNotFound
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.security.permissions import do_maintenance
+
 from bson import ObjectId
 
 import logging

@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import Forbidden
 from max.models import Activity
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.utils import searchParams
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
 from max.rest.sorting import sorted_query
+from max.rest.utils import searchParams
+from max.security.permissions import add_activity
+from max.security.permissions import delete_activity
+from max.security.permissions import list_activities
+from max.security.permissions import list_activities_unsubscribed
+from max.security.permissions import view_activity
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPNoContent
 from pyramid.response import Response
 from pyramid.security import ACLAllowed
-from max.rest import endpoint
-from max.security.permissions import list_activities_unsubscribed, list_activities, add_activity, view_activity, delete_activity
+
 from base64 import b64encode
 from bson import ObjectId
 from datetime import timedelta
+
 import re
 
 
@@ -104,13 +109,6 @@ def getContextActivities(context, request):
 
     if contexts_query or can_list_activities_unsubscribed:
         activities = sorted_query(request, request.db.activity, query, flatten=1)
-    else:
-        # XXX Check in coverage as this probably don't raises ever, as the case of not having any subscription
-        # is covered now by the permission in the view
-
-        # Empty contexts_query means that we don't have any subsriptions to any recursive context
-        # included the root one, so we really are not meant to see anything here
-        raise Forbidden("You don't have permission to see anyting in this context and it's child")
 
     is_head = request.method == 'HEAD'
     handler = JSONResourceRoot(activities, stats=is_head)

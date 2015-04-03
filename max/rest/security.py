@@ -3,10 +3,11 @@ from max import ALLOWED_ROLES
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
 from max.resources import loadMAXSecurity
-from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.security.permissions import manage_security
+
 from pyramid.httpexceptions import HTTPNoContent
 
 

@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
-from max.rest import endpoint
-from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.ResourceHandlers import JSONResourceEntity
-from pyramid.httpexceptions import HTTPNoContent
-from max.rest.utils import searchParams
 from max.models import Token
-from max.security.permissions import list_tokens, add_token, delete_token
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
+from max.rest.utils import searchParams
+from max.security.permissions import add_token
+from max.security.permissions import delete_token
+from max.security.permissions import list_tokens
+
+from pyramid.httpexceptions import HTTPNoContent
 
 
 @endpoint(route_name='conversation_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)

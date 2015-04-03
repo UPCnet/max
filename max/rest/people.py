@@ -2,17 +2,19 @@
 from max.exceptions import ValidationError
 from max.models import User
 from max.rabbitmq import RabbitNotifications
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.security.permissions import add_people
+from max.security.permissions import delete_user
+from max.security.permissions import list_visible_people
+from max.security.permissions import modify_user
+from max.security.permissions import view_user_profile
 
 from pyramid.httpexceptions import HTTPNoContent
-
 from pyramid.settings import asbool
-from max.rest import endpoint
-
-from max.security.permissions import list_visible_people, add_people, view_user_profile, modify_user, delete_user
 
 
 @endpoint(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)

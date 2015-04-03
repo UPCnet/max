@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-from max.rest.ResourceHandlers import JSONResourceEntity
 from max import RESOURCES
-from pyramid.view import view_config
 from max.predicates import RequiredActorPredicate
+from max.resources import Root
+from max.rest import JSONResourceEntity
+from max.security.permissions import view_server_settings
+
+from pyramid.response import Response
+from pyramid.view import view_config
+
+import json
 import pkg_resources
 import re
 import sys
-import json
-
-from max.resources import Root
-from max.security.permissions import view_server_settings
-from pyramid.response import Response
 
 
 @view_config(context=Root)

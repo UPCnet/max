@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from max.exceptions import ObjectNotFound
+from max.exceptions import ValidationError
+from max.rest import endpoint
 from max.rest.utils import download_twitter_user_image
 from max.rest.utils import get_avatar_folder
 from max.rest.utils import get_twitter_api
+from max.security.permissions import modify_avatar
 
 from pyramid.response import Response
-import os
-import time
 
 from PIL import Image
 from PIL import ImageOps
 
-from max.rest import endpoint
-from max.exceptions import ValidationError
-from max.security.permissions import modify_avatar
+import os
+import time
 
 
 @endpoint(route_name='avatar', request_method='POST', requires_actor=True, permission=modify_avatar)

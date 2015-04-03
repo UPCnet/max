@@ -4,21 +4,21 @@ from max import LAST_AUTHORS_LIMIT
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
 from max.models import Context
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
+from max.rest.sorting import sorted_query
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
-from max.rest.sorting import sorted_query
 from max.security.permissions import add_context
 from max.security.permissions import delete_context
+from max.security.permissions import list_activities
 from max.security.permissions import list_contexts
 from max.security.permissions import list_public_contexts
 from max.security.permissions import modify_context
 from max.security.permissions import view_context
-from max.security.permissions import list_activities
 
 from pyramid.httpexceptions import HTTPNoContent
-from max.rest import endpoint
 
 
 @endpoint(route_name='contexts', request_method='GET', permission=list_contexts, requires_actor=True)

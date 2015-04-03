@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 from max.models import Message
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
+from max.rest.utils import flatten
+from max.rest.utils import searchParams
+from max.security.permissions import add_message
+from max.security.permissions import list_messages
+from max.security.permissions import view_message
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
-from max.rest import endpoint
-from max.rest.utils import searchParams, flatten
-from max.rest.ResourceHandlers import JSONResourceEntity, JSONResourceRoot
+
 from base64 import b64encode
 from bson import ObjectId
-
-from max.security.permissions import list_messages, view_message, add_message
 
 
 @endpoint(route_name='messages', request_method='GET', requires_actor=True, permission=list_messages)

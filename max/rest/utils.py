@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import InvalidSearchParams
+
 from pyramid.settings import asbool
 
 from bson import json_util
 from bson.objectid import ObjectId
 from calendar import monthrange
-from datetime import datetime, time
+from copy import copy
+from datetime import datetime
+from datetime import time
 from rfc3339 import rfc3339
 
 import json
@@ -16,7 +19,7 @@ import requests
 import sys
 import tweepy
 import urllib2
-from copy import copy
+
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 

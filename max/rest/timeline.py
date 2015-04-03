@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from max import AUTHORS_SEARCH_MAX_QUERIES_LIMIT
 from max import LAST_AUTHORS_LIMIT
-from max.rest.ResourceHandlers import JSONResourceRoot
-from max.rest.sorting import sorted_query
+from max.rest import JSONResourceRoot
 from max.rest import endpoint
+from max.rest.sorting import sorted_query
 from max.security.permissions import list_activities
 
 

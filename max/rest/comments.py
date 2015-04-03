@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from max.models import Activity
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
 from max.rest.utils import flatten
 from max.rest.utils import searchParams
+from max.security.permissions import add_comment
+from max.security.permissions import delete_comment
+from max.security.permissions import list_comments
 
 from pyramid.httpexceptions import HTTPNoContent
-from max.rest import endpoint
-from max.security.permissions import list_comments, add_comment, delete_comment
 
 
 @endpoint(route_name='user_comments', request_method='GET', permission=list_comments, requires_actor=True)

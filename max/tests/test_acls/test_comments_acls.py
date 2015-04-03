@@ -630,7 +630,7 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         """
         username = 'sheldon'
         self.create_user(username)
-        self.testapp.get('/activities/comments'.format(username), "", headers=oauth2Header(username), status=403)
+        self.testapp.get('/activities/comments', "", headers=oauth2Header(username), status=403)
 
     def test_get_all_comments_as_manager(self):
         """
@@ -640,4 +640,4 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
         """
         username = 'sheldon'
         self.create_user(username)
-        self.testapp.get('/activities/comments'.format(username), "", headers=oauth2Header(test_manager), status=200)
+        self.testapp.get('/activities/comments', "", headers=oauth2Header(test_manager), status=200)

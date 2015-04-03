@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from max.models import Activity
-from max.rest.ResourceHandlers import JSONResourceEntity
+from max.rest import JSONResourceEntity
 
 from pyramid.view import view_config
 

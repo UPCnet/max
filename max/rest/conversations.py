@@ -2,17 +2,25 @@
 from max import CONVERSATION_PARTICIPANTS_LIMIT
 from max.MADMax import MADMaxCollection
 from max.exceptions import Forbidden
-from max.exceptions import ObjectNotFound
-from max.exceptions import Unauthorized
 from max.exceptions import ValidationError
 from max.models import Activity
 from max.models import Conversation
 from max.models import Message
 from max.rabbitmq import RabbitNotifications
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
 from max.rest import endpoint
-from max.security.permissions import add_conversation_for_others, list_conversations, add_conversation, view_conversation, view_conversation_subscription, modify_conversation, delete_conversation, purge_conversations, add_conversation_participant, delete_conversation_participant
+from max.security.permissions import add_conversation
+from max.security.permissions import add_conversation_for_others
+from max.security.permissions import add_conversation_participant
+from max.security.permissions import delete_conversation
+from max.security.permissions import delete_conversation_participant
+from max.security.permissions import list_conversations
+from max.security.permissions import modify_conversation
+from max.security.permissions import purge_conversations
+from max.security.permissions import view_conversation
+from max.security.permissions import view_conversation_subscription
+
 from pyramid.httpexceptions import HTTPNoContent
 
 from bson import ObjectId
@@ -270,7 +278,7 @@ def joinConversation(conversation, request):
             raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         if not request.creator.is_allowed_to_see(actor):
-            raise Unauthorized('User {} is not allowed to have a conversation with {}'.format(request.creator.username, actor.username))
+            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.creator.username, actor.username))
 
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
         actor.addSubscription(conversation)
@@ -331,15 +339,11 @@ def leaveConversation(conversation, request):
 def transferConversationOwnership(conversation, request):
     """
     """
-    actor = request.actor
     cid = request.matchdict.get('id', None)
     subscription = conversation.subscription
 
     # Check if the targeted new owner is on the conversation
     request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
-
-    if subscription is None:
-        raise ObjectNotFound("Cannot transfer ownership to {0}. User is not in conversation {1}".format(actor.username, cid))
 
     previous_owner_username = conversation._owner
     conversation._owner = request.actor.username

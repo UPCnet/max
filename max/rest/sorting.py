@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 from max.rest.utils import searchParams
 
-
-# sort_strategy: A prefefined string identifying a sort strategy
-#     Currently supports:
-#         recent: Sorts by publishing/commenting date defined in sort_priority selection
-#         flag: Sorts by flag date, using sort_priority date as second sort order
-#         likes: Sorts by number of activity likes, using sort_priority date as second sort order
-# sort_priority: Defines if date sorting is based on activity date or last comment date
-
-# Here we define the different known methods to sort objects, grouped py
-# the method name used externally. Each method MUST define a diferent set of
-# sort parameters for each sort_priority that the system recongnizes.
-
 from pymongo import DESCENDING
+
 
 SORT_STRATEGIES = {
     'published': {

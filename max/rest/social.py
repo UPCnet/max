@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from max.rest.ResourceHandlers import JSONResourceEntity
-
-
-from pyramid.httpexceptions import HTTPNoContent
-from max.rest import endpoint
-
 from max.MADMax import MADMaxCollection
 from max.models import Activity
-from max.security.permissions import like, unlike, flag, unflag
+from max.rest import JSONResourceEntity
+from max.rest import endpoint
+from max.security.permissions import flag
+from max.security.permissions import like
+from max.security.permissions import unflag
+from max.security.permissions import unlike
+
+from pyramid.httpexceptions import HTTPNoContent
 
 from bson.objectid import ObjectId
 

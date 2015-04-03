@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxCollection
 from max.models import Activity
-from max.rest.ResourceHandlers import JSONResourceEntity
-
-from max.security.permissions import favorite, unfavorite
-from bson.objectid import ObjectId
+from max.rest import JSONResourceEntity
 from max.rest import endpoint
+from max.security.permissions import favorite
+from max.security.permissions import unfavorite
+
+from bson.objectid import ObjectId
 
 
 @endpoint(route_name='favorites', request_method='POST', requires_actor=True, permission=favorite)

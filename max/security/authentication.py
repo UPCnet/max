@@ -95,8 +95,8 @@ class MaxAuthenticationPolicy(object):
 
     def remember(self, request, principal, **kw):
         """ Not used neither needed """
-        return []
+        return []  # pragma: no cover
 
     def forget(self, request):
         """ Not used neither needed"""
-        return []
+        return []  # pragma: no cover

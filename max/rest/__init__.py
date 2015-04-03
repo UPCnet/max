@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from pyramid.response import Response
+
+import json
 import venusian
 
 
@@ -52,3 +55,70 @@ class endpoint(object):
 
         settings['_info'] = info.codeinfo  # fbo "action_method"
         return wrapped
+
+
+class JSONResourceRoot(object):
+    """
+    """
+    response_content_type = 'application/json'
+
+    def __init__(self, data, status_code=200, stats=False, remaining=False):
+        """
+        """
+        self.data = data
+        self.status_code = status_code
+        self.stats = stats
+        self.remaining = remaining
+        self.headers = {}
+
+    def wrap(self):
+        """
+        """
+        wrapper = self.data
+        return wrapper
+
+    def buildResponse(self, payload=None):
+        """
+            Translate to JSON object if any data. If data is not a list
+            something went wrong
+        """
+
+        if self.stats:
+            response_payload = ''
+            self.headers['X-totalItems'] = str(self.data)
+        else:
+            response_payload = json.dumps(self.wrap())
+
+        if self.remaining:
+            self.headers['X-Has-Remaining-Items'] = '1'
+
+        data = response_payload is None and self.data or response_payload
+        response = Response(data, status_int=self.status_code)
+        response.content_type = self.response_content_type
+        for key, value in self.headers.items():
+            response.headers.add(key, value)
+        return response
+
+
+class JSONResourceEntity(object):
+    """
+    """
+    response_content_type = 'application/json'
+
+    def __init__(self, data, status_code=200):
+        """
+        """
+        self.data = data
+        self.status_code = status_code
+
+    def buildResponse(self, payload=None):
+        """
+            Translate to JSON object if any data. If data is not a dict,
+            something went wrong
+        """
+        response_payload = json.dumps(self.data)
+        data = response_payload is None and self.data or response_payload
+        response = Response(data, status_int=self.status_code)
+        response.content_type = self.response_content_type
+
+        return response

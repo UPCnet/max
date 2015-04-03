@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+from max import DEFAULT_CONTEXT_PERMISSIONS
+from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADMax import MADMaxCollection
+from max.exceptions import InvalidPermission
 from max.models import Activity
-from max.rest.ResourceHandlers import JSONResourceEntity
-from max.rest.ResourceHandlers import JSONResourceRoot
+from max.rest import JSONResourceEntity
+from max.rest import JSONResourceRoot
+from max.rest import endpoint
 from max.rest.utils import searchParams
+from max.security.permissions import add_subscription
+from max.security.permissions import manage_subcription_permissions
+from max.security.permissions import remove_subscription
+from max.security.permissions import view_subscriptions
 
 from pyramid.httpexceptions import HTTPNoContent
-from max.rest import endpoint
-from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
-from max import DEFAULT_CONTEXT_PERMISSIONS
-from max.exceptions import InvalidPermission
-from max.security.permissions import add_subscription, remove_subscription, manage_subcription_permissions, view_subscriptions
 
 
 @endpoint(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
