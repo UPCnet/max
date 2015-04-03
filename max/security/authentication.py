@@ -39,6 +39,9 @@ class MaxAuthenticationPolicy(object):
     def __init__(self, allowed_scopes):
         self.allowed_scopes = allowed_scopes
         self._authenticated_userid = ''
+        self._effective_principals = []
+
+    # Helper methods
 
     def _validate_user(self, request):
         """
@@ -63,7 +66,23 @@ class MaxAuthenticationPolicy(object):
         if not valid:
             raise Unauthorized('Invalid token.')
 
+        request.__authenticated_userid__ = username
         return username
+
+    def _get_principals(self, request):
+        """
+            Calculates the identities that can be used
+            when authorizing the user
+        """
+        principals = [Everyone, Authenticated, request.authenticated_userid]
+        if is_owner(request.context, request.authenticated_userid):
+            principals.append(Owner)
+
+        principals.extend(get_user_roles(request, request.authenticated_userid))
+        request.__effective_principals__ = principals
+        return principals
+
+    # IAuthenticationPolicy Implementation
 
     def authenticated_userid(self, request):
         """
@@ -72,7 +91,10 @@ class MaxAuthenticationPolicy(object):
             On first acces, user is extracted from Oauth headers and validated. Extracted
             user id is cached to future accesses to the property
         """
-        return self._authenticated_userid if self._authenticated_userid else self._validate_user(request)
+        try:
+            return request.__authenticated_userid__
+        except AttributeError:
+            return self._validate_user(request)
 
     def unauthenticated_userid(self, request):
         """
@@ -82,16 +104,12 @@ class MaxAuthenticationPolicy(object):
 
     def effective_principals(self, request):
         """
-            Returns the effective identities that can be used
-            when authorizing the user
+            Returns
         """
-
-        principals = [Everyone, Authenticated, request.authenticated_userid]
-        if is_owner(request.context, request.authenticated_userid):
-            principals.append(Owner)
-
-        principals.extend(get_user_roles(request, request.authenticated_userid))
-        return principals
+        try:
+            return request.__effective_principals__
+        except AttributeError:
+            return self._get_principals(request)
 
     def remember(self, request, principal, **kw):
         """ Not used neither needed """
