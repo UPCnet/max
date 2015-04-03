@@ -4,6 +4,7 @@ from max import LAST_AUTHORS_LIMIT
 from max.rest.ResourceHandlers import JSONResourceRoot
 from max.rest.sorting import sorted_query
 from max.rest import endpoint
+from max.security.permissions import list_activities
 
 
 def timelineQuery(actor):
@@ -34,16 +35,14 @@ def timelineQuery(actor):
     return query
 
 
-@endpoint(route_name='timeline', request_method='GET', requires_actor=True)
-def getUserTimeline(context, request):
+@endpoint(route_name='timeline', request_method='GET', requires_actor=True, permission=list_activities)
+def getUserTimeline(user, request):
     """
          /people/{username}/timeline
 
          Retorna totes les activitats d'un usuari
     """
-    actor = request.actor
-
-    query = timelineQuery(actor)
+    query = timelineQuery(user)
 
     activities = sorted_query(request, request.db.activity, query, flatten=1)
 
@@ -51,8 +50,8 @@ def getUserTimeline(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='timeline_authors', request_method='GET', requires_actor=True)
-def getUserTimelineAuthors(context, request):
+@endpoint(route_name='timeline_authors', request_method='GET', requires_actor=True, permission=list_activities)
+def getUserTimelineAuthors(user, request):
     """
          /people/{username}/timeline/authors
 
@@ -60,8 +59,7 @@ def getUserTimelineAuthors(context, request):
     """
     # Get the author limit from the request or set a default
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
-    actor = request.actor
-    query = timelineQuery(actor)
+    query = timelineQuery(user)
 
     still_has_activities = True
 
