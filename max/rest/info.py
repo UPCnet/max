@@ -151,10 +151,11 @@ def endpoints_view(context, request):
         # if not endpoint_description_match:
         #     import ipdb;ipdb.set_trace()
         endpoint_description = endpoint_description_match.groups()[0]
+        endpoint_documentation = method.__doc__[endpoint_description_match.end():].strip()
 
         method_info = {
             'description': endpoint_description,
-            'documentation': method.__doc__[endpoint_description_match.end():],
+            'documentation': endpoint_documentation if endpoint_documentation else 'Please document me!',
             'rest_params': get_rest_params(method),
             'query_params': get_query_params(method),
             'required_user': required_user(view_settings),
