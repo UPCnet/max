@@ -14,26 +14,18 @@ from pyramid.httpexceptions import HTTPNoContent
 @endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission=manage_security)
 def getSecurity(security, request):
     """
-         /admin/security
+        Get security settings
 
-         Expose the current MAX security roles and its members
-
-         It's intended to be a protected by IP endpoint as we do not want
-         eavesdroping on this information
+        Expose the current MAX security roles and its members
     """
     handler = JSONResourceRoot(security.flatten())
     return handler.buildResponse()
 
 
 @endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission=manage_security)
-def getSecurityUsers(security, request):
+def getUsersRoles(security, request):
     """
-         /admin/security/users
-
-         Expose the current MAX security roles and its members, grouped by  users
-
-         It's intended to be a protected by IP endpoint as we do not want
-         eavesdroping on this information
+        Get users roles
     """
     users = {}
     for role in ALLOWED_ROLES:
@@ -50,6 +42,7 @@ def getSecurityUsers(security, request):
 @endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission=manage_security)
 def check_user_role(security, request):
     """
+        Check if user has a role
     """
 
     role = request.matchdict['role']
@@ -71,9 +64,7 @@ def check_user_role(security, request):
 @endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission=manage_security)
 def add_user_to_role(security, request):
     """
-         /admin/security/roles/{role}/users/{user}
-
-         Adds a user to a role
+        Grants a role to a user
     """
     role = request.matchdict['role']
     user = request.matchdict['user']
@@ -98,9 +89,7 @@ def add_user_to_role(security, request):
 @endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission=manage_security)
 def remove_user_from_role(security, request):
     """
-         /admin/security/roles/{role}/users/{user}
-
-         Removes a user from a role
+        Removes a role from a user
     """
     role = request.matchdict['role']
     user = request.matchdict['user']

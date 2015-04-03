@@ -12,6 +12,7 @@ from bson.objectid import ObjectId
 @endpoint(route_name='favorites', request_method='POST', requires_actor=True, permission=favorite)
 def favorite(activity, request):
     """
+        Favorite activity
     """
 
     if activity.has_favorite_from(request.actor):
@@ -50,6 +51,7 @@ def favorite(activity, request):
 @endpoint(route_name='favorite', request_method='DELETE', requires_actor=True, permission=unfavorite)
 def unfavorite(activity, request):
     """
+        Unfavorite activity
     """
     # Prepare rest parameters to be merged with post data
     rest_params = {

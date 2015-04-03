@@ -15,8 +15,7 @@ from pyramid.httpexceptions import HTTPNoContent
 @endpoint(route_name='conversation_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
 def getPushTokensForConversation(tokens, request):
     """
-         /conversations/{id}/tokens
-         Return all relevant tokens for a given conversation
+        Return conversation tokens
     """
     cid = request.matchdict['id']
     query = {'talkingIn.id': cid}
@@ -39,8 +38,7 @@ def getPushTokensForConversation(tokens, request):
 @endpoint(route_name='context_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
 def getPushTokensForContext(tokens, request):
     """
-         /contexts/{hash}/tokens
-         Return all relevant tokens for a given context
+         Return context tokens
     """
 
     cid = request.matchdict['hash']
@@ -64,7 +62,10 @@ def getPushTokensForContext(tokens, request):
 
 @endpoint(route_name='tokens', request_method='POST', permission=add_token, requires_actor=True)
 def add_device_token(tokens, request):
-    """ Adds a new user device linked to a user. If the token already exists for any user, we'll assume that the new
+    """
+        Adds a user device token
+
+        Adds a new user device linked to a user. If the token already exists for any user, we'll assume that the new
         user is using the old user's device, so we'll delete all the previous tokens and replace them with the new one.
     """
     newtoken = Token.from_request(request)
@@ -82,7 +83,8 @@ def add_device_token(tokens, request):
 
 @endpoint(route_name='user_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
 def view_user_tokens(user, request):
-    """ Delete all tokens of the specified platform.
+    """
+        Delete all platform tokens
     """
     tokens = user.get_tokens()
     handler = JSONResourceRoot(tokens)
@@ -91,7 +93,8 @@ def view_user_tokens(user, request):
 
 @endpoint(route_name='user_platform_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
 def view_platform_user_tokens(user, request):
-    """ Delete all tokens of the specified platform.
+    """
+        Get all user tokens for platform
     """
     platform = request.matchdict['platform']
     tokens = user.get_tokens(platform)
@@ -101,7 +104,8 @@ def view_platform_user_tokens(user, request):
 
 @endpoint(route_name='token', request_method='DELETE', permission=delete_token, requires_actor=True)
 def deleteUserDevice(token, request):
-    """ Delete an existing user device .
+    """
+        Delete user device token
     """
     token.delete()
     return HTTPNoContent()
@@ -109,7 +113,8 @@ def deleteUserDevice(token, request):
 
 @endpoint(route_name='user_tokens', request_method='DELETE', permission=delete_token, requires_actor=True)
 def deleteAllUserDevices(user, request):
-    """ Delete all tokens of the specified platform.
+    """
+        Delete all user device tokens
     """
     user.delete_tokens()
     return HTTPNoContent()
@@ -117,7 +122,8 @@ def deleteAllUserDevices(user, request):
 
 @endpoint(route_name='user_platform_tokens', request_method='DELETE', permission=delete_token, requires_actor=True)
 def deleteUserDevicesByPlatform(user, request):
-    """ Delete all tokens of the specified platform.
+    """
+        Delete all user device tokens for platform
     """
     platform = request.matchdict['platform']
     user.delete_tokens(platform=platform)

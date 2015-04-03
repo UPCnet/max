@@ -38,13 +38,13 @@ RESOURCES['timeline'] = dict(route='/people/{username}/timeline', category='Acti
 RESOURCES['timeline_authors'] = dict(route='/people/{username}/timeline/authors', category='Activities', name='User Timeline authors', traverse='/people/{username}')
 RESOURCES['user_comments'] = dict(route='/people/{username}/comments', category='Comments', name='User comments', traverse='/people/{username}')
 RESOURCES['subscriptions'] = dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}')
-RESOURCES['user_tokens'] = dict(route='/people/{username}/tokens', category='User', name='User device tokens', traverse='/people/{username}')
-RESOURCES['user_platform_tokens'] = dict(route='/people/{username}/tokens/platforms/{platform}', category='User', name='User device tokens by platform', traverse='/people/{username}')
+RESOURCES['user_tokens'] = dict(route='/people/{username}/tokens', category='Tokens', name='User device tokens', traverse='/people/{username}')
+RESOURCES['user_platform_tokens'] = dict(route='/people/{username}/tokens/platforms/{platform}', category='Tokens', name='User device tokens by platform', traverse='/people/{username}')
 
-RESOURCES['tokens'] = dict(route='/tokens', category='Token', name='Device tokens', traverse='/tokens')
-RESOURCES['token'] = dict(route='/tokens/{token}', category='Token', name='Device token', traverse='/tokens/{token}')
-RESOURCES['context_push_tokens'] = dict(route='/contexts/{hash}/tokens', category='Contexts', name='Context tokens', traverse='/tokens')
-RESOURCES['conversation_push_tokens'] = dict(route='/conversations/{id}/tokens', category='Conversations', name='Conversation tokens', traverse='/tokens')
+RESOURCES['tokens'] = dict(route='/tokens', category='Tokens', name='Device tokens', traverse='/tokens')
+RESOURCES['token'] = dict(route='/tokens/{token}', category='Tokens', name='Device token', traverse='/tokens/{token}')
+RESOURCES['context_push_tokens'] = dict(route='/contexts/{hash}/tokens', category='Tokens', name='Context tokens', traverse='/tokens')
+RESOURCES['conversation_push_tokens'] = dict(route='/conversations/{id}/tokens', category='Tokens', name='Conversation tokens', traverse='/tokens')
 
 RESOURCES['comments'] = dict(route='/activities/comments', category='Comments', name='Comments (Global)', traverse='/comments')
 

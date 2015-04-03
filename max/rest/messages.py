@@ -19,8 +19,7 @@ from bson import ObjectId
 @endpoint(route_name='messages', request_method='GET', requires_actor=True, permission=list_messages)
 def getMessages(conversation, request):
     """
-         /conversations/{id}/messages
-         Return all messages from a conversation
+        Get all messages from a conversation
     """
     query = {'contexts.id': str(conversation['_id'])}
     messages = request.db.messages.search(query, sort_by_field="published", keep_private_fields=False, **searchParams(request))
@@ -33,8 +32,10 @@ def getMessages(conversation, request):
 @endpoint(route_name='messages', request_method='POST', requires_actor=True, permission=add_message)
 def add_message(conversation, request):
     """
-         Adds a message to a conversation. The request.actor is the one "talking", either
-         if it was the authenticated user, the rest username or the post body actor, in this order.
+        Adds a message to a conversation
+
+        The request.actor is the one "talking", either if it was the authenticated user,
+        the rest username or the post body actor, in this order.
     """
     message_params = {'actor': request.actor,
                       'verb': 'post',
@@ -64,7 +65,7 @@ def add_message(conversation, request):
 @endpoint(route_name='message_image_sizes', request_method='GET', requires_actor=True, permission=view_message)
 def getMessageImageAttachment(message, request):
     """
-        Returns an image or from local repository.
+        Get a message image
     """
     file_size = request.matchdict.get('size', 'full')
     image, mimetype = message.getImage(size=file_size)
@@ -85,7 +86,7 @@ def getMessageImageAttachment(message, request):
 @endpoint(route_name='message_file_download', request_method='GET', requires_actor=True, permission=view_message)
 def getMessageFileAttachment(message, request):
     """
-        Returns file from local repository.
+        Get a message file
     """
     file_data, mimetype = message.getFile()
 

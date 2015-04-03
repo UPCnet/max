@@ -18,9 +18,7 @@ import time
 @endpoint(route_name='avatar', request_method='POST', requires_actor=True, permission=modify_avatar)
 def postUserAvatar(user, request):
     """
-        /people/{username}/avatar
-
-        Upload user avatar.
+        Upload user avatar
     """
     base_folder = request.registry.settings.get('avatar_folder')
     AVATAR_SIZE = (48, 48)
@@ -60,9 +58,7 @@ def postUserAvatar(user, request):
 @endpoint(route_name='avatar_sizes', request_method='GET')
 def getUserAvatar(context, request):
     """
-        /people/{username}/avatar
-
-        Returns user avatar. Public endpoint.
+        Get user avatar
     """
     base_folder = request.registry.settings.get('avatar_folder')
     username = request.matchdict['username']
@@ -100,9 +96,9 @@ def getUserAvatar(context, request):
 @endpoint(route_name='context_avatar', request_method='GET')
 def getContextAvatar(context, request):
     """
-        /contexts/{hash}/avatar
+        Get context avatar
 
-        Return the context's avatar. To the date, this is only implemented to
+        To the date, this is only implemented to
         work integrated with Twitter.
     """
     chash = context['hash']
@@ -135,7 +131,7 @@ def getContextAvatar(context, request):
 @endpoint(route_name='conversation_avatar', request_method='GET')
 def getConversationUserAvatar(conversation, request):
     """
-        /conversation/{id}/avatar
+        Get conversation avatar
 
         Returns conversation avatar. Public endpoint.
     """

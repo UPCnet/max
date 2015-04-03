@@ -30,8 +30,7 @@ from bson import ObjectId
 @endpoint(route_name='conversations', request_method='GET', requires_actor=True, permission=list_conversations)
 def getConversations(conversations, request):
     """
-         /conversations
-         Return all conversations owned by the requesting actor
+        Get user conversations
     """
     # List subscribed conversations, and use it to make the query
     # This way we can filter 2-people conversations that have been archived
@@ -59,8 +58,7 @@ def getConversations(conversations, request):
 @endpoint(route_name='conversations', request_method='POST', requires_actor=True, permission=add_conversation)
 def postMessage2Conversation(conversations, request):
     """
-         /conversations
-         Post message to a conversation
+        Add a new conversation
     """
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
@@ -191,8 +189,7 @@ def postMessage2Conversation(conversations, request):
 @endpoint(route_name='conversation', request_method='GET', requires_actor=True, permission=view_conversation)
 def getConversation(conversation, request):
     """
-         /conversations/{id}
-         Return Conversation
+        Get a conversation
     """
     handler = JSONResourceEntity(conversation.getInfo(request.actor.username))
     return handler.buildResponse()
@@ -201,8 +198,7 @@ def getConversation(conversation, request):
 @endpoint(route_name='user_conversation', request_method='GET', requires_actor=True, permission=view_conversation_subscription)
 def getUserConversationSubscription(conversation, request):
     """
-         /people/{username}/conversations/{id}
-         Return Conversation subscription
+        Get a user conversation subscription
     """
     subscription = conversation.subscription
 
@@ -223,9 +219,7 @@ def getUserConversationSubscription(conversation, request):
 @endpoint(route_name='conversation', request_method='PUT', requires_actor=True, permission=modify_conversation)
 def ModifyConversation(conversation, request):
     """
-        /conversation/{id}
-
-        Modify the given context.
+        Modify a conversation
     """
     properties = conversation.getMutablePropertiesFromRequest(request)
     conversation.modifyContext(properties)
@@ -238,6 +232,7 @@ def ModifyConversation(conversation, request):
 @endpoint(route_name='conversation', request_method='DELETE', requires_actor=True, permission=delete_conversation)
 def DeleteConversation(conversation, request):
     """
+        Delete a conversation
     """
     conversation.delete()
     return HTTPNoContent()
@@ -246,8 +241,9 @@ def DeleteConversation(conversation, request):
 @endpoint(route_name='conversations', request_method='DELETE', requires_actor=True, permission=purge_conversations)
 def deleteConversations(conversations, request):
     """
-    Deletes ALL the conversations from ALL users in max
-    doing all the consequent unsubscriptions
+        Delete all conversations
+
+        Deletes ALL the conversations from ALL users in max doing all the consequent unsubscriptions
     """
     for conversation in conversations.dump():
         conversation.delete()
@@ -257,7 +253,7 @@ def deleteConversations(conversations, request):
 @endpoint(route_name='participants', request_method='POST', requires_actor=True, permission=add_conversation_participant)
 def joinConversation(conversation, request):
     """
-
+        Join conversation
     """
     actor = request.actor
     cid = request.matchdict['id']
@@ -311,6 +307,7 @@ def joinConversation(conversation, request):
 @endpoint(route_name='participant', request_method='DELETE', requires_actor=True, permission=delete_conversation_participant)
 def leaveConversation(conversation, request):
     """
+        Leave conversation
     """
     actor = request.actor
 
@@ -339,6 +336,7 @@ def leaveConversation(conversation, request):
 @endpoint(route_name='conversation_owner', request_method='PUT', requires_actor=True, permission=transfer_ownership)
 def transferConversationOwnership(conversation, request):
     """
+        Transfer conversation ownership
     """
     cid = request.matchdict.get('id', None)
 

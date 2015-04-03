@@ -24,6 +24,7 @@ from pyramid.httpexceptions import HTTPNoContent
 @endpoint(route_name='contexts', request_method='GET', permission=list_contexts, requires_actor=True)
 def getContexts(contexts, request):
     """
+        Get all contexts
     """
     found_contexts = contexts.search({}, flatten=1, **searchParams(request))
     handler = JSONResourceRoot(found_contexts)
@@ -33,9 +34,7 @@ def getContexts(contexts, request):
 @endpoint(route_name='contexts', request_method='POST', permission=add_context, requires_actor=True)
 def addContext(contexts, request):
     """
-        /contexts
-
-        Adds a context.
+        Adds a context
     """
     # Initialize a Context object from the request
     newcontext = Context.from_request(request)
@@ -61,9 +60,7 @@ def addContext(contexts, request):
 @endpoint(route_name='context', request_method='GET', permission=view_context, requires_actor=True)
 def getContext(context, request):
     """
-        /contexts/{hash}
-
-        [RESTRICTED] Return a context by its hash.
+        Get a context
     """
     handler = JSONResourceEntity(context.getInfo())
     return handler.buildResponse()
@@ -72,9 +69,7 @@ def getContext(context, request):
 @endpoint(route_name='context', request_method='PUT', permission=modify_context, requires_actor=True)
 def ModifyContext(context, request):
     """
-        /contexts/{hash}
-
-        Modify the given context.
+        Modify a context
     """
     properties = context.getMutablePropertiesFromRequest(request)
     context.modifyContext(properties)
@@ -87,6 +82,7 @@ def ModifyContext(context, request):
 @endpoint(route_name='context', request_method='DELETE', permission=delete_context, requires_actor=True)
 def DeleteContext(context, request):
     """
+        Delete a context
     """
     context.removeUserSubscriptions()
     context.removeActivities(logical=True)
@@ -97,6 +93,7 @@ def DeleteContext(context, request):
 @endpoint(route_name='context_tags', request_method='GET', permission=view_context, requires_actor=True)
 def getContextTags(context, request):
     """
+        Get context tags
     """
     handler = JSONResourceRoot(context.tags)
     return handler.buildResponse()
@@ -105,6 +102,7 @@ def getContextTags(context, request):
 @endpoint(route_name='context_tags', request_method='DELETE', permission=modify_context, requires_actor=True)
 def clearContextTags(context, request):
     """
+        Delete all context tags
     """
     context.tags = []
     context.save()
@@ -117,6 +115,7 @@ def clearContextTags(context, request):
 @endpoint(route_name='context_tags', request_method='PUT', permission=modify_context, requires_actor=True)
 def updateContextTags(context, request):
     """
+        Add context tags
     """
     tags = request.decoded_payload
 
@@ -139,6 +138,7 @@ def updateContextTags(context, request):
 @endpoint(route_name='context_tag', request_method='DELETE', permission=modify_context, requires_actor=True)
 def removeContextTag(context, request):
     """
+        Delete context tags
     """
     tag = request.matchdict['tag']
 
@@ -156,9 +156,9 @@ def removeContextTag(context, request):
 @endpoint(route_name='public_contexts', request_method='GET', permission=list_public_contexts, requires_actor=True)
 def getPublicContexts(contexts, request):
     """
-        /contexts/public
+        Get all public contexts
 
-        Return a list of public-subscribable contexts
+        Returns a list of all public subscribable contexts
     """
     found_contexts = contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
@@ -169,7 +169,7 @@ def getPublicContexts(contexts, request):
 @endpoint(route_name='context_activities_authors', request_method='GET', permission=list_activities, requires_actor=True)
 def getContextAuthors(context, request):
     """
-        /contexts/{hash}/activities/authors
+        Get context authors
     """
     chash = request.matchdict['hash']
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))

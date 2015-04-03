@@ -146,12 +146,15 @@ def endpoints_view(context, request):
                 is_head = re.search(r"request\.method\s+==\s+'HEAD'", method_code.groups()[0])
 
         resources_by_route.setdefault(route.name, resource_info)
-        endpoint_description = re.match(r'^\s*(.*?)\s*(?:$|:query)', method.__doc__, re.MULTILINE).groups()[0]
 
-        roles = ['Everyone']
+        endpoint_description_match = re.match(r'^\s*(.*?)\n\s*(\n|$)', method.__doc__, re.MULTILINE)
+        # if not endpoint_description_match:
+        #     import ipdb;ipdb.set_trace()
+        endpoint_description = endpoint_description_match.groups()[0]
 
         method_info = {
             'description': endpoint_description,
+            'documentation': method.__doc__[endpoint_description_match.end():],
             'rest_params': get_rest_params(method),
             'query_params': get_query_params(method),
             'required_user': required_user(view_settings),
@@ -166,9 +169,7 @@ def endpoints_view(context, request):
 
         for req_method in methods:
             # Create method entry
-            resources_by_route[route.name]['methods'].setdefault(req_method, {})
-            for role in roles:
-                resources_by_route[route.name]['methods'][req_method][role] = method_info
+            resources_by_route[route.name]['methods'][req_method] = method_info
 
     if request.params.get('by_category'):
         endpoints = resources_by_route

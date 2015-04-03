@@ -38,9 +38,7 @@ def timelineQuery(actor):
 @endpoint(route_name='timeline', request_method='GET', requires_actor=True, permission=list_activities)
 def getUserTimeline(user, request):
     """
-         /people/{username}/timeline
-
-         Retorna totes les activitats d'un usuari
+        Get user timeline
     """
     query = timelineQuery(user)
 
@@ -53,9 +51,7 @@ def getUserTimeline(user, request):
 @endpoint(route_name='timeline_authors', request_method='GET', requires_actor=True, permission=list_activities)
 def getUserTimelineAuthors(user, request):
     """
-         /people/{username}/timeline/authors
-
-         Retorna totes els 8 ultims autors d'un timeline
+        Get timeline authors
     """
     # Get the author limit from the request or set a default
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))

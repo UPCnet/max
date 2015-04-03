@@ -19,10 +19,7 @@ logger = logging.getLogger('exceptions')
 @endpoint(route_name='maintenance_keywords', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildKeywords(context, request):
     """
-         /maintenance/keywords
-
-         Rebuild keywords of all activities
-
+        Rebuild keywords of all activities
     """
     activities = request.db.activity.search({'verb': 'post'})
     for activity in activities:
@@ -37,11 +34,9 @@ def rebuildKeywords(context, request):
 @endpoint(route_name='maintenance_dates', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildDates(context, request):
     """
-         /maintenance/dates
+        Rebuild dates of activities
 
-         Rebuild dates of activities
-         Now currently sets the lastComment id field
-
+        Now currently sets the lastComment id field
     """
     activities = request.db.activity.search({'verb': 'post'})
     for activity in activities:
@@ -59,10 +54,9 @@ def rebuildDates(context, request):
 @endpoint(route_name='maintenance_subscriptions', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildSubscriptions(context, request):
     """
-         /maintenance/subscriptions
+        Rebuild context subscriptions
 
-         Rebuild subscriptions performing sanity checks
-
+        Performs sanity checks on existing subscriptions
     """
     existing_contexts = {}
     contexts = request.db.contexts.dump()
@@ -89,10 +83,9 @@ def rebuildSubscriptions(context, request):
 @endpoint(route_name='maintenance_conversations', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildConversationSubscriptions(context, request):
     """
-         /maintenance/conversations
+        Rebuild conversation subscriptions
 
-         Rebuild conversation subscriptions performing sanity checks
-
+        Performs sanity checks on existing subscriptions
     """
     existing_conversations = {}
     conversations = request.db.conversations.dump()
@@ -142,8 +135,10 @@ def rebuildConversationSubscriptions(context, request):
 @endpoint(route_name='maintenance_users', request_method='POST', requires_actor=False, permission=do_maintenance)
 def rebuildUser(context, request):
     """
-         Rebuilds user objects with defaults and consistency checks.
-         Currently checks that owner of the object must be the same user:
+        Rebuild users
+
+        Sets sensible defaults and perform consistency checks.
+        Checks that owner of the object must be the same as the user object
     """
     users = request.db.users.dump()
     for user in users:
@@ -158,9 +153,7 @@ def rebuildUser(context, request):
 @endpoint(route_name='maintenance_exception', request_method='GET', requires_actor=False, permission=do_maintenance)
 def getException(context, request):
     """
-         /maintenance/exceptions/{hash}
-
-         Get an exception from the log
+        Get an exception
     """
     ehash = request.matchdict['hash']
     logfile = logger.handlers[0].baseFilename
@@ -183,9 +176,7 @@ def getException(context, request):
 @endpoint(route_name='maintenance_exceptions', request_method='GET', requires_actor=False, permission=do_maintenance)
 def getExceptions(context, request):
     """
-         /maintenance/exceptions
-
-         Get exceptions list from the log
+        Get all exceptions
     """
     logfile = logger.handlers[0].baseFilename
     regex = r'BEGIN EXCEPTION REPORT: (\w+)\nDATE: (.*?)\n'

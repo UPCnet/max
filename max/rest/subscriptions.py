@@ -19,9 +19,7 @@ from pyramid.httpexceptions import HTTPNoContent
 @endpoint(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
 def subscribe(context, request):
     """
-        /context/{hash}/subscriptions
-
-        Subscribe the actor to the suplied context.
+        Subscribe user to context
     """
     actor = request.actor
     rest_params = {'object': context,
@@ -54,6 +52,7 @@ def subscribe(context, request):
 @endpoint(route_name='context_subscription', request_method='DELETE', requires_actor=True, permission=remove_subscription)
 def unsubscribe(context, request):
     """
+        Unsubscribe user from context
     """
     context.removeUserSubscriptions(users_to_delete=[request.actor_username])
     return HTTPNoContent()
@@ -62,6 +61,7 @@ def unsubscribe(context, request):
 @endpoint(route_name='context_subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
 def getContextSubscriptions(context, request):
     """
+        Get all context subscriptions
     """
     found_users = request.db.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
     for user in found_users:
@@ -78,9 +78,7 @@ def getContextSubscriptions(context, request):
 @endpoint(route_name='subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
 def getUserSubscriptions(user, request):
     """
-        /people/{username}/subscriptions
-
-        List all subscriptions for the the suplied oauth user.
+        Get all user subscriptions
     """
     subscriptions = user.get('subscribedTo', [])
 
@@ -102,7 +100,8 @@ def getUserSubscriptions(user, request):
 
 @endpoint(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
 def grantPermissionOnContext(context, request):
-    """ [RESTRICTED]
+    """
+        Grant user permission on context
     """
     permission = request.matchdict.get('permission', None)
     if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
@@ -126,6 +125,7 @@ def grantPermissionOnContext(context, request):
 @endpoint(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
 def revokePermissionOnContext(context, request):
     """
+        Revoke user permission on context
     """
     permission = request.matchdict.get('permission', None)
     if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
@@ -149,6 +149,7 @@ def revokePermissionOnContext(context, request):
 @endpoint(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
 def resetPermissionsOnContext(context, request):
     """
+        Reset user permissions on context
     """
 
     subscription = request.actor.reset_permissions(context.subscription, context)

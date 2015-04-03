@@ -16,6 +16,7 @@ from bson.objectid import ObjectId
 @endpoint(route_name='likes', request_method='POST', requires_actor=True, permission=like)
 def like(activity, request):
     """
+        Like activity
     """
     if activity.has_like_from(request.actor):
         code = 200
@@ -53,6 +54,7 @@ def like(activity, request):
 @endpoint(route_name='like', request_method='DELETE', requires_actor=True, permission=unlike)
 def unlike(activity, request):
     """
+        Unlike activity
     """
 
     # Prepare rest parameters to be merged with post data
@@ -78,7 +80,7 @@ def unlike(activity, request):
 @endpoint(route_name='flag', request_method='POST', requires_actor=True, permission=flag)
 def flagActivity(activity, request):
     """
-         Sets the flagged mark on an activity
+       Flag an activity
     """
     status_code = 200
 
@@ -95,7 +97,7 @@ def flagActivity(activity, request):
 @endpoint(route_name='flag', request_method='DELETE', requires_actor=True, permission=unflag)
 def unflagActivity(activity, request):
     """
-         Unsets the flagged mark on an activity
+       Unflag an activity
     """
     activity.unflag()
     activity.save()

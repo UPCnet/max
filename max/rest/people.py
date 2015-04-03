@@ -20,10 +20,10 @@ from pyramid.settings import asbool
 @endpoint(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
 def getVisibleUsers(users, request):
     """
-         /people
+        Search users
 
-         Return the result of a query specified by the username param as
-         a list of usernames. For UI use only.
+        Return the result of a query specified by the username param as
+        a list of usernames. For UI use only.
     """
     query = {}
 
@@ -42,9 +42,7 @@ def getVisibleUsers(users, request):
 @endpoint(route_name='users', request_method='POST', permission=add_people, requires_actor=False)
 def addUser(users, request):
     """
-        /people
-
-        [RESTRICTED] Creates a system user.
+        Add a user
     """
     username = request.actor_username
     if username is None:
@@ -87,9 +85,7 @@ def addUser(users, request):
 @endpoint(route_name='user', request_method='GET', permission=view_user_profile, requires_actor=True)
 def getUser(user, request):
     """
-        /people/{username}
-
-        Return the required user object.
+        Get a user
     """
 
     # Flattened actor will contain only the visible fields for the current user
@@ -105,10 +101,7 @@ def getUser(user, request):
 @endpoint(route_name='user', request_method='PUT', permission=modify_user, requires_actor=True)
 def ModifyUser(user, request):
     """
-        /people/{username}
-
-        Modifies a system user via oauth, so only the user can modify its own
-        properties.
+        Modify a user
     """
     properties = user.getMutablePropertiesFromRequest(request)
     user.modifyUser(properties)
@@ -120,6 +113,7 @@ def ModifyUser(user, request):
 @endpoint(route_name='user', request_method='DELETE', permission=delete_user, requires_actor=True)
 def deleteUser(user, request):
     """
+        Delete a user
     """
     user.delete()
     return HTTPNoContent()
