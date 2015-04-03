@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from max.models.activity import BaseActivity
 from max.models.conversation import Conversation
-from pyramid.decorator import reify
-from max.security import Manager, Owner
-from pyramid.security import Allow
+from max.security import Manager
+from max.security import Owner
+from max.security.permissions import modify_message
+from max.security.permissions import view_message
 from max.utils.dicts import flatten
-from max.security.permissions import view_message, modify_message
+
+from pyramid.decorator import reify
+from pyramid.security import Allow
+
 
 MESSAGE_CONTEXT_FIELDS = ['displayName', '_id', 'objectType']
 

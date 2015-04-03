@@ -1,28 +1,44 @@
 # -*- coding: utf-8 -*-
+from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.MADObjects import MADBase
 from max.models.context import Context
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
+from max.resources import CommentsTraverser
+from max.security import Manager
+from max.security import Owner
+from max.security import is_owner
+from max.security import is_self_operation
+from max.security.permissions import add_comment
+from max.security.permissions import delete_activity
+from max.security.permissions import delete_comment
+from max.security.permissions import favorite
+from max.security.permissions import flag
+from max.security.permissions import like
+from max.security.permissions import list_comments
+from max.security.permissions import modify_activity
+from max.security.permissions import unfavorite
+from max.security.permissions import unflag
+from max.security.permissions import unlike
+from max.security.permissions import view_activity
 from max.utils import getMaxModelByObjectType
 from max.utils import hasPermission
 from max.utils.dates import rfc3339_parse
 from max.utils.image import rotate_image_by_EXIF
-from max.security import Manager, Owner, is_owner, is_self_operation
-from max.security.permissions import favorite, unfavorite, view_activity, delete_activity, modify_activity, list_comments, add_comment, delete_comment, like, unlike, flag, unflag
-from max.resources import CommentsTraverser
-from pyramid.security import Allow, Authenticated
+
+from pyramid.decorator import reify
+from pyramid.security import Allow
+from pyramid.security import Authenticated
+
 from PIL import Image
 from bson import ObjectId
-from max import DEFAULT_CONTEXT_PERMISSIONS
+
 import datetime
 import json
 import os
 import re
 import requests
-from pyramid.decorator import reify
 
-# Fields that we want to transfer from real context,
-# to the context reference stored on activ
 ACTIVITY_CONTEXT_FIELDS = ['displayName', 'tags', 'hash', 'url', 'objectType', 'notifications']
 
 

@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
+from max import DEFAULT_CONTEXT_PERMISSIONS
 from max.MADMax import MADMaxCollection
 from max.MADObjects import MADBase
 from max.models.user import User
 from max.rabbitmq import RabbitNotifications
+from max.security import Manager
+from max.security import Owner
+from max.security import is_self_operation
+from max.security import permissions
 from max.utils.twitter import get_twitter_api
 from max.utils.twitter import get_userid_from_twitter
 
-from hashlib import sha1
-from max import DEFAULT_CONTEXT_PERMISSIONS
-from pyramid.security import Allow, Authenticated
-from max.security import Owner, Manager, is_self_operation
-from max.security import permissions
 from pyramid.decorator import reify
+from pyramid.security import Allow
+from pyramid.security import Authenticated
+
+from hashlib import sha1
 
 
 class BaseContext(MADBase):

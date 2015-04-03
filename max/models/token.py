@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
-from max.security import Manager, Owner, is_owner
-from max.security.permissions import view_token, modify_token, modify_immutable_fields, view_private_fields, change_ownership
-from pyramid.security import Allow
-from pyramid.decorator import reify
 from max.exceptions import ValidationError
+from max.security import Manager
+from max.security import Owner
+from max.security import is_owner
+from max.security.permissions import change_ownership
+from max.security.permissions import modify_immutable_fields
+from max.security.permissions import modify_token
+from max.security.permissions import view_private_fields
+from max.security.permissions import view_token
+
+from pyramid.decorator import reify
+from pyramid.security import Allow
+
 
 SUPPORTED_PLATFORMS = ['ios', 'android']
 

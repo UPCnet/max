@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from max.MADObjects import MADBase
-from max.security.permissions import manage_security
 from max.security import Manager
-from pyramid.security import Allow
+from max.security.permissions import manage_security
+
 from pyramid.decorator import reify
+from pyramid.security import Allow
 
 
 class Security(MADBase):

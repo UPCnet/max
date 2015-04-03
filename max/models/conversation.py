@@ -2,12 +2,23 @@
 from max.MADMax import MADMaxCollection
 from max.models.context import BaseContext
 from max.rabbitmq import RabbitNotifications
-from max.security.permissions import transfer_ownership, list_messages, add_message, purge_conversations, delete_conversation, view_conversation, view_conversation_subscription, modify_conversation, add_conversation_participant, delete_conversation_participant
-from max.security import Manager, Owner, is_self_operation
+from max.security import Manager
+from max.security import Owner
+from max.security import is_self_operation
+from max.security.permissions import add_conversation_participant
+from max.security.permissions import add_message
+from max.security.permissions import delete_conversation
+from max.security.permissions import delete_conversation_participant
+from max.security.permissions import list_messages
+from max.security.permissions import modify_conversation
+from max.security.permissions import purge_conversations
+from max.security.permissions import transfer_ownership
+from max.security.permissions import view_conversation
+from max.security.permissions import view_conversation_subscription
 from max.utils.dicts import flatten
-from pyramid.security import Allow
-from pymongo import DESCENDING
+
 from pyramid.decorator import reify
+from pyramid.security import Allow
 
 
 class Conversation(BaseContext):

@@ -1,19 +1,33 @@
 # -*- coding: utf-8 -*-
 from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
-from max.MADObjects import MADBase
 from max.MADMax import MADMaxCollection
+from max.MADObjects import MADBase
 from max.rabbitmq import RabbitNotifications
-from max.utils.dicts import flatten
+from max.security import Manager
+from max.security import Owner
+from max.security import is_self_operation
+from max.security.permissions import add_activity
+from max.security.permissions import change_ownership
+from max.security.permissions import delete_token
+from max.security.permissions import list_activities
+from max.security.permissions import list_comments
+from max.security.permissions import list_tokens
+from max.security.permissions import modify_avatar
+from max.security.permissions import modify_immutable_fields
+from max.security.permissions import modify_user
+from max.security.permissions import view_private_fields
+from max.security.permissions import view_subscriptions
+from max.security.permissions import view_user_profile
 from max.utils import getMaxModelByObjectType
+from max.utils.dicts import flatten
 
+from pyramid.decorator import reify
 from pyramid.security import Allow
 from pyramid.security import Authenticated
-from max.security import Owner, Manager, is_self_operation
-from max.security.permissions import list_tokens, delete_token, modify_avatar, view_private_fields, list_comments, modify_user, view_user_profile, modify_immutable_fields, change_ownership, view_subscriptions, list_activities, add_activity
+from pyramid.settings import asbool
 
 from bson import ObjectId
-from pyramid.settings import asbool
-from pyramid.decorator import reify
+
 import datetime
 
 
