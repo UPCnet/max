@@ -3,7 +3,7 @@ from max import maxlogger
 from max.MADMax import MADMaxCollection
 from pyramid.security import Allow, Authenticated
 from max.exceptions import ObjectNotFound, UnknownUserError
-from max.security import Manager, Owner, is_self_operation, is_owner
+from max.security import Manager, Owner, is_self_operation
 from max.security import permissions
 from pyramid.decorator import reify
 import pkg_resources

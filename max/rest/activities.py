@@ -8,11 +8,10 @@ from max.rest.sorting import sorted_query
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.httpexceptions import HTTPNoContent
-from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.response import Response
 from pyramid.security import ACLAllowed
 from max.rest import endpoint
-from max.security.permissions import list_activities_unsubscribed, list_activities, add_activity, view_activity, modify_activity, delete_activity
+from max.security.permissions import list_activities_unsubscribed, list_activities, add_activity, view_activity, delete_activity
 from base64 import b64encode
 from bson import ObjectId
 from datetime import timedelta
@@ -233,13 +232,6 @@ def getActivity(activity, request):
     """
     handler = JSONResourceEntity(activity.flatten())
     return handler.buildResponse()
-
-
-@endpoint(route_name='activity', request_method='PUT', requires_actor=True, permission=modify_activity)
-def modifyActivity(activity, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
 
 
 @endpoint(route_name='activity', request_method='DELETE', requires_actor=True, permission=delete_activity)

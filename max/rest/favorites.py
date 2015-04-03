@@ -3,8 +3,6 @@ from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 
-from pyramid.httpexceptions import HTTPNotImplemented
-
 from max.security.permissions import favorite, unfavorite
 from bson.objectid import ObjectId
 from max.rest import endpoint
@@ -74,17 +72,3 @@ def unfavorite(activity, request):
     newactivity['object']['favorited'] = activity.has_favorite_from(request.actor)
     handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
     return handler.buildResponse()
-
-
-@endpoint(route_name='user_favorites', request_method='GET', requires_actor=True)
-def getUserFavoritedActivities(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@endpoint(route_name='favorites', request_method='GET', requires_actor=True)
-def getActivityFavorites(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover

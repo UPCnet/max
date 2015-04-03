@@ -29,9 +29,6 @@ class JSONHTTPException(HTTPException):
 from pyramid.view import view_config
 
 
-
-
-
 class JSONHTTPUnauthorized(JSONHTTPException):
     code = 401
 

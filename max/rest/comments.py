@@ -6,7 +6,6 @@ from max.rest.utils import flatten
 from max.rest.utils import searchParams
 
 from pyramid.httpexceptions import HTTPNoContent
-from pyramid.httpexceptions import HTTPNotImplemented
 from max.rest import endpoint
 from max.security.permissions import list_comments, add_comment, delete_comment
 
@@ -120,30 +119,9 @@ def addActivityComment(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity_comment', request_method='DELETE', permission=delete_comment)
+@endpoint(route_name='activity_comment', request_method='DELETE', permission=delete_comment, requires_actor=True)
 def deleteActivityComment(comment, request):
     """
     """
     comment.delete()
     return HTTPNoContent()
-
-
-@endpoint(route_name='activity_comment', request_method='GET')
-def getActivityComment(activity, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@endpoint(route_name='activity_comments', request_method='PUT')
-def modifyActivityComments(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@endpoint(route_name='comments', request_method='DELETE')
-def deleteActivityComments(activity, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover

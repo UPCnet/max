@@ -2,22 +2,7 @@
 from max.models import Activity
 from max.rest.ResourceHandlers import JSONResourceEntity
 
-from pyramid.httpexceptions import HTTPNotImplemented
 from pyramid.view import view_config
-
-
-@view_config(route_name='follows', request_method='GET')
-def getFollowedUsers(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@view_config(route_name='follow', request_method='GET')
-def getFollowedUser(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
 
 
 @view_config(route_name='follow', request_method='POST')
@@ -53,4 +38,4 @@ def follow(context, request):
 def unfollow(context, request):
     """
     """
-    return HTTPNotImplemented()  # pragma: no cover
+    pass

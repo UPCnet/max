@@ -106,7 +106,8 @@ def getContextAvatar(context, request):
         Return the context's avatar. To the date, this is only implemented to
         work integrated with Twitter.
     """
-    chash = request.matchdict['hash']
+    chash = context['hash']
+    twitter_username = context['twitterUsername']
 
     base_folder = request.registry.settings.get('avatar_folder')
     avatar_folder = get_avatar_folder(base_folder, 'contexts', chash)
@@ -115,20 +116,13 @@ def getContextAvatar(context, request):
 
     api = get_twitter_api(request.registry)
     if not os.path.exists(context_image_filename):
-        found_context = request.db.contexts.getItemsByhash(chash)
-        if len(found_context) > 0:
-            twitter_username = found_context[0]['twitterUsername']
-            download_twitter_user_image(api, twitter_username, context_image_filename)
-        else:
-            raise ObjectNotFound("There's no context with hash %s" % chash)
+        download_twitter_user_image(api, twitter_username, context_image_filename)
 
     if os.path.exists(context_image_filename):
         # Calculate time since last download and set if we have to re-download or not
         modification_time = os.path.getmtime(context_image_filename)
         hours_since_last_modification = (time.time() - modification_time) / 60 / 60
         if hours_since_last_modification > 3:
-            found_context = request.db.contexts.getItemsByhash(chash)
-            twitter_username = found_context[0]['twitterUsername']
             download_twitter_user_image(api, twitter_username, context_image_filename)
     else:
         context_image_filename = '{}/missing-context.png'.format(base_folder)
@@ -140,7 +134,7 @@ def getContextAvatar(context, request):
 
 
 @endpoint(route_name='conversation_avatar', request_method='GET')
-def getConversationUserAvatar(context, request):
+def getConversationUserAvatar(conversation, request):
     """
         /conversation/{id}/avatar
 

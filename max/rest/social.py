@@ -8,7 +8,6 @@ from max.rest import endpoint
 from max.MADMax import MADMaxCollection
 from max.models import Activity
 from max.security.permissions import like, unlike, flag, unflag
-from pyramid.httpexceptions import HTTPNotImplemented
 
 from bson.objectid import ObjectId
 
@@ -101,17 +100,3 @@ def unflagActivity(activity, request):
     activity.save()
 
     return HTTPNoContent()
-
-
-@endpoint(route_name='user_likes', request_method='GET', requires_actor=True)
-def getUserLikedActivities(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
-
-
-@endpoint(route_name='likes', request_method='GET', requires_actor=True)
-def getActivityLikes(context, request):
-    """
-    """
-    return HTTPNotImplemented()  # pragma: no cover
