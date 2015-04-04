@@ -425,12 +425,14 @@ class MADBase(MADDict):
             $oid and $data BISON structures. Intended for final output
             Also removes fields starting with underscore _fieldname
         """
+        def permission_filter(field):
+            """
+                Is the field NOT visible on the current request?
+            """
+            return not(self.has_field_permission(field, 'view') or field == 'objectType')
+
         dd = dict(self)
-        return_dict = flatten(dd, **kwargs)
-        visible_fields = self.get_visible_fields()
-        for field, value in return_dict.items():
-            if field not in visible_fields and field != 'objectType':
-                del return_dict[field]
+        return_dict = flatten(dd, filter_method=permission_filter, **kwargs)
         return return_dict
 
     def getObjectWrapper(self, objType):

@@ -123,7 +123,7 @@ def clearPrivateFields(di):
             di.pop(key, None)
 
 
-def flattendict(di, **kwargs):
+def flattendict(di, filter_method=None, **kwargs):
     """
         Flattens key/values of a dict and continues the recursion
     """
@@ -151,10 +151,16 @@ def flattendict(di, **kwargs):
         newkey = deUnderescore(di, key)
         if key in squash or newkey in squash:
             di.pop(newkey, None)
+
+        if filter_method:
+            do_filter = filter_method(key)
+            if do_filter:
+                di.pop(newkey, None)
+
     return di
 
 
-def flatten(data, **kwargs):
+def flatten(data, filter_method=None, **kwargs):
     """
         Recursively flatten a dict or list
     """
@@ -164,5 +170,5 @@ def flatten(data, **kwargs):
             newitems.append(flatten(item, **kwargs))
         data = newitems
     if isinstance(data, dict):
-        data = flattendict(data, **kwargs)
+        data = flattendict(data, filter_method=filter_method, **kwargs)
     return data
