@@ -123,11 +123,11 @@ def clearPrivateFields(di):
             di.pop(key, None)
 
 
-def flattendict(di, filter_method=None, **kwargs):
+def flattendict(original, filter_method=None, **kwargs):
     """
         Flattens key/values of a dict and continues the recursion
     """
-    di = dict(di)
+    di = original.copy()
     if not kwargs.get('keep_private_fields', True):
         clearPrivateFields(di)
 

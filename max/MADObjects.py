@@ -431,8 +431,7 @@ class MADBase(MADDict):
             """
             return not(self.has_field_permission(field, 'view') or field == 'objectType')
 
-        dd = dict(self)
-        return_dict = flatten(dd, filter_method=permission_filter, **kwargs)
+        return_dict = flatten(self, filter_method=permission_filter, **kwargs)
         return return_dict
 
     def getObjectWrapper(self, objType):
