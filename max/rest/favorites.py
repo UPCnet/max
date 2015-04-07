@@ -20,7 +20,7 @@ def favorite(activity, request):
 
         activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'favorite', 'object._id': activity['_id'], 'actor.username': request.actor.username}
-        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user favorited this activiry
+        newactivity = activities.last(query)  # Pick the last one, so we get the last time user favorited this activiry
 
     else:
         code = 201

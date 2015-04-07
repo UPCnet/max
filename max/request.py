@@ -167,7 +167,7 @@ def get_request_actor(request):
         try:
             url_hash = sha1(context_actor_url).hexdigest()
             mmdb = request.db
-            actor = mmdb.contexts.getItemsByhash(url_hash)[0]
+            actor = mmdb.contexts.getItemsByhash(url_hash).next()
             actor.setdefault('displayName', '')
             return actor
         except:
@@ -176,7 +176,7 @@ def get_request_actor(request):
     username = get_request_actor_username(request)
     try:
         mmdb = request.db
-        actor = mmdb.users.getItemsByusername(username)[0]
+        actor = mmdb.users.getItemsByusername(username).next()
         actor.setdefault('displayName', actor['username'])
         return actor
     except:
@@ -190,7 +190,7 @@ def get_request_creator(request):
     username = get_username_in_oauth(request)
     try:
         mmdb = request.db
-        actor = mmdb.users.getItemsByusername(username)[0]
+        actor = mmdb.users.getItemsByusername(username).next()
         actor.setdefault('displayName', actor['username'])
         return actor
     except:

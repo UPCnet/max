@@ -29,13 +29,13 @@ def getVisibleUsers(users, request):
 
     filter_fields = ["username", "displayName", "objectType", 'subscribedTo']
     found_users = users.search(query, show_fields=filter_fields, sort_by_field="username", flatten=0, **searchParams(request))
-    remaining = found_users.remaining
+    #remaining = found_users.remaining
 
     # Filter user results. User
 
     filtered_users = [user for user in found_users if request.actor.is_allowed_to_see(user)]
 
-    handler = JSONResourceRoot(flatten(filtered_users, squash=['subscribedTo']), remaining=remaining)
+    handler = JSONResourceRoot(flatten(filtered_users, squash=['subscribedTo']), remaining=found_users.remaining)
     return handler.buildResponse()
 
 

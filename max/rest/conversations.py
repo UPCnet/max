@@ -94,7 +94,7 @@ def postMessage2Conversation(conversations, request):
     # Otherwise, assume is a group conversation and create a new one
     current_conversation = None
     if len(request_participants) == 2:
-        conversations_search = conversations.search({
+        current_conversation = conversations.first({
             'objectType': 'conversation',
             'participants': {
                 '$size': 2},
@@ -102,9 +102,6 @@ def postMessage2Conversation(conversations, request):
             'participants.username': {
                 '$all': request_participants}
         })
-
-        if conversations_search:
-            current_conversation = conversations_search[0]
 
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
@@ -265,7 +262,7 @@ def joinConversation(conversation, request):
         code = 200
         activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
-        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
+        newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
         if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:

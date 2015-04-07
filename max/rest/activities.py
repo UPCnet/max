@@ -153,11 +153,11 @@ def addContextActivity(context, request):
         'contexts.hash': context.hash
     }
 
-    duplicated = request.db.activity.search(query)
+    duplicated = request.db.activity.last(query)
 
     if duplicated:
         code = 200
-        newactivity = duplicated[0]
+        newactivity = duplicated
     else:
         # New activity
         code = 201
@@ -202,11 +202,11 @@ def addUserActivity(user, request):
         'contexts': {'$exists': False}
     }
 
-    duplicated = request.db.activity.search(query)
+    duplicated = request.db.activity.last(query)
 
     if duplicated:
         code = 200
-        newactivity = duplicated[0]
+        newactivity = duplicated
     else:
         # New activity
         code = 201

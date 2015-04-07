@@ -36,7 +36,7 @@ def subscribe(context, request):
         code = 200
         activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'subscribe', 'object.url': newactivity.object['url'], 'actor.username': actor.username}
-        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
+        newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
         actor.addSubscription(context)
@@ -64,14 +64,17 @@ def getContextSubscriptions(context, request):
         Get all context subscriptions
     """
     found_users = request.db.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
-    for user in found_users:
-        subscription = user['subscribedTo'][0]
-        del user['subscribedTo']
-        user['permissions'] = subscription.pop('permissions')
-        user['vetos'] = subscription.pop('vetos', [])
-        user['grants'] = subscription.pop('grants', [])
 
-    handler = JSONResourceRoot(found_users)
+    def format_subscriptions():
+        for user in found_users:
+            subscription = user['subscribedTo'][0]
+            del user['subscribedTo']
+            user['permissions'] = subscription.pop('permissions')
+            user['vetos'] = subscription.pop('vetos', [])
+            user['grants'] = subscription.pop('grants', [])
+            yield user
+
+    handler = JSONResourceRoot(format_subscriptions())
     return handler.buildResponse()
 
 

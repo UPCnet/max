@@ -4,22 +4,42 @@
 from max.exceptions import ObjectNotFound
 
 from bson.objectid import ObjectId
+from pymongo import ASCENDING
 from pymongo import DESCENDING
 
 from max.utils.dicts import deepcopy
-
 import sys
-
 
 UNDEF = "__NO_DEFINED_VALUE_FOR_GETATTR__"
 
 
-class ResultsWrapper(list):
+def ItemWrapper(item, request, collection, flatten=0, **kwargs):
+    """
+        Transforms a mongoDB item to a wrapped representation of it using
+        the appropiate class, mapped by the origin collection of the item.
+        Flattened or not by demand
+    """
+    CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
+    model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[collection], None)
+    wrapped = model.from_object(request, item)
+
+    # Also wrap subobjects, only if we are not flattening
+    if not flatten and 'object' in wrapped:
+        WrapperClass = wrapped.getObjectWrapper(wrapped['object']['objectType'])
+        wrapped['object'] = WrapperClass(request, wrapped['object'], creating=False)
+
+    if flatten:
+        return wrapped.flatten(**kwargs)
+    else:
+        return wrapped
+
+
+class ResultsWrapper(object):
     """
         Wraps a list of results to provide a flag
         showing if there are more items left to show.
     """
-    def __init__(self, results, limit):
+    def __init__(self, request, cursor, limit, flatten, keep_private_fields):
         """
             Slice the results, and set remaining flag if there are more items
             in the results that the limit specified.
@@ -27,9 +47,57 @@ class ResultsWrapper(list):
             Queries with limit are executed with limit + 1, so, if we have
             more result items thatn the limit says, it mens that the query that
             originated this results has items remaining.
+
+            Returns a generator that yields wrapped results until limit. If limit overpassed at
+            least by one item, remaining flat will be set True
+
         """
-        self.extend(results[:limit])
-        self.remaining = len(results) > limit
+        self.remaining = False
+        self.collection = cursor.collection.name
+        self.yielded = 0
+        self.limit = limit
+        self.request = request
+        self.cursor = cursor
+        self.flatten = flatten
+        self.keep_private_fields = keep_private_fields
+        self.generator = self.results()
+
+    def results(self):
+        for result in self.cursor:
+            self.yielded += 1
+            if self.limit > 0 and self.yielded > self.limit:
+                self.remaining = True
+                break
+            yield ItemWrapper(
+                result,
+                self.request,
+                self.collection,
+                flatten=self.flatten,
+                keep_private_fields=self.keep_private_fields)
+
+    def __iter__(self):
+        return self.generator.__iter__()
+
+    def next(self):
+        return self.generator.next()
+
+    def first(self):
+        try:
+            return self.generator.next()
+        except StopIteration:
+            return None
+
+    def get(self, count=None):
+        result = []
+        while True:
+            try:
+                result.append(self.generator.next())
+            except:
+                break
+            if len(result) == count:
+                break
+
+        return result
 
 
 class MADMaxCollection(object):
@@ -95,14 +163,14 @@ class MADMaxCollection(object):
         tags = kwargs.get('tags', None)
         context_tags = kwargs.get('context_tags', None)
         twitter_enabled = kwargs.get('twitter_enabled', None)
-        sort_params = kwargs.get('sort_params', [('_id', DESCENDING)])
+        sort_direction = kwargs.get('sort_direction', DESCENDING)
+        sort_params = kwargs.get('sort_params', [('_id', sort_direction)])
         date_filter = kwargs.get('date_filter', None)
         show_fields = kwargs.get('show_fields', None)
         offset_field = kwargs.get('offset_field', None)
 
         sort_by_field = kwargs.get('sort_by_field', None)
         if sort_by_field:
-            sort_direction = kwargs.get('sort_direction', DESCENDING)
             sort_params = [(sort_by_field, sort_direction)]
 
         # After & before contains the ObjectId of the offset that
@@ -203,8 +271,7 @@ class MADMaxCollection(object):
         # Wrap the result in its Mad Class,
         # and flattens it if specified
 
-        results = [self.ItemWrapper(result, flatten=flatten, keep_private_fields=keep_private_fields) for result in cursor]
-        return ResultsWrapper(results, limit=limit)
+        return ResultsWrapper(self.request, cursor, flatten=flatten, keep_private_fields=keep_private_fields, limit=limit)
 
     def _getQuery(self, itemID):
         """
@@ -217,26 +284,6 @@ class MADMaxCollection(object):
             query[self.query_key] = itemID
         return query
 
-    def ItemWrapper(self, item, flatten=0, **kwargs):
-        """
-            Transforms a mongoDB item to a wrapped representation of it using
-            the appropiate class, mapped by the origin collection of the item.
-            Flattened or not by demand
-        """
-        CLASS_COLLECTION_MAPPING = getattr(sys.modules['max.models'], 'CLASS_COLLECTION_MAPPING', {})
-        model = getattr(sys.modules['max.models'], CLASS_COLLECTION_MAPPING[self.collection.name], None)
-        wrapped = model.from_object(self.request, item)
-
-        # Also wrap subobjects, only if we are not flattening
-        if not flatten and 'object' in wrapped:
-            WrapperClass = wrapped.getObjectWrapper(wrapped['object']['objectType'])
-            wrapped['object'] = WrapperClass(self.request, wrapped['object'], creating=False)
-
-        if flatten:
-            return wrapped.flatten(**kwargs)
-        else:
-            return wrapped
-
     def _getItemsByFieldName(self, fieldname, value):
         """
             Constructs and executes a query on a single fieldname:value pair
@@ -247,19 +294,27 @@ class MADMaxCollection(object):
         query[fieldname] = value
         return self.search(query)
 
+    def wrapped_find_one(self, query, wrap=True, **kwargs):
+        item = self.collection.find_one(query, self.show_fields, **kwargs)
+        if item:
+            if wrap:
+                wrapped = ItemWrapper(item, self.request, self.collection.name)
+                wrapped.__parent__ = self
+            else:
+                return item
+            return wrapped
+
     def __getitem__(self, itemID):
         """
             Returns an unique item of the collection
         """
         query = self._getQuery(itemID)
-        item = self.collection.find_one(query, self.show_fields)
-        if item:
-            wrapped = self.ItemWrapper(item)
-            wrapped.__parent__ = self
-            return wrapped
-        else:
+        item = self.wrapped_find_one(query)
+        if item is None:
             querykey = len(query.keys()) == 1 and query.keys()[0] or 'id'
             raise ObjectNotFound("Object with %s %s not found inside %s" % (querykey, itemID, self.collection.name))
+
+        return item
 
     def __getattr__(self, name):
         """
@@ -271,6 +326,12 @@ class MADMaxCollection(object):
             return lambda value: self._getItemsByFieldName(fieldname, value)
         else:
             raise AttributeError(name)
+
+    def first(self, query={}, flatten=False):
+        return self.wrapped_find_one(query, wrap=not flatten, sort=[('_id', ASCENDING)])
+
+    def last(self, query={}, flatten=False):
+        return self.wrapped_find_one(query, wrap=not flatten, sort=[('_id', DESCENDING)])
 
     def dump(self, flatten=0, **kwargs):
         """

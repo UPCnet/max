@@ -69,9 +69,9 @@ class Root(dict):
 
 
 def get_security_object(root, request):
-        security_settings = request.db.security.search({})
+        security_settings = request.db.security.search({}).next()
         security_settings.__parent__ = root
-        return security_settings[0]
+        return security_settings
 
 
 class MongoDBTraverser(MADMaxCollection):

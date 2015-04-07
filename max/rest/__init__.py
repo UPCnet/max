@@ -57,6 +57,17 @@ class endpoint(object):
         return wrapped
 
 
+class IterEncoder(json.JSONEncoder):
+    def default(self, o):
+        try:
+            return json.JSONEncoder.default(self, o)
+        except TypeError, x:
+            try:
+                return list(o)
+            except:
+                return x
+
+
 class JSONResourceRoot(object):
     """
     """
@@ -87,7 +98,7 @@ class JSONResourceRoot(object):
             response_payload = ''
             self.headers['X-totalItems'] = str(self.data)
         else:
-            response_payload = json.dumps(self.wrap())
+            response_payload = json.dumps(self.wrap(), cls=IterEncoder)
 
         if self.remaining:
             self.headers['X-Has-Remaining-Items'] = '1'
@@ -116,7 +127,7 @@ class JSONResourceEntity(object):
             Translate to JSON object if any data. If data is not a dict,
             something went wrong
         """
-        response_payload = json.dumps(self.data)
+        response_payload = json.dumps(self.data, cls=IterEncoder)
         data = response_payload is None and self.data or response_payload
         response = Response(data, status_int=self.status_code)
         response.content_type = self.response_content_type

@@ -123,11 +123,19 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
 
             # and discard all of them until the last displayed item is found
             # The remaining items will be items with the same like_count not displayed already
-            for activity_index, activity in enumerate(same_likesCount_activities):
-                if activity['id'] == str(last['_id']):
-                    break
+            def not_displayed_activities():
+                result = []
+                activities_enumerator = enumerate(same_likesCount_activities)
 
-            same_likesCount_activities = same_likesCount_activities[activity_index + 1:]
+                for activity_index, activity in activities_enumerator:
+                    if activity['id'] == str(last['_id']):
+                        break
+
+                for activity_index, activity in activities_enumerator:
+                    result.append(activity)
+                return result
+
+            same_likesCount_activities = not_displayed_activities()
 
             # If we have enough results to fullfill the limit requested, we don't
             # need to query more liked items
@@ -156,7 +164,7 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
             count=is_head,
             offset_field='lastLike',
             keep_private_fields=False,
-            **search_params)
+            **search_params).get()
 
     # Use case 1:
     # - We requested <limit> liked activities, and we got zero or less than <limit
@@ -181,7 +189,7 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
             keep_private_fields=False,
             **search_params)
         needed = search_params['limit'] - len(activities)
-        activities += non_liked_activities[:needed]
+        activities += non_liked_activities.get(needed)
 
     return activities
 
@@ -211,7 +219,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
             do_search_flagged = False
 
     if do_search_flagged:
-        activities = collection.search(query, count=is_head, keep_private_fields=False, **search_params)
+        activities = collection.search(query, count=is_head, keep_private_fields=False, **search_params).get()
 
     # Use case 1:
     # - We requested <limit> flagged activities, and we got zero or less than <limit
@@ -219,7 +227,8 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
     #  Use case 2:
     # - We did'nt request any flagged activity because we're in a  2+ page that has no
     #   flagged activities
-    if len(activities) < search_params['limit']:
+    found_activities_count = len(activities)
+    if found_activities_count < search_params['limit']:
         # Search non-flagged activities to fullfill <limit> requirement
         query.pop('flagged', None)
         query['flagged'] = {'$exists': 0}
@@ -233,7 +242,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
             count=is_head,
             keep_private_fields=False,
             **search_params)
-        needed = search_params['limit'] - len(activities)
-        activities += non_flagged_activities[:needed]
+        needed = search_params['limit'] - found_activities_count
+        activities += non_flagged_activities.get(needed)
 
     return activities

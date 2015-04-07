@@ -64,19 +64,27 @@ def getUserTimelineAuthors(user, request):
     distinct_authors = []
     distinct_usernames = []
 
-    activities = []
+    activities = None
     before = None
     queries = 0
 
     while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
-        if not activities:
+        try:
+            # This can raise because the iterator is exhauste, or
+            # or because on first iteration activities is None
+            activity = activities.next()
+        except:
+            activity = None
+
+        if not activity:
             extra = {'before': before} if before else {}
             activities = sorted_query(request, request.db.activity, query, **extra)
-            activities_count = activities if isinstance(activities, int) else len(activities)
+            activities_count = activities if isinstance(activities, int) else activities.cursor.count()
             queries += 1
             still_has_activities = activities_count > 0
-        if still_has_activities:
-            activity = activities.pop(0)
+
+        elif still_has_activities:
+
             before = activity._id
             if activity.actor['username'] not in distinct_usernames:
                 distinct_authors.append(activity.actor)

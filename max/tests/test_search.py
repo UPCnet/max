@@ -30,6 +30,48 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     # BEGIN TESTS
 
+    def test_has_remaining_items(self):
+        """
+            Given there are more than 10 users
+            When i query 10 users
+            I get a X-Has-Remaining-Items header
+        """
+        # Create 9 users +  1 already existing (test_manager)
+        for i in range(10):
+            self.create_user('user-{}'.format(i))
+
+        res = self.testapp.get('/people', headers=oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 10)
+        self.assertEqual(res.headers['X-Has-Remaining-Items'], '1')
+
+    def test_not_has_remaining_items_wihout_limit(self):
+        """
+            Given there are more than 10 users
+            When i query unlimited users
+            I don't get a X-Has-Remaining-Items header
+        """
+        # Create 9 users +  1 already existing (test_manager)
+        for i in range(10):
+            self.create_user('user-{}'.format(i))
+
+        res = self.testapp.get('/people?limit=0', headers=oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 11)
+        self.assertNotIn('X-Has-Remaining-Items', res.headers)
+
+    def test_not_has_remaining_items(self):
+        """
+            Given there are exactly 10 users
+            When i query 10 users
+            I don't get a X-Has-Remaining-Items header
+        """
+        # Create 9 users +  1 already existing (test_manager)
+        for i in range(9):
+            self.create_user('user-{}'.format(i))
+
+        res = self.testapp.get('/people', headers=oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 10)
+        self.assertNotIn('X-Has-Remaining-Items', res.headers)
+
     def test_activities_keyword_generation(self):
         """
                 Tests that all words passing regex are included in keywords

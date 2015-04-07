@@ -164,11 +164,11 @@ def flatten(data, filter_method=None, **kwargs):
     """
         Recursively flatten a dict or list
     """
-    if isinstance(data, list):
+    if isinstance(data, dict):
+        data = flattendict(data, **kwargs)
+    elif isinstance(data, list) or hasattr(data, 'next'):
         newitems = []
         for item in data:
             newitems.append(flatten(item, **kwargs))
         data = newitems
-    if isinstance(data, dict):
-        data = flattendict(data, filter_method=filter_method, **kwargs)
     return data

@@ -23,7 +23,7 @@ def like(activity, request):
 
         activities = MADMaxCollection(request, 'activity')
         query = {'verb': 'like', 'object._id': activity['_id'], 'actor.username': request.actor.username}
-        newactivity = activities.search(query)[-1]  # Pick the last one, so we get the last time user liked this activity
+        newactivity = activities.last(query)  # Pick the last one, so we get the last time user liked this activity
 
     else:
         code = 201
