@@ -191,7 +191,7 @@ class Context(ASObject):
         """
             Calculates the hash based on the url
         """
-        return sha1(self.url).hexdigest()
+        return sha1(self['url']).hexdigest()
 
 
 class Person(ASObject):

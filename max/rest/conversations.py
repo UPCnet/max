@@ -45,7 +45,7 @@ def getConversations(conversations, request):
 
     def conversations_info():
         for conversation in conversations_search:
-            yield conversation.getInfo(request.actor.username)
+            yield conversation.getInfo(request.actor['username'])
 
     sorted_conversations = sorted(conversations_info(), reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
@@ -70,10 +70,10 @@ def postMessage2Conversation(conversations, request):
         raise ValidationError('Empty participants parameter')
     if len(request_participants) != len(list(set(request_participants))):
         raise ValidationError('One or more users duplicated in participants list')
-    if len(request_participants) == 1 and request_participants[0] == request.actor.username:
+    if len(request_participants) == 1 and request_participants[0] == request.actor['username']:
         raise ValidationError('Cannot start a conversation with oneself')
 
-    if request.actor.username not in request_participants and not request.has_permission(add_conversation_for_others):
+    if request.actor['username'] not in request_participants and not request.has_permission(add_conversation_for_others):
         raise ValidationError('Actor must be part of the participants list.')
 
     # Loop trough all participants, if there's one that doesn't exists, an exception will raise
@@ -84,8 +84,8 @@ def postMessage2Conversation(conversations, request):
     users = MADMaxCollection(request, 'users', query_key='username')
     for participant in request_participants:
         user = users[participant]
-        if request.actor.username != user['username'] and not request.actor.is_allowed_to_see(user):
-            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.actor.username, user['username']))
+        if request.actor['username'] != user['username'] and not request.actor.is_allowed_to_see(user):
+            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.actor['username'], user['username']))
         participants[participant] = user
 
     # If there are only two participants in the conversation, try to get an existing conversation
@@ -186,7 +186,7 @@ def getConversation(conversation, request):
     """
         Get a conversation
     """
-    handler = JSONResourceEntity(conversation.getInfo(request.actor.username))
+    handler = JSONResourceEntity(conversation.getInfo(request.actor['username']))
     return handler.buildResponse()
 
 
@@ -202,7 +202,7 @@ def getUserConversationSubscription(conversation, request):
     conversation = conversation_object.flatten()
 
     # Update temporary conversation with subscription permissions and other stuff
-    conversation['displayName'] = conversation_object.realDisplayName(request.actor.username)
+    conversation['displayName'] = conversation_object.realDisplayName(request.actor['username'])
     conversation['lastMessage'] = conversation_object.lastMessage()
     conversation['permissions'] = subscription['permissions']
     conversation['messages'] = 0
@@ -259,7 +259,7 @@ def joinConversation(conversation, request):
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
         activities = MADMaxCollection(request, 'activity')
-        query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor.username}
+        query = {'verb': 'subscribe', 'object.id': cid, 'actor.username': actor['username']}
         newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
@@ -270,7 +270,7 @@ def joinConversation(conversation, request):
             raise Forbidden('This is not a group conversation, so no one else is allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         if not request.creator.is_allowed_to_see(actor):
-            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.creator.username, actor.username))
+            raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.creator['username'], actor['username']))
 
         conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
         actor.addSubscription(conversation)
@@ -312,7 +312,7 @@ def leaveConversation(conversation, request):
     save_context = False
     # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
     if len(conversation.participants) >= 2 and 'group' in conversation.get('tags', []):
-        conversation.participants = [user for user in conversation.participants if user['username'] != actor.username]
+        conversation.participants = [user for user in conversation.participants if user['username'] != actor['username']]
         save_context = True
 
     # Tag conversations that will be left as 1 participant only as archived
@@ -340,8 +340,8 @@ def transferConversationOwnership(conversation, request):
     # Check if the targeted new owner is on the conversation
     request.actor.getSubscription({'id': cid, 'objectType': 'conversation'})
 
-    previous_owner_username = conversation._owner
-    conversation._owner = request.actor.username
+    previous_owner_username = conversation['_owner']
+    conversation['_owner'] = request.actor['username']
     conversation.save()
 
     # Give hability to add new users to the new owner

@@ -29,13 +29,13 @@ def subscribe(context, request):
     newactivity = Activity.from_request(request, rest_params=rest_params)
 
     # Check if user is already subscribed
-    subscribed_contexts_hashes = [a['hash'] for a in actor.subscribedTo]
-    if newactivity.object.getHash() in subscribed_contexts_hashes:
+    subscribed_contexts_hashes = [a['hash'] for a in actor['subscribedTo']]
+    if newactivity['object'].getHash() in subscribed_contexts_hashes:
         # If user already subscribed, send a 200 code and retrieve the original subscribe activity
         # post when user was subscribed. This way in th return data we'll have the date of subscription
         code = 200
         activities = MADMaxCollection(request, 'activity')
-        query = {'verb': 'subscribe', 'object.url': newactivity.object['url'], 'actor.username': actor.username}
+        query = {'verb': 'subscribe', 'object.url': newactivity['object']['url'], 'actor.username': actor['username']}
         newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:

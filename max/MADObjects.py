@@ -26,17 +26,17 @@ class MADDict(dict):
         """
         return self
 
-    def __getattr__(self, key):
-        """
-            Maps dict items access to attributes, while preserving access to class attributes.
+    # def __getattr__(self, key):
+    #     """
+    #         Maps dict items access to attributes, while preserving access to class attributes.
 
-            Wakes up objects from database when necessary.
-        """
-        try:
-            # Try to get the requested attribute as a object contained item
-            return self[key]
-        except AttributeError as exc:
-            raise exc
+    #         Wakes up objects from database when necessary.
+    #     """
+    #     try:
+    #         # Try to get the requested attribute as a object contained item
+    #         return self[key]
+    #     except AttributeError as exc:
+    #         raise exc
 
     def __setitem__(self, key, val):
         """
@@ -59,15 +59,15 @@ class MADDict(dict):
             else:
                 self[k] = v
 
-    def __setattr__(self, key, value):
-        """
-            Enables setting values of dict's items trough attribute assignment,
-            while preserving default setting of class attributes
-        """
-        if key in object.__getattribute__(self, 'schema'):
-            self.__setitem__(key, value)
-        else:
-            object.__setattr__(self, key, value)
+    # def __setattr__(self, key, value):
+    #     """
+    #         Enables setting values of dict's items trough attribute assignment,
+    #         while preserving default setting of class attributes
+    #     """
+    #     if key in object.__getattribute__(self, 'schema'):
+    #         self.__setitem__(key, value)
+    #     else:
+    #         object.__setattr__(self, key, value)
 
     def _on_create_custom_validations(self):
         return True

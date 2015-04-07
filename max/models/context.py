@@ -116,11 +116,11 @@ class BaseContext(MADBase):
             - If neither unsubscribe or subscribe policy found, default unsubscribe policy will be used.
         """
         if permission == 'unsubscribe':
-            policy = self.permissions.get(permission, None)
+            policy = self['permissions'].get(permission, None)
             if policy is None:
                 policy = self.get_permission_policy('subscribe', default)
         else:
-            policy = self.permissions.get(permission, default)
+            policy = self['permissions'].get(permission, default)
 
         return policy
 
@@ -160,7 +160,7 @@ class BaseContext(MADBase):
             updates = {}
 
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
-                updates.update({'contexts.$.displayName': self.displayName})
+                updates.update({'contexts.$.displayName': self['displayName']})
 
             if 'tags' in self.schema.keys() and (self.field_changed('tags') or force_update):
                 updates.update({'contexts.$.tags': self.get('tags')})
@@ -169,8 +169,8 @@ class BaseContext(MADBase):
                 updates.update({'contexts.$.participants': self.participants})
 
             if 'url' in self.schema.keys() and (self.field_changed('url') or force_update):
-                updates.update({'contexts.$.url': self.url})
-                updates.update({'contexts.$.hash': self.hash})
+                updates.update({'contexts.$.url': self['url']})
+                updates.update({'contexts.$.hash': self['hash']})
 
             combined_updates = {'$set': updates}
 
@@ -198,11 +198,11 @@ class BaseContext(MADBase):
                 updates = {}
 
                 if 'url' in must_update_fields:
-                    updates.update({'{}.$.url'.format(self.user_subscription_storage): self.url})
-                    updates.update({'{}.$.hash'.format(self.user_subscription_storage): self.hash})
+                    updates.update({'{}.$.url'.format(self.user_subscription_storage): self['url']})
+                    updates.update({'{}.$.hash'.format(self.user_subscription_storage): self['hash']})
 
                 if 'displayName' in must_update_fields:
-                    updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self.displayName})
+                    updates.update({'{}.$.displayName'.format(self.user_subscription_storage): self['displayName']})
 
                 if 'tags' in must_update_fields:
                     updates.update({'{}.$.tags'.format(self.user_subscription_storage): self.get('tags', [])})
@@ -244,8 +244,8 @@ class BaseContext(MADBase):
                     self.mdb_collection.database.activity.update(
                         {'actor.username': user['username'], 'object.url': self.old['url']},
                         {'$set': {
-                            'object.url': self.url,
-                            'object.hash': self.hash,
+                            'object.url': self['url'],
+                            'object.hash': self['hash'],
                         }},
                         multi=True
                     )
@@ -355,11 +355,11 @@ class Context(BaseContext):
             (Allow, Manager, permissions.list_comments),
         ]
         # Grant subscribe permission to the user to subscribe itself if the context policy allows it
-        if self.permissions.get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
+        if self['permissions'].get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, permissions.add_subscription))
 
         # Grant view activities
-        if self.permissions.get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
+        if self['permissions'].get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
             acl.append((Allow, self.request.authenticated_userid, permissions.list_activities))
 
         # Granted permissions only if a subscription for the current actor exists
@@ -455,7 +455,7 @@ class Context(BaseContext):
         self['hash'] = self.getIdentifier()
 
         # Set displayName only if it's not specified
-        self['displayName'] = self.get('displayName', self.url)
+        self['displayName'] = self.get('displayName', self['url'])
 
     def modifyContext(self, properties):
         """Update the user object with the given properties"""
@@ -480,7 +480,7 @@ class Context(BaseContext):
                     notifier.unbind_user_from_context(self, user['username'])
 
         if 'url' in properties:
-            self.hash = sha1(self.url).hexdigest()
+            self['hash'] = sha1(self['url']).hexdigest()
 
         self.save()
 

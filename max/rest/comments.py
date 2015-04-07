@@ -22,7 +22,7 @@ def getUserComments(user, request):
     query = {
         'object.objectType': 'comment',
         'verb': 'comment',
-        'actor.username': user.username
+        'actor.username': user['username']
     }
     is_head = request.method == 'HEAD'
     comments = request.db.activity.search(
@@ -94,7 +94,7 @@ def addActivityComment(activity, request):
         'object': {
             'inReplyTo': [{
                 '_id': activity['_id'],
-                'objectType': activity.object['objectType'],
+                'objectType': activity['object']['objectType'],
                 'contexts': []
             }]
         }

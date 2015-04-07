@@ -128,8 +128,8 @@ class BaseActivity(MADBase):
 
         # Set date if specified
         if 'published' in self.data:
-            self._created = self.published
-            self.published = rfc3339_parse(self.data['published'])
+            self._created = self['published']
+            self['published'] = rfc3339_parse(self.data['published'])
 
         # Set defaults
         properties = {}
@@ -143,7 +143,7 @@ class BaseActivity(MADBase):
                 properties[key] = default
         self.update(properties)
 
-        if self.verb in ['post']:
+        if self['verb'] in ['post']:
             self.setKeywords()
 
     def modifyActivity(self, properties):
@@ -159,11 +159,11 @@ class BaseActivity(MADBase):
     def setKeywords(self):
         # Append actor as username if object has keywords and actor is a Person
         self['_keywords'] = []
-        self['_keywords'].extend(self.object.get('_keywords', []))
-        if self.actor['objectType'] == 'person':
-            self['_keywords'].append(self.actor['username'])
-            self['_keywords'].extend(self.actor['username'].split('.'))
-            self['_keywords'].extend(self.actor.get('displayName', '').lower().split())
+        self['_keywords'].extend(self['object'].get('_keywords', []))
+        if self['actor']['objectType'] == 'person':
+            self['_keywords'].append(self['actor']['username'])
+            self['_keywords'].extend(self['actor']['username'].split('.'))
+            self['_keywords'].extend(self['actor'].get('displayName', '').lower().split())
 
         # Add keywords from comment objects
         replies = self.get('replies', [])
@@ -190,9 +190,9 @@ class BaseActivity(MADBase):
         self.add_to_list('replies', comment, allow_duplicates=True)
         self.setKeywords()
 
-        activity_hashtags = self.object.setdefault('_hashtags', [])
+        activity_hashtags = self['object'].setdefault('_hashtags', [])
         activity_hashtags.extend(comment.get('_hashtags', []))
-        self.object['_hashtags'] = list(set(activity_hashtags))
+        self['object']['_hashtags'] = list(set(activity_hashtags))
         self.lastComment = ObjectId(comment['id'])
 
         self.save()
@@ -237,7 +237,7 @@ class BaseActivity(MADBase):
             Gets the image associated to this message, if the message is of type file
             And the image exists
         """
-        if self.object['objectType'] != 'file':
+        if self['object']['objectType'] != 'file':
             return None
 
         image_file = self.getBlob()
@@ -252,7 +252,7 @@ class BaseActivity(MADBase):
             Gets the image associated to this message, if the message is of type image
             And the image exists
         """
-        if self.object['objectType'] != 'image':
+        if self['object']['objectType'] != 'image':
             return None
 
         file_extension = size if size != 'full' else ''
@@ -495,7 +495,7 @@ class Activity(BaseActivity):
                 actor_id_field = 'username'
             else:
                 actor_id_field = 'url'
-            self['deletable'] = self.request.actor[actor_id_field] == self._owner
+            self['deletable'] = self.request.actor[actor_id_field] == self['_owner']
             if not self['deletable'] and self.get('contexts'):
                 subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.get('subscribedTo', []) if hasPermission(subscription, 'delete')]
                 for context in self.get('contexts'):

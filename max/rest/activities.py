@@ -91,7 +91,7 @@ def getContextActivities(context, request):
 
         def get_valid_subscriptions():
             subscriptions = []
-            for subscription in request.actor.subscribedTo:
+            for subscription in request.actor['subscribedTo']:
                 if 'read' in subscription.get('permissions', []) \
                    and subscription['objectType'] == 'context'\
                    and subscription['url'].startswith(url):
@@ -104,7 +104,7 @@ def getContextActivities(context, request):
 
         # We'll include also all contexts that are public whitin the url
         public_query = {'permissions.read': 'public', 'url': url_regex}
-        public_contexts = [result.url for result in request.db.contexts.search(public_query, show_fields=['url'])]
+        public_contexts = [result['url'] for result in request.db.contexts.search(public_query, show_fields=['url'])]
 
         if public_contexts:
             contexts_query.append({'contexts.url': {'$in': public_contexts}})
@@ -149,8 +149,8 @@ def addContextActivity(context, request):
     query = {
         actor_id_key: actor_id_value,
         'object.content': newactivity['object']['content'],
-        'published': {'$gt': newactivity.published - timedelta(minutes=1)},
-        'contexts.hash': context.hash
+        'published': {'$gt': newactivity['published'] - timedelta(minutes=1)},
+        'contexts.hash': context['hash']
     }
 
     duplicated = request.db.activity.last(query)
@@ -196,9 +196,9 @@ def addUserActivity(user, request):
     # Search if there's any activity from the same user with
     # the same actor and without context
     query = {
-        'actor.username': request.actor.username,
+        'actor.username': request.actor['username'],
         'object.content': newactivity['object'].get('content', ''),
-        'published': {'$gt': newactivity.published - timedelta(minutes=1)},
+        'published': {'$gt': newactivity['published'] - timedelta(minutes=1)},
         'contexts': {'$exists': False}
     }
 

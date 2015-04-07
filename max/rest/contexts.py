@@ -209,7 +209,7 @@ def getContextAuthors(context, request):
 
         elif still_has_activities:
 
-            before = activity._id
+            before = activity['_id']
             if activity.actor['username'] not in distinct_usernames:
                 distinct_authors.append(activity.actor)
                 distinct_usernames.append(activity.actor['username'])

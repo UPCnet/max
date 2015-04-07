@@ -142,8 +142,8 @@ def rebuildUser(context, request):
     """
     users = request.db.users.dump()
     for user in users:
-        if user._owner != user.username:
-            user._owner = user.username
+        if user['_owner'] != user.username:
+            user['_owner'] = user.username
             user.save()
 
     handler = JSONResourceRoot([])

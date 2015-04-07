@@ -16,7 +16,7 @@ def is_owner(context, userid):
         If the object has no ownership information, returns False.
     """
     try:
-        return getattr(context, '_owner') == userid
+        return context['_owner'] == userid
     except:
         return False
 

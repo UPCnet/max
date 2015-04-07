@@ -162,14 +162,14 @@ class User(MADBase):
         """
         subscription = context.prepareUserSubscription()
         self.add_to_list(context.user_subscription_storage, subscription, safe=False)
-        context._after_subscription_add(self.username)
+        context._after_subscription_add(self['username'])
 
     def removeSubscription(self, context):
         """
             Unsubscribes the user from the context
         """
         self.delete_from_list(context.user_subscription_storage, {context.unique.lstrip('_'): context.getIdentifier()})
-        context._after_subscription_remove(self.username)
+        context._after_subscription_remove(self['username'])
 
     def modifyUser(self, properties):
         """Update the user object with the given properties"""
@@ -213,7 +213,7 @@ class User(MADBase):
 
         if has_updatable_fields or force_update:
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
-                self.mdb_collection.database.conversations.update({'participants.username': self.username}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
+                self.mdb_collection.database.conversations.update({'participants.username': self['username']}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
 
     def grantPermission(self, subscription, permission, permanent=DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY):
         """
@@ -398,7 +398,7 @@ class User(MADBase):
         if i_am_visible and not user_is_visible:
             return False
 
-        my_subcriptions = set([subscription['hash'] for subscription in self.subscribedTo])
+        my_subcriptions = set([subscription['hash'] for subscription in self['subscribedTo']])
         user_subcriptions = set([subscription['hash'] for subscription in user['subscribedTo']])
         have_subscriptions_in_common = my_subcriptions.intersection(user_subcriptions)
 
@@ -426,7 +426,7 @@ class User(MADBase):
             conversations_by_id = {str(conv['_id']): conv for conv in conversations}
             for subscription in actor['talkingIn']:
                 conversation_object = conversations_by_id[subscription['id']]
-                subscription['displayName'] = conversation_object.realDisplayName(self.username)
+                subscription['displayName'] = conversation_object.realDisplayName(self['username'])
                 subscription['lastMessage'] = conversation_object.lastMessage()
                 subscription['participants'] = conversation_object.participants
                 subscription['tags'] = conversation_object.tags
@@ -442,11 +442,11 @@ class User(MADBase):
         """
         if notifications:
             notifier = RabbitNotifications(self.request)
-            notifier.add_user(self.username)
+            notifier.add_user(self['username'])
 
     def _after_delete(self):
         """
             Deletes user exchanges just after user is deleted.
         """
         notifier = RabbitNotifications(self.request)
-        notifier.delete_user(self.username)
+        notifier.delete_user(self['username'])
