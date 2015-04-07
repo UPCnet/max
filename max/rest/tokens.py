@@ -12,6 +12,11 @@ from max.security.permissions import list_tokens
 from pyramid.httpexceptions import HTTPNoContent
 
 
+def formatted_tokens(tokens):
+    for token in tokens:
+        yield dict(token=token['token'], platform=token['platform'], username=token['_owner'])
+
+
 @endpoint(route_name='conversation_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
 def getPushTokensForConversation(tokens, request):
     """
@@ -20,18 +25,14 @@ def getPushTokensForConversation(tokens, request):
     cid = request.matchdict['id']
     query = {'talkingIn.id': cid}
 
-    result = []
-
+    user_tokens = []
     users = request.db.users.search(query, show_fields=["username"], sort_by_field="username", flatten=1)
     usernames = [user['username'] for user in users]
 
     if usernames:
         user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
 
-        for token in user_tokens:
-            result.append(dict(token=token['token'], platform=token['platform'], username=token['_owner']))
-
-    handler = JSONResourceRoot(result)
+    handler = JSONResourceRoot(formatted_tokens(user_tokens))
     return handler.buildResponse()
 
 
@@ -45,18 +46,14 @@ def getPushTokensForContext(tokens, request):
     contexts = MADMaxCollection(request, 'contexts', query_key='hash')
     ctxt = contexts[cid]
 
-    result = []
-
+    user_tokens = []
     users = ctxt.subscribedUsers()
     usernames = [user['username'] for user in users]
 
     if usernames:
         user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
 
-        for token in user_tokens:
-            result.append(dict(token=token['token'], platform=token['platform'], username=token['_owner']))
-
-    handler = JSONResourceRoot(result)
+    handler = JSONResourceRoot(formatted_tokens(user_tokens))
     return handler.buildResponse()
 
 

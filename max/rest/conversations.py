@@ -43,13 +43,11 @@ def getConversations(conversations, request):
 
     conversations_search = conversations.search(query, sort_by_field="published")
 
-    conversations_info = []
-    for conversation in conversations_search:
+    def conversations_info():
+        for conversation in conversations_search:
+            yield conversation.getInfo(request.actor.username)
 
-        conversation_info = conversation.getInfo(request.actor.username)
-        conversations_info.append(conversation_info)
-
-    sorted_conversations = sorted(conversations_info, reverse=True, key=lambda conv: conv['lastMessage']['published'])
+    sorted_conversations = sorted(conversations_info(), reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
     handler = JSONResourceRoot(sorted_conversations)
     return handler.buildResponse()
