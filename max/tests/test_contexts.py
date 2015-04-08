@@ -3,6 +3,7 @@ from max.tests import test_default_security
 from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
+from max.tests.base import MockTweepyAPI
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 
@@ -10,6 +11,7 @@ from functools import partial
 from mock import patch
 from paste.deploy import loadapp
 
+import httpretty
 import json
 import os
 import unittest
@@ -110,7 +112,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         context_permissions = dict(read='subscribed', write='restricted', subscribe='restricted', invite='restricted')
         self.create_context(create_context, permissions=context_permissions)
         self.admin_subscribe_user_to_context(username, subscribe_context)
-        res = self.create_activity(username, user_status_context, expect=403)
+        self.create_activity(username, user_status_context, expect=403)
 
     def test_add_public_context(self):
         from hashlib import sha1
@@ -219,7 +221,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         url_hash = '0000000000000'
         self.testapp.put('/contexts/%s' % url_hash, json.dumps({"twitterHashtag": "assignatura1"}), oauth2Header(test_manager), status=404)
 
-    @unittest.skipUnless(os.environ.get('Twitter', False), 'Skipping due to lack of Twitter config')
+    @httpretty.activate
+    @patch('tweepy.API', MockTweepyAPI)
     def test_modify_context_with_twitter_username(self):
         from hashlib import sha1
         from .mockers import create_context

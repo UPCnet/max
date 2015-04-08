@@ -252,3 +252,38 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
 
         self.assertEqual(rewrited_request_url, '/tokens/{}'.format(token))
+
+    def test_deprecated_sortBy_parameter(self):
+        """
+            Given a plain user
+            When I query ativities using old sortBy parameter
+            I get the expected result
+
+            THIS TEST IS A DUPLICATE OF max.tests.test_timeline_order_sorted_by_last_comment_publish_date
+            ONLY TO TEST THE TRANSLATION OF THE SORTBY PARAMETER
+
+        """
+        from .mockers import user_status, user_comment
+        username = 'messi'
+        self.create_user(username)
+        activity_ids = []
+        # Create 7 activities to overpass limit of 5
+        for i in range(7):
+            activity_ids.append(self.create_activity(username, user_status, note=str(i)).json['id'])
+        res = self.testapp.post('/activities/%s/comments' % str(activity_ids[0]), json.dumps(user_comment), oauth2Header(username), status=201)
+        # Get first 5 results
+        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5' % username, "", oauth2Header(username), status=200)
+        self.assertEqual(len(res.json), 5)
+
+        self.assertEqual(res.json[0].get('id', None), activity_ids[0])
+        self.assertEqual(res.json[1].get('id', None), activity_ids[6])
+        self.assertEqual(res.json[2].get('id', None), activity_ids[5])
+        self.assertEqual(res.json[3].get('id', None), activity_ids[4])
+        self.assertEqual(res.json[4].get('id', None), activity_ids[3])
+
+        # get next 2 results
+        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5&before=%s' % (username, activity_ids[3]), "", oauth2Header(username), status=200)
+        self.assertEqual(len(res.json), 2)
+
+        self.assertEqual(res.json[0].get('id', None), activity_ids[2])
+        self.assertEqual(res.json[1].get('id', None), activity_ids[1])

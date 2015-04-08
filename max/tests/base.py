@@ -1,31 +1,45 @@
 # -*- coding: utf-8 -*-
 from max.tests import test_manager
-
-from urllib import urlencode
 from max.utils.dicts import deepcopy
 from max.utils.image import get_avatar_folder
+
+from PIL import Image
+from io import BytesIO
+from pymongo.cursor import Cursor
+from pymongo.errors import AutoReconnect
+from urllib import urlencode
 
 import json
 import os
 import pymongo
 import requests
 import shutil
+import tweepy
 
-from io import BytesIO
-from PIL import Image
 
 MOCK_TOKEN = "jfa1sDF2SDF234"
+FAILURES = 3
 
+# Copy of original patched methods
 requests_get = requests.get
 requests_post = requests.post
-
-
-from pymongo.cursor import Cursor
-from pymongo.errors import AutoReconnect
-
 original_cursor_init = Cursor.__init__
 
-FAILURES = 3
+
+class MockTweepyAPI(object):
+    def __init__(self, auth, fail=False):
+        self.fail = fail
+
+    def verify_credentials(self, *args, **kwargs):
+        if self.fail:
+            raise Exception('Simulated Twitter Failure')
+        return True
+
+    def get_user(self, username):
+        user = tweepy.models.User
+        user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
+        user.id_str = '526326641'
+        return user
 
 
 def mocked_cursor_init(self, *args, **kwargs):
@@ -54,7 +68,7 @@ class mock_requests_obj(object):
     def __init__(self, *args, **kwargs):
         if kwargs.get('text', None) is not None:
             self.text = kwargs['text']
-        if kwargs.get('content', None) is not None:
+        if kwargs.get('content', None) is not None: # pragma: no cover
             self.content = kwargs['content']
         self.status_code = kwargs['status_code']
 
@@ -137,7 +151,7 @@ class MaxTestApp(object):
                 if 'error' in getattr(res, 'json', []):
                     message += '\nRaised {error}: "{error_description}"'.format(**res.json)
             # Identify errors without json
-            elif res.status_int != status:
+            elif res.status_int != status:  # pragma: no cover
                 print res.body
                 # Print a alert to avoid going mad again debugging why a
                 # error response has no body, because was a HEAD ...
@@ -210,7 +224,7 @@ class MaxAvatarsTestBase(object):
 
 class MaxTestBase(object):
 
-    def __init__(self, testapp):
+    def __init__(self, testapp):  # pragma: no cover
         self.testapp = testapp
 
     def reset_database(self, app):

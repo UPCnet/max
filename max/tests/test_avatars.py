@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-from max.tests import test_default_security
 from max.tests import test_cloudapis
+from max.tests import test_default_security
 from max.tests import test_manager
+from max.tests.base import MaxAvatarsTestBase
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
-from max.tests.base import MaxAvatarsTestBase
+from max.tests.base import MockTweepyAPI
 from max.tests.base import mock_get
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
-
 from max.utils.image import get_avatar_folder
 
 from functools import partial
@@ -20,7 +20,6 @@ import json
 import os
 import shutil
 import tempfile
-import tweepy
 import unittest
 
 
@@ -31,22 +30,6 @@ def http_mock_twitter_user_image(image):
         status=200,
         content_type="image/png"
     )
-
-
-class MockTweepyAPI(object):
-    def __init__(self, auth, fail=False):
-        self.fail = fail
-
-    def verify_credentials(self, *args, **kwargs):
-        if self.fail:
-            raise Exception('Simulated Twitter Failure')
-        return True
-
-    def get_user(self, username):
-        user = tweepy.models.User
-        user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
-        user.id_str = '526326641'
-        return user
 
 
 class AvatarFolderTests(unittest.TestCase, MaxTestBase):

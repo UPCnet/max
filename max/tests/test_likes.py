@@ -191,7 +191,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             res = self.create_activity(username, user_status_context)
             activities.append(res.json['id'])
 
-        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sortBy=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
+        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sort=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(firstpage.json), 3)
 
@@ -202,7 +202,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(firstpage.json[2]['likesCount'], 0)
         self.assertEqual(firstpage.json[2]['id'], activities[3])
 
-        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=%d&before=%s' % ("user1", page_size, activities[3]), "", oauth2Header("user1"), status=200)
+        secondpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=%d&before=%s' % ("user1", page_size, activities[3]), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(secondpage.json), 3)
 
@@ -243,7 +243,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.like_activity(username, activities[4])
         self.like_activity(username, activities[2])
 
-        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sortBy=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
+        firstpage = self.testapp.get('/people/%s/timeline?limit=%d&sort=likes' % ("user1", page_size), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(firstpage.json), 3)
         self.assertEqual(firstpage.json[0]['likesCount'], 1)
@@ -253,7 +253,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(firstpage.json[2]['likesCount'], 1)
         self.assertEqual(firstpage.json[2]['id'], activities[5])
 
-        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=%d&before=%s' % ("user1", page_size, activities[5]), "", oauth2Header("user1"), status=200)
+        secondpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=%d&before=%s' % ("user1", page_size, activities[5]), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(secondpage.json), 3)
 
@@ -328,7 +328,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.like_activity('user1', activities[8])
 
-        firstpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3' % "user1", "", oauth2Header("user1"), status=200)
+        firstpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=3' % "user1", "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(firstpage.json), 3)
         self.assertEqual(firstpage.json[0]['likesCount'], 5)
@@ -338,7 +338,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(firstpage.json[2]['likesCount'], 3)
         self.assertEqual(firstpage.json[2]['id'], activities[6])
 
-        secondpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[6]), "", oauth2Header("user1"), status=200)
+        secondpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=3&before=%s' % ("user1", activities[6]), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(secondpage.json), 3)
         self.assertEqual(secondpage.json[0]['likesCount'], 3)
@@ -348,7 +348,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(secondpage.json[2]['likesCount'], 3)
         self.assertEqual(secondpage.json[2]['id'], activities[3])
 
-        thirdpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[3]), "", oauth2Header("user1"), status=200)
+        thirdpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=3&before=%s' % ("user1", activities[3]), "", oauth2Header("user1"), status=200)
 
         self.assertEqual(len(thirdpage.json), 3)
         self.assertEqual(thirdpage.json[0]['likesCount'], 3)
@@ -358,7 +358,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(thirdpage.json[2]['likesCount'], 1)
         self.assertEqual(thirdpage.json[2]['id'], activities[8])
 
-        fourthpage = self.testapp.get('/people/%s/timeline?sortBy=likes&limit=3&before=%s' % ("user1", activities[8]), "", oauth2Header("user1"), status=200)
+        fourthpage = self.testapp.get('/people/%s/timeline?sort=likes&limit=3&before=%s' % ("user1", activities[8]), "", oauth2Header("user1"), status=200)
         self.assertEqual(len(fourthpage.json), 1)
         self.assertEqual(fourthpage.json[0]['likesCount'], 0)
         self.assertEqual(fourthpage.json[0]['id'], activities[9])

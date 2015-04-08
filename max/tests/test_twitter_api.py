@@ -31,7 +31,7 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
             cloudapis_config = ConfigParser.ConfigParser()
             cloudapis_config.read(cloudapis_file)
             twitter_config = dict(cloudapis_config.items('twitter'))
-        except ConfigParser.NoSectionError:
+        except ConfigParser.NoSectionError:  # pragma: no cover
             raise Exception("\n\nMissing or invalid twitter section at {}".format(cloudapis_file))
 
         valid_configuration = twitter_config.get('consumer_key') and \
@@ -39,7 +39,7 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
             twitter_config.get('access_token') and\
             twitter_config.get('access_token_secret')
 
-        if not valid_configuration:
+        if not valid_configuration:  # pragma: no cover
             raise Exception("\n\nMissing or invalid twitter section value at {}".format(cloudapis_file))
 
         real_cloudapis = {'twitter': twitter_config}

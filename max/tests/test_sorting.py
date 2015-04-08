@@ -51,7 +51,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity_2_id = self.create_activity(username, user_status_context, note='Third').json['id']
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
-        res = self.testapp.get('/contexts/%s/activities?sortBy=activities' % (context_query['context']), '', oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities?sort=published' % (context_query['context']), '', oauth2Header(username), status=200)
 
         self.assertEqual(len(res.json), 3)
         self.assertEqual(res.json[0].get('id', None), activity_2_id)
@@ -74,7 +74,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             activity_ids.append(self.create_activity(username, user_status, note=str(i)).json['id'])
         res = self.testapp.post('/activities/%s/comments' % str(activity_ids[0]), json.dumps(user_comment), oauth2Header(username), status=201)
         # Get first 5 results
-        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5' % username, "", oauth2Header(username), status=200)
+        res = self.testapp.get('/people/%s/timeline?sort=published&priority=comments&limit=5' % username, "", oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 5)
 
         self.assertEqual(res.json[0].get('id', None), activity_ids[0])
@@ -84,7 +84,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json[4].get('id', None), activity_ids[3])
 
         # get next 2 results
-        res = self.testapp.get('/people/%s/timeline?sortBy=comments&limit=5&before=%s' % (username, activity_ids[3]), "", oauth2Header(username), status=200)
+        res = self.testapp.get('/people/%s/timeline?sort=published&priority=comments&limit=5&before=%s' % (username, activity_ids[3]), "", oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 2)
 
         self.assertEqual(res.json[0].get('id', None), activity_ids[2])
@@ -105,7 +105,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activity_2_id = self.create_activity(username, user_status, note="third").json['id']
         res = self.testapp.post('/activities/%s/comments' % str(activity_1_id), json.dumps(user_comment), oauth2Header(username), status=201)
 
-        res = self.testapp.get('/people/%s/timeline?sortBy=activities' % username, "", oauth2Header(username), status=200)
+        res = self.testapp.get('/people/%s/timeline?sort=published' % username, "", oauth2Header(username), status=200)
         self.assertEqual(len(res.json), 3)
         self.assertEqual(res.json[0].get('id', None), activity_2_id)
         self.assertEqual(res.json[1].get('id', None), activity_1_id)
