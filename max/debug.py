@@ -5,14 +5,13 @@ def patched_check_token(*args, **kwargs):
     return True
 
 
-def setup(config, settings):
+def setup(settings):
     if asbool(settings['max.debug_api']):
-        sort_order = dict(under='pyramid_debugtoolbar.toolbar_tween_factory')
 
-        # Don't apply tween order when running from tests
         if asbool(settings.get('testing', False)):  # pragma: no cover
-            sort_order = {}
-        config.add_tween('max.tweens.browser_debug_factory', **sort_order)
+            settings['pyramid.tweens'].insert(0, 'max.tweens.browser_debug_factory')
+        else:
+            settings['pyramid.tweens'].append('max.tweens.browser_debug_factory')
 
     if asbool(settings['max.oauth_passtrough']):
         import max.security.authentication

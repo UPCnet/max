@@ -73,11 +73,13 @@ def main(*args, **settings):
 
     # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
     settings['pyramid.tweens'] = [
-        'max.tweens.deprecation_wrapper_factory',
-        'max.tweens.post_tunneling_factory',
-        'max.tweens.compatibility_checker_factory',
         'max.tweens.excview_tween_factory',
+        'max.tweens.compatibility_checker_factory',
+        'max.tweens.post_tunneling_factory',
+        'max.tweens.deprecation_wrapper_factory',
     ]
+
+    debug.setup(settings)
 
     config = Configurator(
         settings=settings,
@@ -91,10 +93,6 @@ def main(*args, **settings):
     config.add_request_method(get_database, name='db', reify=True)
     config.add_request_method(extract_post_data, name='decoded_payload', reify=True)
     config.add_request_method(get_oauth_headers, name='auth_headers', reify=True)
-
-    debug.setup(config, settings)
-
-    config.add_route('wadl', '/WADL')
 
     # Mongodb connection initialization
     cluster_enabled = asbool(settings.get('mongodb.cluster', False))
@@ -132,6 +130,6 @@ def main(*args, **settings):
         route_params = {param: value for param, value in properties.items() if param in ['traverse']}
         config.add_route(name, properties.get('route'), **route_params)
 
-    config.scan('max', ignore=['max.tests', 'max.scripts'])
+    config.scan('max', ignore=['max.tests'])
     set_signal()
     return config.make_wsgi_app()
