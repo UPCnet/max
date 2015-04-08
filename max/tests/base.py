@@ -20,6 +20,23 @@ requests_get = requests.get
 requests_post = requests.post
 
 
+from pymongo.cursor import Cursor
+from pymongo.errors import AutoReconnect
+
+original_cursor_init = Cursor.__init__
+
+FAILURES = 3
+
+
+def mocked_cursor_init(self, *args, **kwargs):
+    if FAILURES == 0:
+        return original_cursor_init(self, *args, **kwargs)
+
+    global FAILURES
+    FAILURES -= 1
+    raise AutoReconnect('Mocked AutoReconnect failure')
+
+
 def impersonate_payload(source, username):
     """
         Adds an actor to a payload, to impersonate it

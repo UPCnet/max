@@ -5,7 +5,7 @@ from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
-
+from max.tests.base import mocked_cursor_init
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp
@@ -83,3 +83,17 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
 
+    @patch('pymongo.cursor.Cursor.__init__', mocked_cursor_init)
+    def test_mongodb_autoreconnect(self):
+        """
+            Test that if mongodb disconnects once was connected, a autoreconect loop
+            will start waiting for mongodb to recover
+        """
+        #  Make Cursor __init__ fail 3 times with AutoReconnect. Test will show 3 errors similar to
+        #  AttributeError: "'Cursor' object has no attribute '_Cursor__killed'" in <bound method Cursor.__del__ of <pymongo.cursor.Cursor object at 0x1072b3410>> ignored
+        import max.tests
+        max.tests.FAILURES = 3
+
+        username = 'messi'
+        self.create_user(username)
+        self.testapp.get('/people/{}'.format(username), '', headers=oauth2Header(test_manager))

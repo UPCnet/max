@@ -97,7 +97,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         usernamenotme = 'xavi'
 
         self.create_user(username)
-        import ipdb;ipdb.set_trace()
         self.create_user(usernamenotme)
 
         res = self.testapp.get('/people/%s' % username, "", oauth2Header(usernamenotme), status=200)
