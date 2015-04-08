@@ -20,7 +20,9 @@ from max.exceptions.http import JSONHTTPUnauthorized
 from max.exceptions.scavenger import saveException
 from pyramid.view import view_config
 from pyramid.view import forbidden_view_config
-from pyramid.view import notfound_view_config
+from pymongo.errors import AutoReconnect
+from pymongo.errors import ConnectionFailure
+
 from max.exceptions.http import JSONHTTPInternalServerError
 from pyramid.settings import asbool
 

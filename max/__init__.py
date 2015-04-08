@@ -71,17 +71,19 @@ def main(*args, **settings):
     authz_policy = ACLAuthorizationPolicy()
     authn_policy = MaxAuthenticationPolicy(['widgetcli'])
 
+    # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
+    settings['pyramid.tweens'] = [
+        'max.tweens.deprecation_wrapper_factory',
+        'max.tweens.post_tunneling_factory',
+        'max.tweens.compatibility_checker_factory',
+        'max.tweens.excview_tween_factory',
+    ]
+
     config = Configurator(
         settings=settings,
         authentication_policy=authn_policy,
         authorization_policy=authz_policy,
         root_factory=Root)
-
-    # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
-    config.add_tween('pyramid.tweens.excview_tween_factory')
-    config.add_tween('max.tweens.deprecation_wrapper_factory')
-    config.add_tween('max.tweens.post_tunneling_factory')
-    config.add_tween('max.tweens.compatibility_checker_factory')
 
     config.add_request_method(get_request_actor_username, name='actor_username', reify=True)
     config.add_request_method(get_request_actor, name='actor', reify=True)
