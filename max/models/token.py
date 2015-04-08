@@ -9,7 +9,7 @@ from max.security.permissions import modify_immutable_fields
 from max.security.permissions import modify_token
 from max.security.permissions import view_private_fields
 from max.security.permissions import view_token
-
+from max.validators import is_valid_ios_token
 from pyramid.decorator import reify
 from pyramid.security import Allow
 
@@ -90,6 +90,10 @@ class Token(MADBase):
                 properties[key] = self.data[key]
             elif 'default' in value.keys():
                 properties[key] = default
+
+        if properties['platform'] == 'ios':
+            if not is_valid_ios_token(properties['token']):
+                raise ValidationError('Invalid {platform} token for'.format(**properties))
 
         properties['platform'] = properties.get('platform', '').lower()
         if properties['platform'] not in SUPPORTED_PLATFORMS:

@@ -5,11 +5,11 @@ from max.regex import RE_VALID_TWITTER_USERNAME
 
 import re
 
-# Validators accept ONE parameter containing the value of the field to be validated
+# Validators accept one parameter containing the value of the field to be validated
 # Validators respond with a 2-element tuple (success, message)
 
 # - success MUST be a boolean indicating were the validation succeded or not
-# - message MUST be a message indicating a description of why the validation didn't succeded
+# - message MUST be a string indicating a description of why the validation didn't succeded
 
 
 def isValidHashtag(text, message='Invalid hashtag'):
@@ -32,11 +32,11 @@ def isValidTwitterUsername(text, message='Invalid twitter username'):
     return (success, message)
 
 
-def isValidIOSToken(text, message='Invalid IOS token'):
+def is_valid_ios_token(token, message='Invalid IOS token'):
     """
         Is a valid IOS token?
         See max.regex for more info on the regex
     """
-    match = re.match(RE_VALID_IOS_TOKEN, text)
+    match = re.match(RE_VALID_IOS_TOKEN, token)
     success = match is not None
     return (success, message)
