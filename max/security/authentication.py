@@ -21,12 +21,8 @@ def check_token(url, username, token, scope, oauth_standard):
     """
         Checks if a user matches the given token.
     """
-    if oauth_standard:
-        payload = {"access_token": token, "username": username}
-        payload['scope'] = scope if scope else 'widgetcli'
-    else:
-        payload = {"oauth_token": token, "user_id": username}
-        payload['scope'] = scope if scope else 'widgetcli'
+    payload = {"access_token": token, "username": username}
+    payload['scope'] = scope if scope else 'widgetcli'
     return requests.post(url, data=payload, verify=False).status_code == 200
 
 
@@ -61,7 +57,7 @@ class MaxAuthenticationPolicy(object):
         valid = check_token(
             settings['max_oauth_check_endpoint'],
             username, oauth_token, scope,
-            asbool(settings.get('max_oauth_standard', False)))
+            asbool(settings.get('max_oauth_standard', True)))
 
         if not valid:
             raise Unauthorized('Invalid token.')
