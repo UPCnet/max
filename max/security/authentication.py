@@ -96,7 +96,7 @@ class MaxAuthenticationPolicy(object):
         """
             DUP of authenticated_userid
         """
-        return self.authenticated_userid
+        return self.authenticated_userid   # pragma: no cover
 
     def effective_principals(self, request):
         """
