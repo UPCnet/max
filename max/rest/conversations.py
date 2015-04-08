@@ -128,7 +128,7 @@ def postMessage2Conversation(conversations, request):
                            'verb': 'subscribe',
                            'object': {'objectType': 'conversation',
                                       'id': newconversation['_id'],
-                                      'participants': newconversation.participants},
+                                      'participants': newconversation['participants']},
                            'contexts': []  # Override contexts from request
 
                            }
@@ -159,7 +159,7 @@ def postMessage2Conversation(conversations, request):
     # is bigger than 2 people. Conversations that are created with only 2 people from the beggining
     # Will not be able to grow
 
-    if len(current_conversation.participants) > 2:
+    if len(current_conversation['participants']) > 2:
         subscription = request.actor.getSubscription(current_conversation)
         request.actor.grantPermission(subscription, 'invite', permanent=False)
         request.actor.grantPermission(subscription, 'kick', permanent=False)
@@ -263,7 +263,7 @@ def joinConversation(conversation, request):
         newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
 
     else:
-        if len(conversation.participants) == CONVERSATION_PARTICIPANTS_LIMIT:
+        if len(conversation['participants']) == CONVERSATION_PARTICIPANTS_LIMIT:
             raise Forbidden('This conversation is full, no more of {} participants allowed'.format(CONVERSATION_PARTICIPANTS_LIMIT))
 
         if 'group' not in conversation.get('tags', []):
@@ -272,12 +272,12 @@ def joinConversation(conversation, request):
         if not request.creator.is_allowed_to_see(actor):
             raise Forbidden('User {} is not allowed to have a conversation with {}'.format(request.creator['username'], actor['username']))
 
-        conversation.participants.append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
+        conversation['participants'].append(actor.flatten(preserve=['displayName', 'objectType', 'username']))
         actor.addSubscription(conversation)
 
         # If we add anyone to a conversation,  we remove the archive tag, no matter how many participants have
         if 'archive' in conversation.get('tags', []):
-            conversation.tags.remove('archive')
+            conversation['tags'].remove('archive')
 
         conversation.save()
 
@@ -289,7 +289,7 @@ def joinConversation(conversation, request):
                        'verb': 'subscribe',
                        'object': {'objectType': 'conversation',
                                   'id': cid,
-                                  'participants': conversation.participants}
+                                  'participants': conversation['participants']}
                        }
 
         newactivity = Activity.from_request(request, rest_params=rest_params)
@@ -311,12 +311,12 @@ def leaveConversation(conversation, request):
 
     save_context = False
     # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
-    if len(conversation.participants) >= 2 and 'group' in conversation.get('tags', []):
-        conversation.participants = [user for user in conversation.participants if user['username'] != actor['username']]
+    if len(conversation['participants']) >= 2 and 'group' in conversation.get('tags', []):
+        conversation['participants'] = [user for user in conversation['participants'] if user['username'] != actor['username']]
         save_context = True
 
     # Tag conversations that will be left as 1 participant only as archived
-    if len(conversation.participants) == 2:
+    if len(conversation['participants']) == 2:
         conversation.setdefault('tags', [])
         if 'archive' not in conversation['tags']:
             conversation['tags'].append('archive')

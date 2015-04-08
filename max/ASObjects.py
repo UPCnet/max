@@ -132,7 +132,7 @@ class Comment(ASObject):
             acl.append((Allow, activity.request.authenticated_userid, delete_comment))
 
         if activity.get('contexts', []) and hasattr(activity.request.actor, 'getSubscription'):
-            subscription = activity.request.actor.getSubscription(activity.contexts[0])
+            subscription = activity.request.actor.getSubscription(activity['contexts'][0])
             if subscription:
                 permissions = subscription.get('permissions', [])
                 if 'delete' in permissions:
@@ -140,15 +140,17 @@ class Comment(ASObject):
 
         return acl
 
-    @property
-    def _owner(self):
+    def __missing__(self, key):
         """
             XXX Try to improve this ...
 
             This wraps the actor username that posted the comment as _owner, to be able to check
             ownership when using a Comment as a traversed object
         """
-        return self.get('actor', {}).get('username', None)
+        if key == '_owner':
+            return self['actor']['username']
+        else:
+            raise KeyError(key)
 
     def setKeywords(self):
         self['_keywords'] = findKeywords(self.data['content'])

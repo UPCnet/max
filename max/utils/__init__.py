@@ -105,7 +105,7 @@ def searchParams(request):
 
     favorites = request.params.get('favorites')
     if asbool(favorites):
-        params['favorites'] = request.actor.username
+        params['favorites'] = request.actor_username
 
     context_tags = request.params.getall('context_tags')
     if context_tags:

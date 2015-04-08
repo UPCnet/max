@@ -137,8 +137,8 @@ class RabbitNotifications(object):
         message.prepare(self.message_defaults)
         message.update({
             "user": {
-                'username': self.request.actor.username,
-                'displayname': self.request.actor.displayName,
+                'username': self.request.actor['username'],
+                'displayname': self.request.actor['displayName'],
             },
             "action": "add",
             "object": "activity",
@@ -157,8 +157,8 @@ class RabbitNotifications(object):
         message.prepare(self.message_defaults)
         message.update({
             "user": {
-                'username': self.request.actor.username,
-                'displayname': self.request.actor.displayName,
+                'username': self.request.actor['username'],
+                'displayname': self.request.actor['displayName'],
             },
             "action": "add",
             "object": "activity",
@@ -182,8 +182,8 @@ class RabbitNotifications(object):
         message.prepare(self.message_defaults)
         message.update({
             "user": {
-                'username': self.request.actor.username,
-                'displayname': self.request.actor.displayName,
+                'username': self.request.actor['username'],
+                'displayname': self.request.actor['displayName'],
             },
             "action": "add",
             "object": "conversation",

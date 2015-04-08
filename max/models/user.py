@@ -185,7 +185,7 @@ class User(MADBase):
 
         criteria = {}
         criteria.update({'subscribedTo.hash': subscription['hash']})   # update object that matches hash
-        criteria.update({'_id': self._id})                 # of collection entry with _id
+        criteria.update({'_id': self['_id']})                 # of collection entry with _id
 
         # overwrite permissions
         what = {
@@ -213,7 +213,7 @@ class User(MADBase):
 
         if has_updatable_fields or force_update:
             if 'displayName' in self.schema.keys() and (self.field_changed('displayName') or force_update):
-                self.mdb_collection.database.conversations.update({'participants.username': self['username']}, {'$set': {'participants.$.displayName': self.displayName}}, multi=True)
+                self.mdb_collection.database.conversations.update({'participants.username': self['username']}, {'$set': {'participants.$.displayName': self['displayName']}}, multi=True)
 
     def grantPermission(self, subscription, permission, permanent=DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY):
         """
@@ -257,7 +257,7 @@ class User(MADBase):
         subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
 
         criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
-        criteria.update({'_id': self._id})                 # of collection entry with _id
+        criteria.update({'_id': self['_id']})                 # of collection entry with _id
 
         # overwrite permissions
         what = {
@@ -316,7 +316,7 @@ class User(MADBase):
         subscription_unique_field = '{}.{}'.format(context_storage_field, context_unique_field)
 
         criteria.update({subscription_unique_field: subscription[context_unique_field]})   # update object that matches hash
-        criteria.update({'_id': self._id})                 # of collection entry with _id
+        criteria.update({'_id': self['_id']})                 # of collection entry with _id
 
         # overwrite permissions
 
@@ -352,7 +352,7 @@ class User(MADBase):
 
         tokens = MADMaxCollection(self.request, 'tokens')
         query = {
-            '_owner': self._owner,
+            '_owner': self['_owner'],
         }
 
         if platform is not None:
@@ -372,7 +372,7 @@ class User(MADBase):
         """
         tokens = MADMaxCollection(self.request, 'tokens')
         query = {
-            '_owner': self._owner,
+            '_owner': self['_owner'],
         }
 
         if platform is not None:
@@ -428,8 +428,8 @@ class User(MADBase):
                 conversation_object = conversations_by_id[subscription['id']]
                 subscription['displayName'] = conversation_object.realDisplayName(self['username'])
                 subscription['lastMessage'] = conversation_object.lastMessage()
-                subscription['participants'] = conversation_object.participants
-                subscription['tags'] = conversation_object.tags
+                subscription['participants'] = conversation_object['participants']
+                subscription['tags'] = conversation_object['tags']
                 subscription['messages'] = 0
 
             actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])

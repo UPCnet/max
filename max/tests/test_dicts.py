@@ -38,22 +38,22 @@ class FunctionalTests(unittest.TestCase):
         md['foo'] = 'bar'
         self.assertEqual(md['foo'], 'bar')
 
-    def test_maddict_access_items_as_attributes(self):
-        """
-            Test MADDict allows to access item keys as attributes
-        """
-        md = MyMADDict()
-        md['foo'] = 'bar'
-        self.assertEqual(md.foo, 'bar')
+    # def test_maddict_access_items_as_attributes(self):
+    #     """
+    #         Test MADDict allows to access item keys as attributes
+    #     """
+    #     md = MyMADDict()
+    #     md['foo'] = 'bar'
+    #     self.assertEqual(md.foo, 'bar')
 
-    def test_maddict_assign_items_as_attributes(self):
-        """
-            Test MADDict saves values on the dict structure
-            when accesed as an item key defined on schema property
-        """
-        md = MyMADDict()
-        md.foo = 'bar'
-        self.assertEqual(dict.__getitem__(md, 'foo'), 'bar')
+    # def test_maddict_assign_items_as_attributes(self):
+    #     """
+    #         Test MADDict saves values on the dict structure
+    #         when accesed as an item key defined on schema property
+    #     """
+    #     md = MyMADDict()
+    #     md.foo = 'bar'
+    #     self.assertEqual(dict.__getitem__(md, 'foo'), 'bar')
 
     def test_maddict_assign_custom_class_attributes(self):
         """

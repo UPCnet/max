@@ -166,7 +166,7 @@ class BaseContext(MADBase):
                 updates.update({'contexts.$.tags': self.get('tags')})
 
             if 'participants' in self.schema.keys() and (self.field_changed('participants') or force_update):
-                updates.update({'contexts.$.participants': self.participants})
+                updates.update({'contexts.$.participants': self['participants']})
 
             if 'url' in self.schema.keys() and (self.field_changed('url') or force_update):
                 updates.update({'contexts.$.url': self['url']})
@@ -211,7 +211,7 @@ class BaseContext(MADBase):
                     updates.update({'{}.$.notifications'.format(self.user_subscription_storage): self.get('notifications', False)})
 
                 if 'participants' in must_update_fields:
-                    updates.update({'{}.$.participants'.format(self.user_subscription_storage): self.participants})
+                    updates.update({'{}.$.participants'.format(self.user_subscription_storage): self['participants']})
 
                 if 'permissions' in must_update_fields:
                     subscription = user_object.getSubscription(self)
@@ -262,7 +262,7 @@ class BaseContext(MADBase):
         users = usersdb.search(criteria)
 
         for user in users:
-            if users_to_delete == [] or user.username in users_to_delete:
+            if users_to_delete == [] or user['username'] in users_to_delete:
                 user.removeSubscription(self)
 
     def removeActivities(self, logical=False):

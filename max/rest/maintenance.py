@@ -23,7 +23,7 @@ def rebuildKeywords(context, request):
     """
     activities = request.db.activity.search({'verb': 'post'})
     for activity in activities:
-        activity.object.setKeywords()
+        activity['object'].setKeywords()
         activity.setKeywords()
         activity.save()
 
@@ -142,8 +142,8 @@ def rebuildUser(context, request):
     """
     users = request.db.users.dump()
     for user in users:
-        if user['_owner'] != user.username:
-            user['_owner'] = user.username
+        if user['_owner'] != user['username']:
+            user['_owner'] = user['username']
             user.save()
 
     handler = JSONResourceRoot([])

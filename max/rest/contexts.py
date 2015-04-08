@@ -95,7 +95,7 @@ def getContextTags(context, request):
     """
         Get context tags
     """
-    handler = JSONResourceRoot(context.tags)
+    handler = JSONResourceRoot(context['tags'])
     return handler.buildResponse()
 
 
@@ -104,7 +104,7 @@ def clearContextTags(context, request):
     """
         Delete all context tags
     """
-    context.tags = []
+    context['tags'] = []
     context.save()
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
@@ -126,12 +126,12 @@ def updateContextTags(context, request):
     if not valid_tags:
         raise ValidationError("Sorry, We're expecting a list of strings...")
 
-    context.tags.extend(tags)
-    context.tags = list(set(context.tags))
+    context['tags'].extend(tags)
+    context['tags'] = list(set(context['tags']))
     context.save()
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
-    handler = JSONResourceRoot(context.tags)
+    handler = JSONResourceRoot(context['tags'])
     return handler.buildResponse()
 
 
@@ -143,7 +143,7 @@ def removeContextTag(context, request):
     tag = request.matchdict['tag']
 
     try:
-        context.tags.remove(tag)
+        context['tags'].remove(tag)
     except ValueError:
         raise ObjectNotFound('This context has no tag "{}"'.format(tag))
 
@@ -210,9 +210,9 @@ def getContextAuthors(context, request):
         elif still_has_activities:
 
             before = activity['_id']
-            if activity.actor['username'] not in distinct_usernames:
-                distinct_authors.append(activity.actor)
-                distinct_usernames.append(activity.actor['username'])
+            if activity['actor']['username'] not in distinct_usernames:
+                distinct_authors.append(activity['actor'])
+                distinct_usernames.append(activity['actor']['username'])
 
     handler = JSONResourceRoot(distinct_authors)
     return handler.buildResponse()

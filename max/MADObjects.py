@@ -490,34 +490,6 @@ class MADBase(MADDict):
                 fields.append(field.lstrip('_'))
         return fields
 
-    # def get_visible_fields(self):
-    #     """
-    #         DEBUG VERSION, uncomment to debug field access
-    #         Returns the real fieldname (without leading _) that
-    #         the current authenticated user has permission to see
-    #     """
-    #     print
-    #     print "********* FIELD ACCESS DEBUG for {} {}************".format(
-    #         self.__class__.__name__,
-    #         self.get(self.unique, 'unknown')
-    #     )
-    #     print "Request: {} {}".format(self.request.method, self.request.path)
-    #     fields = []
-    #     for field in self.schema:
-    #         if self.has_field_permission(field, 'view'):
-    #             fields.append(field.lstrip('_'))
-    #         else:
-    #             print '  User {} has no permission "{}{}" for field "{}" @ {}'.format(
-    #                 self.request.authenticated_userid,
-    #                 self.get_field_permission_for(field, 'view'),
-    #                 ' [default]' if self.schema[field].get('view', None) is None else '',
-    #                 field,
-    #                 self.request.context.__class__.__name__
-    #             )
-    #     print "*****************************************"
-    #     print
-    #     return fields
-
     def get_editable_fields(self):
         """
             Returns the real fieldname (without leading _) on which

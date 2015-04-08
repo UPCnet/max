@@ -108,7 +108,6 @@ class CommentsTraverser(object):
 
     def __getitem__(self, commentid):
         from max.ASObjects import Comment
-
         if self.activity:
             comment = self.activity.get_comment(commentid)
             comment_object = Comment(self.request, comment, creating=False)

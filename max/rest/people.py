@@ -87,11 +87,6 @@ def getUser(user, request):
     """
         Get a user
     """
-
-    # Flattened actor will contain only the visible fields for the current user
-    # So we will only prepare the calculated conversations  (lastMessage & displayName)
-    # if we have permission to view the talkingIn field
-
     actor_info = user.getInfo()
 
     handler = JSONResourceEntity(actor_info)

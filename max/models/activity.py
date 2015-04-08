@@ -153,7 +153,7 @@ class BaseActivity(MADBase):
         self.save()
 
     def get_comment(self, commentid):
-        comments = [comment for comment in self.replies if comment['id'] == commentid]
+        comments = [comment for comment in self['replies'] if comment['id'] == commentid]
         return comments[0] if comments is not [] else False
 
     def setKeywords(self):
@@ -193,7 +193,7 @@ class BaseActivity(MADBase):
         activity_hashtags = self['object'].setdefault('_hashtags', [])
         activity_hashtags.extend(comment.get('_hashtags', []))
         self['object']['_hashtags'] = list(set(activity_hashtags))
-        self.lastComment = ObjectId(comment['id'])
+        self['lastComment'] = ObjectId(comment['id'])
 
         self.save()
 
@@ -206,7 +206,7 @@ class BaseActivity(MADBase):
         """
         """
         self.delete_from_list('replies', {'id': commentid})
-        self.replies = [comment for comment in self.replies if comment.get('id', comment.get('_id')) != commentid]
+        self['replies'] = [comment for comment in self['replies'] if comment.get('id', comment.get('_id')) != commentid]
         self.setKeywords()
         self.save()
         # XXX TODO Update hastags
@@ -222,7 +222,7 @@ class BaseActivity(MADBase):
         base_path = self.request.registry.settings.get('file_repository')
         separator = '.' if extension else ''
 
-        dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', str(self._id)).groups())
+        dirs = list(re.search('(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{2})(\w{12})', str(self['_id'])).groups())
         filename = dirs.pop() + separator + extension
 
         path = base_path + '/' + '/'.join(dirs)
@@ -368,7 +368,6 @@ class Activity(BaseActivity):
             (Allow, Owner, delete_activity),
 
         ]
-
         if is_self_operation(self.request):
             acl.append((Allow, self.request.authenticated_userid, favorite))
 
@@ -393,7 +392,7 @@ class Activity(BaseActivity):
 
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Context
-            context = Context.from_database(self.request, self.contexts[0]['hash'])
+            context = Context.from_database(self.request, self['contexts'][0]['hash'])
 
             subscription = self.request.actor.getSubscription(context)
             if subscription:
@@ -461,8 +460,8 @@ class Activity(BaseActivity):
         self.pop('comments', None)
 
     def _after_saving_object(self, oid):
-        if not hasattr(self, 'lastComment'):
-            self.lastComment = oid
+        if 'lastComment' not in self:
+            self['lastComment'] = oid
             self.save()
 
     def _before_insert_object(self):
@@ -472,7 +471,7 @@ class Activity(BaseActivity):
     def _after_insert_object(self, oid):
         # notify activity if the activity is from a context
         # with enabled notifications
-        self.lastComment = oid
+        self['lastComment'] = oid
         self.save()
 
         notify = self.get('contexts', [{}])[0].get('notifications', False)
@@ -513,12 +512,12 @@ class Activity(BaseActivity):
     def flag(self):
         """
         """
-        self.flagged = datetime.datetime.utcnow()
+        self['flagged'] = datetime.datetime.utcnow()
 
     def unflag(self):
         """
         """
-        self.flagged = None
+        self['flagged'] = None
 
     def add_favorite_from(self, actor):
         """
@@ -526,10 +525,10 @@ class Activity(BaseActivity):
         """
         prepared_actor = {
             actor.unique: actor.get(actor.unique),
-            'objectType': actor.objectType
+            'objectType': actor['objectType']
         }
         self.add_to_list('favorites', prepared_actor, allow_duplicates=False)
-        self.favoritesCount = len(self.favorites)
+        self['favoritesCount'] = len(self['favorites'])
         self.save()
 
     def add_like_from(self, actor):
@@ -538,11 +537,11 @@ class Activity(BaseActivity):
         """
         prepared_actor = {
             actor.unique: actor.get(actor.unique),
-            'objectType': actor.objectType
+            'objectType': actor['objectType']
         }
         self.add_to_list('likes', prepared_actor, allow_duplicates=False)
-        self.likesCount = len(self.likes)
-        self.lastLike = datetime.datetime.utcnow()
+        self['likesCount'] = len(self['likes'])
+        self['lastLike'] = datetime.datetime.utcnow()
         self.save()
 
     def delete_favorite_from(self, actor):
@@ -550,8 +549,8 @@ class Activity(BaseActivity):
             Deletes the favorite mark from somebody from an activity
         """
         self.delete_from_list('favorites', {actor.unique: actor.get(actor.unique)})
-        self.favorites = [favorite for favorite in self.favorites if favorite[actor.unique] != actor[actor.unique]]
-        self.favoritesCount = len(self.favorites)
+        self['favorites'] = [favorite for favorite in self['favorites'] if favorite[actor.unique] != actor[actor.unique]]
+        self['favoritesCount'] = len(self['favorites'])
         self.save()
 
     def delete_like_from(self, actor):
@@ -559,8 +558,8 @@ class Activity(BaseActivity):
             Deletes the like mark from somebody from an activity
         """
         self.delete_from_list('likes', {actor.unique: actor.get(actor.unique)})
-        self.likes = [like for like in self.likes if like[actor.unique] != actor[actor.unique]]
-        self.likesCount = len(self.likes)
+        self['likes'] = [like for like in self['likes'] if like[actor.unique] != actor[actor.unique]]
+        self['likesCount'] = len(self['likes'])
         self.save()
 
     def has_like_from(self, actor):

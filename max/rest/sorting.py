@@ -179,7 +179,7 @@ def get_activities_sorted_by_like_count(collection, query, search_params, is_hea
         # (Use case 2) Filter by the last displayed
         search_params['sort_order'] = 'activities'
         if not last_page_had_likes:
-            search_params['before'] = last._id
+            search_params['before'] = last['_id']
 
         # QUERY ID: NO_LIKES_QUERY
         search_params['sort_params'] = SORT_STRATEGIES['published']['activity']
@@ -234,7 +234,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
         query['flagged'] = {'$exists': 0}
         # (Use case 2) Filter by the last displayed
         if not do_search_flagged:
-            search_params['before'] = last._id
+            search_params['before'] = last['_id']
 
         search_params['sort_params'] = SORT_STRATEGIES['published']['activity']
         non_flagged_activities = collection.search(

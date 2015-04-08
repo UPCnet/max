@@ -112,10 +112,10 @@ def addActivityComment(activity, request):
     newactivity_oid = newactivity.insert()
     newactivity['_id'] = newactivity_oid
 
-    comment = dict(newactivity.object)
-    comment['published'] = newactivity.published
+    comment = dict(newactivity['object'])
+    comment['published'] = newactivity['published']
     comment['actor'] = request.actor
-    comment['id'] = newactivity._id
+    comment['id'] = newactivity['_id']
     del comment['inReplyTo']
     activity.addComment(comment)
 
