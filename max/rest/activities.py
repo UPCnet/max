@@ -23,7 +23,7 @@ from datetime import timedelta
 import re
 
 
-@endpoint(route_name='user_activities', request_method='GET', requires_actor=True, permission=list_activities)
+@endpoint(route_name='user_activities', request_method='GET', permission=list_activities)
 def getUserActivities(user, request):
     """
         Get user activities
@@ -44,7 +44,7 @@ def getUserActivities(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activities', request_method='GET', requires_actor=True, permission=list_activities)
+@endpoint(route_name='activities', request_method='GET', permission=list_activities)
 def getGlobalActivities(context, request):
     """
         Get global activities
@@ -57,7 +57,7 @@ def getGlobalActivities(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_activities', request_method='GET', requires_actor=True, permission=list_activities)
+@endpoint(route_name='context_activities', request_method='GET', permission=list_activities)
 def getContextActivities(context, request):
     """
         Get context activities
@@ -122,7 +122,7 @@ def getContextActivities(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_activities', request_method='POST', requires_actor=True, permission=add_activity)
+@endpoint(route_name='context_activities', request_method='POST', permission=add_activity)
 def addContextActivity(context, request):
     """
          Add a context activity
@@ -177,7 +177,7 @@ def addContextActivity(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_activities', request_method='POST', requires_actor=True, permission=add_activity)
+@endpoint(route_name='user_activities', request_method='POST', permission=add_activity)
 def addUserActivity(user, request):
     """
          Add a timeline activity
@@ -226,7 +226,7 @@ def addUserActivity(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity', request_method='GET', requires_actor=True, permission=view_activity)
+@endpoint(route_name='activity', request_method='GET', permission=view_activity)
 def getActivity(activity, request):
     """
         Get an activity
@@ -237,7 +237,7 @@ def getActivity(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity', request_method='DELETE', requires_actor=True, permission=delete_activity)
+@endpoint(route_name='activity', request_method='DELETE', permission=delete_activity)
 def deleteActivity(activity, request):
     """
         Delete an activity
@@ -248,8 +248,8 @@ def deleteActivity(activity, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='activity_image', request_method='GET', requires_actor=True, permission=view_activity)
-@endpoint(route_name='activity_image_sizes', request_method='GET', requires_actor=True, permission=view_activity)
+@endpoint(route_name='activity_image', request_method='GET', permission=view_activity)
+@endpoint(route_name='activity_image_sizes', request_method='GET', permission=view_activity)
 def getActivityImageAttachment(activity, request):
     """
         Get an activity image
@@ -274,7 +274,7 @@ def getActivityImageAttachment(activity, request):
     return response
 
 
-@endpoint(route_name='activity_file_download', request_method='GET', requires_actor=True, permission=view_activity)
+@endpoint(route_name='activity_file_download', request_method='GET', permission=view_activity)
 def getActivityFileAttachment(activity, request):
     """
         Get an activity file

@@ -35,7 +35,7 @@ def timelineQuery(actor):
     return query
 
 
-@endpoint(route_name='timeline', request_method='GET', requires_actor=True, permission=list_activities)
+@endpoint(route_name='timeline', request_method='GET', permission=list_activities)
 def getUserTimeline(user, request):
     """
         Get user timeline
@@ -48,7 +48,7 @@ def getUserTimeline(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='timeline_authors', request_method='GET', requires_actor=True, permission=list_activities)
+@endpoint(route_name='timeline_authors', request_method='GET', permission=list_activities)
 def getUserTimelineAuthors(user, request):
     """
         Get timeline authors

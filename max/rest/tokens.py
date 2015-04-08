@@ -17,7 +17,7 @@ def formatted_tokens(tokens):
         yield dict(token=token['token'], platform=token['platform'], username=token['_owner'])
 
 
-@endpoint(route_name='conversation_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
+@endpoint(route_name='conversation_push_tokens', request_method='GET', permission=list_tokens)
 def getPushTokensForConversation(tokens, request):
     """
         Return conversation tokens
@@ -36,7 +36,7 @@ def getPushTokensForConversation(tokens, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_push_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
+@endpoint(route_name='context_push_tokens', request_method='GET', permission=list_tokens)
 def getPushTokensForContext(tokens, request):
     """
          Return context tokens
@@ -57,7 +57,7 @@ def getPushTokensForContext(tokens, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='tokens', request_method='POST', permission=add_token, requires_actor=True)
+@endpoint(route_name='tokens', request_method='POST', permission=add_token)
 def add_device_token(tokens, request):
     """
         Adds a user device token
@@ -78,7 +78,7 @@ def add_device_token(tokens, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
+@endpoint(route_name='user_tokens', request_method='GET', permission=list_tokens)
 def view_user_tokens(user, request):
     """
         Delete all platform tokens
@@ -88,7 +88,7 @@ def view_user_tokens(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_platform_tokens', request_method='GET', permission=list_tokens, requires_actor=True)
+@endpoint(route_name='user_platform_tokens', request_method='GET', permission=list_tokens)
 def view_platform_user_tokens(user, request):
     """
         Get all user tokens for platform
@@ -99,7 +99,7 @@ def view_platform_user_tokens(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='token', request_method='DELETE', permission=delete_token, requires_actor=True)
+@endpoint(route_name='token', request_method='DELETE', permission=delete_token)
 def deleteUserDevice(token, request):
     """
         Delete user device token
@@ -108,7 +108,7 @@ def deleteUserDevice(token, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='user_tokens', request_method='DELETE', permission=delete_token, requires_actor=True)
+@endpoint(route_name='user_tokens', request_method='DELETE', permission=delete_token)
 def deleteAllUserDevices(user, request):
     """
         Delete all user device tokens
@@ -117,7 +117,7 @@ def deleteAllUserDevices(user, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='user_platform_tokens', request_method='DELETE', permission=delete_token, requires_actor=True)
+@endpoint(route_name='user_platform_tokens', request_method='DELETE', permission=delete_token)
 def deleteUserDevicesByPlatform(user, request):
     """
         Delete all user device tokens for platform

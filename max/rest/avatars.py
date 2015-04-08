@@ -15,7 +15,7 @@ import os
 import time
 
 
-@endpoint(route_name='avatar', request_method='POST', requires_actor=True, permission=modify_avatar)
+@endpoint(route_name='avatar', request_method='POST', permission=modify_avatar)
 def postUserAvatar(user, request):
     """
         Upload user avatar

@@ -9,7 +9,7 @@ from max.security.permissions import unfavorite
 from bson.objectid import ObjectId
 
 
-@endpoint(route_name='favorites', request_method='POST', requires_actor=True, permission=favorite)
+@endpoint(route_name='favorites', request_method='POST', permission=favorite)
 def favorite(activity, request):
     """
         Favorite activity
@@ -48,7 +48,7 @@ def favorite(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='favorite', request_method='DELETE', requires_actor=True, permission=unfavorite)
+@endpoint(route_name='favorite', request_method='DELETE', permission=unfavorite)
 def unfavorite(activity, request):
     """
         Unfavorite activity

@@ -17,7 +17,7 @@ from pyramid.httpexceptions import HTTPNoContent
 from pyramid.settings import asbool
 
 
-@endpoint(route_name='users', request_method='GET', permission=list_visible_people, requires_actor=True)
+@endpoint(route_name='users', request_method='GET', permission=list_visible_people)
 def getVisibleUsers(users, request):
     """
         Search users
@@ -39,7 +39,7 @@ def getVisibleUsers(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='users', request_method='POST', permission=add_people, requires_actor=False)
+@endpoint(route_name='users', request_method='POST', permission=add_people)
 def addUser(users, request):
     """
         Add a user
@@ -82,7 +82,7 @@ def addUser(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='GET', permission=view_user_profile, requires_actor=True)
+@endpoint(route_name='user', request_method='GET', permission=view_user_profile)
 def getUser(user, request):
     """
         Get a user
@@ -93,7 +93,7 @@ def getUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='PUT', permission=modify_user, requires_actor=True)
+@endpoint(route_name='user', request_method='PUT', permission=modify_user)
 def ModifyUser(user, request):
     """
         Modify a user
@@ -105,7 +105,7 @@ def ModifyUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='DELETE', permission=delete_user, requires_actor=True)
+@endpoint(route_name='user', request_method='DELETE', permission=delete_user)
 def deleteUser(user, request):
     """
         Delete a user

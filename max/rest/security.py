@@ -11,7 +11,7 @@ from max.security.permissions import manage_security
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@endpoint(route_name='admin_security', request_method='GET', requires_actor=False, permission=manage_security)
+@endpoint(route_name='admin_security', request_method='GET', permission=manage_security)
 def getSecurity(security, request):
     """
         Get security settings
@@ -22,7 +22,7 @@ def getSecurity(security, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_users', request_method='GET', requires_actor=False, permission=manage_security)
+@endpoint(route_name='admin_security_users', request_method='GET', permission=manage_security)
 def getUsersRoles(security, request):
     """
         Get users roles
@@ -39,7 +39,7 @@ def getUsersRoles(security, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='GET', requires_actor=False, permission=manage_security)
+@endpoint(route_name='admin_security_role_user', request_method='GET', permission=manage_security)
 def check_user_role(security, request):
     """
         Check if user has a role
@@ -61,7 +61,7 @@ def check_user_role(security, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='POST', requires_actor=False, permission=manage_security)
+@endpoint(route_name='admin_security_role_user', request_method='POST', permission=manage_security)
 def add_user_to_role(security, request):
     """
         Grants a role to a user
@@ -86,7 +86,7 @@ def add_user_to_role(security, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='admin_security_role_user', request_method='DELETE', requires_actor=False, permission=manage_security)
+@endpoint(route_name='admin_security_role_user', request_method='DELETE', permission=manage_security)
 def remove_user_from_role(security, request):
     """
         Removes a role from a user

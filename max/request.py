@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from max.MADMax import MADMaxDB
-import json
+from max.exceptions import Unauthorized
+from max.exceptions import UnknownUserError
+from max.routes import RESOURCES
+
 from bson import json_util
 from hashlib import sha1
-from max.exceptions import Unauthorized
+
+import json
 
 
 def extract_post_data(request):
@@ -160,8 +164,11 @@ def get_request_actor(request):
     """
         Retrieves the User object or the Context from the database matching the actor
         found in the request. If a context author is found, will override any person
-        actor
+        actor.
+
+        If no actor is found, check if the current route-method pair requires an actor.
     """
+    actor = None
     context_actor_url = get_context_author_url(request)
     if context_actor_url:
         try:
@@ -171,7 +178,7 @@ def get_request_actor(request):
             actor.setdefault('displayName', '')
             return actor
         except:
-            return None
+            actor = None
 
     username = get_request_actor_username(request)
     try:
@@ -180,7 +187,12 @@ def get_request_actor(request):
         actor.setdefault('displayName', actor['username'])
         return actor
     except:
-        return None
+        actor = None
+
+    if actor is None:
+        if request.method not in RESOURCES[request.matched_route.name].get('actor_not_required', []):
+            raise UnknownUserError('Unknown actor identified by: {}'.format(username))
+    return actor
 
 
 def get_request_creator(request):

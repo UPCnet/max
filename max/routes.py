@@ -8,7 +8,7 @@
     The routes have one required paramter "route" that defines the URI that will
     be used by pyramid router to match views with.
 
-    There is a "traverse" parameter that  if present, will be used  to tell pyramid
+    There is a "traverse" parameter that if present, will be used to tell pyramid
     which object should try to traverse to be the context of a request. URI's used in
     this parameter don't have to match URI in "route" param, but they must conform to
     existing Traversers on the Root context. see max.resources for more info. Routes
@@ -17,7 +17,7 @@
     Finally there are keys used in the api info endpoint to classify the endpoints.
     Routes in this file are sorted by the kind of traverser used. "category"
     parameter defines a classification based on a more 'high level' view of the endpoint.
-    For example "subcriptions" resource is classified on "Subscriptions"  even if it's
+    For example "subcriptions" resource is classified on "Subscriptions" even if it's
     using the people traverser, in order to group it with all other subscription related endpoints.
 
     IMPORTANT! Routes with fixed path segments, that must override routes with the same pattern but
@@ -29,7 +29,7 @@ from collections import OrderedDict
 
 RESOURCES = OrderedDict()
 
-RESOURCES['users'] = dict(route='/people', category='User', name='Users', traverse='/people')
+RESOURCES['users'] = dict(route='/people', category='User', name='Users', traverse='/people', actor_not_required=['POST'])
 RESOURCES['user'] = dict(route='/people/{username}', category='User', name='User', traverse='/people/{username}')
 RESOURCES['avatar'] = dict(route='/people/{username}/avatar', filesystem=True, category='User', name='User avatar', traverse='/people/{username}')
 RESOURCES['avatar_sizes'] = dict(route='/people/{username}/avatar/{size}', filesystem=True, category='User', name='User avatar sizes', traverse='/people/{username}')
@@ -100,16 +100,16 @@ RESOURCES['info_settings'] = dict(route='/info/settings', category='Management',
 
 # Maintenance Resources
 
-RESOURCES['admin_security'] = dict(route='/admin/security', category='Management', name='Security settings', traverse="/security")
-RESOURCES['admin_security_role_user'] = dict(route='/admin/security/roles/{role}/users/{user}', category='Management', name='User role', traverse="/security/")
-RESOURCES['admin_security_users'] = dict(route='/admin/security/users', category='Management', name='Users with security', traverse="/security/")
-RESOURCES['maintenance_keywords'] = dict(route='/admin/maintenance/keywords', category='Management', name='Keywords maintenance')
-RESOURCES['maintenance_dates'] = dict(route='/admin/maintenance/dates', category='Management', name='Dates maintenance')
-RESOURCES['maintenance_subscriptions'] = dict(route='/admin/maintenance/subscriptions', category='Management', name='Subscriptions maintenance')
-RESOURCES['maintenance_conversations'] = dict(route='/admin/maintenance/conversations', category='Management', name='Conversations maintenance')
-RESOURCES['maintenance_users'] = dict(route='/admin/maintenance/users', category='Management', name='Users Maintenance')
-RESOURCES['maintenance_exceptions'] = dict(route='/admin/maintenance/exceptions', category='Management', name='Error Exception list')
-RESOURCES['maintenance_exception'] = dict(route='/admin/maintenance/exceptions/{hash}', category='Management', name='Error Exception')
+RESOURCES['admin_security'] = dict(route='/admin/security', category='Management', name='Security settings', traverse="/security", actor_not_required=['GET'])
+RESOURCES['admin_security_role_user'] = dict(route='/admin/security/roles/{role}/users/{user}', category='Management', name='User role', traverse="/security/", actor_not_required=['GET', 'POST', 'DELETE'])
+RESOURCES['admin_security_users'] = dict(route='/admin/security/users', category='Management', name='Users with security', traverse="/security/", actor_not_required=['GET'])
+RESOURCES['maintenance_keywords'] = dict(route='/admin/maintenance/keywords', category='Management', name='Keywords maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_dates'] = dict(route='/admin/maintenance/dates', category='Management', name='Dates maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_subscriptions'] = dict(route='/admin/maintenance/subscriptions', category='Management', name='Subscriptions maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_conversations'] = dict(route='/admin/maintenance/conversations', category='Management', name='Conversations maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_users'] = dict(route='/admin/maintenance/users', category='Management', name='Users Maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_exceptions'] = dict(route='/admin/maintenance/exceptions', category='Management', name='Error Exception list', actor_not_required=['GET'])
+RESOURCES['maintenance_exception'] = dict(route='/admin/maintenance/exceptions/{hash}', category='Management', name='Error Exception', actor_not_required=['GET'])
 
 # Routes not currently implemented
 

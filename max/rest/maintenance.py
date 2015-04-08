@@ -16,7 +16,7 @@ import re
 logger = logging.getLogger('exceptions')
 
 
-@endpoint(route_name='maintenance_keywords', request_method='POST', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_keywords', request_method='POST', permission=do_maintenance)
 def rebuildKeywords(context, request):
     """
         Rebuild keywords of all activities
@@ -31,7 +31,7 @@ def rebuildKeywords(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_dates', request_method='POST', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_dates', request_method='POST', permission=do_maintenance)
 def rebuildDates(context, request):
     """
         Rebuild dates of activities
@@ -51,7 +51,7 @@ def rebuildDates(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_subscriptions', request_method='POST', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_subscriptions', request_method='POST', permission=do_maintenance)
 def rebuildSubscriptions(context, request):
     """
         Rebuild context subscriptions
@@ -80,7 +80,7 @@ def rebuildSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_conversations', request_method='POST', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_conversations', request_method='POST', permission=do_maintenance)
 def rebuildConversationSubscriptions(context, request):
     """
         Rebuild conversation subscriptions
@@ -132,7 +132,7 @@ def rebuildConversationSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_users', request_method='POST', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_users', request_method='POST', permission=do_maintenance)
 def rebuildUser(context, request):
     """
         Rebuild users
@@ -150,7 +150,7 @@ def rebuildUser(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_exception', request_method='GET', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_exception', request_method='GET', permission=do_maintenance)
 def getException(context, request):
     """
         Get an exception
@@ -173,7 +173,7 @@ def getException(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='maintenance_exceptions', request_method='GET', requires_actor=False, permission=do_maintenance)
+@endpoint(route_name='maintenance_exceptions', request_method='GET', permission=do_maintenance)
 def getExceptions(context, request):
     """
         Get all exceptions

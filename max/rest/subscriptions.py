@@ -16,7 +16,7 @@ from max.security.permissions import view_subscriptions
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@endpoint(route_name='context_subscriptions', request_method='POST', requires_actor=True, permission=add_subscription)
+@endpoint(route_name='context_subscriptions', request_method='POST', permission=add_subscription)
 def subscribe(context, request):
     """
         Subscribe user to context
@@ -49,7 +49,7 @@ def subscribe(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_subscription', request_method='DELETE', requires_actor=True, permission=remove_subscription)
+@endpoint(route_name='context_subscription', request_method='DELETE', permission=remove_subscription)
 def unsubscribe(context, request):
     """
         Unsubscribe user from context
@@ -58,7 +58,7 @@ def unsubscribe(context, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='context_subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
+@endpoint(route_name='context_subscriptions', request_method='GET', permission=view_subscriptions)
 def getContextSubscriptions(context, request):
     """
         Get all context subscriptions
@@ -78,7 +78,7 @@ def getContextSubscriptions(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='subscriptions', request_method='GET', requires_actor=True, permission=view_subscriptions)
+@endpoint(route_name='subscriptions', request_method='GET', permission=view_subscriptions)
 def getUserSubscriptions(user, request):
     """
         Get all user subscriptions
@@ -101,7 +101,7 @@ def getUserSubscriptions(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_user_permission', request_method='PUT', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permission', request_method='PUT', permission=manage_subcription_permissions)
 def grantPermissionOnContext(context, request):
     """
         Grant user permission on context
@@ -125,7 +125,7 @@ def grantPermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_user_permission', request_method='DELETE', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permission', request_method='DELETE', permission=manage_subcription_permissions)
 def revokePermissionOnContext(context, request):
     """
         Revoke user permission on context
@@ -149,7 +149,7 @@ def revokePermissionOnContext(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_user_permissions_defaults', request_method='POST', requires_actor=True, permission=manage_subcription_permissions)
+@endpoint(route_name='context_user_permissions_defaults', request_method='POST', permission=manage_subcription_permissions)
 def resetPermissionsOnContext(context, request):
     """
         Reset user permissions on context

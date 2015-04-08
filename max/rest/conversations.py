@@ -27,7 +27,7 @@ from pyramid.httpexceptions import HTTPNoContent
 from bson import ObjectId
 
 
-@endpoint(route_name='conversations', request_method='GET', requires_actor=True, permission=list_conversations)
+@endpoint(route_name='conversations', request_method='GET', permission=list_conversations)
 def getConversations(conversations, request):
     """
         Get user conversations
@@ -53,7 +53,7 @@ def getConversations(conversations, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversations', request_method='POST', requires_actor=True, permission=add_conversation)
+@endpoint(route_name='conversations', request_method='POST', permission=add_conversation)
 def postMessage2Conversation(conversations, request):
     """
         Add a new conversation
@@ -181,7 +181,7 @@ def postMessage2Conversation(conversations, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversation', request_method='GET', requires_actor=True, permission=view_conversation)
+@endpoint(route_name='conversation', request_method='GET', permission=view_conversation)
 def getConversation(conversation, request):
     """
         Get a conversation
@@ -190,7 +190,7 @@ def getConversation(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_conversation', request_method='GET', requires_actor=True, permission=view_conversation_subscription)
+@endpoint(route_name='user_conversation', request_method='GET', permission=view_conversation_subscription)
 def getUserConversationSubscription(conversation, request):
     """
         Get a user conversation subscription
@@ -211,7 +211,7 @@ def getUserConversationSubscription(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversation', request_method='PUT', requires_actor=True, permission=modify_conversation)
+@endpoint(route_name='conversation', request_method='PUT', permission=modify_conversation)
 def ModifyConversation(conversation, request):
     """
         Modify a conversation
@@ -224,7 +224,7 @@ def ModifyConversation(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='conversation', request_method='DELETE', requires_actor=True, permission=delete_conversation)
+@endpoint(route_name='conversation', request_method='DELETE', permission=delete_conversation)
 def DeleteConversation(conversation, request):
     """
         Delete a conversation
@@ -233,7 +233,7 @@ def DeleteConversation(conversation, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='conversations', request_method='DELETE', requires_actor=True, permission=purge_conversations)
+@endpoint(route_name='conversations', request_method='DELETE', permission=purge_conversations)
 def deleteConversations(conversations, request):
     """
         Delete all conversations
@@ -245,7 +245,7 @@ def deleteConversations(conversations, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='participants', request_method='POST', requires_actor=True, permission=add_conversation_participant)
+@endpoint(route_name='participants', request_method='POST', permission=add_conversation_participant)
 def joinConversation(conversation, request):
     """
         Join conversation
@@ -299,7 +299,7 @@ def joinConversation(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='participant', request_method='DELETE', requires_actor=True, permission=delete_conversation_participant)
+@endpoint(route_name='participant', request_method='DELETE', permission=delete_conversation_participant)
 def leaveConversation(conversation, request):
     """
         Leave conversation
@@ -328,7 +328,7 @@ def leaveConversation(conversation, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='conversation_owner', request_method='PUT', requires_actor=True, permission=transfer_ownership)
+@endpoint(route_name='conversation_owner', request_method='PUT', permission=transfer_ownership)
 def transferConversationOwnership(conversation, request):
     """
         Transfer conversation ownership

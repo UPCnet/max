@@ -21,7 +21,7 @@ from max.security.permissions import view_context
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@endpoint(route_name='contexts', request_method='GET', permission=list_contexts, requires_actor=True)
+@endpoint(route_name='contexts', request_method='GET', permission=list_contexts)
 def getContexts(contexts, request):
     """
         Get all contexts
@@ -31,7 +31,7 @@ def getContexts(contexts, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='contexts', request_method='POST', permission=add_context, requires_actor=True)
+@endpoint(route_name='contexts', request_method='POST', permission=add_context)
 def addContext(contexts, request):
     """
         Adds a context
@@ -57,7 +57,7 @@ def addContext(contexts, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context', request_method='GET', permission=view_context, requires_actor=True)
+@endpoint(route_name='context', request_method='GET', permission=view_context)
 def getContext(context, request):
     """
         Get a context
@@ -66,7 +66,7 @@ def getContext(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context', request_method='PUT', permission=modify_context, requires_actor=True)
+@endpoint(route_name='context', request_method='PUT', permission=modify_context)
 def ModifyContext(context, request):
     """
         Modify a context
@@ -79,7 +79,7 @@ def ModifyContext(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context', request_method='DELETE', permission=delete_context, requires_actor=True)
+@endpoint(route_name='context', request_method='DELETE', permission=delete_context)
 def DeleteContext(context, request):
     """
         Delete a context
@@ -90,7 +90,7 @@ def DeleteContext(context, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='context_tags', request_method='GET', permission=view_context, requires_actor=True)
+@endpoint(route_name='context_tags', request_method='GET', permission=view_context)
 def getContextTags(context, request):
     """
         Get context tags
@@ -99,7 +99,7 @@ def getContextTags(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_tags', request_method='DELETE', permission=modify_context, requires_actor=True)
+@endpoint(route_name='context_tags', request_method='DELETE', permission=modify_context)
 def clearContextTags(context, request):
     """
         Delete all context tags
@@ -112,7 +112,7 @@ def clearContextTags(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_tags', request_method='PUT', permission=modify_context, requires_actor=True)
+@endpoint(route_name='context_tags', request_method='PUT', permission=modify_context)
 def updateContextTags(context, request):
     """
         Add context tags
@@ -135,7 +135,7 @@ def updateContextTags(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_tag', request_method='DELETE', permission=modify_context, requires_actor=True)
+@endpoint(route_name='context_tag', request_method='DELETE', permission=modify_context)
 def removeContextTag(context, request):
     """
         Delete context tags
@@ -153,7 +153,7 @@ def removeContextTag(context, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='public_contexts', request_method='GET', permission=list_public_contexts, requires_actor=True)
+@endpoint(route_name='public_contexts', request_method='GET', permission=list_public_contexts)
 def getPublicContexts(contexts, request):
     """
         Get all public contexts
@@ -166,7 +166,7 @@ def getPublicContexts(contexts, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_activities_authors', request_method='GET', permission=list_activities, requires_actor=True)
+@endpoint(route_name='context_activities_authors', request_method='GET', permission=list_activities)
 def getContextAuthors(context, request):
     """
         Get context authors

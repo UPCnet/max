@@ -211,7 +211,7 @@ def get_activities_sorted_by_flagged_first(collection, query, search_params, is_
         # Get the last object of the previous page...
         last = collection[search_params['before']]
         search_params['before'] = None
-        #... and if that item displayed is flagged it means
+        # ... and if that item displayed is flagged it means
         # that we may have more flagged items to display
         if last.get('flagged', None):
             query['flagged']['$lt'] = last['flagged']

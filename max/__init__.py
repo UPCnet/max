@@ -11,7 +11,6 @@ else:
     GEVENT_AVAILABLE = True
 
 from max import debug
-from max.predicates import RequiredActorPredicate
 from max.resources import loadCloudAPISettings
 from max.resources import loadMAXSecurity
 from max.resources import loadMAXSettings
@@ -132,7 +131,5 @@ def main(*args, **settings):
         config.add_route(name, properties.get('route'), **route_params)
 
     config.scan('max', ignore=['max.tests', 'max.scripts'])
-
-    config.add_view_predicate('requires_actor', RequiredActorPredicate)
     set_signal()
     return config.make_wsgi_app()

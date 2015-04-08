@@ -12,7 +12,7 @@ from max.security.permissions import list_comments
 from pyramid.httpexceptions import HTTPNoContent
 
 
-@endpoint(route_name='user_comments', request_method='GET', permission=list_comments, requires_actor=True)
+@endpoint(route_name='user_comments', request_method='GET', permission=list_comments)
 def getUserComments(user, request):
     """
         Get user comments
@@ -38,7 +38,7 @@ def getUserComments(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity_comments', request_method='GET', permission=list_comments, requires_actor=True)
+@endpoint(route_name='activity_comments', request_method='GET', permission=list_comments)
 def getActivityComments(activity, request):
     """
         Get activity comments
@@ -52,7 +52,7 @@ def getActivityComments(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='context_comments', request_method='GET', permission=list_comments, requires_actor=True)
+@endpoint(route_name='context_comments', request_method='GET', permission=list_comments)
 def getContextComments(context, request):
     """
         Get context activities comments
@@ -71,7 +71,7 @@ def getContextComments(context, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='comments', request_method='GET', permission=list_comments, requires_actor=True)
+@endpoint(route_name='comments', request_method='GET', permission=list_comments)
 def getGlobalComments(comments, request):
     """
         Get global comments
@@ -82,7 +82,7 @@ def getGlobalComments(comments, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity_comments', request_method='POST', permission=add_comment, requires_actor=True)
+@endpoint(route_name='activity_comments', request_method='POST', permission=add_comment)
 def addActivityComment(activity, request):
     """
         Add a comment to an activity
@@ -123,7 +123,7 @@ def addActivityComment(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='activity_comment', request_method='DELETE', permission=delete_comment, requires_actor=True)
+@endpoint(route_name='activity_comment', request_method='DELETE', permission=delete_comment)
 def deleteActivityComment(comment, request):
     """
         Delete an activity

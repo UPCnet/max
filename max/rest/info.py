@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from max import RESOURCES
-from max.predicates import RequiredActorPredicate
 from max.resources import Root
 from max.rest import JSONResourceEntity
 from max.security.permissions import view_server_settings
@@ -88,12 +87,6 @@ def endpoints_view(context, request):
                 return item.discriminator
         return 'Anonymous'
 
-    def required_user(view):
-        for predicate in view['predicates']:
-            if isinstance(predicate, RequiredActorPredicate):
-                return predicate.required
-        return False
-
     def get_query_params(method):
         params = []
         endpoint_query_params = re.findall(r':query(\*?)\s+({.*?})\s+(.*?)\n', method.__doc__, re.MULTILINE)
@@ -158,7 +151,6 @@ def endpoints_view(context, request):
             'documentation': endpoint_documentation if endpoint_documentation else 'Please document me!',
             'rest_params': get_rest_params(method),
             'query_params': get_query_params(method),
-            'required_user': required_user(view_settings),
             'permission': view_permission(view)
         }
 

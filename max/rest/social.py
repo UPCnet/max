@@ -13,7 +13,7 @@ from pyramid.httpexceptions import HTTPNoContent
 from bson.objectid import ObjectId
 
 
-@endpoint(route_name='likes', request_method='POST', requires_actor=True, permission=like)
+@endpoint(route_name='likes', request_method='POST', permission=like)
 def like(activity, request):
     """
         Like activity
@@ -51,7 +51,7 @@ def like(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='like', request_method='DELETE', requires_actor=True, permission=unlike)
+@endpoint(route_name='like', request_method='DELETE', permission=unlike)
 def unlike(activity, request):
     """
         Unlike activity
@@ -77,7 +77,7 @@ def unlike(activity, request):
     return HTTPNoContent()
 
 
-@endpoint(route_name='flag', request_method='POST', requires_actor=True, permission=flag)
+@endpoint(route_name='flag', request_method='POST', permission=flag)
 def flagActivity(activity, request):
     """
        Flag an activity
@@ -94,7 +94,7 @@ def flagActivity(activity, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='flag', request_method='DELETE', requires_actor=True, permission=unflag)
+@endpoint(route_name='flag', request_method='DELETE', permission=unflag)
 def unflagActivity(activity, request):
     """
        Unflag an activity

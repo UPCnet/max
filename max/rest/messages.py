@@ -17,7 +17,7 @@ from bson import ObjectId
 from pymongo import ASCENDING
 
 
-@endpoint(route_name='messages', request_method='GET', requires_actor=True, permission=list_messages)
+@endpoint(route_name='messages', request_method='GET', permission=list_messages)
 def getMessages(conversation, request):
     """
         Get all messages from a conversation
@@ -29,8 +29,8 @@ def getMessages(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user_conversation_messages', request_method='POST', requires_actor=True, permission=add_message)
-@endpoint(route_name='messages', request_method='POST', requires_actor=True, permission=add_message)
+@endpoint(route_name='user_conversation_messages', request_method='POST', permission=add_message)
+@endpoint(route_name='messages', request_method='POST', permission=add_message)
 def add_message(conversation, request):
     """
         Adds a message to a conversation
@@ -62,8 +62,8 @@ def add_message(conversation, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='message_image', request_method='GET', requires_actor=True, permission=view_message)
-@endpoint(route_name='message_image_sizes', request_method='GET', requires_actor=True, permission=view_message)
+@endpoint(route_name='message_image', request_method='GET', permission=view_message)
+@endpoint(route_name='message_image_sizes', request_method='GET', permission=view_message)
 def getMessageImageAttachment(message, request):
     """
         Get a message image
@@ -84,7 +84,7 @@ def getMessageImageAttachment(message, request):
     return response
 
 
-@endpoint(route_name='message_file_download', request_method='GET', requires_actor=True, permission=view_message)
+@endpoint(route_name='message_file_download', request_method='GET', permission=view_message)
 def getMessageFileAttachment(message, request):
     """
         Get a message file
