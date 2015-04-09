@@ -120,3 +120,27 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json[1]['token'], u'12345678901234567890123456789012')
         self.assertEqual(res.json[1]['username'], u'messi')
         self.assertEqual(len(res.json), 2)
+
+    def test_get_pushtokens_for_given_context(self):
+        """
+        """
+        from .mockers import create_context, subscribe_context
+        username = 'messi'
+        username2 = 'xavi'
+        self.create_user(username)
+        self.create_user(username2)
+
+        platform = 'ios'
+        token_1 = '12345678901234567890123456789012'
+        token_2 = '12345678901234567890123456789013'
+        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token_1), "", oauth2Header(username), status=201)
+        self.testapp.post('/people/%s/device/%s/%s' % (username2, platform, token_2), "", oauth2Header(username2), status=201)
+
+        url_hash = self.create_context(create_context).json['hash']
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+
+        res = self.testapp.get('/contexts/%s/tokens' % (url_hash), '', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.json[0]['platform'], u'ios')
+        self.assertEqual(res.json[0]['token'], u'12345678901234567890123456789012')
+        self.assertEqual(res.json[0]['username'], u'messi')
+        self.assertEqual(len(res.json), 1)

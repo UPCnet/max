@@ -70,6 +70,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers['X-HTTP-Method-Override'] = 'DELETE'
         self.testapp.post('/activities/{}'.format(activity_id), '', headers, status=204)
 
+    def test_compat_id_match(self):
+        """
+        """
+        username = 'messi'
+        self.create_user(username)
+        headers = oauth2Header(username)
+        headers['X-Max-Compat-ID'] = 'test'
+        self.testapp.get('/people', headers=headers, status=200)
+
+    def test_compat_id_mismatch(self):
+        """
+        """
+        username = 'messi'
+        self.create_user(username)
+        headers = oauth2Header(username)
+        headers['X-Max-Compat-ID'] = 'test2'
+        self.testapp.get('/people', headers=headers, status=412)
+
     def test_post_tunneling_on_put(self):
         """
             Test that calling a endpoint with PUT indirectly within a POST
@@ -80,7 +98,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         headers = oauth2Header(username)
         headers['X-HTTP-Method-Override'] = 'PUT'
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
+        self.assertEqual(res.request.method, 'PUT')
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
+
+    def test_post_tunneling_on_get(self):
+        """
+            Test that calling a endpoint with GET indirectly within a POST
+            with the headers as post data
+            actually calls the real GET method with the "post data headers" injected on real headers
+        """
+        username = 'messi'
+        self.create_user(username)
+        params = oauth2Header(username)
+        params['X-HTTP-Method-Override'] = 'GET'
+        res = self.testapp.post('/people', params, status=200)
+        self.assertEqual(res.request.method, 'GET')
+        self.assertEqual(res.request.headers['X-Oauth-Username'], params['X-Oauth-Username'])
+        self.assertEqual(res.request.headers['X-Oauth-Scope'], params['X-Oauth-Scope'])
+        self.assertEqual(res.request.headers['X-Oauth-Token'], params['X-Oauth-Token'])
 
     def test_image_rotation_180(self):
         from max.utils.image import rotate_image_by_EXIF

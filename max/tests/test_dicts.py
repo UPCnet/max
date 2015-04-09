@@ -38,6 +38,27 @@ class FunctionalTests(unittest.TestCase):
         md['foo'] = 'bar'
         self.assertEqual(md['foo'], 'bar')
 
+    def test_flatten_with_squash(self):
+        from max.utils.dicts import flatten
+        md = {'key_one': 'Hello', 'key_two': 'World'}
+        flattened = flatten(md, squash=['key_two'])
+        self.assertIn('key_one', flattened)
+        self.assertNotIn('key_two', flattened)
+
+    def test_flatten_with_preserve(self):
+        from max.utils.dicts import flatten
+        md = {'key_one': 'Hello', 'key_two': 'World'}
+        flattened = flatten(md, preserve=['key_two'])
+        self.assertIn('key_two', flattened)
+        self.assertNotIn('key_one', flattened)
+
+    def test_flatten_with_preserve_and_squash(self):
+        from max.utils.dicts import flatten
+        md = {'key_one': 'Hello', 'key_two': 'World'}
+        flattened = flatten(md, preserve=['key_two'], squash=['key_two'])
+        self.assertIn('key_two', flattened)
+        self.assertNotIn('key_one', flattened)
+
     # def test_maddict_access_items_as_attributes(self):
     #     """
     #         Test MADDict allows to access item keys as attributes

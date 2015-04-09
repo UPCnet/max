@@ -57,7 +57,7 @@ class MockTweepyAPI(object):
         return True
 
     def get_user(self, username):
-        user = tweepy.models.User
+        user = tweepy.models.User()
         if self.provide_image:
             user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
         user.id_str = '526326641'

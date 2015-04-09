@@ -2,13 +2,6 @@ Owner = 'Owner'
 Manager = 'Manager'
 
 
-def is_manager(request, userid):
-    """
-        Returns whether the current authenticated user has the Manager role.
-    """
-    return Manager in get_user_roles(request, userid)
-
-
 def is_owner(context, userid):
     """
         Checks if a user owns a object.

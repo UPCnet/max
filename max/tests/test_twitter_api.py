@@ -117,6 +117,7 @@ class TwitterApiFailingScenariosTestCase(unittest.TestCase, MaxTestBase):
 
     def tearDown(self):
         shutil.rmtree(self.tempfolder)
+        self.app.registry.max_store.drop_collection('cloudapis')
 
     def test_get_twitter_api_no_settings(self):
         """

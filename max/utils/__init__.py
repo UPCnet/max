@@ -10,6 +10,26 @@ import re
 import sys
 
 
+DEPRECATED_SORTBY_MAPPINGS = {
+    "activities": {
+        "sort_strategy": u"published",
+        "sort_priority": u"activity"
+    },
+    "comments": {
+        "sort_strategy": u"published",
+        "sort_priority": u"comments"
+    },
+    "likes": {
+        "sort_strategy": u"likes",
+        "sort_priority": u"activity"
+    },
+    "flagged": {
+        "sort_strategy": u"flagged",
+        "sort_priority": u"activity"
+    },
+}
+
+
 def getMaxModelByObjectType(objectType):
     return getattr(sys.modules['max.models'], objectType.capitalize(), None)
 
@@ -22,24 +42,12 @@ def searchParams(request):
     """
     params = {}
 
-    # KEEP For compatibility with older max, that did'nt distinguish
+    # KEEP For compatibility with older max, that didn't distinguish
     # between sort order and sort priority. "sortBy" param will be translated
     # to sort_params
 
     deprecated_sort_by = request.params.get('sortBy', None)
-
-    if deprecated_sort_by == 'activities':
-        params['sort_strategy'] = 'published'
-        params['sort_priority'] = 'activity'
-    elif deprecated_sort_by == 'comments':
-        params['sort_strategy'] = 'published'
-        params['sort_priority'] = 'comments'
-    elif deprecated_sort_by == 'likes':
-        params['sort_strategy'] = 'likes'
-        params['sort_priority'] = 'activity'
-    elif deprecated_sort_by == 'flagged':
-        params['sort_strategy'] = 'flagged'
-        params['sort_priority'] = 'activity'
+    params = DEPRECATED_SORTBY_MAPPINGS.get(deprecated_sort_by, {}).copy()
 
     sort_order = request.params.get('sort', None)
     if sort_order:

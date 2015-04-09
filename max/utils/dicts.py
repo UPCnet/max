@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from bson import json_util
 from bson.objectid import ObjectId
 from copy import copy
 from datetime import datetime
@@ -67,7 +66,6 @@ def deepcopy(original):
                     return obj[:]   # lists, tuples, strings, unicode
                 except:
                     return obj  # ints
-        return obj  # other uncatched
 
     return process(original)
 
@@ -78,28 +76,12 @@ def decodeBSONEntity(di, key):
 
         ObjectId --> hexvalue
         datetime --> rfc3339
-
-        Also, while json_util.default creates a new dict in the form {$name: decodedvalue} we assign
-        the decoded value, 'flattening' the value directly in the field.
-
-        Fallback to other values using json_util.default, and flattening only those decoded entities
-        that has only one key.
     """
     value = di[key]
     if isinstance(value, ObjectId):
         di[key] = str(value)
-        return
-    if isinstance(value, datetime):
+    elif isinstance(value, datetime):
         di[key] = rfc3339(value, utc=True, use_system_timezone=False)
-        return
-    try:
-        decoded = json_util.default(di[key])
-        if len(decoded.keys()) == 1:
-            di[key] = decoded[decoded.keys()[0]]
-        else:
-            di[key] = decoded
-    except:
-        pass
 
 
 def deUnderescore(di, key):
@@ -139,7 +121,7 @@ def flattendict(original, filter_method=None, **kwargs):
     if 'preserve' in kwargs and 'squash' in kwargs:
         squash = []
     # If only preserved was indicated, squash
-    elif preserve is not None:
+    if preserve is not None:
         squash = set(di.keys()) - set(preserve)
 
     for key in di.keys():
