@@ -83,7 +83,7 @@ def date_filter_parser(date_filter):
             query = {
                 '$gt': datetime.combine(base_dt1, time.max)
             }
-        elif exact:
+        else:
             base_dt2 = datetime(*date2)
             query = {
                 '$gte': datetime.combine(base_dt1, time.min),

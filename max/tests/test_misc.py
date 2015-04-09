@@ -6,6 +6,7 @@ from max.tests.base import MaxTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 from max.tests.base import mocked_cursor_init
+from max.tests.base import FailureCounter
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp
@@ -15,8 +16,12 @@ import os
 import unittest
 
 
-def fucked_up_insert(self):
-    pass
+def fucked_up_insert():
+    """
+        This mocked method never really gets executed as it will fail
+        on wrong method argument count.
+    """
+    pass  # pragma: no cover
 
 
 class FunctionalTests(unittest.TestCase, MaxTestBase):
@@ -157,9 +162,25 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         """
         #  Make Cursor __init__ fail 3 times with AutoReconnect. Test will show 3 errors similar to
         #  AttributeError: "'Cursor' object has no attribute '_Cursor__killed'" in <bound method Cursor.__del__ of <pymongo.cursor.Cursor object at 0x1072b3410>> ignored
-        import max.tests
-        max.tests.FAILURES = 3
+        from max.tests.base import FAILURES
+        FAILURES.set(3)
 
         username = 'messi'
         self.create_user(username)
-        self.testapp.get('/people/{}'.format(username), '', headers=oauth2Header(test_manager))
+        self.testapp.get('/people/{}'.format(username), '', headers=oauth2Header(test_manager), status=200)
+
+    @patch('pymongo.cursor.Cursor.__init__', partial(mocked_cursor_init, raise_at_end=True))
+    def test_mongodb_autoreconnect_and_crash(self):
+        """
+            Test that if mongodb disconnects once was connected, a autoreconect loop
+            will start waiting for mongodb to recover, And if a different exception raises
+            in between, loop will exit and raise the exception
+        """
+        #  Make Cursor __init__ fail 3 times with AutoReconnect. Test will show 3 errors similar to
+        #  AttributeError: "'Cursor' object has no attribute '_Cursor__killed'" in <bound method Cursor.__del__ of <pymongo.cursor.Cursor object at 0x1072b3410>> ignored
+        from max.tests.base import FAILURES
+        FAILURES.set(3)
+
+        username = 'messi'
+        res = self.create_user(username, expect=500)
+        self.assertEqual(res.json['error'], 'ServerError')

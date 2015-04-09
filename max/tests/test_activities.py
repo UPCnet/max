@@ -454,7 +454,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_activity(username_not_me, user_status_contextA)
         self.create_activity(username_not_me, user_status_contextB)
 
-        res = self.testapp.get('/contexts/%s/activities?context_tags=Assignatura' % (context_query['context']), '', oauth2Header(username), status=200)
+        res = self.testapp.get('/contexts/%s/activities' % (context_query['context']), {'context_tags': ['Assignatura', '']}, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
 

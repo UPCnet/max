@@ -38,7 +38,7 @@ def excview_tween_factory(handler, registry):
             # clear old generated request.response, if any; it may
             # have been mutated by the view, and its state is not
             # sane (e.g. caching headers)
-            if 'response' in attrs:
+            if 'response' in attrs:  # pragma: no cover
                 del attrs['response']
             # we use .get instead of .__getitem__ below due to
             # https://github.com/Pylons/pyramid/issues/700
@@ -46,7 +46,7 @@ def excview_tween_factory(handler, registry):
             provides = providedBy(catched_exc)
             for_ = (IExceptionViewClassifier, request_iface.combined, provides)
             view_callable = adapters.lookup(for_, IView, default=None)
-            if view_callable is None:
+            if view_callable is None:  # pragma: no cover
                 raise
             return view_callable(catched_exc, request)
 
@@ -59,7 +59,10 @@ def excview_tween_factory(handler, registry):
                     response = handler(request)
                 except AutoReconnect:
                     pass
-                except Exception as exc:
+                # This except gets a pragma, because it seems that is executed in another frame and
+                # is not catched by coverage module
+                except Exception as exc:  # pragma: no cover
+                    tryin_to_reconnect = False
                     response = handle_exception(exc)
                 else:
                     tryin_to_reconnect = False

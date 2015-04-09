@@ -20,12 +20,25 @@ import tweepy
 
 
 MOCK_TOKEN = "jfa1sDF2SDF234"
-FAILURES = 3
 
 # Copy of original patched methods
 requests_get = requests.get
 requests_post = requests.post
 original_cursor_init = Cursor.__init__
+
+
+class FailureCounter(object):
+    def __init__(self, count):
+        self.count = count
+
+    def dec(self):
+        self.count -= 1
+
+    def set(self, count):
+        self.count = count
+
+
+FAILURES = FailureCounter(3)
 
 
 def http_mock_twitter_user_image(image, status=200):
@@ -66,11 +79,14 @@ class MockTweepyAPI(object):
 
 
 def mocked_cursor_init(self, *args, **kwargs):
-    if FAILURES == 0:
+    raise_at_end = kwargs.pop('raise_at_end', False)
+    if FAILURES.count == 0:
         return original_cursor_init(self, *args, **kwargs)
+    elif FAILURES.count == 1 and raise_at_end:
+        FAILURES.dec()
+        raise Exception('Raised on AutoReconnect loop')
 
-    global FAILURES
-    FAILURES -= 1
+    FAILURES.dec()
     raise AutoReconnect('Mocked AutoReconnect failure')
 
 

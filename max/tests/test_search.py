@@ -143,6 +143,24 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         expected_hashtags = [u'canvi', u'comentari', u'nou']
         self.assertListEqual(result['object']['hashtags'], expected_hashtags)
 
+    def test_context_activities_hashtag_search(self):
+        """
+        """
+        from .mockers import context_query
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note='text with hashtag #test')
+
+        res = self.testapp.get('/contexts/%s/activities?hashtag=test' % (context_query['context']), '', oauth2Header(username), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 1)
+
     def test_context_activities_keyword_search(self):
         """
         """
