@@ -37,10 +37,11 @@ def http_mock_twitter_user_image(image, status=200):
     )
 
 
-def http_mock_bitly(status=200):
+def http_mock_bitly(status=200, body=None):
+    body = '{"status_code": %s, "data": {"url": "http://shortened.url"}}' % status if body is None else body
     httpretty.register_uri(
         httpretty.GET, re.compile("http://api.bitly.com"),
-        body='{"status_code": %s, "data": {"url": "http://shortened.url"}}' % status,
+        body=body,
         status=status,
         content_type="application/json"
     )

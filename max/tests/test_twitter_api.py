@@ -112,12 +112,11 @@ class TwitterApiFailingScenariosTestCase(unittest.TestCase, MaxTestBase):
         """
         self.conf_dir = os.path.dirname(__file__)
         self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
-
+        self.app.registry.max_store.drop_collection('cloudapis')
         self.tempfolder = tempfile.mkdtemp()
 
     def tearDown(self):
         shutil.rmtree(self.tempfolder)
-        self.app.registry.max_store.drop_collection('cloudapis')
 
     def test_get_twitter_api_no_settings(self):
         """
@@ -126,6 +125,7 @@ class TwitterApiFailingScenariosTestCase(unittest.TestCase, MaxTestBase):
             I get nothing in response
         """
         from max.utils.twitter import get_twitter_api
+        self.app.registry.cloudapis_settings['twitter'] = {}
         api = get_twitter_api(self.app.registry)
         self.assertEqual(api, None)
 

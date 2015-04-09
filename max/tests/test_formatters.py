@@ -85,6 +85,15 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(url, newurl)
 
     @httpretty.activate
+    def test_url_shortened_parsing_failure(self):
+        from max.utils.formatting import shortenURL
+
+        http_mock_bitly(status=500, body="invalid json")
+        url = 'http://example.com'
+        newurl = shortenURL(url)
+        self.assertEqual(url, newurl)
+
+    @httpretty.activate
     def test_url_shortened(self):
         from max.utils.formatting import shortenURL
 

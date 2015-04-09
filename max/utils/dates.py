@@ -77,11 +77,11 @@ def date_filter_parser(date_filter):
             return {
                 '$lt': datetime.combine(base_dt1, time.min)
             }
-        if after:
+        elif after:
             return {
                 '$gt': datetime.combine(base_dt1, time.max)
             }
-        if exact:
+        elif exact:
             base_dt2 = datetime(*date2)
             return {
                 '$gte': datetime.combine(base_dt1, time.min),
