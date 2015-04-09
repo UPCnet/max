@@ -9,6 +9,7 @@ from pymongo.cursor import Cursor
 from pymongo.errors import AutoReconnect
 from urllib import urlencode
 
+import httpretty
 import json
 import os
 import pymongo
@@ -26,9 +27,19 @@ requests_post = requests.post
 original_cursor_init = Cursor.__init__
 
 
+def http_mock_twitter_user_image(image, status=200):
+    httpretty.register_uri(
+        httpretty.GET, "https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png",
+        body=open(image, "rb").read(),
+        status=status,
+        content_type="image/png"
+    )
+
+
 class MockTweepyAPI(object):
-    def __init__(self, auth, fail=False):
+    def __init__(self, auth, fail=False, provide_image=True):
         self.fail = fail
+        self.provide_image = provide_image
 
     def verify_credentials(self, *args, **kwargs):
         if self.fail:
@@ -37,7 +48,8 @@ class MockTweepyAPI(object):
 
     def get_user(self, username):
         user = tweepy.models.User
-        user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
+        if self.provide_image:
+            user.profile_image_url_https = 'https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png'
         user.id_str = '526326641'
         return user
 

@@ -9,6 +9,7 @@ from max.tests.base import MockTweepyAPI
 from max.tests.base import mock_get
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
+from max.tests.base import http_mock_twitter_user_image
 from max.utils.image import get_avatar_folder
 
 from functools import partial
@@ -21,15 +22,6 @@ import os
 import shutil
 import tempfile
 import unittest
-
-
-def http_mock_twitter_user_image(image):
-    httpretty.register_uri(
-        httpretty.GET, "https://pbs.twimg.com/profile_images/1901828730/logo_MAX_color_normal.png",
-        body=open(image, "rb").read(),
-        status=200,
-        content_type="image/png"
-    )
 
 
 class AvatarFolderTests(unittest.TestCase, MaxTestBase):

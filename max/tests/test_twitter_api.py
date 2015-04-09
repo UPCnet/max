@@ -1,18 +1,24 @@
+# -*- coding: utf-8 -*-
 from max.tests.base import MaxTestBase
-import unittest
-import os
-import sys
-import re
-import ConfigParser
+from max.tests.base import MockTweepyAPI
+from max.tests.base import http_mock_twitter_user_image
+
 from paste.deploy import loadapp
-import tempfile
+
+import ConfigParser
+import httpretty
+import os
+import re
 import shutil
+import sys
+import tempfile
+import unittest
 
 
 class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
     """
-        Tests to check the correct resoultion of avatar folder
-        for different scenarios.
+        Tests to check communication with twitter api
+        and max twitter utils
     """
 
     def setUp(self):
@@ -95,3 +101,58 @@ class TwitterApiTestCase(unittest.TestCase, MaxTestBase):
         imagefile = os.path.join(self.tempfolder, 'twitter.png')
         download_twitter_user_image(api, 'maxupcnet', imagefile)
         self.assertFileExists(imagefile)
+
+
+class TwitterApiFailingScenariosTestCase(unittest.TestCase, MaxTestBase):
+
+    def setUp(self):
+        """
+            Tests to check failing scenarios when communicating
+            with twitter api
+        """
+        self.conf_dir = os.path.dirname(__file__)
+        self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
+
+        self.tempfolder = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tempfolder)
+
+    def test_get_twitter_api_no_settings(self):
+        """
+            Given an empty cloudapis settings
+            When i try to get the twitter api object
+            I get nothing in response
+        """
+        from max.utils.twitter import get_twitter_api
+        api = get_twitter_api(self.app.registry)
+        self.assertEqual(api, None)
+
+    def test_get_twitter_api_no_image_url(self):
+        """
+            Given a tweepy api without user image property
+            When i try to get the user image
+            I get no download
+        """
+        from max.utils.twitter import download_twitter_user_image
+        api = MockTweepyAPI(None, provide_image=False)
+        imagefile = os.path.join(self.tempfolder, 'twitter.png')
+        download_twitter_user_image(api, 'maxupcnet', imagefile)
+        self.assertFileNotExists(imagefile)
+
+    @httpretty.activate
+    def test_get_twitter_api_failing_download(self):
+        """
+            Given a tweepy api with user image property
+            And a url that fails for some unknown reason
+            When i try to get the user image
+            I get no download
+        """
+        from max.utils.twitter import download_twitter_user_image
+        avatar_image = os.path.join(self.conf_dir, "avatar.png")
+        http_mock_twitter_user_image(avatar_image, status=500)
+
+        api = MockTweepyAPI(None, provide_image=True)
+        imagefile = os.path.join(self.tempfolder, 'twitter.png')
+        download_twitter_user_image(api, 'maxupcnet', imagefile)
+        self.assertFileNotExists(imagefile)
