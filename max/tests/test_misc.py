@@ -15,6 +15,10 @@ import os
 import unittest
 
 
+def fucked_up_insert(self):
+    pass
+
+
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
@@ -46,6 +50,18 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         res = self.testapp.post('/people/%s/activities' % username, oauth2Header(test_manager), status=401)
         self.assertEqual(res.json['error_description'], u'Authorization found in url params, not in request. Check your tests, you may be passing the authentication headers as the request body...')
+
+    @patch('max.models.user.User.insert', fucked_up_insert)
+    def test_generic_exception_catching(self):
+        """
+            Test calling a webservice  moked to force an exception, to test the scavenger
+            that formats a beautiful json error messages for uncatched exceptions
+        """
+        username = 'messi'
+        res = self.create_user(username, expect=500)
+        self.assertEqual(res.json['error'], 'ServerError')
+        self.assertIn('BEGIN EXCEPTION REPORT', res.json['error_description'])
+        self.assertIn('END EXCEPTION REPORT', res.json['error_description'])
 
     def test_bad_body_content_parsing(self):
         """

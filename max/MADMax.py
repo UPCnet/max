@@ -81,12 +81,6 @@ class ResultsWrapper(object):
     def next(self):
         return self.generator.next()
 
-    def first(self):
-        try:
-            return self.generator.next()
-        except StopIteration:
-            return None
-
     def get(self, count=None):
         result = []
         while True:
@@ -116,14 +110,6 @@ class MADMaxCollection(object):
         self.show_fields = field_filter
 
         self.collection = getattr(request.db.db, collection, None)
-
-    def setQueryKey(self, key):
-        """
-            Sets the key from where dict-like access will be searched on. Must be
-            a unique field of the object, because in this kind of access only a item is
-            returned
-        """
-        self.query_key = key
 
     def setVisibleResultFields(self, fields):
         """
@@ -261,9 +247,9 @@ class MADMaxCollection(object):
         if count:
             return cursor.count()
 
-        # Sort and limit the results if specified
-        if sort_params:
-            cursor = cursor.sort(sort_params)
+        # Sort the results
+        cursor = cursor.sort(sort_params)
+
         if limit:
             cursor = cursor.limit(limit + 1)
 

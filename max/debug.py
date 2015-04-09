@@ -10,7 +10,7 @@ def setup(settings):
 
         if asbool(settings.get('testing', False)):  # pragma: no cover
             settings['pyramid.tweens'].insert(0, 'max.tweens.browser_debug_factory')
-        else:
+        else:  # pragma: no cover
             settings['pyramid.tweens'].append('max.tweens.browser_debug_factory')
 
     if asbool(settings['max.oauth_passtrough']):

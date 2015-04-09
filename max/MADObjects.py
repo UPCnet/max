@@ -21,15 +21,11 @@ class MADDict(dict):
     """
     schema = {}
 
-    def __deepcopy__(self, item):
-        """
-        """
-        return self
-
+    # NOT USED ANYMORE
+    #
     # def __getattr__(self, key):
     #     """
     #         Maps dict items access to attributes, while preserving access to class attributes.
-
     #         Wakes up objects from database when necessary.
     #     """
     #     try:
@@ -37,6 +33,16 @@ class MADDict(dict):
     #         return self[key]
     #     except AttributeError as exc:
     #         raise exc
+    #
+    # def __setattr__(self, key, value):
+    #     """
+    #         Enables setting values of dict's items trough attribute assignment,
+    #         while preserving default setting of class attributes
+    #     """
+    #     if key in object.__getattribute__(self, 'schema'):
+    #         self.__setitem__(key, value)
+    #     else:
+    #         object.__setattr__(self, key, value)
 
     def __setitem__(self, key, val):
         """
@@ -58,16 +64,6 @@ class MADDict(dict):
                 self[k].update(v)
             else:
                 self[k] = v
-
-    # def __setattr__(self, key, value):
-    #     """
-    #         Enables setting values of dict's items trough attribute assignment,
-    #         while preserving default setting of class attributes
-    #     """
-    #     if key in object.__getattribute__(self, 'schema'):
-    #         self.__setitem__(key, value)
-    #     else:
-    #         object.__setattr__(self, key, value)
 
     def _on_create_custom_validations(self):
         return True
@@ -159,32 +155,6 @@ class MADDict(dict):
                     del self.data[fieldname]
                     if fieldname in self:
                         del self[fieldname]
-
-
-    # def validate(self):
-    #     """
-    #         Checks if all the required schema fields (required=1) are present in
-    #         the collected data
-    #         Executes custom validations if present
-    #     """
-    #     for fieldname in self.schema:
-    #         # Check required
-    #         if self.schema.get(fieldname).get('required', 0):
-    #             if not self.checkParameterExists(fieldname):
-    #                 raise MissingField, 'Required parameter "%s" not found in the request' % fieldname
-
-    #         # Check validators if fieldname in current data
-    #         if fieldname in self.data:
-    #             validators = self.schema.get(fieldname).get('validators', [])
-    #             for validator_name in validators:
-    #                 validator = getattr(sys.modules['max.validators'], validator_name, None)
-    #                 if validator:
-    #                     success, message = validator(self.data.get(fieldname))
-    #                     if success == False:
-    #                         raise ValidationError, 'Validation error on field "%s": %s' % (fieldname, message)
-
-    #     self._validate()
-    #     return True
 
 
 class MADBase(MADDict):
@@ -479,17 +449,6 @@ class MADBase(MADDict):
         permission_name = self.get_field_permission_for(field, mode)
         return isinstance(self.request.has_permission(permission_name, self), ACLAllowed)
 
-    def get_visible_fields(self):
-        """
-            Returns the real fieldname (without leading _) that
-            the current authenticated user has permission to see
-        """
-        fields = []
-        for field in self.schema:
-            if self.has_field_permission(field, 'view'):
-                fields.append(field.lstrip('_'))
-        return fields
-
     def get_editable_fields(self):
         """
             Returns the real fieldname (without leading _) on which
@@ -507,3 +466,16 @@ class MADBase(MADDict):
 
         properties = {fieldName: params.get(fieldName) for fieldName in self.get_editable_fields() if params.get(fieldName, None) is not None}
         return properties
+
+    # NOT USED ANYMORE
+    #
+    # def get_visible_fields(self):
+    #     """
+    #         Returns the real fieldname (without leading _) that
+    #         the current authenticated user has permission to see
+    #     """
+    #     fields = []
+    #     for field in self.schema:
+    #         if self.has_field_permission(field, 'view'):
+    #             fields.append(field.lstrip('_'))
+    #     return fields

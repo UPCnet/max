@@ -459,11 +459,6 @@ class Activity(BaseActivity):
         # Remove comments traverser before saving
         self.pop('comments', None)
 
-    def _after_saving_object(self, oid):
-        if 'lastComment' not in self:
-            self['lastComment'] = oid
-            self.save()
-
     def _before_insert_object(self):
         # Remove comments traverser before inserting
         self.pop('comments', None)
@@ -486,26 +481,22 @@ class Activity(BaseActivity):
 
             * Set the liked and favorited flags on the object, with the number of each marks
         """
-        if self.request.actor is not None:
-            # Execute only if we have a actor in the request. I we don't have a actor
-            # probably (ehem) is a restricted function, and we don't need this flag.
+        if isinstance(self.request.actor, User):
+            actor_id_field = 'username'
+        else:
+            actor_id_field = 'url'
+        self['deletable'] = self.request.actor[actor_id_field] == self['_owner']
+        if not self['deletable'] and self.get('contexts'):
+            subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.get('subscribedTo', []) if hasPermission(subscription, 'delete')]
+            for context in self.get('contexts'):
+                self['deletable'] = context['hash'] in subscriptions_with_delete_permission
 
-            if isinstance(self.request.actor, User):
-                actor_id_field = 'username'
-            else:
-                actor_id_field = 'url'
-            self['deletable'] = self.request.actor[actor_id_field] == self['_owner']
-            if not self['deletable'] and self.get('contexts'):
-                subscriptions_with_delete_permission = [subscription['hash'] for subscription in self.request.actor.get('subscribedTo', []) if hasPermission(subscription, 'delete')]
-                for context in self.get('contexts'):
-                    self['deletable'] = context['hash'] in subscriptions_with_delete_permission
+        # Mark the comments with the deletable flag too
+        for comment in self.get('replies', []):
+            comment['deletable'] = self['deletable'] or self.request.actor[actor_id_field] == comment['actor']['username']
 
-            # Mark the comments with the deletable flag too
-            for comment in self.get('replies', []):
-                comment['deletable'] = self['deletable'] or self.request.actor[actor_id_field] == comment['actor']['username']
-
-            self['favorited'] = self.has_favorite_from(self.request.actor)
-            self['liked'] = self.has_like_from(self.request.actor)
+        self['favorited'] = self.has_favorite_from(self.request.actor)
+        self['liked'] = self.has_like_from(self.request.actor)
 
         self['comments'] = CommentsTraverser(None, self.request, self)
 

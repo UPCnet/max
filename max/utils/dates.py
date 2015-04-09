@@ -50,6 +50,8 @@ def date_filter_parser(date_filter):
     date1 = [0, 0, 0]
     date2 = [0, 0, 0]
 
+    query = {}
+
     if result:
         year, month, day = result.groups()
         date1[0] = int(year)
@@ -74,18 +76,18 @@ def date_filter_parser(date_filter):
 
         base_dt1 = datetime(*date1)
         if before:
-            return {
+            query = {
                 '$lt': datetime.combine(base_dt1, time.min)
             }
         elif after:
-            return {
+            query = {
                 '$gt': datetime.combine(base_dt1, time.max)
             }
         elif exact:
             base_dt2 = datetime(*date2)
-            return {
+            query = {
                 '$gte': datetime.combine(base_dt1, time.min),
                 '$lte': datetime.combine(base_dt2, time.max)
             }
 
-    return {}
+    return query
