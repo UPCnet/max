@@ -13,6 +13,7 @@ import httpretty
 import json
 import os
 import pymongo
+import re
 import requests
 import shutil
 import tweepy
@@ -33,6 +34,15 @@ def http_mock_twitter_user_image(image, status=200):
         body=open(image, "rb").read(),
         status=status,
         content_type="image/png"
+    )
+
+
+def http_mock_bitly(status=200):
+    httpretty.register_uri(
+        httpretty.GET, re.compile("http://api.bitly.com"),
+        body='{"status_code": %s, "data": {"url": "http://shortened.url"}}' % status,
+        status=status,
+        content_type="application/json"
     )
 
 

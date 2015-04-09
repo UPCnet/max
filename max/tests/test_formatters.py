@@ -2,6 +2,7 @@
 from max.tests import test_default_security
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
+from max.tests.base import http_mock_bitly
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 from max.tests import test_manager
@@ -10,6 +11,7 @@ from functools import partial
 from mock import patch
 from paste.deploy import loadapp
 
+import httpretty
 import json
 import os
 import unittest
@@ -72,3 +74,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(username)
         res = self.create_activity(username, user_status_with_url)
         self.assertIn('bit.ly', res.json['object']['content'],)
+
+    @httpretty.activate
+    def test_url_shortened_bitly_failure(self):
+        from max.utils.formatting import shortenURL
+
+        http_mock_bitly(status=500)
+        url = 'http://example.com'
+        newurl = shortenURL(url)
+        self.assertEqual(url, newurl)
+
+    @httpretty.activate
+    def test_url_shortened(self):
+        from max.utils.formatting import shortenURL
+
+        http_mock_bitly()
+        url = 'http://example.com'
+        newurl = shortenURL(url)
+        self.assertEqual(newurl, "http://shortened.url")
+
+    @httpretty.activate
+    def test_url_secure_shortened(self):
+        from max.utils.formatting import shortenURL
+
+        http_mock_bitly()
+        url = 'http://example.com'
+        newurl = shortenURL(url, secure=True)
+        self.assertEqual(newurl, "https://shortened.url")
+

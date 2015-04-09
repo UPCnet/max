@@ -23,7 +23,7 @@ def rotate_image_by_EXIF(image):
         return image.rotate(exif_rotation)
     return image
 
-# def
+
 SPLITTERS = {
     'people': re.compile(r'^(.{2})'),
     'contexts': re.compile(r'^(.{2})(.{2})(.{2})')

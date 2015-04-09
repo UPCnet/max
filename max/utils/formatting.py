@@ -62,7 +62,7 @@ def shortenURL(url, secure=False):
     # substitute with a fake domain
     # to allow bitly shortening in development environments
     # (localhost/ port not allowed in URI by bitly api)
-    url = re.sub(r'(.*://)(localhost:[0-9]{4,5})(.*)', r'\1foo.bar\3', url)
+    shortened_url = re.sub(r'(.*://)(localhost:[0-9]{4,5})(.*)', r'\1foo.bar\3', url)
 
     bitly_username = 'maxclient'
     bitly_api_key = 'R_33a0cbaa2d41c3957dc5a40a0b2c2760'
@@ -81,10 +81,10 @@ def shortenURL(url, secure=False):
     try:
         response = json.loads(req.content)
         if response.get('status_code', None) == 200:
-            url = response.get('data', {}).get('url', queryurl)
+            shortened_url = response.get('data', {}).get('url', queryurl)
             if secure:
-                url.replace('http://', 'https://')
+                shortened_url = shortened_url.replace('http://', 'https://')
     except:
-        url = queryurl
+        shortened_url = url
 
-    return url
+    return shortened_url

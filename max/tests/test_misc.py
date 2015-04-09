@@ -18,8 +18,8 @@ import unittest
 class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def setUp(self):
-        conf_dir = os.path.dirname(__file__)
-        self.app = loadapp('config:tests.ini', relative_to=conf_dir)
+        self.conf_dir = os.path.dirname(__file__)
+        self.app = loadapp('config:tests.ini', relative_to=self.conf_dir)
         self.reset_database(self.app)
         self.app.registry.max_store.security.insert(test_default_security)
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
@@ -75,13 +75,28 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Test that calling a endpoint with PUT indirectly within a POST
             actually calls the real PUT method
         """
-
         username = 'messi'
         self.create_user(username)
         headers = oauth2Header(username)
         headers['X-HTTP-Method-Override'] = 'PUT'
         res = self.testapp.post('/people/{}'.format(username), json.dumps({"displayName": "Lionel Messi"}), headers, status=200)
         self.assertEqual(res.json['displayName'], 'Lionel Messi')
+
+    def test_image_rotation_180(self):
+        from max.utils.image import rotate_image_by_EXIF
+        from PIL import Image
+
+        image = Image.open('{}/truita2.jpg'.format(self.conf_dir))
+        rotated = rotate_image_by_EXIF(image)
+        self.assertNotEqual(image, rotated)
+
+    def test_image_rotation_no_rotation(self):
+        from max.utils.image import rotate_image_by_EXIF
+        from PIL import Image
+
+        image = Image.open('{}/avatar.png'.format(self.conf_dir))
+        rotated = rotate_image_by_EXIF(image)
+        self.assertEqual(image, rotated)
 
     @patch('pymongo.cursor.Cursor.__init__', mocked_cursor_init)
     def test_mongodb_autoreconnect(self):

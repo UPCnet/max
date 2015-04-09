@@ -30,7 +30,6 @@ def download_twitter_user_image(api, twitterUsername, filename):
 
         if image_url:
             req = requests.get(image_url, verify=False)
-            import ipdb;ipdb.set_trace()
             if req.status_code == 200:
                 open(filename, 'w').write(req.content)
                 exit_status = True
