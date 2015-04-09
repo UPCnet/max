@@ -76,7 +76,7 @@ class mock_requests_obj(object):
 def mock_post(self, url, *args, **kwargs):  # pragma: no cover
     # Return OK to any post request targeted to 'checktoken', with the mock token
     if url.endswith('checktoken'):
-        token = kwargs.get('data', {}).get('oauth_token')
+        token = kwargs.get('data', {}).get('access_token')
         status_code = 200 if token == MOCK_TOKEN else 401
         return mock_requests_obj(text='', status_code=status_code)
     elif '/people/messi/activities' in url:
