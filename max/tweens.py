@@ -5,13 +5,51 @@ from max.deprecations import DELETE_DEPRECATIONS
 from max.deprecations import POST_DEPRECATIONS
 from max.deprecations import check_deprecation
 from max.exceptions.http import JSONHTTPPreconditionFailed
+from max.exceptions.scavenger import format_raw_request
+from max.exceptions.scavenger import format_raw_response
 
 from pyramid.interfaces import IExceptionViewClassifier
 from pyramid.interfaces import IRequest
 from pyramid.interfaces import IView
+
 from pymongo.errors import AutoReconnect
 
+import logging
+import signal
 import sys
+
+
+request_logger = logging.getLogger('requestdump')
+dump_requests = {'enabled': False}
+
+SEPARATOR = '-' * 80
+DUMP_TEMPLATE = """
+{sep}
+{{}}
+--
+{{}}
+{sep}
+""".format(sep=SEPARATOR)
+
+
+def set_signal():
+    def toggle_request_dump(*args):
+        dump_requests['enabled'] = not dump_requests['enabled']
+        request_logger.debug('{}abling request dumper'.format('En' if dump_requests['enabled'] else 'Dis'))
+
+    signal.signal(signal.SIGUSR1, toggle_request_dump)
+
+
+def dump_request(request, response):
+    """
+        Logs formatted request + response to request_dump logger
+        if global var dump_requests['enabled'] is True
+    """
+    if dump_requests['enabled'] and response.status_int != 500:
+        request_logger.debug(DUMP_TEMPLATE.format(
+            format_raw_request(request),
+            format_raw_response(response)
+        ))
 
 
 def excview_tween_factory(handler, registry):
@@ -69,6 +107,8 @@ def excview_tween_factory(handler, registry):
 
         except Exception as exc:
             response = handle_exception(exc)
+
+        dump_request(request, response)
         return response
 
     return excview_tween

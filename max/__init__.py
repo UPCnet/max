@@ -10,19 +10,23 @@ except ImportError:
 else:
     GEVENT_AVAILABLE = True
 
+
 from max import debug
+from max.request import extract_post_data
+from max.request import get_database
+from max.request import get_oauth_headers
+from max.request import get_request_actor
+from max.request import get_request_actor_username
+from max.request import get_request_creator
+from max.resources import Root
 from max.resources import loadCloudAPISettings
 from max.resources import loadMAXSecurity
 from max.resources import loadMAXSettings
-from max.resources import Root
 from max.routes import RESOURCES
 from max.security.authentication import MaxAuthenticationPolicy
+from max.tweens import set_signal
 from maxutils import mongodb
-from max.request import get_request_creator
-from max.request import get_request_actor_username
-from max.request import get_request_actor
-from max.request import get_database
-from max.request import extract_post_data, get_oauth_headers
+
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.config import Configurator
 from pyramid.settings import asbool
@@ -48,19 +52,8 @@ DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY = True
 
 
 import logging
-import signal
 
 logger = logging.getLogger('exceptions')
-request_logger = logging.getLogger('requestdump')
-dump_requests = {'enabled': False}
-
-
-def set_signal():
-    def toggle_request_dump(*args):
-        dump_requests['enabled'] = not dump_requests['enabled']
-        request_logger.debug('{}abling request dumper'.format('En' if dump_requests['enabled'] else 'Dis'))
-
-    signal.signal(signal.SIGUSR1, toggle_request_dump)
 
 
 def main(*args, **settings):
