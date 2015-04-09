@@ -13,7 +13,7 @@ class FunctionalTests(unittest.TestCase):
     def test_bad_dates_query(self):
         """
         """
-        query = date_filter_parser('badquery')
+        query = date_filter_parser('')
         self.assertEqual(query, {})
 
     def test_exact_year(self):

@@ -82,8 +82,7 @@ def searchParams(request):
 
     if 'date_filter' in request.params:
         date_filter = date_filter_parser(request.params.get('date_filter', ''))
-        if date_filter:
-            params['date_filter'] = date_filter
+        params['date_filter'] = date_filter
 
     hashtags = request.params.getall('hashtag')
     if hashtags:
