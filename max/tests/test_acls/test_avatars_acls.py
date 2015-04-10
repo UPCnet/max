@@ -119,3 +119,24 @@ class AvatarsACLTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         url_hash = sha1(create_context_full['url']).hexdigest()
 
         self.testapp.get('/contexts/%s/avatar' % url_hash, '', {}, status=200)
+
+    # Get conversation avatar tests
+
+    def test_get_conversation_avatar_unauthenticated(self):
+        """
+            Given i'm a unauthenticated user
+            When I try to get a user avatar
+            I succeed
+        """
+        from max.tests.mockers import message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.upload_user_avatar(sender, "avatar.png")
+        self.testapp.get('/conversations/%s/avatar' % cid, '', {}, status=200)

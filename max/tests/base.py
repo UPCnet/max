@@ -213,6 +213,7 @@ class MaxAvatarsTestBase(object):
         shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing.png'.format(self.avatar_folder))
         shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-people.png'.format(self.avatar_folder))
         shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-context.png'.format(self.avatar_folder))
+        shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-conversation.png'.format(self.avatar_folder))
         shutil.copyfile('{}/missing.png'.format(self.conf_dir), '{}/missing-people-large.png'.format(self.avatar_folder))
 
     def tearDown(self):
