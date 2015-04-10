@@ -14,7 +14,7 @@ class endpoint(object):
 
     def __init__(self, **settings):
         if 'for_' in settings:
-            if settings.get('context') is None:
+            if settings.get('context') is None:  # pragma: no cover
                 settings['context'] = settings['for_']
         self.__dict__.update(settings)
 
@@ -46,7 +46,7 @@ class endpoint(object):
         # # Modify codeinfo to preserver original wrapper method name
         # info.codeinfo = info.codeinfo[:-1] + ('@endpoint.{}'.format(wrapped.__name__),)
 
-        if info.scope == 'class':
+        if info.scope == 'class':  # pragma: no cover
             # if the decorator was attached to a method in a class, or
             # otherwise executed at class scope, we need to set an
             # 'attr' into the settings if one isn't already in there

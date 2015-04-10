@@ -1,7 +1,10 @@
 import inspect
 
 
-def marmoset_patch(old, new, extra_globals={}):
+def marmoset_patch(old, new, extra_globals={}):  # pragma: no cover
+    """
+        Patch to disable requests logging when running on gevent
+    """
     g = old.func_globals
     g.update(extra_globals)
     c = inspect.getsource(new)
@@ -9,7 +12,6 @@ def marmoset_patch(old, new, extra_globals={}):
     old.im_func.func_code = g[new.__name__].func_code
 
 
-# Patch to disable requests logging on gevent
 def log_request(self):  # pragma: no cover
     pass
 
@@ -18,4 +20,4 @@ try:
 except:
     pass
 else:
-    marmoset_patch(WSGIHandler.log_request, log_request)
+    marmoset_patch(WSGIHandler.log_request, log_request)  # pragma: no cover
