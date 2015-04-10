@@ -73,12 +73,10 @@ def format_raw_response(response):
     return raw_response
 
 
-def saveException(request, error):  # pragma: no cover
+def saveException(request, error):
     """
         Logs the exception
 
-        This code will only raise if a non-tested thing appear
-         So, as the tests will not ever see this, we exlcude it from coverage
     """
     time = datetime.now().isoformat()
     matched_route = request.matched_route.name if request.matched_route else 'No route matched'
