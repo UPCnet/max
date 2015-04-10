@@ -277,3 +277,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = format_raw_request(mock_request_bad_encoding)
         self.assertIn('*** Unicode Decode Error parsing request, request trunked at byte 569 ***', res)
+
+    def test_raw_response_parsing(self):
+        from max.exceptions.scavenger import format_raw_response
+        res = self.testapp.get('/people/test_manager/avatar')
+        parsed = format_raw_response(res)
+        self.assertIn('<Image data 3909 bytes>', parsed)
