@@ -219,3 +219,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertGreater(len(lines), 2)
         self.assertEqual(lines[0].strip(), 'Enabling request dumper')
         self.assertEqual(lines[-1].strip(), 'Disabling request dumper')
+
+    def test_api_info(self):
+        """
+            Test that api info endpoint reports all non-info routes
+            Test (single route) that expected keys are present on route and method levels
+        """
+        from max.routes import RESOURCES
+        defined_routes = [route_name for route_name in RESOURCES.keys() if not route_name.startswith('info')]
+
+        res = self.testapp.get('/info/api', status=200)
+
+        api_route_names = res.json.keys()
+        self.assertIsInstance(res.json, dict)
+        self.assertItemsEqual(api_route_names, defined_routes)
+        self.assertItemsEqual(res.json['user'].keys(), [u'category', u'name', u'url', u'route', u'filesystem', u'id', u'methods'])
+        self.assertItemsEqual(res.json['user']['methods']['GET'].keys(), [u'rest_params', u'query_params', u'documentation', u'description', u'permission'])
+
+    def test_api_info_by_category(self):
+        """
+        """
+        from max.routes import RESOURCES
+        defined_categories = list(set([route.get('category') for name, route in RESOURCES.items() if route.get('category')]))
+        res = self.testapp.get('/info/api?by_category=1', status=200)
+
+        listed_categories = [category['name'] for category in res.json]
+
+        self.assertIsInstance(res.json, list)
+        self.assertItemsEqual(defined_categories, listed_categories)
+        self.assertItemsEqual(res.json[0].keys(), [u'name', u'resources', u'id'])
