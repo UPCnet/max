@@ -3,10 +3,10 @@ from max.tests import test_default_security
 from max.tests import test_manager
 from max.tests.base import MaxTestApp
 from max.tests.base import MaxTestBase
+from max.tests.base import MaxAvatarsTestBase
 from max.tests.base import mock_post
 from max.tests.base import oauth2Header
 from max.tests.base import mocked_cursor_init
-from max.tests.base import FailureCounter
 from functools import partial
 from mock import patch
 from paste.deploy import loadapp
@@ -24,7 +24,7 @@ def fucked_up_insert():
     pass  # pragma: no cover
 
 
-class FunctionalTests(unittest.TestCase, MaxTestBase):
+class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
 
     def setUp(self):
         self.conf_dir = os.path.dirname(__file__)
@@ -279,7 +279,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIn('*** Unicode Decode Error parsing request, request trunked at byte 569 ***', res)
 
     def test_raw_response_parsing(self):
+        MaxAvatarsTestBase.setUp(self)
         from max.exceptions.scavenger import format_raw_response
         res = self.testapp.get('/people/test_manager/avatar')
         parsed = format_raw_response(res)
         self.assertIn('<Image data 3909 bytes>', parsed)
+        MaxAvatarsTestBase.tearDown(self)
+

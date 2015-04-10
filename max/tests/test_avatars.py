@@ -185,6 +185,17 @@ class AvatarTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         self.assertEqual(self.get_user_avatar_dimensions(username), (48, 48))
         self.assertEqual(self.get_user_avatar_dimensions(username, 'large'), (250, 250))
 
+    def test_invalid_upload_user_avatar(self):
+        """
+            Given a user without avatar
+            When I upload an image for that user on the json body
+            I get an error
+        """
+        username = 'messi'
+        self.create_user(username)
+
+        self.testapp.post('/people/{}/avatar'.format(username), '', headers=oauth2Header(username), status=400)
+
     def test_get_user_avatar(self):
         """
             Given a user with avatar
