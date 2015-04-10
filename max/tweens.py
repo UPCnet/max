@@ -23,7 +23,7 @@ request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
 
 SEPARATOR = '-' * 80
-DUMP_TEMPLATE = """
+DUMP_TEMPLATE = u"""
 {sep}
 {{}}
 --
@@ -35,8 +35,7 @@ DUMP_TEMPLATE = """
 def set_signal():
     def toggle_request_dump(*args):
         dump_requests['enabled'] = not dump_requests['enabled']
-        request_logger.debug('{}abling request dumper'.format('En' if dump_requests['enabled'] else 'Dis'))
-
+        request_logger.debug(u'{}abling request dumper'.format('En' if dump_requests['enabled'] else 'Dis'))
     signal.signal(signal.SIGUSR1, toggle_request_dump)
 
 

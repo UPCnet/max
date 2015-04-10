@@ -12,7 +12,7 @@ request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
 
 
-ERROR_TEMPLATE = """
+ERROR_TEMPLATE = u"""
 ------------------------------------------------
 BEGIN EXCEPTION REPORT: {hash}
 MATCHED_ROUTE: {matched_route}
@@ -44,14 +44,14 @@ def format_raw_request(request):
                 boundary = boundary.replace('$', r'\$')
                 image = re.search(r'\r\n(?:.*?Content-type:\s*image.*?)\r\n\r\n(.*?){}'.format(boundary), raw_request, re.DOTALL | re.IGNORECASE).groups()[0]
                 if image:
-                    raw_request = raw_request.replace(image, '<Image data {} bytes>\r\n'.format(len(image)))
+                    raw_request = raw_request.replace(image, u'<Image data {} bytes>\r\n'.format(len(image)))
 
         raw_request.encode('utf-8')
 
     except UnicodeDecodeError as unicode_error:
-        return raw_request[:unicode_error.start] + "\r\n*** Unicode Decode Error parsing request, request trunked at byte {} ***\r\n".format(unicode_error.start)
+        return raw_request[:unicode_error.start] + u"\r\n*** Unicode Decode Error parsing request, request trunked at byte {} ***\r\n".format(unicode_error.start)
     except Exception:
-        return"\r\n*** Error parsing request ***\r\n\r\n{}\r\n*** End traceback ***".format(traceback.format_exc())
+        return u"\r\n*** Error parsing request ***\r\n\r\n{}\r\n*** End traceback ***".format(traceback.format_exc())
 
     return raw_request
 

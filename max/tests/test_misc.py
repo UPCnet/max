@@ -184,3 +184,38 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         res = self.create_user(username, expect=500)
         self.assertEqual(res.json['error'], 'ServerError')
+
+    def test_request_dumper(self):
+        """
+            Test request dumper logs requests when activated on
+            assigned signal USER1 handler
+        """
+        import io
+        import logging
+        import signal
+        from max.tweens import request_logger
+
+        # Intercept logger to a variable
+        request_logger.setLevel(logging.DEBUG)
+        log_capture_string = io.StringIO()
+        log_handler = logging.StreamHandler(log_capture_string)
+        log_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(message)s')
+        log_handler.setFormatter(formatter)
+        request_logger.addHandler(log_handler)
+
+        # Retrieve the assigned handler
+        handler = signal.getsignal(signal.SIGUSR1)
+
+        handler()  # Enable request dumper
+        self.create_user('messi')
+        handler()  # Disable request dumper
+
+        # Read lines from captured log
+        log_capture_string.seek(0)
+        lines = log_capture_string.readlines()
+        log_capture_string.close()
+
+        self.assertGreater(len(lines), 2)
+        self.assertEqual(lines[0].strip(), 'Enabling request dumper')
+        self.assertEqual(lines[-1].strip(), 'Disabling request dumper')

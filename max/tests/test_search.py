@@ -179,6 +179,26 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
 
+    def test_context_comments_keyword_search(self):
+        """
+        """
+        from .mockers import create_context
+        from .mockers import subscribe_context, user_status_context
+        from .mockers import user_comment
+
+        username = 'messi'
+        self.create_user(username)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        activity_1_id = self.create_activity(username, user_status_context, note='Second activity').json['id']
+
+        res = self.testapp.post('/activities/%s/comments' % activity_1_id, json.dumps(user_comment), oauth2Header(username), status=201)
+        res = self.testapp.get('/activities/comments', {'keyword': ['comentari']}, oauth2Header(test_manager), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['object']['inReplyTo'][0]['id'], activity_1_id)
+
     def test_context_activities_actor_search(self):
         """
         """

@@ -298,14 +298,14 @@ class BaseContext(MADBase):
             Executed after a user has been subscribed to this context
             Override to add custom behaviour for each context type
         """
-        pass
+        pass  # pragma: no cover
 
     def _after_subscription_remove(self, username):
         """
             Executed after a user has been unsubscribed to this context
             Override to add custom behaviour for each context type
         """
-        pass
+        pass  # pragma: no cover
 
 
 class Context(BaseContext):

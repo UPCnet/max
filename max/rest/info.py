@@ -135,8 +135,7 @@ def endpoints_view(context, request):
         if view_settings['request_methods'] == 'GET':
             code = open(module.__file__.rstrip('c')).read()
             method_code = re.search(r'def\s+{}(.*?)(?:\n@|$)'.format(method_name), code, re.DOTALL)
-            if method_code:
-                is_head = re.search(r"request\.method\s+==\s+'HEAD'", method_code.groups()[0])
+            is_head = re.search(r"request\.method\s+==\s+'HEAD'", method_code.groups()[0])
 
         resources_by_route.setdefault(route.name, resource_info)
 
