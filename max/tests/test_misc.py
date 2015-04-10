@@ -248,3 +248,32 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertIsInstance(res.json, list)
         self.assertItemsEqual(defined_categories, listed_categories)
         self.assertItemsEqual(res.json[0].keys(), [u'name', u'resources', u'id'])
+
+    def test_raw_request_parsing(self):
+        """
+        """
+        from max.exceptions.scavenger import format_raw_request
+        from .mockers import mock_request
+
+        res = format_raw_request(mock_request)
+        replaced_image = "Content-type: image/png\r\n\r\n<Image data 20496 bytes>\r\n"
+        self.assertIn(replaced_image, res)
+
+    def test_raw_request_parsing_error(self):
+        """
+        """
+        from max.exceptions.scavenger import format_raw_request
+        from .mockers import mock_request_bad_request
+
+        res = format_raw_request(mock_request_bad_request)
+        self.assertIn('*** Error parsing request ***', res)
+        self.assertIn('*** End traceback ***', res)
+
+    def test_raw_request_parsing_bad_encoding_error(self):
+        """
+        """
+        from max.exceptions.scavenger import format_raw_request
+        from .mockers import mock_request_bad_encoding
+
+        res = format_raw_request(mock_request_bad_encoding)
+        self.assertIn('*** Unicode Decode Error parsing request, request trunked at byte 569 ***', res)

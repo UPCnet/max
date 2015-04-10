@@ -50,9 +50,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         files = [('file', 'avatar.png', thefile.read(), 'image/png')]
 
         res = self.testapp.post('/people/{}/activities'.format(username), dict(json_data=json.dumps(activity)), oauth2Header(username), upload_files=files, status=201)
-
         res = self.testapp.get('/people/{}/activities'.format(username), '', oauth2Header(username), status=200)
         response = res.json
+
         self.assertEqual(response[0]['object'].get('fullURL'), u'/activities/{}/image/full'.format(response[0]['id']))
         self.assertEqual(response[0]['object'].get('thumbURL'), u'/activities/{}/image/thumb'.format(response[0]['id']))
 

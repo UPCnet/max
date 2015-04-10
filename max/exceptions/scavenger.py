@@ -42,11 +42,12 @@ def format_raw_request(request):
             boundary = re.search(r"boundary\s*=\s*(.*?)$", content_type).groups()[0]
             if boundary:
                 boundary = boundary.replace('$', r'\$')
-                image = re.search(r'\r\n(?:.*?Content-type:\s*image.*?)\r\n\r\n(.*?){}'.format(boundary), raw_request, re.DOTALL | re.IGNORECASE).groups()[0]
-                if image:
-                    raw_request = raw_request.replace(image, u'<Image data {} bytes>\r\n'.format(len(image)))
+                match = re.search(r'\r\n(?:.*?Content-type:\s*image.*?)\r\n\r\n(.*?){}'.format(boundary), raw_request, re.DOTALL | re.IGNORECASE)
+                if match:
+                    image = match.groups()[0]
+                    raw_request = raw_request.replace(image, '<Image data {} bytes>\r\n'.format(len(image)))
 
-        raw_request.encode('utf-8')
+        raw_request.decode('utf-8')
 
     except UnicodeDecodeError as unicode_error:
         return raw_request[:unicode_error.start] + u"\r\n*** Unicode Decode Error parsing request, request trunked at byte {} ***\r\n".format(unicode_error.start)
