@@ -247,6 +247,29 @@ class AvatarTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         self.assertIn('image', response.content_type)
         self.assertEqual(self.get_image_dimensions_from(response), (48, 48))
 
+    def test_get_user_avatar_large_missing_all(self):
+        """
+            Given a user without avatar
+            When I retrieve the large avatar
+            And the large avatars has disappeared
+            Then I get the 48x48 version of that avatar
+        """
+        username = 'messi'
+        self.create_user(username)
+        self.upload_user_avatar(username, "avatar.png")
+
+        avatar_folder = get_avatar_folder(self.avatar_folder, 'people', username, size='large')
+        os.remove('{}/{}'.format(avatar_folder, username))
+
+        avatar_folder = get_avatar_folder(self.avatar_folder, 'people', username)
+        os.remove('{}/{}'.format(avatar_folder, username))
+
+        response = self.testapp.get('/people/%s/avatar/%s' % (username, 'large'), '', {}, status=200)
+
+        self.assertIn('image', response.content_type)
+        self.assertIn('image', response.content_type)
+        self.assertEqual(self.get_image_dimensions_from(response), (48, 48))
+
     @httpretty.activate
     @patch('tweepy.API', MockTweepyAPI)
     def test_get_context_twitter_download_avatar(self):

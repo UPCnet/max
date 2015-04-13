@@ -37,6 +37,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/people/%s' % username, "", oauth2Header(test_manager), status=201)
         return username
 
+    def test_create_user_missing_username(self):
+        self.testapp.post('/people', json.dumps({}), oauth2Header(test_manager), status=400)
+
     def test_create_user_creator_is_admin(self):
         """
             Given an admin user

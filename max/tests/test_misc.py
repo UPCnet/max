@@ -70,12 +70,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
 
     def test_bad_body_content_parsing(self):
         """
-            Test calling a service with a list on post body, that expects nothing on it
-            It should not fail, simply ignore content. Failures would be due a parsing error
-            trying to extract actor information from the body.
+            Test calling a service with a list on post body, that expects a json object.
+            It should fail
         """
         username = 'messi'
-        self.testapp.post('/people/%s' % username, '[]', oauth2Header(username), status=201)
+        self.testapp.post('/people/%s' % username, '[]', oauth2Header(username), status=400)
 
     def test_post_tunneling_on_delete(self):
         """

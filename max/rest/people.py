@@ -44,7 +44,11 @@ def addUser(users, request):
     """
         Add a user
     """
-    username = request.actor_username
+    payload = request.decoded_payload
+    if not isinstance(payload, dict):
+        raise ValidationError('Unexpected data type in request')
+
+    username = payload.get('username', None)
     if username is None:
         raise ValidationError('Missing username in request')
 

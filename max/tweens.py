@@ -13,6 +13,7 @@ from pyramid.interfaces import IRequest
 from pyramid.interfaces import IView
 
 from pymongo.errors import AutoReconnect
+from urllib import unquote_plus
 
 import logging
 import signal
@@ -198,6 +199,8 @@ def browser_debug_factory(handler, registry):
                 if payload:
                     request.text = payload
 
+        request.body = unquote_plus(request.body).strip('=')
+        request.headers['Content-Type'] = 'application/json'
         response = handler(request)
 
         if debug == '1' and user:
