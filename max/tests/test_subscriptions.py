@@ -114,7 +114,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username_not_me, subscribe_contextA)
         self.admin_subscribe_user_to_context(username, subscribe_contextB)
 
-        res = self.testapp.get('/people/%s/subscriptions' % username, {'tag': ['Assignatura']}, oauth2Header(username), status=200)
+        res = self.testapp.get('/people/%s/subscriptions' % username, {'tags': ['Assignatura']}, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].get('url'), 'http://atenea.upc.edu/A')
