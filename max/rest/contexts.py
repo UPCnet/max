@@ -53,7 +53,7 @@ def addContext(contexts, request):
         contextid = newcontext.insert()
         newcontext['_id'] = contextid
 
-    handler = JSONResourceEntity(newcontext.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newcontext.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -62,7 +62,7 @@ def getContext(context, request):
     """
         Get a context
     """
-    handler = JSONResourceEntity(context.getInfo())
+    handler = JSONResourceEntity(request, context.getInfo())
     return handler.buildResponse()
 
 
@@ -75,7 +75,7 @@ def ModifyContext(context, request):
     context.modifyContext(properties)
     context.updateUsersSubscriptions()
     context.updateContextActivities()
-    handler = JSONResourceEntity(context.flatten())
+    handler = JSONResourceEntity(request, context.flatten())
     return handler.buildResponse()
 
 

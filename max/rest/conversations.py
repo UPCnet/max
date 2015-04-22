@@ -177,7 +177,7 @@ def postMessage2Conversation(conversations, request):
     notifier = RabbitNotifications(request)
     notifier.add_conversation(current_conversation)
 
-    handler = JSONResourceEntity(output_message, status_code=201)
+    handler = JSONResourceEntity(request, output_message, status_code=201)
     return handler.buildResponse()
 
 
@@ -186,7 +186,7 @@ def getConversation(conversation, request):
     """
         Get a conversation
     """
-    handler = JSONResourceEntity(conversation.getInfo(request.actor['username']))
+    handler = JSONResourceEntity(request, conversation.getInfo(request.actor['username']))
     return handler.buildResponse()
 
 
@@ -207,7 +207,7 @@ def getUserConversationSubscription(conversation, request):
     conversation['permissions'] = subscription['permissions']
     conversation['messages'] = 0
 
-    handler = JSONResourceEntity(conversation)
+    handler = JSONResourceEntity(request, conversation)
     return handler.buildResponse()
 
 
@@ -220,7 +220,7 @@ def ModifyConversation(conversation, request):
     conversation.modifyContext(properties)
     conversation.updateUsersSubscriptions()
     conversation.updateContextActivities()
-    handler = JSONResourceEntity(conversation.flatten())
+    handler = JSONResourceEntity(request, conversation.flatten())
     return handler.buildResponse()
 
 
@@ -295,7 +295,7 @@ def joinConversation(conversation, request):
         newactivity = Activity.from_request(request, rest_params=rest_params)
         newactivity_oid = newactivity.insert()  # Insert a subscribe activity
         newactivity['_id'] = newactivity_oid
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -356,5 +356,5 @@ def transferConversationOwnership(conversation, request):
     previous_owner.revokePermission(subscription, 'kick')
     previous_owner.grantPermission(subscription, 'unsubscribe')
 
-    handler = JSONResourceEntity(conversation.flatten())
+    handler = JSONResourceEntity(request, conversation.flatten())
     return handler.buildResponse()

@@ -44,7 +44,7 @@ def favorite(activity, request):
     newactivity['object']['favorites'] = activity['favorites']  # Return the current favorites of the activity
     newactivity['object']['favoritesCount'] = activity['favoritesCount']
     newactivity['object']['favorited'] = activity.has_favorite_from(request.actor)
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -73,5 +73,5 @@ def unfavorite(activity, request):
     newactivity['object']['favorites'] = activity['favorites']
     newactivity['object']['favoritesCount'] = activity['favoritesCount']
     newactivity['object']['favorited'] = activity.has_favorite_from(request.actor)
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=200)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=200)
     return handler.buildResponse()

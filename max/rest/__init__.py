@@ -116,9 +116,10 @@ class JSONResourceEntity(object):
     """
     response_content_type = 'application/json'
 
-    def __init__(self, data, status_code=200):
+    def __init__(self, request, data, status_code=200):
         """
         """
+        self.request = request
         self.data = data
         self.status_code = status_code
 
@@ -127,6 +128,9 @@ class JSONResourceEntity(object):
             Translate to JSON object if any data. If data is not a dict,
             something went wrong
         """
+        if 'show_acls' in self.request.params:
+            self.data['acls'] = self.request.context.dump_acls()
+
         response_payload = json.dumps(self.data, cls=IterEncoder)
         data = response_payload is None and self.data or response_payload
         response = Response(data, status_int=self.status_code)

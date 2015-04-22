@@ -429,6 +429,13 @@ class MADBase(MADDict):
     # Security Related methods and properties
     #
 
+    def dump_acls(self):
+        acls = []
+        for acl_type, principal, permission in self.__acl__:
+            if principal in self.request.effective_principals and permission not in acls:
+                acls.append(permission)
+        return acls
+
     def get_default_permission_for(self, mode):
         """
             Returns the default permission for a field access type (view, edit)

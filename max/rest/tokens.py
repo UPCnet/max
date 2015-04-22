@@ -74,7 +74,7 @@ def add_device_token(tokens, request):
     # insert the token always
     newtoken.insert()
 
-    handler = JSONResourceEntity(newtoken.flatten(), status_code=201)
+    handler = JSONResourceEntity(request, newtoken.flatten(), status_code=201)
     return handler.buildResponse()
 
 

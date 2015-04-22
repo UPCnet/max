@@ -119,7 +119,7 @@ def addActivityComment(activity, request):
     del comment['inReplyTo']
     activity.addComment(comment)
 
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 

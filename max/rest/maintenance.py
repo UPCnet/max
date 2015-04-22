@@ -169,7 +169,7 @@ def getException(context, request):
         'request': http_request,
         'traceback': traceback
     }
-    handler = JSONResourceEntity(result)
+    handler = JSONResourceEntity(request, result)
     return handler.buildResponse()
 
 

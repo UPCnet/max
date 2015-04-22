@@ -291,6 +291,7 @@ class BaseContext(MADBase):
         context.setdefault('permissions', {})
         for permission, value in DEFAULT_CONTEXT_PERMISSIONS.items():
             context['permissions'][permission] = context['permissions'].get(permission, value)
+
         return context
 
     def _after_subscription_add(self, username):

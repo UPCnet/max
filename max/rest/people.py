@@ -82,7 +82,7 @@ def addUser(users, request):
         userid = newuser.insert(notifications=create_exchanges)
 
         newuser['_id'] = userid
-    handler = JSONResourceEntity(newuser.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newuser.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -93,7 +93,7 @@ def getUser(user, request):
     """
     actor_info = user.getInfo()
 
-    handler = JSONResourceEntity(actor_info)
+    handler = JSONResourceEntity(request, actor_info)
     return handler.buildResponse()
 
 
@@ -105,7 +105,7 @@ def ModifyUser(user, request):
     properties = user.getMutablePropertiesFromRequest(request)
     user.modifyUser(properties)
     user.updateConversationParticipants()
-    handler = JSONResourceEntity(user.flatten())
+    handler = JSONResourceEntity(request, user.flatten())
     return handler.buildResponse()
 
 

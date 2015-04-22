@@ -41,7 +41,7 @@ def getMaxPublicInfo(context, request):
             settings[setting] = max_settings[setting]
 
     settings['version'] = pkg_resources.require("max")[0].version
-    handler = JSONResourceEntity(settings)
+    handler = JSONResourceEntity(request, settings)
     return handler.buildResponse()
 
 
@@ -56,7 +56,7 @@ def getMaxSettings(context, request):
     settings = {key: value for key, value in max_settings.items() if re.match('^(max|mongodb|cache|oauth)', key)}
     settings['version'] = pkg_resources.require("max")[0].version
 
-    handler = JSONResourceEntity(settings)
+    handler = JSONResourceEntity(request, settings)
     return handler.buildResponse()
 
 
@@ -193,8 +193,8 @@ def endpoints_view(context, request):
             }
             categories.append(category)
 
-        handler = JSONResourceEntity(categories)
+        handler = JSONResourceEntity(request, categories)
     else:
-        handler = JSONResourceEntity(resources_by_route)
+        handler = JSONResourceEntity(request, resources_by_route)
 
     return handler.buildResponse()

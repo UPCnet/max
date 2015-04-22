@@ -59,6 +59,21 @@ class ContextACLTests(unittest.TestCase, MaxTestBase):
 
     # View context tests
 
+    def test_view_context_as_manager_with_acls(self):
+        """
+            Given i'm a user that has the Manager role
+            When i try to update any context
+            I succeed
+            And I get the acls for that context
+        """
+
+        from max.tests.mockers import create_context
+        self.create_user(test_manager)
+        res = self.create_context(create_context)
+        chash = res.json['hash']
+        res = self.testapp.get('/contexts/%s?show_acls=1' % chash, "", oauth2Header(test_manager), status=200)
+        self.assertGreater(len(res.json['acls']), 0)
+
     def test_view_context_as_manager(self):
         """
             Given i'm a user that has the Manager role

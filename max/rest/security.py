@@ -57,7 +57,7 @@ def check_user_role(security, request):
     if user not in security['roles'][role]:
         raise ObjectNotFound("User {} doesn't have role {}".format(user, role))
 
-    handler = JSONResourceEntity({'roles': [role]})
+    handler = JSONResourceEntity(request, {'roles': [role]})
     return handler.buildResponse()
 
 

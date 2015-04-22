@@ -58,7 +58,7 @@ def add_message(conversation, request):
         message_oid = newmessage.insert()
         newmessage['_id'] = message_oid
 
-    handler = JSONResourceEntity(newmessage.flatten(), status_code=201)
+    handler = JSONResourceEntity(request, newmessage.flatten(), status_code=201)
     return handler.buildResponse()
 
 

@@ -47,7 +47,7 @@ def like(activity, request):
     newactivity['object']['likes'] = activity['likes']  # Return the current likes of the activity
     newactivity['object']['likesCount'] = activity['likesCount']  # Return the current likes of the activity
     newactivity['object']['liked'] = activity.has_like_from(request.actor)
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -90,7 +90,7 @@ def flagActivity(activity, request):
         activity.save()
         status_code = 201
 
-    handler = JSONResourceEntity(activity.flatten(), status_code=status_code)
+    handler = JSONResourceEntity(request, activity.flatten(), status_code=status_code)
     return handler.buildResponse()
 
 

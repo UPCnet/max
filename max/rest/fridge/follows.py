@@ -30,7 +30,7 @@ def follow(context, request):
 
     request.actor.addFollower(newactivity['object'])
 
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 

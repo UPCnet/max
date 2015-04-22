@@ -173,7 +173,7 @@ def addContextActivity(context, request):
             activity_oid = newactivity.insert()
             newactivity['_id'] = ObjectId(activity_oid)
 
-    handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()
 
 
@@ -222,7 +222,7 @@ def addUserActivity(user, request):
             activity_oid = newactivity.insert()
             newactivity['_id'] = activity_oid
 
-    handler = JSONResourceEntity(newactivity.flatten(squash=['keywords']), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()
 
 
@@ -233,7 +233,7 @@ def getActivity(activity, request):
 
          :rest activity The id of the activity
     """
-    handler = JSONResourceEntity(activity.flatten())
+    handler = JSONResourceEntity(request, activity.flatten())
     return handler.buildResponse()
 
 

@@ -45,7 +45,7 @@ def subscribe(context, request):
         code = 201
         newactivity_oid = newactivity.insert()  # Insert a subscribe activity
         newactivity['_id'] = newactivity_oid
-    handler = JSONResourceEntity(newactivity.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
 
 
@@ -121,7 +121,7 @@ def grantPermissionOnContext(context, request):
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
 
-    handler = JSONResourceEntity(subscription, status_code=code)
+    handler = JSONResourceEntity(request, subscription, status_code=code)
     return handler.buildResponse()
 
 
@@ -145,7 +145,7 @@ def revokePermissionOnContext(context, request):
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
         code = 201
-    handler = JSONResourceEntity(subscription, status_code=code)
+    handler = JSONResourceEntity(request, subscription, status_code=code)
     return handler.buildResponse()
 
 
@@ -156,5 +156,5 @@ def resetPermissionsOnContext(context, request):
     """
 
     subscription = request.actor.reset_permissions(context.subscription, context)
-    handler = JSONResourceEntity(subscription, status_code=200)
+    handler = JSONResourceEntity(request, subscription, status_code=200)
     return handler.buildResponse()
