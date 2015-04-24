@@ -15,18 +15,16 @@ from max.exceptions import UnknownUserError
 from max.exceptions import ValidationError
 from max.exceptions.http import JSONHTTPBadRequest
 from max.exceptions.http import JSONHTTPForbidden
+from max.exceptions.http import JSONHTTPInternalServerError
 from max.exceptions.http import JSONHTTPNotFound
 from max.exceptions.http import JSONHTTPUnauthorized
 from max.exceptions.scavenger import saveException
-from pyramid.view import view_config
-from pyramid.view import forbidden_view_config
-from pymongo.errors import AutoReconnect
-from pymongo.errors import ConnectionFailure
 
-from max.exceptions.http import JSONHTTPInternalServerError
 from pyramid.settings import asbool
+from pyramid.view import view_config
 
 from bson.errors import InvalidId
+
 import traceback
 
 
@@ -35,26 +33,9 @@ def unauthorized(exc, request):
     return JSONHTTPUnauthorized(error=dict(objectType='error', error=Unauthorized.__name__, error_description=exc.message))
 
 
-@forbidden_view_config()
-def main_forbidden(request):
-    """
-        This view pops up when an authorization error occurs in the pyramid pipeline.
-
-        NOTE: There is another forbidden view just below here, that catches the
-        Forbidden exceptions inside endpoint code.
-    """
-    message = 'User "{}" has no permission "{}" here '.format(request.authenticated_userid, request.exception.result.permission)
-    return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=message))
-
-
 @view_config(context=Forbidden)
 def forbidden(exc, request):
     return JSONHTTPForbidden(error=dict(objectType='error', error=Forbidden.__name__, error_description=exc.message))
-
-
-# @notfound_view_config()
-# def notfound(request):
-#     return JSONHTTPNotFound(error=dict(objectType='error', error=ObjectNotFound.__name__, error_description='Object {} not found'.format(request.exception.detail)))
 
 
 @view_config(context=UnknownUserError)

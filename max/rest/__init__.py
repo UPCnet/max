@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 from pyramid.response import Response
 
 import json
@@ -88,6 +88,9 @@ class JSONResourceRoot(object):
         wrapper = self.data
         return wrapper
 
+    def __call__(self, *args, **kwargs):
+        return self.buildResponse(*args, **kwargs)
+
     def buildResponse(self, payload=None):
         """
             Translate to JSON object if any data. If data is not a list
@@ -122,6 +125,9 @@ class JSONResourceEntity(object):
         self.request = request
         self.data = data
         self.status_code = status_code
+
+    def __call__(self, *args, **kwargs):
+        return self.buildResponse(*args, **kwargs)
 
     def buildResponse(self, payload=None):
         """
