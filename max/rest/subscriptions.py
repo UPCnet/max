@@ -3,6 +3,7 @@ from max import DEFAULT_CONTEXT_PERMISSIONS
 from max import DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY
 from max.MADMax import MADMaxCollection
 from max.exceptions import InvalidPermission
+from max.exceptions import ObjectNotFound
 from max.models import Activity
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
@@ -54,6 +55,11 @@ def unsubscribe(context, request):
     """
         Unsubscribe user from context
     """
+    subscription = context.subscription
+
+    if subscription is None:
+        raise ObjectNotFound('{} is not susbcribed to {}'.format(request.actor, context['hash']))
+
     context.removeUserSubscriptions(users_to_delete=[request.actor_username])
     return HTTPNoContent()
 
@@ -110,14 +116,19 @@ def grantPermissionOnContext(context, request):
     if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
-    if permission in context.subscription.get('_grants', []):
+    subscription = context.subscription
+
+    if subscription is None:
+        raise ObjectNotFound('{} is not susbcribed to {}'.format(request.actor, context['hash']))
+
+    if permission in subscription.get('_grants', []):
         # Already have the permission grant
         code = 200
     else:
         # Assign the permission
         code = 201
         subscription = request.actor.grantPermission(
-            context.subscription,
+            subscription,
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
 
@@ -134,14 +145,19 @@ def revokePermissionOnContext(context, request):
     if permission not in DEFAULT_CONTEXT_PERMISSIONS.keys():
         raise InvalidPermission("There's not any permission named '%s'" % permission)
 
+    subscription = context.subscription
+
+    if subscription is None:
+        raise ObjectNotFound('{} is not susbcribed to {}'.format(request.actor, context['hash']))
+
     code = 200
-    if permission in context.subscription.get('_vetos', []):
+    if permission in subscription.get('_vetos', []):
         code = 200
         # Alredy vetted
     else:
         # We have the permission, let's delete it
         subscription = request.actor.revokePermission(
-            context.subscription,
+            subscription,
             permission,
             permanent=request.params.get('permanent', DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY))
         code = 201

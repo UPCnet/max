@@ -354,6 +354,11 @@ class Context(BaseContext):
             (Allow, Owner, permissions.list_activities),
             (Allow, Manager, permissions.add_activity),
             (Allow, Manager, permissions.list_comments),
+
+            (Allow, Manager, permissions.manage_subcription_permissions),
+            (Allow, Owner, permissions.manage_subcription_permissions),
+            (Allow, Manager, permissions.remove_subscription),
+            (Allow, Owner, permissions.remove_subscription),
         ]
         # Grant subscribe permission to the user to subscribe itself if the context policy allows it
         if self['permissions'].get('subscribe', DEFAULT_CONTEXT_PERMISSIONS['subscribe']) == 'public' and is_self_operation(self.request):
@@ -369,12 +374,12 @@ class Context(BaseContext):
             # Grant permisions only available if subscription exists. Setting this permissions
             # conditionally here, causes a Forbidden to be raised when trying to modify or delete
             # an inexistent subscription, event if you're a Owner or Manager.
-            acl.extend([
-                (Allow, Manager, permissions.manage_subcription_permissions),
-                (Allow, Owner, permissions.manage_subcription_permissions),
-                (Allow, Manager, permissions.remove_subscription),
-                (Allow, Owner, permissions.remove_subscription),
-            ])
+            # acl.extend([
+            #     (Allow, Manager, permissions.manage_subcription_permissions),
+            #     (Allow, Owner, permissions.manage_subcription_permissions),
+            #     (Allow, Manager, permissions.remove_subscription),
+            #     (Allow, Owner, permissions.remove_subscription),
+            # ])
 
             # Grant ubsubscribe permission if the user subscription allows it
             # but only if is trying to unsubscribe itself.

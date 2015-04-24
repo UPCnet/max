@@ -427,11 +427,10 @@ class User(MADBase):
             for subscription in actor['talkingIn']:
                 conversation_object = conversations_by_id[subscription['id']]
                 subscription['displayName'] = conversation_object.realDisplayName(self['username'])
-                subscription['lastMessage'] = conversation_object.lastMessage()
+                subscription['lastMessage'] = flatten(conversation_object.lastMessage())
                 subscription['participants'] = conversation_object['participants']
                 subscription['tags'] = conversation_object['tags']
                 subscription['messages'] = 0
-
             actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
         return actor

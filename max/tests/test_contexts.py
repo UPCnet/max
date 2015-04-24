@@ -522,7 +522,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_context(create_context_private_r)
         chash = sha1(create_context_private_r['url']).hexdigest()
         permission = 'write'
-        self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=403)
+        self.testapp.put('/contexts/%s/permissions/%s/%s' % (chash, username, permission), "", oauth2Header(test_manager), status=404)
 
     def test_grant_invalid_permission_on_subscribed_context(self):
         from .mockers import create_context_private_r, subscribe_context
