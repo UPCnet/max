@@ -90,7 +90,6 @@ class JSONResourceRoot(object):
             Translate to JSON object if any data. If data is not a list
             something went wrong
         """
-        import ipdb;ipdb.set_trace()
         if self.stats:
             response_payload = ''
             self.headers['X-totalItems'] = str(self.data)
