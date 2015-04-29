@@ -554,17 +554,21 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual('write' in result['permissions'], False)
 
     def test_get_context_subscriptions(self):
+        from .mockers import create_contextA, subscribe_contextA
         from .mockers import create_context_private_r, subscribe_context
         from hashlib import sha1
         username = 'messi'
         self.create_user(username)
+        self.create_context(create_contextA)
         self.create_context(create_context_private_r)
         self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username, subscribe_contextA)
         chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.get('/contexts/%s/subscriptions' % (chash), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
-
+        import ipdb;ipdb.set_trace()
         self.assertEqual(result[0].get('username', ''), 'messi')
+        self.assertEqual(result[0].get('hash', ''), chash)
 
     def test_create_context_with_upload_url(self):
         """ """

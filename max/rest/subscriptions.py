@@ -69,16 +69,19 @@ def getContextSubscriptions(context, request):
     """
         Get all context subscriptions
     """
-    found_users = request.db.users.search({"subscribedTo.hash": context['hash']}, flatten=1, show_fields=["username", "subscribedTo"], **searchParams(request))
+    found_users = request.db.users.search({"subscribedTo.hash": context['hash']}, flatten=0, show_fields=["username", "subscribedTo"], **searchParams(request))
 
     def format_subscriptions():
         for user in found_users:
-            subscription = user['subscribedTo'][0]
-            del user['subscribedTo']
-            user['permissions'] = subscription.pop('permissions')
-            user['vetos'] = subscription.pop('vetos', [])
-            user['grants'] = subscription.pop('grants', [])
-            yield user
+            user_subscription = user.getSubscription(context)
+            subscription = {
+                'username': user['username'],
+                'permissions': user_subscription['permissions'],
+                'vetos': user_subscription.get('vetos', []),
+                'grants': user_subscription.get('grants', []),
+                'hash': user_subscription['hash']
+            }
+            yield subscription
 
     handler = JSONResourceRoot(format_subscriptions())
     return handler.buildResponse()

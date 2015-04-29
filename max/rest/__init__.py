@@ -58,14 +58,14 @@ class endpoint(object):
 
 
 class IterEncoder(json.JSONEncoder):
-    def default(self, o):
+    def default(self, obj):
         try:
-            return json.JSONEncoder.default(self, o)
+            return json.JSONEncoder.default(self, obj)
         except TypeError, x:
             try:
-                return list(o)
+                return list(obj)
             except:
-                return x
+                raise x
 
 
 class JSONResourceRoot(object):
@@ -82,12 +82,6 @@ class JSONResourceRoot(object):
         self.remaining = remaining
         self.headers = {}
 
-    def wrap(self):
-        """
-        """
-        wrapper = self.data
-        return wrapper
-
     def __call__(self, *args, **kwargs):
         return self.buildResponse(*args, **kwargs)
 
@@ -96,12 +90,12 @@ class JSONResourceRoot(object):
             Translate to JSON object if any data. If data is not a list
             something went wrong
         """
-
+        import ipdb;ipdb.set_trace()
         if self.stats:
             response_payload = ''
             self.headers['X-totalItems'] = str(self.data)
         else:
-            response_payload = json.dumps(self.wrap(), cls=IterEncoder)
+            response_payload = json.dumps(self.data, cls=IterEncoder)
 
         if self.remaining:
             self.headers['X-Has-Remaining-Items'] = '1'
