@@ -566,7 +566,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         chash = sha1(create_context_private_r['url']).hexdigest()
         res = self.testapp.get('/contexts/%s/subscriptions' % (chash), "", oauth2Header(test_manager), status=200)
         result = json.loads(res.text)
-        import ipdb;ipdb.set_trace()
         self.assertEqual(result[0].get('username', ''), 'messi')
         self.assertEqual(result[0].get('hash', ''), chash)
 
