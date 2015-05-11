@@ -82,7 +82,7 @@ def addUser(users, request):
         userid = newuser.insert(notifications=create_exchanges)
 
         newuser['_id'] = userid
-    handler = JSONResourceEntity(request, newuser.flatten(), status_code=code)
+    handler = JSONResourceEntity(request, newuser.getInfo(), status_code=code)
     return handler.buildResponse()
 
 
