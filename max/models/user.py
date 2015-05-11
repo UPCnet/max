@@ -114,7 +114,9 @@ class User(MADBase):
         ]
 
         if is_self_operation(self.request):
-            acl.append((Allow, self.request.authenticated_userid, list_tokens))
+            acl.append((Allow, self.request.authenticated_userid, list_tokens)),
+            acl.append((Allow, self.request.authenticated_userid, view_subscriptions))
+
         return acl
 
     def format_unique(self, key):

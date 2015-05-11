@@ -242,10 +242,9 @@ class PeopleTraverser(MongoDBTraverser):
             (Allow, Owner, permissions.view_subscriptions),
         ]
 
-        # Grant add permission and some view permission if user is trying to create itself
+        # Grant add permission if user is trying to create itself
         if self.request.authenticated_userid == self.request.actor_username:
             acl.append((Allow, self.request.authenticated_userid, permissions.add_people))
-            acl.append((Allow, self.request.authenticated_userid, permissions.view_subscriptions))
 
         return acl
 
