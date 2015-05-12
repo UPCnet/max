@@ -2,8 +2,13 @@
 from calendar import monthrange
 from datetime import datetime
 from datetime import time
+from rfc3339 import rfc3339
 
 import re
+
+
+def datetime_to_rfc3339(dt):
+    return rfc3339(dt, utc=True, use_system_timezone=False)
 
 
 def rfc3339_parse(date):

@@ -1,5 +1,10 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+from datetime import datetime
 from pyramid.response import Response
+from types import GeneratorType
+
+from max.MADMax import ResultsWrapper
+from max.utils.dates import datetime_to_rfc3339
 
 import json
 import venusian
@@ -61,11 +66,14 @@ class IterEncoder(json.JSONEncoder):
     def default(self, obj):
         try:
             return json.JSONEncoder.default(self, obj)
-        except TypeError, x:
-            try:
+        except TypeError, catched:
+            if isinstance(obj, GeneratorType):
                 return list(obj)
-            except:
-                raise x
+            if isinstance(obj, ResultsWrapper):
+                return list(obj)
+            elif isinstance(obj, datetime):
+                return datetime_to_rfc3339(obj)
+            raise catched
 
 
 class JSONResourceRoot(object):

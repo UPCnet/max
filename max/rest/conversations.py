@@ -200,7 +200,6 @@ def getUserConversationSubscription(conversation, request):
     conversations_collection = conversation.__parent__
     conversation_object = conversations_collection[subscription['id']]
     conversation = conversation_object.flatten()
-
     # Update temporary conversation with subscription permissions and other stuff
     conversation['displayName'] = conversation_object.realDisplayName(request.actor['username'])
     conversation['lastMessage'] = conversation_object.lastMessage()

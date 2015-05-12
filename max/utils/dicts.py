@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+from max.utils.dates import datetime_to_rfc3339
+
 from bson.objectid import ObjectId
 from copy import copy
 from datetime import datetime
-from rfc3339 import rfc3339
 
 
 class RUDict(dict):
@@ -81,7 +82,7 @@ def decodeBSONEntity(di, key):
     if isinstance(value, ObjectId):
         di[key] = str(value)
     elif isinstance(value, datetime):
-        di[key] = rfc3339(value, utc=True, use_system_timezone=False)
+        di[key] = datetime_to_rfc3339(value)
 
 
 def deUnderescore(di, key):
