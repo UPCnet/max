@@ -36,38 +36,35 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
     def test_add_device_token_ios(self):
         username = 'messi'
-        platform = 'ios'
-        token = '12345678901234567890123456789012'
+        token = {'platform': 'ios', 'token': '12345678901234567890123456789012'}
         self.create_user(username)
-        res = self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
+        res = self.testapp.post('/tokens', json.dumps(token), oauth2Header(username), status=201)
         result = json.loads(res.text)
-        self.assertEqual(result.get('token', ''), token)
-        self.assertEqual(result.get('platform', ''), platform)
+        self.assertEqual(result.get('token', ''), token['token'])
+        self.assertEqual(result.get('platform', ''), token['platform'])
 
     def test_add_device_token_android(self):
         username = 'messi'
-        platform = 'android'
-        token = '12345678901234567890123456789012klhsdflajshdfkjashdfoq'
         self.create_user(username)
-        res = self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
+        token = {'platform': 'android', 'token': '12345678901234567890123456789012klhsdflajshdfkjashdfoq'}
+        res = self.testapp.post('/tokens', json.dumps(token), oauth2Header(username), status=201)
         result = json.loads(res.text)
-        self.assertEqual(result.get('token', ''), token)
-        self.assertEqual(result.get('platform', ''), platform)
+        self.assertEqual(result.get('token', ''), token['token'])
+        self.assertEqual(result.get('platform', ''), token['platform'])
 
     def test_add_device_invalid_platform(self):
         username = 'messi'
-        platform = 'blackberry'
-        token = '12345678901234567890123456789012klhsdflajshdfkjashdfoq'
+        token = {'platform': 'blackberry', 'token': '12345678901234567890123456789012klhsdflajshdfkjashdfoq'}
         self.create_user(username)
-        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=400)
+        self.testapp.post('/tokens', json.dumps(token), oauth2Header(username), status=400)
 
     def test_delete_device_token(self):
         username = 'messi'
-        platform = 'ios'
-        token = '12345678901234567890123456789012'
+        token = {'platform': 'ios', 'token': '12345678901234567890123456789012'}
+
         self.create_user(username)
-        self.testapp.post('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=201)
-        self.testapp.delete('/people/%s/device/%s/%s' % (username, platform, token), "", oauth2Header(username), status=204)
+        self.testapp.post('/tokens', json.dumps(token), oauth2Header(username), status=201)
+        self.testapp.delete('/tokens/%s' % (token['token']), "", oauth2Header(username), status=204)
 
     def test_add_duplicated_token(self):
         """
@@ -79,17 +76,16 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.create_user(sender)
         self.create_user(recipient)
 
-        platform = 'ios'
-        token = '12345678901234567890123456789012'
+        token = {'platform': 'ios', 'token': '12345678901234567890123456789012'}
 
-        self.testapp.post('/people/%s/device/%s/%s' % (sender, platform, token), "", headers=oauth2Header(sender), status=201)
-        sender_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(sender, platform), "", headers=oauth2Header(sender), status=200).json
+        self.testapp.post('/tokens', json.dumps(token), oauth2Header(sender), status=201)
+        sender_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(sender, token['platform']), "", headers=oauth2Header(sender), status=200).json
 
         self.assertEqual(len(sender_tokens), 1)
-        self.testapp.post('/people/%s/device/%s/%s' % (recipient, platform, token), "", headers=oauth2Header(recipient), status=201)
+        self.testapp.post('/tokens', json.dumps(token), oauth2Header(recipient), status=201)
 
-        sender_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(sender, platform), "", headers=oauth2Header(sender), status=200).json
-        recipient_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(recipient, platform), "", headers=oauth2Header(recipient), status=200).json
+        sender_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(sender, token['platform']), "", headers=oauth2Header(sender), status=200).json
+        recipient_tokens = self.testapp.get('/people/{}/tokens/platforms/{}'.format(recipient, token['platform']), "", headers=oauth2Header(recipient), status=200).json
 
         self.assertEqual(len(sender_tokens), 0)
         self.assertEqual(len(recipient_tokens), 1)

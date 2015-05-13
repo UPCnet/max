@@ -248,6 +248,10 @@ def fix_deprecated_add_token(request, match):
     request.headers['Content-Type'] = 'application/json'
 
     def wrapper(response):
+        """
+            Replaces response body with the request actor,
+            as expected by the older api
+        """
         import json
         response.body = json.dumps(request.actor.getInfo())
         return response
