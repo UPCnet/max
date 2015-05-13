@@ -160,18 +160,22 @@ def post_tunneling_factory(handler, registry):
 
 def deprecation_wrapper_factory(handler, registry):
     def deprecation_wrapper_tween(request):
+        response_wrapper = None
         if request.method == 'POST':
             for pattern, action in POST_DEPRECATIONS:
-                matched = check_deprecation(request, pattern, action)
+                matched, response_wrapper = check_deprecation(request, pattern, action)
                 if matched:
                     break
         elif request.method == 'DELETE':
             for pattern, action in DELETE_DEPRECATIONS:
-                matched = check_deprecation(request, pattern, action)
+                matched, response_wrapper = check_deprecation(request, pattern, action)
                 if matched:
                     break
         response = handler(request)
-        return response
+        if response_wrapper:
+            return response_wrapper(response)
+        else:
+            return response
     return deprecation_wrapper_tween
 
 

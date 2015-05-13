@@ -247,6 +247,13 @@ def fix_deprecated_add_token(request, match):
     # Force headers needed to avoid body content quoting on tests
     request.headers['Content-Type'] = 'application/json'
 
+    def wrapper(response):
+        import json
+        response.body = json.dumps(request.actor.getInfo())
+        return response
+
+    return wrapper
+
 
 def fix_deprecated_delete_token(request, match):
     """
@@ -283,8 +290,10 @@ def check_deprecation(request, pattern, action):
     """
     match = pattern(request.path_info)
     if match:
-        action(request, match)
-        return True
+        response_wrapper = action(request, match)
+        return True, response_wrapper
+
+    return False, None
 
 # PLEASE! Construct depreaction list sorted by matching frequency, so deprecations expected
 # to happen more frequently that others go first. This is to minimize the number of deprecations tested

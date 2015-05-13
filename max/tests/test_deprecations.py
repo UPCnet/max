@@ -215,8 +215,9 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
             Given a request to the deprecated POST /people/{user}/device/{platform}/{token}
             When the request is processed
             Then the request is rewrited as POST /tokens
-            And the token is injected in the body
-            And the platform is injected in the body
+            And the token is injected in the request body
+            And the platform is injected in the reqeust body
+            And the response contains a Person instead of a Token
         """
         username = 'sheldon'
         self.create_user(username)
@@ -229,8 +230,8 @@ class DeprecationTests(unittest.TestCase, MaxTestBase):
         rewrited_request_url = urlparse.urlparse(rewrited_request.url).path
 
         self.assertEqual(rewrited_request_url, '/tokens')
-        self.assertEqual(res.json['token'], token)
-        self.assertEqual(res.json['platform'], platform)
+        self.assertEqual(res.json['username'], username)
+        self.assertEqual(res.json['objectType'], 'person')
 
     def test_deprecated_delete_token(self):
         """
