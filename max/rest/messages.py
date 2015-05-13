@@ -23,9 +23,11 @@ def getMessages(conversation, request):
         Get all messages from a conversation
     """
     query = {'contexts.id': str(conversation['_id'])}
-    messages = request.db.messages.search(query, sort_direction=DESCENDING, sort_by_field="published", keep_private_fields=False, **searchParams(request))
-    remaining = messages.remaining
-    handler = JSONResourceRoot(flatten(messages, reverse=True), remaining=remaining)
+
+    # Sorting by _id, as id is indeed the same as published
+    messages = request.db.messages.search(query, sort_direction=DESCENDING, sort_by_field="_id", keep_private_fields=False, **searchParams(request))
+    inverted = flatten(messages, reverse=True)
+    handler = JSONResourceRoot(inverted, remaining=messages.remaining)
     return handler.buildResponse()
 
 
