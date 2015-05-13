@@ -29,7 +29,6 @@ def getVisibleUsers(users, request):
 
     filter_fields = ["username", "displayName", "objectType", 'subscribedTo']
     found_users = users.search(query, show_fields=filter_fields, sort_by_field="username", flatten=0, **searchParams(request))
-    #remaining = found_users.remaining
 
     # Filter user results. User
 
