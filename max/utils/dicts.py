@@ -155,6 +155,6 @@ def flatten(data, filter_method=None, reverse=False, **kwargs):
             if reverse:
                 newitems.insert(0, flatten(item, **kwargs))
             else:
-                newitems.append()
+                newitems.append(flatten(item, **kwargs))
         data = newitems
     return data
