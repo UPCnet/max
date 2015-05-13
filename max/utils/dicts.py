@@ -143,7 +143,7 @@ def flattendict(original, filter_method=None, **kwargs):
     return di
 
 
-def flatten(data, filter_method=None, **kwargs):
+def flatten(data, filter_method=None, reverse=False, **kwargs):
     """
         Recursively flatten a dict or list
     """
@@ -152,6 +152,9 @@ def flatten(data, filter_method=None, **kwargs):
     elif isinstance(data, list) or hasattr(data, 'next'):
         newitems = []
         for item in data:
-            newitems.append(flatten(item, **kwargs))
+            if reverse:
+                newitems.insert(0, flatten(item, **kwargs))
+            else:
+                newitems.append()
         data = newitems
     return data

@@ -25,7 +25,7 @@ def getMessages(conversation, request):
     query = {'contexts.id': str(conversation['_id'])}
     messages = request.db.messages.search(query, sort_direction=DESCENDING, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining
-    handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
+    handler = JSONResourceRoot(flatten(messages, reverse=True), remaining=remaining)
     return handler.buildResponse()
 
 
