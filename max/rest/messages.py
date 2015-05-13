@@ -14,7 +14,7 @@ from pyramid.response import Response
 
 from base64 import b64encode
 from bson import ObjectId
-from pymongo import ASCENDING
+from pymongo import DESCENDING
 
 
 @endpoint(route_name='messages', request_method='GET', permission=list_messages)
@@ -23,9 +23,9 @@ def getMessages(conversation, request):
         Get all messages from a conversation
     """
     query = {'contexts.id': str(conversation['_id'])}
-    messages = request.db.messages.search(query, sort_direction=ASCENDING, sort_by_field="published", keep_private_fields=False, **searchParams(request))
+    messages = request.db.messages.search(query, sort_direction=DESCENDING, sort_by_field="published", keep_private_fields=False, **searchParams(request))
     remaining = messages.remaining
-    handler = JSONResourceRoot(flatten(messages), remaining=remaining)
+    handler = JSONResourceRoot(flatten(messages[::-1]), remaining=remaining)
     return handler.buildResponse()
 
 
