@@ -7,7 +7,6 @@ import logging
 import re
 import traceback
 
-logger = logging.getLogger('exceptions')
 request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
 
@@ -78,13 +77,13 @@ def saveException(request, error):
         Logs the exception
 
     """
-    time = datetime.now().isoformat()
+    now = datetime.now()
     matched_route = request.matched_route.name if request.matched_route else 'No route matched'
     matchdict = request.matchdict or []
 
     entry = dict(
         traceback=error,
-        time=time,
+        time=now.isoformat(),
         raw_request=format_raw_request(request),
         matched_route=matched_route,
         matchdict=matchdict,
@@ -93,5 +92,11 @@ def saveException(request, error):
     dump = json.dumps(entry)
     entry['hash'] = sha1(dump).hexdigest()
     exception_log = ERROR_TEMPLATE.format(**entry)
-    logger.debug(exception_log)
+
+    exception_filename = '{folder}/max_{date}_{hash}'.format(
+        folder=request.registry.settings.get('exceptions_folder'),
+        date=now.strftime('%Y%m%d%H%M%S'),
+        hash=entry['hash']
+    )
+    open(exception_filename, 'w').write(exception_log)
     return entry['hash'], exception_log

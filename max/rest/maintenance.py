@@ -8,8 +8,11 @@ from max.rest import endpoint
 from max.security.permissions import do_maintenance
 
 from bson import ObjectId
+from datetime import datetime
 
 import logging
+import glob
+import os
 import re
 
 
@@ -156,11 +159,15 @@ def getException(context, request):
         Get an exception
     """
     ehash = request.matchdict['hash']
-    logfile = logger.handlers[0].baseFilename
-    regex = r'BEGIN EXCEPTION REPORT: %s\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT' % (ehash)
-    match = re.search(regex, open(logfile).read(), re.DOTALL)
-    if not match:
+    exceptions_folder = request.registry.settings.get('exceptions_folder')
+    matches = glob.glob('{}/*{}'.format(exceptions_folder, ehash))
+
+    if not matches:
         raise ObjectNotFound("There is no logged exception with this hash")
+
+    exception = open(matches[0]).read()
+    regex = r'BEGIN EXCEPTION REPORT: .*?\nDATE: (.*?)\nREQUEST:\n\n(.*?)\n\nTRACEBACK:\n\n(.*?)\nEND EXCEPTION REPORT'
+    match = re.search(regex, exception, re.DOTALL)
 
     date, http_request, traceback = match.groups()
 
@@ -178,10 +185,21 @@ def getExceptions(context, request):
     """
         Get all exceptions
     """
-    logfile = logger.handlers[0].baseFilename
-    regex = r'BEGIN EXCEPTION REPORT: (\w+)\nDATE: (.*?)\n'
-    matches = re.findall(regex, open(logfile).read(), re.DOTALL)
-    exceptions = [{'id': exception_id, 'date': exception_date} for exception_id, exception_date in matches]
+    exceptions_folder = request.registry.settings.get('exceptions_folder')
+    exception_files = os.listdir(exceptions_folder)
+
+    exceptions = []
+
+    for exception_filename in exception_files:
+        try:
+            logger, date, exception_id = exception_filename.split('_')
+        except:
+            pass
+
+        exceptions.append({
+            'id': exception_id,
+            'date': datetime.strptime(date, '%Y%m%d%H%M%S').strftime('%Y/%m/%d %H:%M:%S')
+        })
 
     handler = JSONResourceRoot(exceptions)
     return handler.buildResponse()

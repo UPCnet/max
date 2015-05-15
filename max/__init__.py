@@ -32,6 +32,7 @@ from pyramid.config import Configurator
 from pyramid.settings import asbool
 from pyramid_beaker import set_cache_regions_from_settings
 
+import os
 
 DEFAULT_CONTEXT_PERMISSIONS = dict(
     read='restricted',
@@ -125,4 +126,10 @@ def main(*args, **settings):
 
     config.scan('max', ignore=['max.tests'])
     set_signal()
+
+    # Create exceptions log folfer if it doesnt exists
+    exceptions_folder = config.registry.settings.get('exceptions_folder')
+    if not os.path.exists(exceptions_folder):
+        os.makedirs(exceptions_folder)
+
     return config.make_wsgi_app()
