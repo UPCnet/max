@@ -188,18 +188,17 @@ def getExceptions(context, request):
     exceptions_folder = request.registry.settings.get('exceptions_folder')
     exception_files = os.listdir(exceptions_folder)
 
-    exceptions = []
+    def get_exceptions():
+        for exception_filename in exception_files:
+            try:
+                logger, date, exception_id = exception_filename.split('_')
+            except:
+                pass
 
-    for exception_filename in exception_files:
-        try:
-            logger, date, exception_id = exception_filename.split('_')
-        except:
-            pass
+            yield {
+                'id': exception_id,
+                'date': datetime.strptime(date, '%Y%m%d%H%M%S').strftime('%Y/%m/%d %H:%M:%S')
+            }
 
-        exceptions.append({
-            'id': exception_id,
-            'date': datetime.strptime(date, '%Y%m%d%H%M%S').strftime('%Y/%m/%d %H:%M:%S')
-        })
-
-    handler = JSONResourceRoot(exceptions)
+    handler = JSONResourceRoot(sorted(get_exceptions(), key=lambda x: x['date'], reverse=True))
     return handler.buildResponse()

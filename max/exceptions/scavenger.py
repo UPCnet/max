@@ -83,7 +83,7 @@ def saveException(request, error):
 
     entry = dict(
         traceback=error,
-        time=now.isoformat(),
+        time=now.strftime('%Y/%m/%d %H:%M:%S'),
         raw_request=format_raw_request(request),
         matched_route=matched_route,
         matchdict=matchdict,
