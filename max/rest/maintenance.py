@@ -10,13 +10,9 @@ from max.security.permissions import do_maintenance
 from bson import ObjectId
 from datetime import datetime
 
-import logging
 import glob
 import os
 import re
-
-
-logger = logging.getLogger('exceptions')
 
 
 @endpoint(route_name='maintenance_keywords', request_method='POST', permission=do_maintenance)
