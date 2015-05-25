@@ -162,7 +162,8 @@ def endpoints_view(context, request):
             'payload': payload,
             'rest_params': get_rest_params(method),
             'query_params': get_query_params(method),
-            'permission': view_permission(view)
+            'permission': view_permission(view),
+            'modifiers': method.modifiers
         }
 
         # In case we found that the GET method has a HEAD version

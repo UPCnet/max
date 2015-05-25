@@ -16,6 +16,7 @@ class endpoint(object):
         Stolen from pyramid.view.view_config
     """
     venusian = venusian  # for testing injection
+    modifiers = []
 
     def __init__(self, **settings):
         if 'for_' in settings:
@@ -26,9 +27,10 @@ class endpoint(object):
     def __call__(self, wrapped):
         settings = self.__dict__.copy()
         depth = settings.pop('_depth', 0)
+        modifiers = settings.pop('modifiers', [])
 
         def callback(context, name, ob):
-
+            ob.modifiers = modifiers
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
