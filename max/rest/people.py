@@ -41,7 +41,30 @@ def getVisibleUsers(users, request):
 @endpoint(route_name='users', request_method='POST', permission=add_people)
 def addUser(users, request):
     """
-        Add a user
+    Add a user
+
+    Creates a new user in the system, with all the attributes provided
+    in the posted user object.
+
+    - ``username`` - Used to identify and login the user. Thisis the onlu required parameter and cannot be modified.
+    - ``displayname`` - The full name of the user.
+    - ``twitterUsername`` - A valid Twitter® username (without the @symbol), used on the twitter integration service.
+
+
+    This operation is idempotent, which means that a request to create a user that already exists,
+    will not recreate or overwrite that user. Instead, the existing user object will be returned. You can
+    tell when this happens by looking at the HTTP response status code. A new user insertion will return
+    a **201 CREATED** code, and with an existing users a **200 OK** code will.
+
+
+    + Request
+
+        {
+            "username": "user1",
+            "displayName": "user2",
+            "twitterUsername: "twitteruser",
+        }
+
     """
     payload = request.decoded_payload
     if not isinstance(payload, dict):

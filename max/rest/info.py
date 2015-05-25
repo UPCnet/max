@@ -3,6 +3,7 @@ from max import RESOURCES
 from max.resources import Root
 from max.rest import JSONResourceEntity
 from max.security.permissions import view_server_settings
+from max.utils.markdown import reformat_markdown
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -144,10 +145,21 @@ def endpoints_view(context, request):
         #     import ipdb;ipdb.set_trace()
         endpoint_description = endpoint_description_match.groups()[0]
         endpoint_documentation = method.__doc__[endpoint_description_match.end():].strip()
+        endpoint_documentation = re.sub(r'\n    ', '\n', endpoint_documentation)
 
+        parsed_documentation, extracted = reformat_markdown(endpoint_documentation)
+
+        payload = extracted.get('Request', '{}')
+        try:
+            decoded_payload = json.loads(payload)
+        except:
+            pass
+        else:
+            payload = json.dumps(decoded_payload, indent=4)
         method_info = {
             'description': endpoint_description,
-            'documentation': endpoint_documentation if endpoint_documentation else 'Please document me!',
+            'documentation': parsed_documentation if parsed_documentation else 'Please document me!',
+            'payload': payload,
             'rest_params': get_rest_params(method),
             'query_params': get_query_params(method),
             'permission': view_permission(view)

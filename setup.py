@@ -23,7 +23,8 @@ requires = [
     'pika',
     'Pillow',
     'maxcarrot',
-    'maxutils'
+    'maxutils',
+    'mistune'
 ]
 
 test_requires = ['WebTest', 'mock', 'robotsuite', 'pyramid_robot']
