@@ -130,7 +130,7 @@ def main(*args, **settings):
     set_signal()
 
     # Create exceptions log folfer if it doesnt exists
-    exceptions_folder = config.registry.settings.get('exceptions_folder')
+    exceptions_folder = config.registry.settings.get('exceptions_folder', '/tmp/exceptions/')
     if not os.path.exists(exceptions_folder):
         os.makedirs(exceptions_folder)
 
