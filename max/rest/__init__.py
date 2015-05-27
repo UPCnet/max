@@ -34,24 +34,18 @@ class endpoint(object):
             config = context.config.with_package(info.module)
             config.add_view(view=ob, **settings)
 
-        # def max_wrapper(func):
-        #     def replacement(*args, **kwargs):
-        #         return func(*args, **kwargs)
-        #     return replacement
-
-        # # pre-decorate original method before passing it to venusian
-        # rewrapped = max_wrapper(wrapped)
-
-        # # patch decorated info to preserver name and doc
-        # rewrapped.__name__ = wrapped.__name__
-        # rewrapped.__doc__ = wrapped.__doc__
-
-        # effectively apply the @endpoint decorator
         info = self.venusian.attach(wrapped, callback, category='max',
                                     depth=depth + 1)
 
-        # # Modify codeinfo to preserver original wrapper method name
-        # info.codeinfo = info.codeinfo[:-1] + ('@endpoint.{}'.format(wrapped.__name__),)
+        # Fix multiline decorator signature in code object
+        decorator_name = '@{}'.format(self.__class__.__name__)
+        if decorator_name not in info.codeinfo[3]:
+            codelines = open(info.codeinfo[0]).readlines()
+            end = info.codeinfo[1]
+            start = end
+            while decorator_name not in codelines[start] and end - start <= 4:
+                start -= 1
+            info.codeinfo = info.codeinfo[:-1] + (''.join(codelines[start:end]),)
 
         if info.scope == 'class':  # pragma: no cover
             # if the decorator was attached to a method in a class, or

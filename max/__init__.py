@@ -50,8 +50,10 @@ LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
 ALLOWED_ROLES = ['Manager', 'NonVisible', 'HubManager']
 DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY = True
-
-
+PAGINATION_MODIFIERS = ['before', 'after', 'limit']
+SORTING_MODIFIERS = ['sort', 'priority']
+FILTERING_MODIFIERS = ['date_filter', 'hashtag', 'actor', 'keywords', 'tags', 'favorites', 'context_tags']
+SEARCH_MODIFIERS = PAGINATION_MODIFIERS + SORTING_MODIFIERS + FILTERING_MODIFIERS
 import logging
 
 logger = logging.getLogger('exceptions')

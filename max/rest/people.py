@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from max import SEARCH_MODIFIERS
 from max.exceptions import ValidationError
 from max.models import User
 from max.rabbitmq import RabbitNotifications
@@ -17,13 +18,20 @@ from pyramid.httpexceptions import HTTPNoContent
 from pyramid.settings import asbool
 
 
-@endpoint(route_name='users', request_method='GET', permission=list_visible_people)
+@endpoint(
+    route_name='users', request_method='GET',
+    permission=list_visible_people,
+    modifiers=SEARCH_MODIFIERS + ['twitter_enabled'])
 def getVisibleUsers(users, request):
     """
         Search users
 
-        Return the result of a query specified by the username param as
-        a list of usernames. For UI use only.
+        Return a list of persons of the system, optionaly filtered using the available
+        modifiers.
+
+        The objects returned by this endpoint are intended for user listing and
+        searching, so only username and displayName attributes of a person are returned. If you
+        need the full profile of a user, use the `GET` endpoint of the `User` resource.
     """
     query = {}
 
@@ -38,31 +46,34 @@ def getVisibleUsers(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='users', request_method='POST', permission=add_people, modifiers=['notifications'])
+@endpoint(
+    route_name='users', request_method='POST',
+    permission=add_people,
+    modifiers=['notifications'])
 def addUser(users, request):
     """
-    Add a user
+        Add a user
 
-    Creates a new user in the system, with all the attributes provided
-    in the posted user object.
+        Creates a new user in the system, with all the attributes provided
+        in the posted user object.
 
-    - ``username`` - Used to identify and login the user. This is the only required parameter and cannot be modified.
-    - ``displayname`` - The full name of the user.
-    - ``twitterUsername`` - A valid Twitter® username (without @ prefix), used on the twitter integration service.
+        - `username` - Used to identify and login the user. This is the only required parameter and cannot be modified.
+        - `displayname` - The full name of the user.
+        - `twitterUsername` - A valid Twitter® username (without @ prefix), used on the twitter integration service.
 
 
-    This operation is idempotent, which means that a request to create a user that already exists,
-    will not recreate or overwrite that user. Instead, the existing user object will be returned. You can
-    tell when this happens by looking at the HTTP response status code. A new user insertion will return
-    a **201 CREATED** code, and with an existing users a **200 OK** code will.
+        This operation is idempotent, which means that a request to create a user that already exists,
+        will not recreate or overwrite that user. Instead, the existing user object will be returned. You can
+        tell when this happens by looking at the HTTP response status code. A new user insertion will return
+        a **201 CREATED** code, and with an existing users a **200 OK**.
 
-    + Request
+        + Request
 
-        {
-            "username": "user1",
-            "displayName": "user2",
-            "twitterUsername: "twitteruser",
-        }
+            {
+                "username": "user1",
+                "displayName": "user2",
+                "twitterUsername: "twitteruser",
+            }
 
     """
     payload = request.decoded_payload
@@ -107,7 +118,9 @@ def addUser(users, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='GET', permission=view_user_profile)
+@endpoint(
+    route_name='user', request_method='GET',
+    permission=view_user_profile)
 def getUser(user, request):
     """
         Get a user
@@ -118,10 +131,20 @@ def getUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='PUT', permission=modify_user)
+@endpoint(
+    route_name='user', request_method='PUT',
+    permission=modify_user)
 def ModifyUser(user, request):
     """
         Modify a user
+
+        Updates user information stored on the user object. Properties on request
+        not previously set will be added and the existing ones overiddeb by the new
+        values.
+
+        > Note that properties other than the ones defined on the user creation method,
+        > that may be visible on the user profile (like `subscribedTo` or `talkingIn`) are
+        > not updatable using this endpoint. You must use the available methods  for that goal.
     """
     properties = user.getMutablePropertiesFromRequest(request)
     user.modifyUser(properties)
@@ -130,10 +153,15 @@ def ModifyUser(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='user', request_method='DELETE', permission=delete_user)
+@endpoint(
+    route_name='user', request_method='DELETE',
+    permission=delete_user)
 def deleteUser(user, request):
     """
         Delete a user
+
+        Permanently deletes a user from the system. This operation destroys the user and all its data,
+        including subscriptions to contexts and conversations.
     """
     user.delete()
     return HTTPNoContent()

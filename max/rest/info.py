@@ -145,7 +145,7 @@ def endpoints_view(context, request):
         #     import ipdb;ipdb.set_trace()
         endpoint_description = endpoint_description_match.groups()[0]
         endpoint_documentation = method.__doc__[endpoint_description_match.end():].strip()
-        endpoint_documentation = re.sub(r'\n    ', '\n', endpoint_documentation)
+        endpoint_documentation = re.sub(r'\n        ', '\n', endpoint_documentation)
 
         parsed_documentation, extracted = reformat_markdown(endpoint_documentation)
 

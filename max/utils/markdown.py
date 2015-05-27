@@ -2,6 +2,28 @@ import mistune
 import re
 
 
+def_links = r' *\[([^^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)'
+
+def_footnotes = r'\[\^([^\]]+)\]: *([^\n]*(?:\n+|$)(?: {1,}[^\n]*(?:\n+|$))*)'
+
+
+list_block = re.compile(
+    r'( *)([*+-]|\d+\.) [\s\S]+?'
+    r'(?:'
+    r'\n+(?=\1?(?:[-*_] *){3,}(?:\n+|$))'  # hrule
+    r'|\n+(?=%s)'  # def links
+    r'|\n+(?=%s)'  # def footnotes
+    r'|\n{2,}'
+    r'(?! )'
+    r'(?!\1(?:[*+-]|\d+\.) )\n*'
+    r'|'
+    r'\s*$)' % (
+        def_links,
+        def_footnotes,
+    )
+)
+
+
 def extract(text, target, status, extracted, default):
     if re.match(r'^  [\{\}]', text):
         text = '  ' + text
@@ -13,6 +35,8 @@ def extract(text, target, status, extracted, default):
 
 
 def reformat_markdown(text):
+    if '+ Request' in text:
+        import ipdb;ipdb.set_trace()
 
     md = mistune.Markdown()
     tokens = md.block(text)
