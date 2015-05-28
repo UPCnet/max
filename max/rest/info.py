@@ -149,7 +149,7 @@ def endpoints_view(context, request):
 
         parsed_documentation, extracted = reformat_markdown(endpoint_documentation)
 
-        payload = extracted.get('Request', '{}')
+        payload = extracted.get('request', '{}')
         try:
             decoded_payload = json.loads(payload)
         except:

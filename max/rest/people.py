@@ -65,14 +65,14 @@ def addUser(users, request):
         This operation is idempotent, which means that a request to create a user that already exists,
         will not recreate or overwrite that user. Instead, the existing user object will be returned. You can
         tell when this happens by looking at the HTTP response status code. A new user insertion will return
-        a **201 CREATED** code, and with an existing users a **200 OK**.
+        a **201 CREATED** code, and a **200 OK** for an existing user.
 
         + Request
 
             {
                 "username": "user1",
                 "displayName": "user2",
-                "twitterUsername: "twitteruser",
+                "twitterUsername": "twitteruser"
             }
 
     """
@@ -138,13 +138,25 @@ def ModifyUser(user, request):
     """
         Modify a user
 
-        Updates user information stored on the user object. Properties on request
-        not previously set will be added and the existing ones overiddeb by the new
-        values.
+        Updates user information stored on the user object. Only known properties on request
+        can be updated, and so any unknown property will be discarded silently. Any existing
+        property value will be overriden by the new value.
+
+        You also can unset a property by setting its value to `null.
+
+
+        + Request
+
+            {
+                "displayName": "user2",
+                "twitterUsername": "twitteruser"
+            }
+
 
         > Note that properties other than the ones defined on the user creation method,
-        > that may be visible on the user profile (like `subscribedTo` or `talkingIn`) are
-        > not updatable using this endpoint. You must use the available methods  for that goal.
+        that may be visible on the user profile (like `subscribedTo` or `talkingIn`) are
+        not updatable using this endpoint. You must use the appropiate available methods
+        for that goal.
     """
     properties = user.getMutablePropertiesFromRequest(request)
     user.modifyUser(properties)
