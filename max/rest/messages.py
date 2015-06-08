@@ -27,7 +27,7 @@ def getMessages(conversation, request):
     # Sorting by _id, as id is indeed the same as published
     messages = request.db.messages.search(query, sort_direction=DESCENDING, sort_by_field="_id", keep_private_fields=False, **searchParams(request))
     inverted = flatten(messages, reverse=True)
-    handler = JSONResourceRoot(inverted, remaining=messages.remaining)
+    handler = JSONResourceRoot(request, inverted, remaining=messages.remaining)
     return handler.buildResponse()
 
 

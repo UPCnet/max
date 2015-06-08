@@ -34,7 +34,7 @@ def getUserComments(user, request):
         count=is_head,
         **searchParams(request))
 
-    handler = JSONResourceRoot(comments, stats=is_head)
+    handler = JSONResourceRoot(request, comments, stats=is_head)
     return handler.buildResponse()
 
 
@@ -48,7 +48,7 @@ def getActivityComments(activity, request):
     replies = activity.get('replies', {})
     items = replies
     result = flatten(items, keep_private_fields=False)
-    handler = JSONResourceRoot(result)
+    handler = JSONResourceRoot(request, result)
     return handler.buildResponse()
 
 
@@ -67,7 +67,7 @@ def getContextComments(context, request):
     }
 
     comments = request.db.activity.search(query, flatten=1, count=is_head, **searchParams(request))
-    handler = JSONResourceRoot(comments, stats=is_head)
+    handler = JSONResourceRoot(request, comments, stats=is_head)
     return handler.buildResponse()
 
 
@@ -78,7 +78,7 @@ def getGlobalComments(comments, request):
     """
     is_head = request.method == 'HEAD'
     activities = request.db.activity.search({'verb': 'comment'}, flatten=1, count=is_head, **searchParams(request))
-    handler = JSONResourceRoot(activities, stats=is_head)
+    handler = JSONResourceRoot(request, activities, stats=is_head)
     return handler.buildResponse()
 
 

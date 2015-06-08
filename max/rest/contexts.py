@@ -27,7 +27,7 @@ def getContexts(contexts, request):
         Get all contexts
     """
     found_contexts = contexts.search({}, flatten=1, **searchParams(request))
-    handler = JSONResourceRoot(found_contexts)
+    handler = JSONResourceRoot(request, found_contexts)
     return handler.buildResponse()
 
 
@@ -95,7 +95,7 @@ def getContextTags(context, request):
     """
         Get context tags
     """
-    handler = JSONResourceRoot(context['tags'])
+    handler = JSONResourceRoot(request, context['tags'])
     return handler.buildResponse()
 
 
@@ -108,7 +108,7 @@ def clearContextTags(context, request):
     context.save()
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -131,7 +131,7 @@ def updateContextTags(context, request):
     context.save()
     context.updateContextActivities(force_update=True)
     context.updateUsersSubscriptions(force_update=True)
-    handler = JSONResourceRoot(context['tags'])
+    handler = JSONResourceRoot(request, context['tags'])
     return handler.buildResponse()
 
 
@@ -162,7 +162,7 @@ def getPublicContexts(contexts, request):
     """
     found_contexts = contexts.search({'permissions.subscribe': 'public'}, **searchParams(request))
 
-    handler = JSONResourceRoot(flatten(found_contexts, squash=['owner', 'creator', 'published']))
+    handler = JSONResourceRoot(request, flatten(found_contexts, squash=['owner', 'creator', 'published']))
     return handler.buildResponse()
 
 
@@ -214,5 +214,5 @@ def getContextAuthors(context, request):
                 distinct_authors.append(activity['actor'])
                 distinct_usernames.append(activity['actor']['username'])
 
-    handler = JSONResourceRoot(distinct_authors)
+    handler = JSONResourceRoot(request, distinct_authors)
     return handler.buildResponse()

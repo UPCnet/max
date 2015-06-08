@@ -83,7 +83,7 @@ def getContextSubscriptions(context, request):
             }
             yield subscription
 
-    handler = JSONResourceRoot(format_subscriptions())
+    handler = JSONResourceRoot(request, format_subscriptions())
     return handler.buildResponse()
 
 
@@ -106,7 +106,7 @@ def getUserSubscriptions(user, request):
                 filtered_subscriptions.append(subscription)
         subscriptions = filtered_subscriptions
 
-    handler = JSONResourceRoot(subscriptions)
+    handler = JSONResourceRoot(request, subscriptions)
     return handler.buildResponse()
 
 

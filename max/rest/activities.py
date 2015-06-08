@@ -40,7 +40,7 @@ def getUserActivities(user, request):
     is_head = request.method == 'HEAD'
     activities = request.db.activity.search(query, keep_private_fields=False, flatten=1, count=is_head, **searchParams(request))
 
-    handler = JSONResourceRoot(activities, stats=is_head)
+    handler = JSONResourceRoot(request, activities, stats=is_head)
     return handler.buildResponse()
 
 
@@ -53,7 +53,7 @@ def getGlobalActivities(context, request):
     """
     is_head = request.method == 'HEAD'
     activities = request.db.activity.search({'verb': 'post'}, flatten=1, count=is_head, **searchParams(request))
-    handler = JSONResourceRoot(activities, stats=is_head)
+    handler = JSONResourceRoot(request, activities, stats=is_head)
     return handler.buildResponse()
 
 
@@ -118,7 +118,7 @@ def getContextActivities(context, request):
         activities = sorted_query(request, request.db.activity, query, flatten=1)
 
     is_head = request.method == 'HEAD'
-    handler = JSONResourceRoot(activities, stats=is_head)
+    handler = JSONResourceRoot(request, activities, stats=is_head)
     return handler.buildResponse()
 
 

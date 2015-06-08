@@ -49,7 +49,7 @@ def getConversations(conversations, request):
 
     sorted_conversations = sorted(conversations_info(), reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
-    handler = JSONResourceRoot(sorted_conversations)
+    handler = JSONResourceRoot(request, sorted_conversations)
     return handler.buildResponse()
 
 

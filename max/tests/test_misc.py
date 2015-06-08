@@ -233,7 +233,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         self.assertIsInstance(res.json, dict)
         self.assertItemsEqual(api_route_names, defined_routes)
         self.assertItemsEqual(res.json['user'].keys(), [u'category', u'name', u'url', u'route', u'filesystem', u'id', u'methods'])
-        self.assertItemsEqual(res.json['user']['methods']['GET'].keys(), [u'rest_params', u'query_params', u'documentation', u'description', u'permission'])
+        self.assertItemsEqual(res.json['user']['methods']['GET'].keys(), [u'rest_params', u'query_params', u'documentation', u'description', u'permission', u'modifiers', u'payload'])
 
     def test_api_info_by_category(self):
         """

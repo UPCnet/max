@@ -32,7 +32,7 @@ def getPushTokensForConversation(tokens, request):
     if usernames:
         user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
 
-    handler = JSONResourceRoot(formatted_tokens(user_tokens))
+    handler = JSONResourceRoot(request, formatted_tokens(user_tokens))
     return handler.buildResponse()
 
 
@@ -53,7 +53,7 @@ def getPushTokensForContext(tokens, request):
     if usernames:
         user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
 
-    handler = JSONResourceRoot(formatted_tokens(user_tokens))
+    handler = JSONResourceRoot(request, formatted_tokens(user_tokens))
     return handler.buildResponse()
 
 
@@ -84,7 +84,7 @@ def view_user_tokens(user, request):
         Delete all platform tokens
     """
     tokens = user.get_tokens()
-    handler = JSONResourceRoot(tokens)
+    handler = JSONResourceRoot(request, tokens)
     return handler.buildResponse()
 
 
@@ -95,7 +95,7 @@ def view_platform_user_tokens(user, request):
     """
     platform = request.matchdict['platform']
     tokens = user.get_tokens(platform)
-    handler = JSONResourceRoot(tokens)
+    handler = JSONResourceRoot(request, tokens)
     return handler.buildResponse()
 
 

@@ -26,7 +26,7 @@ def rebuildKeywords(context, request):
         activity.setKeywords()
         activity.save()
 
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -46,7 +46,7 @@ def rebuildDates(context, request):
             activity['lastComment'] = ObjectId(activity['replies'][-1]['id'])
         activity.save()
 
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -75,7 +75,7 @@ def rebuildSubscriptions(context, request):
                 subscription.pop('vetos', None)
                 subscription.pop('grants', None)
         user.save()
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -127,7 +127,7 @@ def rebuildConversationSubscriptions(context, request):
                     subscription['participants'] = existing_conversations[subscription['id']]['participants']
         user.updateConversationParticipants(force_update=True)
         user.save()
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -145,7 +145,7 @@ def rebuildUser(context, request):
             user['_owner'] = user['username']
             user.save()
 
-    handler = JSONResourceRoot([])
+    handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 
 
@@ -196,5 +196,5 @@ def getExceptions(context, request):
                 'date': datetime.strptime(date, '%Y%m%d%H%M%S').strftime('%Y/%m/%d %H:%M:%S')
             }
 
-    handler = JSONResourceRoot(sorted(get_exceptions(), key=lambda x: x['date'], reverse=True))
+    handler = JSONResourceRoot(request, sorted(get_exceptions(), key=lambda x: x['date'], reverse=True))
     return handler.buildResponse()

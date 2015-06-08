@@ -44,7 +44,7 @@ def getUserTimeline(user, request):
 
     activities = sorted_query(request, request.db.activity, query, flatten=1)
 
-    handler = JSONResourceRoot(activities)
+    handler = JSONResourceRoot(request, activities)
     return handler.buildResponse()
 
 
@@ -90,5 +90,5 @@ def getUserTimelineAuthors(user, request):
                 distinct_authors.append(activity['actor'])
                 distinct_usernames.append(activity['actor']['username'])
 
-    handler = JSONResourceRoot(distinct_authors)
+    handler = JSONResourceRoot(request, distinct_authors)
     return handler.buildResponse()

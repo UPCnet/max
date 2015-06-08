@@ -18,7 +18,7 @@ def getSecurity(security, request):
 
         Expose the current MAX security roles and its members
     """
-    handler = JSONResourceRoot(security.flatten())
+    handler = JSONResourceRoot(request, security.flatten())
     return handler.buildResponse()
 
 
@@ -35,7 +35,7 @@ def getUsersRoles(security, request):
 
     user_roles = [{'username': username, 'roles': [{'name': role, 'active': user_roles.get(role, False)} for role in ALLOWED_ROLES]} for username, user_roles in users.items()]
 
-    handler = JSONResourceRoot(user_roles)
+    handler = JSONResourceRoot(request, user_roles)
     return handler.buildResponse()
 
 
@@ -82,7 +82,7 @@ def add_user_to_role(security, request):
     security['roles'][role] = list(set(security['roles'][role]))
     security.save()
     request.registry.max_security = loadMAXSecurity(request.registry)
-    handler = JSONResourceRoot(security.flatten()['roles'][role], status_code=status_code)
+    handler = JSONResourceRoot(request, security.flatten()['roles'][role], status_code=status_code)
     return handler.buildResponse()
 
 
