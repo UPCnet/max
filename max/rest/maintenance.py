@@ -7,6 +7,8 @@ from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.security.permissions import do_maintenance
 
+from pyramid.httpexceptions import HTTPNoContent
+
 from bson import ObjectId
 from datetime import datetime
 
@@ -174,6 +176,22 @@ def getException(context, request):
     }
     handler = JSONResourceEntity(request, result)
     return handler.buildResponse()
+
+
+@endpoint(route_name='maintenance_exception', request_method='DELETE', permission=do_maintenance)
+def deleteException(context, request):
+    """
+        Delete an exception
+    """
+    ehash = request.matchdict['hash']
+    exceptions_folder = request.registry.settings.get('exceptions_folder')
+    matches = glob.glob('{}/*{}'.format(exceptions_folder, ehash))
+
+    if not matches:
+        raise ObjectNotFound("There is no logged exception with this hash")
+
+    os.remove(matches[0])
+    return HTTPNoContent()
 
 
 @endpoint(route_name='maintenance_exceptions', request_method='GET', permission=do_maintenance)
