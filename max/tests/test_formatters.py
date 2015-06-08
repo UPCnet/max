@@ -110,4 +110,3 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         url = 'http://example.com'
         newurl = shortenURL(url, secure=True)
         self.assertEqual(newurl, "https://shortened.url")
-

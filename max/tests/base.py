@@ -107,7 +107,7 @@ class mock_requests_obj(object):
     def __init__(self, *args, **kwargs):
         if kwargs.get('text', None) is not None:
             self.text = kwargs['text']
-        if kwargs.get('content', None) is not None: # pragma: no cover
+        if kwargs.get('content', None) is not None:  # pragma: no cover
             self.content = kwargs['content']
         self.status_code = kwargs['status_code']
 
@@ -393,5 +393,3 @@ class MaxTestBase(object):
             return [a for a in mongo_method(query)]
         else:
             return mongo_method(query, action)
-
-
