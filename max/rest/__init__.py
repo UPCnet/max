@@ -77,9 +77,10 @@ class JSONResourceRoot(object):
     """
     response_content_type = 'application/json'
 
-    def __init__(self, data, status_code=200, stats=False, remaining=False):
+    def __init__(self, request, data, status_code=200, stats=False, remaining=False):
         """
         """
+        self.request = request
         self.data = data
         self.status_code = status_code
         self.stats = stats
