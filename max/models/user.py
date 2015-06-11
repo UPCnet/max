@@ -340,7 +340,11 @@ class User(MADBase):
     def getSubscription(self, context):
         """
         """
-        ContextClass = getMaxModelByObjectType(context['objectType'])
+        subscription_object_type = context.get('objectType', None)
+        if subscription_object_type is None:
+            return None
+
+        ContextClass = getMaxModelByObjectType(subscription_object_type)
         temp_context = ContextClass.from_object(self.request, context)
 
         for subscription in self.get(temp_context.user_subscription_storage, []):
