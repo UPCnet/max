@@ -169,6 +169,7 @@ class ActivitiesTraverser(MongoDBTraverser):
     def __acl__(self):
         acl = [
             (Allow, Manager, permissions.list_activities),
+            (Allow, Manager, permissions.view_activity),
         ]
         return acl
 

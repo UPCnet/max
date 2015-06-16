@@ -417,7 +417,7 @@ class Activity(BaseActivity):
                     acl.append((Allow, self.request.authenticated_userid, add_comment))
 
             # If no susbcription found, check context policy
-            if context.get('permissions', ).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
+            if context.get('permissions', {}).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
                 acl.append((Allow, self.request.authenticated_userid, view_activity))
                 if is_self_operation(self.request):
                     acl.append((Allow, self.request.authenticated_userid, like))
