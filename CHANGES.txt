@@ -1,11 +1,32 @@
 CHANGELOG
 =========
 
-5.1 (unreleased)
+5.1 (2015-06-19)
 ----------------
 
-- Nothing changed yet.
-
+* Fix view permissions on activity fields [Carles Bruguera]
+* Fix listing activities from deleted contexts [Carles Bruguera]
+* Add delete exception endpoint [Carles Bruguera]
+* Merge branch 'develop' of github.com:UPCnet/max into develop [Carles Bruguera]
+*  [Carles Bruguera]
+* Conflicts: [Carles Bruguera]
+* max/models/context.py [Carles Bruguera]
+* max/rest/contexts.py [Carles Bruguera]
+* max/rest/conversations.py [Carles Bruguera]
+* max/rest/people.py [Carles Bruguera]
+* max/rest/utils.py [Carles Bruguera]
+* max/tests/__init__.py [Carles Bruguera]
+* max/tests/base.py [Carles Bruguera]
+* max/tests/test_avatars.py [Carles Bruguera]
+* max/tests/test_formatters.py [Carles Bruguera]
+* max/tests/test_twitter_api.py [Carles Bruguera]
+* Migrate to new JSONRootResource [Carles Bruguera]
+* Make Resource root use request as param [Carles Bruguera]
+* Use pure regex to extract markdown docstrings [Carles Bruguera]
+* Safe default for exceptions [Carles Bruguera]
+* Documentation and markdown stuff [Carles Bruguera]
+* Modifiers anotations on endpoint method [Carles Bruguera]
+* Add a markdown utility to parse documentation [Carles Bruguera]
 
 5.0 (2015-05-19)
 ----------------
