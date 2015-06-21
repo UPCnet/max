@@ -13,12 +13,12 @@ def timelineQuery(actor):
 
     # Add the activity of the people that the user follows
     actors_followings = []
-    for following in actor['following']:
+    for following in actor.get('following', []):
         actors_followings.append({'actor.username': following['username']})
 
     # Add the activity of the people that posts to a particular context
     contexts_followings = []
-    for subscribed in actor['subscribedTo']:
+    for subscribed in actor.get('subscribedTo', []):
         # Don't show conversations in timeline
         contexts_followings.append({'contexts.url': subscribed['url']})
 
