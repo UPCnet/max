@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.2 (unreleased)
-----------------
+5.1.1 (2015-06-21)
+------------------
 
-- Nothing changed yet.
-
+* Don't assume properties exist [Carles Bruguera]
 
 5.1 (2015-06-19)
 ----------------
