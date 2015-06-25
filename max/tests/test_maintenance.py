@@ -62,7 +62,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         activities = self.exec_mongo_query('activity', 'find', {'verb': 'post'})
         activity = activities[0]
 
-        #simulate ancient commented field with wrong date
+        # simulate ancient commented field with wrong date
         activity['commented'] = activity['published']
         del activity['lastComment']
         self.exec_mongo_query('activity', 'update', {'_id': activities[0]['_id']}, activity)
@@ -84,7 +84,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.admin_subscribe_user_to_context(username, subscribe_context)
         self.create_activity(username, user_status_context)
 
-        #Hard modify context directly on mongo to simulate changed permissions, displayName and tags
+        # Hard modify context directly on mongo to simulate changed permissions, displayName and tags
         contexts = self.exec_mongo_query('contexts', 'find', {'hash': chash})
         context = contexts[0]
         context['permissions']['write'] = 'restricted'
@@ -93,13 +93,13 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.exec_mongo_query('contexts', 'update', {'_id': context['_id']}, context)
         self.testapp.post('/admin/maintenance/subscriptions', "", oauth2Header(test_manager), status=200)
 
-        #Check user subscription is updated
+        # Check user subscription is updated
         res = self.testapp.get('/people/{}'.format(username), "", oauth2Header(username), status=200)
         self.assertEqual(res.json['subscribedTo'][0]['displayName'], 'Changed Name')
         self.assertListEqual(res.json['subscribedTo'][0]['tags'], ['Assignatura', 'new tag'])
         self.assertListEqual(res.json['subscribedTo'][0]['permissions'], ['read'])
 
-        #Check user activity is updated
+        # Check user activity is updated
         res = self.testapp.get('/people/{}/timeline'.format(username), "", oauth2Header(username), status=200)
         self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
         self.assertListEqual(res.json[0]['contexts'][0]['tags'], ['Assignatura', 'new tag'])
@@ -116,7 +116,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
 
-        #Hard modify group conversation directly on mongo to simulate changed permissions, displayName and tags
+        # Hard modify group conversation directly on mongo to simulate changed permissions, displayName and tags
         conversations = self.exec_mongo_query('conversations', 'find', {})
         conversation = conversations[0]
         conversation['permissions']['write'] = 'restricted'
@@ -133,7 +133,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
 
-        #Check user subscription is updated
+        # Check user subscription is updated
         res = self.testapp.get('/people/{}'.format(sender), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json['talkingIn'][0]['displayName'], 'Changed Name')
         self.assertEqual(res.json['talkingIn'][0]['participants'][0]['username'], 'messi')
@@ -143,11 +143,11 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertListEqual(res.json['talkingIn'][0]['tags'], ['group'])
         conversation_id = res.json['talkingIn'][0]['id']
 
-        #Check context participants are updated
+        # Check context participants are updated
         res = self.testapp.get('/conversations/{}'.format(conversation_id), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json['participants'][0]['displayName'], 'Lionel Messi')
 
-        #Check user activity is updated
+        # Check user activity is updated
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
 
@@ -155,7 +155,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
 
-        #Hard modify user directly on mongo to simulate wrong owner and check is wrong
+        # Hard modify user directly on mongo to simulate wrong owner and check is wrong
         self.exec_mongo_query('users', 'update', {'username': username}, {'$set': {'_owner': 'test_manager'}})
         res = self.testapp.get('/people/{}'.format(username), "", oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['owner'], 'test_manager')
@@ -163,3 +163,31 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.post('/admin/maintenance/users', "", oauth2Header(test_manager), status=200)
         res = self.testapp.get('/people/{}'.format(username), "", oauth2Header(test_manager), status=200)
         self.assertEqual(res.json['owner'], username)
+
+    def test_maintenance_tokens(self):
+        username = 'messi'
+        self.create_user(username)
+
+        # Hard modify user directly on mongo to simulate old style tokens
+        self.exec_mongo_query('users', 'update', {'username': username}, {'$set': {'iosDevices': ['token1', 'token2'], 'androidDevices': ['token3', 'token4']}})
+        user = self.exec_mongo_query('users', 'find', {'username': username})[0]
+        ios = self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'ios'), "", oauth2Header(username), status=200)
+        android = self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'android'), "", oauth2Header(username), status=200)
+
+        self.assertEqual(ios.json, [])
+        self.assertEqual(android.json, [])
+        self.assertIn('iosDevices', user)
+        self.assertIn('androidDevices', user)
+
+        self.testapp.post('/admin/maintenance/tokens', "", oauth2Header(test_manager), status=200)
+
+        user = self.exec_mongo_query('users', 'find', {'username': username})[0]
+        ios = self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'ios'), "", oauth2Header(username), status=200)
+        android = self.testapp.get('/people/{}/tokens/platforms/{}'.format(username, 'android'), "", oauth2Header(username), status=200)
+
+        migrated_ios_tokens = [a['token'] for a in ios.json]
+        migrated_android_tokens = [a['token'] for a in android.json]
+        self.assertItemsEqual(migrated_ios_tokens, ['token1', 'token2'])
+        self.assertItemsEqual(migrated_android_tokens, ['token3', 'token4'])
+        self.assertNotIn('iosDevices', user)
+        self.assertNotIn('androidDevices', user)

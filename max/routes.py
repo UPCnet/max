@@ -108,6 +108,7 @@ RESOURCES['maintenance_dates'] = dict(route='/admin/maintenance/dates', category
 RESOURCES['maintenance_subscriptions'] = dict(route='/admin/maintenance/subscriptions', category='Management', name='Subscriptions maintenance', actor_not_required=['POST'])
 RESOURCES['maintenance_conversations'] = dict(route='/admin/maintenance/conversations', category='Management', name='Conversations maintenance', actor_not_required=['POST'])
 RESOURCES['maintenance_users'] = dict(route='/admin/maintenance/users', category='Management', name='Users Maintenance', actor_not_required=['POST'])
+RESOURCES['maintenance_tokens'] = dict(route='/admin/maintenance/tokens', category='Management', name='Tokens Maintenance', actor_not_required=['POST'])
 RESOURCES['maintenance_exceptions'] = dict(route='/admin/maintenance/exceptions', category='Management', name='Error Exception list', actor_not_required=['GET'])
 RESOURCES['maintenance_exception'] = dict(route='/admin/maintenance/exceptions/{hash}', category='Management', name='Error Exception', actor_not_required=['GET'])
 

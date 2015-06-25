@@ -25,7 +25,6 @@ class Token(MADBase):
     def __acl__(self):
         acl = [
             (Allow, Manager, view_token),
-
             (Allow, Owner, view_token),
         ]
 

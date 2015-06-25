@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from max.exceptions import ObjectNotFound
 from max.models import Context
+from max.models import Token
 from max.models import Conversation
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
@@ -146,6 +147,43 @@ def rebuildUser(context, request):
         if user['_owner'] != user['username']:
             user['_owner'] = user['username']
             user.save()
+
+    handler = JSONResourceRoot(request, [])
+    return handler.buildResponse()
+
+
+@endpoint(route_name='maintenance_tokens', request_method='POST', permission=do_maintenance)
+def rebuildTokens(context, request):
+    """
+        Rebuild tokens
+
+        Move any user that has old style tokens to the new tokens collection
+    """
+    # Find all users with tokens
+    users_with_tokens = request.db.db.users.find({'$or': [{'iosDevices.0': {'$exists': True}}, {'androidDevices.0': {'$exists': True}}]})
+
+    platforms = [
+        ('ios', 'iosDevices'),
+        ('android', 'androidDevices')
+    ]
+
+    for user in users_with_tokens:
+        for platform, oldfield in platforms:
+            tokens = user.get(oldfield, [])
+
+            for token in tokens:
+                newtoken = Token.from_object(request, {
+                    'platform': platform,
+                    'token': token,
+                    'objectId': 'token',
+                    '_owner': user['username'],
+                    '_creator': user['username'],
+                })
+                newtoken.setDates()
+                newtoken.insert()
+
+    # Clean old token fields
+    request.db.db.users.update({}, {'$unset': {'iosDevices': '', 'androidDevices': ''}}, multi=True)
 
     handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
