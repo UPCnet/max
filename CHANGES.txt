@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.1.2 (unreleased)
+5.1.2 (2015-06-25)
 ------------------
 
-- Nothing changed yet.
-
+* Add token migration script [Carles Bruguera]
 
 5.1.1 (2015-06-21)
 ------------------
