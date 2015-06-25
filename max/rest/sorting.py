@@ -20,7 +20,7 @@ SORT_STRATEGIES = {
 }
 
 
-def sorted_query(request, collection, query, **kwargs):
+def sorted_query(request, collection, query, count=None, **kwargs):
     """
         Main sort method that determines which method of sorting to use
         based on sort parameters found in the request.
@@ -29,7 +29,8 @@ def sorted_query(request, collection, query, **kwargs):
     """
     search_params = searchParams(request)
     search_params.update(kwargs)
-    is_head = request.method == 'HEAD'
+    is_head = count if count is not None else request.method == 'HEAD'
+
     strategy = search_params.pop('sort_strategy', 'published')
     priority = search_params.pop('sort_priority', 'activity')
 

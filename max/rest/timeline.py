@@ -57,38 +57,54 @@ def getUserTimelineAuthors(user, request):
     author_limit = int(request.params.get('limit', LAST_AUTHORS_LIMIT))
     query = timelineQuery(user)
 
-    still_has_activities = True
+    # Save full author object to construct the response
+    # and a separate username field to make the unique-fication easier
 
-    # Save full author object to construct de response
-    # and a separate username field to make the uniquefication easier
     distinct_authors = []
     distinct_usernames = []
 
-    activities = None
-    before = None
-    queries = 0
+    feed_parameters = {
+        'queries': 0,
+        'before': None
+    }
 
-    while len(distinct_usernames) < author_limit and still_has_activities and queries <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
-        try:
-            # This can raise because the iterator is exhauste, or
-            # or because on first iteration activities is None
-            activity = activities.next()
-        except:
+    def extra_params():
+        params = {'limit': 30}
+        if feed_parameters['before'] is not None:
+            params['before'] = feed_parameters['before']
+        return params
+
+    def feed_activities():
+        """
+            Keep feeding a continuous flow of activitesm making as many queries
+            as needed, while not reaching defined limit
+        """
+        while feed_parameters['queries'] <= AUTHORS_SEARCH_MAX_QUERIES_LIMIT:
+            activities = sorted_query(request, request.db.activity, query, count=False, **extra_params())
             activity = None
+            for activity in activities:
+                yield activity
 
-        if not activity:
-            extra = {'before': before} if before else {}
-            activities = sorted_query(request, request.db.activity, query, **extra)
-            activities_count = activities if isinstance(activities, int) else activities.cursor.count()
-            queries += 1
-            still_has_activities = activities_count > 0
+            # Once exhausted the first query, prepare for the next round
+            if activity:
+                feed_parameters['before'] = activity['_id']
+                feed_parameters['queries'] += 1
+            else:
+                raise StopIteration
 
-        elif still_has_activities:
+    # While there are activities coming from queries, collect distinct usernames until
+    # target author_limit found
 
-            before = activity['_id']
-            if activity['actor']['username'] not in distinct_usernames:
-                distinct_authors.append(activity['actor'])
-                distinct_usernames.append(activity['actor']['username'])
+    for activity in feed_activities():
+        if activity['actor']['username'] not in distinct_usernames:
+            distinct_authors.append(activity['actor'])
+            distinct_usernames.append(activity['actor']['username'])
 
-    handler = JSONResourceRoot(request, distinct_authors)
+        if len(distinct_usernames) == author_limit:
+            break
+
+    is_head = request.method == 'HEAD'
+    data = len(distinct_usernames) if is_head else distinct_authors
+
+    handler = JSONResourceRoot(request, data, stats=is_head)
     return handler.buildResponse()
