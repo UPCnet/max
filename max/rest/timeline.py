@@ -8,30 +8,49 @@ from max.security.permissions import list_activities
 
 
 def timelineQuery(actor):
+    """
+        Construct the query used to get a user's timeline
+    """
+    # As this query may be composed by several $or clauses, we define which
+    # query fields are common to all clauses
+    # This includes only visible activity (this is: activity with visible=True AND
+    # activity WITHOUT the visible field ) and activities with verb 'post'
+    common_query_fields = {
+        'verb': 'post',
+        'visible': {'$ne': False}
+    }
+
     # Add the activity of the requesting user
     actor_query = {'actor.username': actor['username']}
+    actor_query.update(common_query_fields)
+
+    # Add the activity written on contexts where the user is subscribed
+    subscribed_contexts_urls = [subscribed['url'] for subscribed in actor.get('subscribedTo', [])]
+    context_activity_query = {
+        'contexts.url': {
+            '$in': subscribed_contexts_urls
+        }
+    }
+    context_activity_query.update(common_query_fields)
 
     # Add the activity of the people that the user follows
-    actors_followings = []
-    for following in actor.get('following', []):
-        actors_followings.append({'actor.username': following['username']})
+    followed_usernames = [followed['username'] for followed in actor.get('following', [])]
+    followed_users_activity_query = {
+        'actor.username': {
+            '$in': followed_usernames
+        }
+    }
+    followed_users_activity_query.update(common_query_fields)
 
-    # Add the activity of the people that posts to a particular context
-    contexts_followings = []
-    for subscribed in actor.get('subscribedTo', []):
-        # Don't show conversations in timeline
-        contexts_followings.append({'contexts.url': subscribed['url']})
+    # Construct the final $or query
+    query = {
+        "$or": [
+            actor_query,
+            context_activity_query,
+            followed_users_activity_query
+        ]
+    }
 
-    query_items = []
-    query_items.append(actor_query)
-    query_items += actors_followings
-    query_items += contexts_followings
-
-    query = {'$or': query_items}
-    query['verb'] = 'post'
-    # Include only visible activity, this includes activity with visible=True
-    # and activity WITHOUT the visible field
-    query['visible'] = {'$ne': False}
     return query
 
 
