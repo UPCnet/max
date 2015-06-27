@@ -78,43 +78,35 @@ def getContextActivities(context, request):
     query.update({'verb': 'post'})                                 # 'post' activities
     query.update({'contexts.url': url_regex})                      # equal or child of url
 
-    contexts_query = []
-
     # Check if we have permission to unrestrictely view activities from recursive contexts:
     can_list_activities_unsubscribed = isinstance(request.has_permission(list_activities_unsubscribed), ACLAllowed)
 
     # If we can't view unsubcribed contexts, filter from which contexts we get activities by listing
-    # the contexts that the user has read permission on his subscriptions. Public contexts
-    # will be added if this condition is met, as if we're unrestricted, main query already includes them all
+    # the contexts that the user has read permission on his subscriptions. Public contexts are only searched here
+    # because if we can list_activities_unsubscribed, main query already includes them.
 
+    readable_contexts_urls = []
     if not can_list_activities_unsubscribed:
-
-        def get_valid_subscriptions():
-            subscriptions = []
-            for subscription in request.actor['subscribedTo']:
-                if 'read' in subscription.get('permissions', []) \
-                   and subscription['objectType'] == 'context'\
-                   and subscription['url'].startswith(url):
-                    subscriptions.append(subscription['url'])
-            return subscriptions
-
-        # XXX Filter subscriptions by url prefix PLEASE:
-        subscribed_query = {'contexts.url': {'$in': get_valid_subscriptions()}}
-        contexts_query.append(subscribed_query)
+        # Include all urls from subscriptions to contexts whose url
+        # is a child of of main context url,
+        for subscription in request.actor['subscribedTo']:
+            if 'read' in subscription.get('permissions', []) \
+               and subscription['objectType'] == 'context'\
+               and subscription['url'].startswith(url):
+                readable_contexts_urls.append(subscription['url'])
 
         # We'll include also all contexts that are public whitin the url
         public_query = {'permissions.read': 'public', 'url': url_regex}
-        public_contexts = [result['url'] for result in request.db.contexts.search(public_query, show_fields=['url'])]
+        for result in request.db.contexts.search(public_query, show_fields=['url']):
+            readable_contexts_urls.append(result['url'])
 
-        if public_contexts:
-            contexts_query.append({'contexts.url': {'$in': public_contexts}})
+    # if any url collected, include it on the query
+    if readable_contexts_urls:
+        query['contexts.url'] = {'$in': readable_contexts_urls}
 
-    if contexts_query:
-        query.update({'$or': contexts_query})
-
-    activities = sorted_query(request, request.db.activity, query, flatten=1)
-
-    if contexts_query or can_list_activities_unsubscribed:
+    activities = []
+    # Execute search only if we have read permision on some contexts or we have usubscribed access to activities.
+    if readable_contexts_urls or can_list_activities_unsubscribed:
         activities = sorted_query(request, request.db.activity, query, flatten=1)
 
     is_head = request.method == 'HEAD'
