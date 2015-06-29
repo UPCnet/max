@@ -392,7 +392,14 @@ class Activity(BaseActivity):
 
         if self.get('contexts', []) and hasattr(self.request.actor, 'getSubscription'):
             from max.models import Context
-            context = Context.from_database(self.request, self['contexts'][0]['hash'])
+
+            # When dealing with context activities, request context will be already loaded, so reuse it
+            activity_context_same_as_request_context = isinstance(self.request.context, Context) and self.request.context['hash'] == self['contexts'][0]['hash']
+            if activity_context_same_as_request_context:
+                context = self.request.context
+            else:
+                # When activity context is not loaded, instantiate a lazy one
+                context = Context.from_object(self.request, self['contexts'][0])
 
             subscription = self.request.actor.getSubscription(context)
             if subscription:
@@ -417,10 +424,13 @@ class Activity(BaseActivity):
                     acl.append((Allow, self.request.authenticated_userid, add_comment))
 
             # If no susbcription found, check context policy
-            if context.get('permissions', {}).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
-                acl.append((Allow, self.request.authenticated_userid, view_activity))
-                if is_self_operation(self.request):
-                    acl.append((Allow, self.request.authenticated_userid, like))
+            else:
+                # XXX This should be cached at resource level
+                context.wake()
+                if context.get('permissions', {}).get('read', DEFAULT_CONTEXT_PERMISSIONS['read']) == 'public':
+                    acl.append((Allow, self.request.authenticated_userid, view_activity))
+                    if is_self_operation(self.request):
+                        acl.append((Allow, self.request.authenticated_userid, like))
 
             # Only context activites can be flagged/unflagged, so we give permissions to
             # Manager here, as it don't make sense to do it globally
