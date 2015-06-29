@@ -18,7 +18,7 @@ from urllib import unquote_plus
 import logging
 import signal
 import sys
-
+import json
 
 request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
@@ -179,9 +179,33 @@ def deprecation_wrapper_factory(handler, registry):
     return deprecation_wrapper_tween
 
 
+import os
+REPORT_BASE = '/tmp/mongo_probe'
+
+
 def mongodb_probe_factory(handler, registry):
     def mongodb_probe_tween(request):
+        if not hasattr(request, 'mongodb_probe'):
+            request.mongodb_probe = {
+                'cursors': {},
+                'cursor_count': 0
+            }
+
         response = handler(request)
+        if request.matched_route:
+            endpoint = request.matched_route.path.strip('/').replace('/', '_')
+            method = request.method
+            request_folder = '{}/{}___{}'.format(REPORT_BASE, endpoint, method)
+            if not os.path.exists(request_folder):
+                os.makedirs(request_folder)
+            count = len(os.listdir(request_folder))
+            request_queries = []
+            for cursorid, cursor in sorted(request.mongodb_probe.get('cursors', []).items(), key=lambda x: x[1]['order']):
+                del cursor['order']
+                del cursor['used']
+                request_queries.append(cursor)
+
+            open('{}/{}'.format(request_folder, count), 'w').write(json.dumps(request_queries, indent=4))
 
         return response
     return mongodb_probe_tween

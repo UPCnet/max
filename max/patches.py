@@ -1,4 +1,6 @@
 import inspect
+import traceback
+import re
 from pyramid.threadlocal import get_current_request
 
 
@@ -35,15 +37,54 @@ IGNORE_COLLECTIONS = ['$cmd']
 def get_probe_data():
     request = get_current_request()
     if request:
-        if not hasattr(request, 'mongodb_probe'):
-            request.mongodb_probe = {}
-
-        request.mongodb_probe.setdefault('cursors', {})
-        request.mongodb_probe.setdefault('cursor_count', 0)
         return request.mongodb_probe
 
 
-def patched_Cursor__init__(self, collection, spec, *args, **kwargs):
+def get_originator():
+    stack = traceback.extract_stack()
+    clean = []
+
+    for file, line, method, code in stack[::-1]:
+        if 'max/max' not in file:
+            continue
+        if file.endswith('patches.py'):
+            continue
+        module = re.search('src/max/(.*?)\.py', file).groups()[0].replace('/', '.')
+        if module in ['max.tweens']:
+            break
+        mid = '{}.{}:{}'.format(module, method, line)
+        clean.append(mid)
+    clean = clean[::-1]
+    return clean
+
+from copy import deepcopy
+from datetime import datetime
+
+
+def format_spec(spec):
+    from_spec = deepcopy(spec)
+    newspec = {}
+
+    def format_value(value):
+        if isinstance(value, datetime):
+            return value.isoformat()
+        elif isinstance(value, list):
+            newlist = []
+            for item in value:
+                newlist.append(format_value(item))
+            return newlist
+        elif isinstance(value, dict):
+            newdict = []
+            for itemkey, item in value.items():
+                newdict[itemkey] = format_value(item)
+            return newdict
+    for key, value in from_spec.items:
+        newspec[key] = format_value(value)
+
+    return newspec
+
+
+def patched_Cursor__init__(self, collection, spec={}, *args, **kwargs):
     original_Cursor__init__(self, collection, spec, *args, **kwargs)
     if collection.name not in IGNORE_COLLECTIONS:
         probe_data = get_probe_data()
@@ -52,7 +93,7 @@ def patched_Cursor__init__(self, collection, spec, *args, **kwargs):
             probe_data['cursors'][cursor_id] = {
                 'used': False,
                 'collection': collection.name,
-                'spec': spec,
+                'spec': format(spec),
                 'order': probe_data['cursor_count']
             }
             probe_data['cursor_count'] += 1
@@ -63,10 +104,9 @@ def patched_Cursornext(self):
     if probe_data:
         cursor_id = id(self)
         if cursor_id in probe_data['cursors']:
-            # if probe_data['cursors'][cursor_id]['collection'] == 'activity':
-                # import ipdb;ipdb.set_trace()
             if not probe_data['cursors'][cursor_id]['used']:
                 probe_data['cursors'][cursor_id]['used'] = True
+                probe_data['cursors'][cursor_id]['originator'] = get_originator()
 
     data = original_Cursornext(self)
     return data

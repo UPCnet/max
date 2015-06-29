@@ -70,10 +70,11 @@ def main(*args, **settings):
     # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
     settings['pyramid.tweens'] = [
         'max.tweens.excview_tween_factory',
+        'max.tweens.mongodb_probe_factory',
         'max.tweens.compatibility_checker_factory',
         'max.tweens.post_tunneling_factory',
         'max.tweens.deprecation_wrapper_factory',
-        'max.tweens.mongodb_probe_factory'
+
     ]
 
     debug.setup(settings)
