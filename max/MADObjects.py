@@ -189,6 +189,10 @@ class MADBase(MADDict):
             pass
         self.data = RUDict({})
 
+        # Property used to mark instances coming from 'from_object'
+        # To know that they are not read from database.
+        self.asleep = False
+
     @classmethod
     def from_request(cls, request, rest_params={}):
         instance = cls(request)
@@ -225,6 +229,7 @@ class MADBase(MADDict):
     def from_database(cls, request, key):
         instance = cls(request)
         instance.data[instance.unique] = instance.format_unique(key)
+        instance.asleep = True
         instance.wake()
         return instance
 
@@ -237,6 +242,7 @@ class MADBase(MADDict):
         if 'id' in source:
             instance['_id'] = source['id']
         instance._post_init_from_object(source)
+        instance.asleep = True
         return instance
 
     def field_changed(self, field):
@@ -265,13 +271,17 @@ class MADBase(MADDict):
 
     def wake(self):
         """
-            Tries to recover a lazy object from the database
+            Tries to recover a lazy object from the database.
+
+            Instances marked as asleep = True, are the only ones that
+            will be waked up.
         """
-        obj = self.alreadyExists()
-        if obj:
-            self.update(obj)
-            self.old.update(obj)
-            self.old = deepcopy(flatten(self.old))
+        if self.asleep:
+            obj = self.alreadyExists()
+            if obj:
+                self.update(obj)
+                self.old.update(obj)
+                self.old = deepcopy(flatten(self.old))
 
     def format_unique(self, key):
         return key if isinstance(key, ObjectId) else ObjectId(key)
