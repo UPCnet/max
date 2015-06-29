@@ -294,6 +294,8 @@ class MADMaxCollection(object):
         """
             Returns an unique item of the collection
         """
+        if itemID == '_owner':
+            return None
         query = self._getQuery(itemID)
         item = self.wrapped_find_one(query)
         if item is None:

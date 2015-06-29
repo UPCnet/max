@@ -73,6 +73,7 @@ def main(*args, **settings):
         'max.tweens.compatibility_checker_factory',
         'max.tweens.post_tunneling_factory',
         'max.tweens.deprecation_wrapper_factory',
+        'max.tweens.mongodb_probe_factory'
     ]
 
     debug.setup(settings)

@@ -179,6 +179,14 @@ def deprecation_wrapper_factory(handler, registry):
     return deprecation_wrapper_tween
 
 
+def mongodb_probe_factory(handler, registry):
+    def mongodb_probe_tween(request):
+        response = handler(request)
+
+        return response
+    return mongodb_probe_tween
+
+
 def browser_debug_factory(handler, registry):
     def browser_debug_tween(request):
         debug = request.params.get('d', None)
