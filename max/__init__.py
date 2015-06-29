@@ -12,6 +12,7 @@ else:
 
 
 from max import debug
+from max.patches import enable_mongodb_probe
 from max.request import extract_post_data
 from max.request import get_database
 from max.request import get_oauth_headers
@@ -67,15 +68,22 @@ def main(*args, **settings):
     authz_policy = ACLAuthorizationPolicy()
     authn_policy = MaxAuthenticationPolicy(['widgetcli'])
 
+    # Read max settings
+    max_settings = loadMAXSettings(settings)
+
     # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
-    settings['pyramid.tweens'] = [
-        'max.tweens.excview_tween_factory',
-        'max.tweens.mongodb_probe_factory',
+    tweens = ['max.tweens.excview_tween_factory']
+    if max_settings.get('max_enable_mongodb_probe', False):
+        tweens.append('max.tweens.mongodb_probe_factory')
+        enable_mongodb_probe()
+
+    tweens += [
         'max.tweens.compatibility_checker_factory',
         'max.tweens.post_tunneling_factory',
         'max.tweens.deprecation_wrapper_factory',
-
     ]
+
+    settings['pyramid.tweens'] = tweens
 
     debug.setup(settings)
 
@@ -111,7 +119,7 @@ def main(*args, **settings):
     config.registry.max_store = db
 
     # Set MAX settings
-    config.registry.max_settings = loadMAXSettings(settings)
+    config.registry.max_settings = max_settings
 
     # Set Twitter settings
     config.registry.cloudapis_settings = loadCloudAPISettings(config.registry)

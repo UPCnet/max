@@ -111,5 +111,7 @@ def patched_Cursornext(self):
     data = original_Cursornext(self)
     return data
 
-Cursor.__init__ = patched_Cursor__init__
-Cursor.next = patched_Cursornext
+
+def enable_mongodb_probe():
+    Cursor.__init__ = patched_Cursor__init__
+    Cursor.next = patched_Cursornext
