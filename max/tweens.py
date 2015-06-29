@@ -19,6 +19,7 @@ import logging
 import signal
 import sys
 import json
+import traceback
 
 request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
@@ -205,7 +206,16 @@ def mongodb_probe_factory(handler, registry):
                 del cursor['used']
                 request_queries.append(cursor)
 
-            open('{}/{}'.format(request_folder, count), 'w').write(json.dumps(request_queries, indent=4))
+            output = {
+                'queries': request_queries,
+                'request': request.url
+            }
+
+            test_name = [a[2] for a in traceback.extract_stack() if a[2].startswith('test_')]
+            if test_name:
+                output['test'] = test_name
+
+            open('{}/{}'.format(request_folder, count), 'w').write(json.dumps(output, indent=4))
 
         return response
     return mongodb_probe_tween
