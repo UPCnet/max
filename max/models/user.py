@@ -395,7 +395,7 @@ class User(MADBase):
 
         in_restricted_visibility_mode = asbool(self.request.registry.max_settings.get('max_restricted_user_visibility_mode', False))
 
-        non_visible_user_list = self.request.registry.max_security.get('roles', {}).get('NonVisible', [])
+        non_visible_user_list = self.request.registry.max_security.get_role_users('NonVisible')
         i_am_visible = self['username'] not in non_visible_user_list
         user_is_visible = user['username'] not in non_visible_user_list
 

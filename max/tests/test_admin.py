@@ -22,7 +22,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app = loadapp('config:tests.ini', relative_to=conf_dir)
         self.reset_database(self.app)
         self.app.registry.max_store.security.insert(test_default_security)
-        self.app.registry.max_security = test_default_security
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)

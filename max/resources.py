@@ -69,9 +69,10 @@ class Root(dict):
 
 
 def get_security_object(root, request):
-        security_settings = request.db.security.search({}).next()
-        security_settings.__parent__ = root
-        return security_settings
+    security_settings = request.registry.max_security
+    security_settings.__parent__ = root
+    security_settings.request = request
+    return security_settings
 
 
 class MongoDBTraverser(MADMaxCollection):
@@ -269,13 +270,16 @@ def loadCloudAPISettings(registry):
     if cloudapis_settings:
         return cloudapis_settings
     else:
-        maxlogger.info("No cloudapis info found. Please run initialization database script.")  #pragma: no cover
+        maxlogger.info("No cloudapis info found. Please run initialization database script.")  # pragma: no cover
         return DUMMY_CLOUD_API_DATA
 
 
 def loadMAXSecurity(registry):
+    from max.models import Security
+    from collections import namedtuple
+    Request = namedtuple('Request', ['db'])
     security_settings = [a for a in registry.max_store.security.find({})]
     if security_settings:
-        return security_settings[0]
+        return Security.from_object(Request(registry.max_store), security_settings[0])
     else:
-        maxlogger.info("No security info found. Please run initialization database script.")  #pragma: no cover
+        maxlogger.info("No security info found. Please run initialization database script.")  # pragma: no cover

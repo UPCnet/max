@@ -28,5 +28,4 @@ def get_user_roles(request, userid):
     """
 
     security = request.registry.max_security
-    user_roles = [role for role, users in security.get("roles", {}).items() if userid in users]
-    return user_roles
+    return security.get_user_roles(userid)

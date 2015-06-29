@@ -2,7 +2,6 @@
 from max import ALLOWED_ROLES
 from max.exceptions import ObjectNotFound
 from max.exceptions import ValidationError
-from max.resources import loadMAXSecurity
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
@@ -48,13 +47,10 @@ def check_user_role(security, request):
     role = request.matchdict['role']
     user = request.matchdict['user']
 
-    security.setdefault('roles', {})
-    security['roles'].setdefault(role, [])
-
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    if user not in security['roles'][role]:
+    if not security.has_role(user, role):
         raise ObjectNotFound("User {} doesn't have role {}".format(user, role))
 
     handler = JSONResourceEntity(request, {'roles': [role]})
@@ -72,16 +68,10 @@ def add_user_to_role(security, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    security.setdefault('roles', {})
-    security['roles'].setdefault(role, [])
-    status_code = 200
-    if user not in security['roles'][role]:
-        security['roles'][role].append(user)
-        status_code = 201
-    # Remove possible duplicates from list
-    security['roles'][role] = list(set(security['roles'][role]))
-    security.save()
-    request.registry.max_security = loadMAXSecurity(request.registry)
+    added = security.add_user_to_role(user, role)
+    status_code = 201 if added else 200
+    if added:
+        security.save()
     handler = JSONResourceRoot(request, security.flatten()['roles'][role], status_code=status_code)
     return handler.buildResponse()
 
@@ -97,14 +87,10 @@ def remove_user_from_role(security, request):
     if role not in ALLOWED_ROLES:
         raise ValidationError('Role "{}" is not a valid role'.format(role))
 
-    security.setdefault('roles', {})
-    security['roles'].setdefault(role, [])
-    if user not in security['roles'][role]:
-        raise ObjectNotFound("User {} in not in {} role list".format(user, role))
+    if not security.has_role(user, role):
+        raise ObjectNotFound("User {} doesn't have role {}".format(user, role))
 
-    # Make sure we delete the user, even if it's declared more than onece
-    while user in security['roles'][role]:
-        security['roles'][role].remove(user)
-    security.save()
-    request.registry.max_security = loadMAXSecurity(request.registry)
+    removed = security.remove_user_from_role(user, role)
+    if removed:
+        security.save()
     return HTTPNoContent()

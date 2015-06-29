@@ -22,7 +22,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.app = loadapp('config:tests.ini', relative_to=conf_dir)
         self.reset_database(self.app)
         self.app.registry.max_store.security.insert(test_default_security_single)
-        self.app.registry.max_security = test_default_security_single
         self.patched_post = patch('requests.post', new=partial(mock_post, self))
         self.patched_post.start()
         self.testapp = MaxTestApp(self)
@@ -38,7 +37,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'messi'
         self.create_user(username)
         res = self.testapp.post('/admin/security/roles/%s/users/%s' % ('Manager', username), "", oauth2Header(test_manager), status=201)
-        self.assertListEqual(['messi', 'test_manager'], res.json)
+        self.assertItemsEqual(['messi', 'test_manager'], res.json)
 
     def test_security_add_user_to_non_allowed_role(self):
         username = 'messi'

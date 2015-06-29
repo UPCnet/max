@@ -14,6 +14,7 @@ from paste.deploy import loadapp
 import json
 import os
 import unittest
+import shutil
 
 
 def fucked_up_insert():
@@ -36,6 +37,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         self.testapp = MaxTestApp(self)
 
         self.create_user(test_manager)
+
+    def tearDown(self):
+        shutil.rmtree('{}/exceptions'.format(self.conf_dir))
 
     # BEGIN TESTS
 
