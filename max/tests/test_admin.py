@@ -195,7 +195,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
     #     from hashlib import sha1
 
     #     result = self.create_context(create_invalid_context, expect=201)
-    #     import ipdb;ipdb.set_trace()
         # url_hash = sha1(create_invalid_context['object']['url']).hexdigest()
         # res = self.testapp.post('/contexts/%s/activities' % url_hash, json.dumps(user_status_context), oauth2Header(test_manager))
         # result = json.loads(res.text)

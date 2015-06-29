@@ -141,8 +141,6 @@ def endpoints_view(context, request):
         resources_by_route.setdefault(route.name, resource_info)
 
         endpoint_description_match = re.match(r'^\s*(.*?)\n\s*(\n|$)', method.__doc__, re.MULTILINE)
-        # if not endpoint_description_match:
-        #     import ipdb;ipdb.set_trace()
         endpoint_description = endpoint_description_match.groups()[0]
         endpoint_documentation = method.__doc__[endpoint_description_match.end():].strip()
         endpoint_documentation = re.sub(r'\n        ', '\n', endpoint_documentation)

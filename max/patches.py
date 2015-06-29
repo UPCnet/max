@@ -63,8 +63,8 @@ def patched_Cursornext(self):
     if probe_data:
         cursor_id = id(self)
         if cursor_id in probe_data['cursors']:
-            if probe_data['cursors'][cursor_id]['collection'] == 'activity':
-                import ipdb;ipdb.set_trace()
+            # if probe_data['cursors'][cursor_id]['collection'] == 'activity':
+                # import ipdb;ipdb.set_trace()
             if not probe_data['cursors'][cursor_id]['used']:
                 probe_data['cursors'][cursor_id]['used'] = True
 
