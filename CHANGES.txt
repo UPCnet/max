@@ -1,11 +1,14 @@
 CHANGELOG
 =========
 
-5.3 (unreleased)
+5.3 (2015-06-30)
 ----------------
 
-- Nothing changed yet.
-
+* Lighten duplicated post search query [Carles Bruguera]
+* Optimize timeline query, remove empty query parts [Carles Bruguera]
+* Generate unique query list [Carles Bruguera]
+* Remove old token fields references [Carles Bruguera]
+* Avoid noisy errors on mongodb autoreconnect tests [Carles Bruguera]
 
 5.2 (2015-06-30)
 ----------------
