@@ -2,6 +2,8 @@ import inspect
 import traceback
 import re
 from pyramid.threadlocal import get_current_request
+import json
+from hashlib import sha1
 
 
 def marmoset_patch(old, new, extra_globals={}):  # pragma: no cover
@@ -61,24 +63,40 @@ from copy import deepcopy
 from datetime import datetime
 
 
-def format_spec(spec):
+def format_spec(spec, normalize=False):
     from_spec = deepcopy(spec)
     newspec = {}
 
-    def format_value(value):
-        if isinstance(value, datetime):
-            return value.isoformat()
-        elif isinstance(value, list):
+    def _format(value):
+        if normalize:
+            return 'VALUE'
+        else:
+            if isinstance(value, datetime):
+                return value.isoformat()
+            elif isinstance(value, unicode):
+                return value.encode('utf-8')
+            else:
+                return str(value)
+
+    def format_value(value, normalize=False):
+        if isinstance(value, list):
             newlist = []
             for item in value:
-                newlist.append(format_value(item))
+                newvalue = format_value(item)
+                # When normalizing, do not add a value to a list if it's already in
+                # This way all plain value lists will remain the same
+                if normalize is False or (normalize is True and newvalue not in newlist):
+                    newlist.append(newvalue)
             return newlist
         elif isinstance(value, dict):
-            newdict = []
+            newdict = {}
             for itemkey, item in value.items():
                 newdict[itemkey] = format_value(item)
             return newdict
-    for key, value in from_spec.items:
+        else:
+            return _format(value)
+
+    for key, value in from_spec.items():
         newspec[key] = format_value(value)
 
     return newspec
@@ -90,10 +108,14 @@ def patched_Cursor__init__(self, collection, spec={}, *args, **kwargs):
         probe_data = get_probe_data()
         if probe_data:
             cursor_id = id(self)
+            normalized_spec = format_spec(spec, normalize=True)
+            cursor_hash = sha1(json.dumps(normalized_spec)).hexdigest()
+
             probe_data['cursors'][cursor_id] = {
                 'used': False,
                 'collection': collection.name,
-                'spec': format(spec),
+                'spec': normalized_spec,
+                'hash': cursor_hash,
                 'order': probe_data['cursor_count']
             }
             probe_data['cursor_count'] += 1

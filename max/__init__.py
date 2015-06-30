@@ -49,7 +49,7 @@ DEFAULT_CONTEXT_PERMISSIONS = dict(
 CONVERSATION_PARTICIPANTS_LIMIT = 20
 LAST_AUTHORS_LIMIT = 8
 AUTHORS_SEARCH_MAX_QUERIES_LIMIT = 6
-ALLOWED_ROLES = ['Manager', 'NonVisible', 'HubManager']
+ALLOWED_ROLES = ['Manager', 'NonVisible']
 DEFAULT_CONTEXT_PERMISSIONS_PERMANENCY = True
 PAGINATION_MODIFIERS = ['before', 'after', 'limit']
 SORTING_MODIFIERS = ['sort', 'priority']
@@ -71,9 +71,9 @@ def main(*args, **settings):
     # Read max settings
     max_settings = loadMAXSettings(settings)
 
-    # IMPORTANT NOTE !! Order matters! Last tween added will be the first to be invoked
+    # IMPORTANT NOTE !! Order matters! First tween added will be the first to be invoked
     tweens = ['max.tweens.excview_tween_factory']
-    if max_settings.get('max_enable_mongodb_probe', False):
+    if max_settings.get('max_enable_mongodb_probe', False) or os.environ.get('mongoprobe', False):
         tweens.append('max.tweens.mongodb_probe_factory')
         enable_mongodb_probe()
 

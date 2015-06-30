@@ -181,7 +181,10 @@ def deprecation_wrapper_factory(handler, registry):
 
 
 import os
-REPORT_BASE = '/tmp/mongo_probe'
+REQUEST_REPORT = '/tmp/mongo_probe/requests'
+QUERIES_REPORT = '/tmp/mongo_probe/queries'
+
+from copy import deepcopy
 
 
 def mongodb_probe_factory(handler, registry):
@@ -191,12 +194,11 @@ def mongodb_probe_factory(handler, registry):
                 'cursors': {},
                 'cursor_count': 0
             }
-
         response = handler(request)
         if request.matched_route:
             endpoint = request.matched_route.path.strip('/').replace('/', '_')
             method = request.method
-            request_folder = '{}/{}___{}'.format(REPORT_BASE, endpoint, method)
+            request_folder = '{}/{}___{}'.format(REQUEST_REPORT, endpoint, method)
             if not os.path.exists(request_folder):
                 os.makedirs(request_folder)
             count = len(os.listdir(request_folder))
@@ -205,6 +207,13 @@ def mongodb_probe_factory(handler, registry):
                 del cursor['order']
                 del cursor['used']
                 request_queries.append(cursor)
+                if not os.path.exists(QUERIES_REPORT):
+                    os.makedirs(QUERIES_REPORT)
+                if not os.path.exists('{}/{collection}_{hash}'.format(QUERIES_REPORT, **cursor)):
+                    dumped = deepcopy(cursor)
+                    del dumped['originator']
+                    del dumped['hash']
+                    open('{}/{collection}_{hash}'.format(QUERIES_REPORT, **cursor), 'w').write(json.dumps(dumped, indent=4))
 
             output = {
                 'queries': request_queries,
