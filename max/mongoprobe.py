@@ -39,7 +39,7 @@ def get_originator():
     for file, line, method, code in stack[::-1]:
         if 'max/max' not in file:
             continue
-        if file.endswith('patches.py'):
+        if file.endswith('mongoprobe.py'):
             continue
         module = re.search('src/max/(.*?)\.py', file).groups()[0].replace('/', '.')
         if module in ['max.tweens']:
@@ -72,7 +72,7 @@ def format_spec(spec, normalize=False):
             else:
                 return str(value)
 
-    def format_value(value, normalize=False):
+    def format_value(value):
         if isinstance(value, list):
             newlist = []
             for item in value:
@@ -109,7 +109,7 @@ def patched_Cursor__init__(self, collection, spec={}, *args, **kwargs):
         if probe_data:
             cursor_id = id(self)
             normalized_spec = format_spec(spec, normalize=True)
-            cursor_hash = sha1(json.dumps(normalized_spec)).hexdigest()
+            cursor_hash = sha1(collection.name + json.dumps(normalized_spec)).hexdigest()
 
             probe_data['cursors'][cursor_id] = {
                 'used': False,
