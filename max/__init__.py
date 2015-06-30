@@ -12,7 +12,7 @@ else:
 
 
 from max import debug
-from max.patches import enable_mongodb_probe
+from max import mongoprobe
 from max.request import extract_post_data
 from max.request import get_database
 from max.request import get_oauth_headers
@@ -72,20 +72,15 @@ def main(*args, **settings):
     max_settings = loadMAXSettings(settings)
 
     # IMPORTANT NOTE !! Order matters! First tween added will be the first to be invoked
-    tweens = ['max.tweens.excview_tween_factory']
-    if max_settings.get('max_enable_mongodb_probe', False) or os.environ.get('mongoprobe', False):
-        tweens.append('max.tweens.mongodb_probe_factory')
-        enable_mongodb_probe()
-
-    tweens += [
+    settings['pyramid.tweens'] = [
+        'max.tweens.excview_tween_factory',
         'max.tweens.compatibility_checker_factory',
         'max.tweens.post_tunneling_factory',
         'max.tweens.deprecation_wrapper_factory',
     ]
 
-    settings['pyramid.tweens'] = tweens
-
     debug.setup(settings)
+    mongoprobe.setup(settings)
 
     config = Configurator(
         settings=settings,

@@ -13,13 +13,11 @@ from pyramid.interfaces import IRequest
 from pyramid.interfaces import IView
 
 from pymongo.errors import AutoReconnect
-from urllib import unquote_plus
 
 import logging
 import signal
 import sys
-import json
-import traceback
+
 
 request_logger = logging.getLogger('requestdump')
 dump_requests = {'enabled': False}
@@ -178,89 +176,3 @@ def deprecation_wrapper_factory(handler, registry):
         else:
             return response
     return deprecation_wrapper_tween
-
-
-import os
-REQUEST_REPORT = '/tmp/mongo_probe/requests'
-QUERIES_REPORT = '/tmp/mongo_probe/queries'
-
-from copy import deepcopy
-
-
-def mongodb_probe_factory(handler, registry):
-    def mongodb_probe_tween(request):
-        if not hasattr(request, 'mongodb_probe'):
-            request.mongodb_probe = {
-                'cursors': {},
-                'cursor_count': 0
-            }
-        response = handler(request)
-        if request.matched_route:
-            endpoint = request.matched_route.path.strip('/').replace('/', '_')
-            method = request.method
-            request_folder = '{}/{}___{}'.format(REQUEST_REPORT, endpoint, method)
-            if not os.path.exists(request_folder):
-                os.makedirs(request_folder)
-            count = len(os.listdir(request_folder))
-            request_queries = []
-            for cursorid, cursor in sorted(request.mongodb_probe.get('cursors', []).items(), key=lambda x: x[1]['order']):
-                del cursor['order']
-                del cursor['used']
-                request_queries.append(cursor)
-                if not os.path.exists(QUERIES_REPORT):
-                    os.makedirs(QUERIES_REPORT)
-                if not os.path.exists('{}/{collection}_{hash}'.format(QUERIES_REPORT, **cursor)):
-                    dumped = deepcopy(cursor)
-                    del dumped['originator']
-                    del dumped['hash']
-                    open('{}/{collection}_{hash}'.format(QUERIES_REPORT, **cursor), 'w').write(json.dumps(dumped, indent=4))
-
-            output = {
-                'queries': request_queries,
-                'request': request.url
-            }
-
-            test_name = [a[2] for a in traceback.extract_stack() if a[2].startswith('test_')]
-            if test_name:
-                output['test'] = test_name
-
-            open('{}/{}'.format(request_folder, count), 'w').write(json.dumps(output, indent=4))
-
-        return response
-    return mongodb_probe_tween
-
-
-def browser_debug_factory(handler, registry):
-    def browser_debug_tween(request):
-        debug = request.params.get('d', None)
-        debugging = debug is not None
-        if debugging:
-            user = request.params.get('u', None)
-            token = request.params.get('t', 'fake_token')
-            method = request.params.get('m', '').upper()
-            payload = request.params.get('p', None)
-
-            if user:
-                new_headers = {
-                    'X-Oauth-Token': token,
-                    'X-Oauth-Username': user,
-                    'X-Oauth-Scope': 'widgetcli'
-                }
-                request.headers.update(new_headers)
-
-                if method in ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS']:
-                    request.method = method.upper()
-
-                if payload:
-                    request.text = payload
-
-        request.body = unquote_plus(request.body).strip('=')
-        request.headers['Content-Type'] = 'application/json'
-        response = handler(request)
-
-        if debug == '1' and user:
-            response.content_type = 'text/html'
-            response.text = u'<html><body>{}</body></html>'.format(response.text)
-        return response
-
-    return browser_debug_tween
