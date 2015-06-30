@@ -182,7 +182,7 @@ class BaseActivity(MADBase):
         """
 
         # Clean innecessary fields
-        non_needed_actor_fields = ['talkingIn', 'androidDevices', 'iosDevices', 'subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
+        non_needed_actor_fields = ['talkingIn', 'subscribedTo', 'following', 'last_login', '_id', 'published', 'twitterUsername']
         for fieldname in non_needed_actor_fields:
             if fieldname in comment['actor']:
                 del comment['actor'][fieldname]
