@@ -17,10 +17,14 @@ import unittest
 import shutil
 
 
+def noop(*args, **kwargs):
+    pass
+
+
 def fucked_up_insert():
     """
-        This mocked method never really gets executed as it will fail
-        on wrong method argument count.
+        This mocked method never really gets executed. I'ts used to simulate
+        wrong method argument count.
     """
     pass  # pragma: no cover
 
@@ -63,8 +67,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
     @patch('max.models.user.User.insert', fucked_up_insert)
     def test_generic_exception_catching(self):
         """
-            Test calling a webservice  moked to force an exception, to test the scavenger
-            that formats a beautiful json error messages for uncatched exceptions
+            Test calling a webservice mocked to force an exception, to test the scavenger
+            that formats beautiful json error messages for uncatched exceptions
         """
         username = 'messi'
         res = self.create_user(username, expect=500)
@@ -157,14 +161,14 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         rotated = rotate_image_by_EXIF(image)
         self.assertEqual(image, rotated)
 
+    # __del__ is patched to avoid "ignored exceptions", just to avoid visual noise on test output.
+    @patch('pymongo.cursor.Cursor.__del__', noop)
     @patch('pymongo.cursor.Cursor.__init__', mocked_cursor_init)
     def test_mongodb_autoreconnect(self):
         """
             Test that if mongodb disconnects once was connected, a autoreconect loop
             will start waiting for mongodb to recover
         """
-        #  Make Cursor __init__ fail 3 times with AutoReconnect. Test will show 3 errors similar to
-        #  AttributeError: "'Cursor' object has no attribute '_Cursor__killed'" in <bound method Cursor.__del__ of <pymongo.cursor.Cursor object at 0x1072b3410>> ignored
         from max.tests.base import FAILURES
         FAILURES.set(3)
 
@@ -172,6 +176,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
         self.create_user(username)
         self.testapp.get('/people/{}'.format(username), '', headers=oauth2Header(test_manager), status=200)
 
+    # __del__ is patched to avoid "ignored exceptions", just to avoid visual noise on test output.
+    @patch('pymongo.cursor.Cursor.__del__', noop)
     @patch('pymongo.cursor.Cursor.__init__', partial(mocked_cursor_init, raise_at_end=True))
     def test_mongodb_autoreconnect_and_crash(self):
         """
@@ -179,8 +185,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase, MaxAvatarsTestBase):
             will start waiting for mongodb to recover, And if a different exception raises
             in between, loop will exit and raise the exception
         """
-        #  Make Cursor __init__ fail 3 times with AutoReconnect. Test will show 3 errors similar to
-        #  AttributeError: "'Cursor' object has no attribute '_Cursor__killed'" in <bound method Cursor.__del__ of <pymongo.cursor.Cursor object at 0x1072b3410>> ignored
         from max.tests.base import FAILURES
         FAILURES.set(3)
 
