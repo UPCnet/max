@@ -140,12 +140,17 @@ def addContextActivity(context, request):
 
     query = {
         actor_id_key: actor_id_value,
-        'object.content': newactivity['object']['content'],
         'published': {'$gt': newactivity['published'] - timedelta(minutes=1)},
-        'contexts.hash': context['hash']
+        'contexts.hash': context['hash'],
+        'verb': 'post'
     }
 
-    duplicated = request.db.activity.last(query)
+    possible_duplicates = request.db.activity.search(query)
+    duplicated = False
+    for candidate in possible_duplicates:
+        if candidate['object']['content'] == newactivity['object'].get('content', ''):
+            duplicated = candidate
+            break
 
     if duplicated:
         code = 200
@@ -189,12 +194,17 @@ def addUserActivity(user, request):
     # the same actor and without context
     query = {
         'actor.username': request.actor['username'],
-        'object.content': newactivity['object'].get('content', ''),
         'published': {'$gt': newactivity['published'] - timedelta(minutes=1)},
-        'contexts': {'$exists': False}
+        'contexts': {'$exists': False},
+        'verb': 'post'
     }
 
-    duplicated = request.db.activity.last(query)
+    possible_duplicates = request.db.activity.search(query)
+    duplicated = None
+    for candidate in possible_duplicates:
+        if candidate['object']['content'] == newactivity['object'].get('content', ''):
+            duplicated = candidate
+            break
 
     if duplicated:
         code = 200
