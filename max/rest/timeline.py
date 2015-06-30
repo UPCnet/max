@@ -20,10 +20,6 @@ def timelineQuery(actor):
         'visible': {'$ne': False}
     }
 
-    # Add the activity of the requesting user
-    actor_query = {'actor.username': actor['username']}
-    actor_query.update(common_query_fields)
-
     # Add the activity written on contexts where the user is subscribed
     subscribed_contexts_urls = [subscribed['url'] for subscribed in actor.get('subscribedTo', [])]
     context_activity_query = {
@@ -35,6 +31,8 @@ def timelineQuery(actor):
 
     # Add the activity of the people that the user follows
     followed_usernames = [followed['username'] for followed in actor.get('following', [])]
+    # Include the requesting actor as another followed user
+    followed_usernames.append(actor['username'])
     followed_users_activity_query = {
         'actor.username': {
             '$in': followed_usernames
@@ -42,15 +40,15 @@ def timelineQuery(actor):
     }
     followed_users_activity_query.update(common_query_fields)
 
-    # Construct the final $or query
-    query = {
-        "$or": [
-            actor_query,
-            context_activity_query,
-            followed_users_activity_query
-        ]
-    }
+    # Construct the final $or query. followed_users_activity_query will never be empty, as it will always
+    # include the requesting username. Subscribed contexts may be empty.
+    or_queries = [followed_users_activity_query]
+    if subscribed_contexts_urls:
+        or_queries.append(context_activity_query)
 
+    query = {
+        "$or": or_queries
+    }
     return query
 
 
