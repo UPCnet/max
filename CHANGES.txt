@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-5.4 (unreleased)
-----------------
+5.3.1 (2015-07-01)
+------------------
 
-- Nothing changed yet.
-
+* Include collection name on hash key [Carles Bruguera]
+* Globally catch & fix suboptimal $or queries [Carles Bruguera]
+* Reorganize debug and probe out of main max code [Carles Bruguera]
 
 5.3 (2015-06-30)
 ----------------
