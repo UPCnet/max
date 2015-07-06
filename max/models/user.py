@@ -441,7 +441,6 @@ class User(MADBase):
                     {"$sort": {"_id": 1}},
                     {"$group": {
                         "_id": "$contexts.id",
-                        "content": {"$last": "$object.content"},
                         "object": {"$last": "$object"},
                         "published": {"$last": "$published"}
                     }}
@@ -451,7 +450,7 @@ class User(MADBase):
                 def format_message(db_message):
                     message_object = db_message.get('object', {})
                     message = dict(
-                        objectType=message_object.get('objectType'),
+                        objectType=message_object.get('objectType', 'note'),
                         content=message_object.get('content', ''),
                         published=db_message.get('published', '')
                     )
