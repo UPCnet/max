@@ -427,17 +427,38 @@ class User(MADBase):
         actor = self.flatten()
         if self.has_field_permission('talkingIn', 'view'):
             actor.setdefault('talkingIn', [])
-            conversations_collection = MADMaxCollection(self.request, 'conversations')
-            conversations = conversations_collection.search({'_id': {'$in': [ObjectId(conv['id']) for conv in actor['talkingIn']]}})
-            conversations_by_id = {str(conv['_id']): conv for conv in conversations}
-            for subscription in actor['talkingIn']:
-                conversation_object = conversations_by_id[subscription['id']]
-                subscription['displayName'] = conversation_object.realDisplayName(self['username'])
-                subscription['lastMessage'] = flatten(conversation_object.lastMessage())
-                subscription['participants'] = conversation_object['participants']
-                subscription['tags'] = conversation_object['tags']
-                subscription['messages'] = 0
-            actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
+
+            if actor['talkingIn']:
+                conversation_objectids = [ObjectId(conv['id']) for conv in actor['talkingIn']]
+                conversations_collection = MADMaxCollection(self.request, 'conversations')
+                conversations = conversations_collection.search({'_id': {'$in': conversation_objectids}})
+                conversations_by_id = {str(conv['_id']): conv for conv in conversations}
+
+                messages_collection = MADMaxCollection(self.request, 'messages').collection
+
+                pipeline = [
+                    {"$match": {"contexts.id": {"$in": conversations_by_id.keys()}}},
+                    {"$sort": {"_id": 1}},
+                    {"$group": {"_id": "$contexts.id", "content": {"$last": "$object.content"}, "published": {"$last": "$published"}}}
+                ]
+                messages = messages_collection.aggregate(pipeline)['result']
+
+                def format_message(message):
+                    return dict(
+                        objectType='message',
+                        content=message['content'],
+                        published=message['published']
+                    )
+                messages_by_conversation = {message['_id'][0]: format_message(message) for message in messages}
+                for subscription in actor['talkingIn']:
+                    conversation_object = conversations_by_id[subscription['id']]
+                    subscription['displayName'] = conversation_object.realDisplayName(self['username'])
+                    subscription['lastMessage'] = messages_by_conversation[subscription['id']]
+                    subscription['participants'] = conversation_object['participants']
+                    subscription['tags'] = conversation_object['tags']
+                    subscription['messages'] = 0
+
+                actor['talkingIn'] = sorted(actor['talkingIn'], reverse=True, key=lambda conv: conv['lastMessage']['published'])
 
         return actor
 
