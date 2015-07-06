@@ -439,16 +439,30 @@ class User(MADBase):
                 pipeline = [
                     {"$match": {"contexts.id": {"$in": conversations_by_id.keys()}}},
                     {"$sort": {"_id": 1}},
-                    {"$group": {"_id": "$contexts.id", "content": {"$last": "$object.content"}, "published": {"$last": "$published"}}}
+                    {"$group": {
+                        "_id": "$contexts.id",
+                        "content": {"$last": "$object.content"},
+                        "object": {"$last": "$object"},
+                        "published": {"$last": "$published"}
+                    }}
                 ]
                 messages = messages_collection.aggregate(pipeline)['result']
 
-                def format_message(message):
-                    return dict(
-                        objectType='message',
-                        content=message['content'],
-                        published=message['published']
+                def format_message(db_message):
+                    message_object = db_message.get('object', {})
+                    message = dict(
+                        objectType=message_object.get('objectType'),
+                        content=message_object.get('content', ''),
+                        published=db_message.get('published', '')
                     )
+
+                    # Set object urls for media types
+                    if message['objectType'] in ['file', 'image']:
+                        message['fullURL'] = message['object'].get('fullURL', '')
+                        if ['objectType'] == 'image':
+                            message['thumbURL'] = message['object'].get('thumbURL', '')
+
+                    return message
                 messages_by_conversation = {message['_id'][0]: format_message(message) for message in messages}
                 for subscription in actor['talkingIn']:
                     conversation_object = conversations_by_id[subscription['id']]
