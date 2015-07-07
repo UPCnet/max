@@ -136,14 +136,6 @@ class MADMaxCollection(object):
         """
         search_query = deepcopy(query)
 
-        # Catch mixed unoptimal $or queries and reformulate
-        if '$or' in search_query and len(search_query.keys()) > 1:
-            mixed_specs = {key: value for key, value in search_query.items() if key != '$or'}
-            for spec in search_query['$or']:
-                spec.update(mixed_specs)
-            for spec in mixed_specs:
-                del search_query[spec]
-
         # Extract known params from kwargs
         limit = kwargs.get('limit', None)
         flatten = kwargs.get('flatten', 0)
@@ -246,6 +238,14 @@ class MADMaxCollection(object):
         if date_filter:
             # Filter the query to objects matching a specific published date range
             search_query.update({'published': date_filter})
+
+        # Catch mixed unoptimal $or queries and reformulate
+        if '$or' in search_query and len(search_query.keys()) > 1:
+            mixed_specs = {key: value for key, value in search_query.items() if key != '$or'}
+            for spec in search_query['$or']:
+                spec.update(mixed_specs)
+            for spec in mixed_specs:
+                del search_query[spec]
 
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)
