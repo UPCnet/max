@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-5.3.2 (unreleased)
+5.3.2 (2015-07-07)
 ------------------
 
-- Nothing changed yet.
-
+* Move optimizer code to catch all query additions [Carles Bruguera]
+* Get image/file url when using aggregation [Carles Bruguera]
+* Use aggregation to retrieve all user last messages [Carles Bruguera]
 
 5.3.1 (2015-07-01)
 ------------------
