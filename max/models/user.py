@@ -457,9 +457,9 @@ class User(MADBase):
 
                     # Set object urls for media types
                     if message['objectType'] in ['file', 'image']:
-                        message['fullURL'] = message['object'].get('fullURL', '')
-                        if ['objectType'] == 'image':
-                            message['thumbURL'] = message['object'].get('thumbURL', '')
+                        message['fullURL'] = message_object.get('fullURL', '')
+                        if message['objectType'] == 'image':
+                            message['thumbURL'] = message_object.get('thumbURL', '')
 
                     return message
                 messages_by_conversation = {message['_id'][0]: format_message(message) for message in messages}
