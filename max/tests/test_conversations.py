@@ -10,6 +10,7 @@ from functools import partial
 from mock import patch
 from paste.deploy import loadapp
 
+import datetime
 import json
 import os
 import unittest
@@ -1150,3 +1151,36 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(res.json['displayName'], creation_message['contexts'][0]['displayName'])
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient2), status=200)
         self.assertEqual(res.json['displayName'], creation_message['contexts'][0]['displayName'])
+
+    def test_get_all_messages(self):
+        """
+            Given a conversation between two plain users
+            When a restricted user retrieves all the messages
+            I get all the messages
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/messages', '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 1)
+
+        # With query date
+        now = datetime.datetime.now()
+        before = now - datetime.timedelta(weeks=6)
+        res = self.testapp.get('/messages?date_filter={}'.format(now.year), '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 1)
+
+        res = self.testapp.get('/messages?date_filter={}-{}'.format(before.year, before.month), '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 0)
+
+        # HEAD
+        res = self.testapp.head('/messages', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.headers['X-totalItems'], '1')

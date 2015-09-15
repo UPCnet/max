@@ -18,7 +18,18 @@ from pymongo import DESCENDING
 
 
 @endpoint(route_name='messages', request_method='GET', permission=list_messages)
-def getMessages(conversation, request):
+def getMessages(message, request):
+    """
+        Get all messages
+    """
+    is_head = request.method == 'HEAD'
+    activities = request.db.messages.search({'verb': 'post'}, flatten=1, count=is_head, **searchParams(request))
+    handler = JSONResourceRoot(request, activities, stats=is_head)
+    return handler.buildResponse()
+
+
+@endpoint(route_name='conversation_messages', request_method='GET', permission=list_messages)
+def getConversationMessages(conversation, request):
     """
         Get all messages from a conversation
     """
@@ -32,7 +43,7 @@ def getMessages(conversation, request):
 
 
 @endpoint(route_name='user_conversation_messages', request_method='POST', permission=add_message)
-@endpoint(route_name='messages', request_method='POST', permission=add_message)
+@endpoint(route_name='conversation_messages', request_method='POST', permission=add_message)
 def add_message(conversation, request):
     """
         Adds a message to a conversation

@@ -76,6 +76,7 @@ RESOURCES['context_tags'] = dict(route='/contexts/{hash}/tags', category='Contex
 RESOURCES['context_tag'] = dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag', traverse='/contexts/{hash}')
 
 RESOURCES['conversations'] = dict(route='/conversations', category='Conversations', name='Conversations', traverse='/conversations')
+#RESOURCES['conversations_active'] = dict(route='/conversations/active', category='Conversations', name='Active conversations', traverse='/conversations')
 RESOURCES['conversation'] = dict(route='/conversations/{id}', category='Conversations', name='Conversation', traverse='/conversations/{id}')
 RESOURCES['conversation_owner'] = dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner', traverse='/conversations/{id}')
 RESOURCES['conversation_avatar'] = dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar', traverse='/conversations/{id}')
@@ -84,10 +85,10 @@ RESOURCES['participants'] = dict(route='/conversations/{id}/participants', categ
 RESOURCES['participant'] = dict(route='/conversations/{id}/participants/{username}', category='Conversations', name='Conversation participant', traverse='/conversations/{id}')
 
 # This two resources share the same implementation. The latter is keeped to avoid setting a GET depreaction wrapper
-RESOURCES['messages'] = dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages', traverse='/conversations/{id}')
+RESOURCES['conversation_messages'] = dict(route='/conversations/{id}/messages', category='Conversations', name='Conversation mesages', traverse='/conversations/{id}')
 RESOURCES['user_conversation_messages'] = dict(route='/people/{username}/conversations/{id}/messages', category='Conversations', name='User conversation messages', traverse='/conversations/{id}')
 
-RESOURCES['message_image'] = dict(route='/messages/{id}/image', category='Messages', name='Image', traverse='/messages')
+RESOURCES['messages'] = dict(route='/messages', category='Messages', name='All messages', traverse='/messages')
 RESOURCES['message_image'] = dict(route='/messages/{id}/image', category='Messages', name='Image', traverse='/messages/{id}')
 RESOURCES['message_image_sizes'] = dict(route='/messages/{id}/image/{size}', category='Messages', name='Named size Image', traverse='/messages/{id}')
 RESOURCES['message_file_download'] = dict(route='/messages/{id}/file/download', category='Messages', name='File', traverse='/messages/{id}')
