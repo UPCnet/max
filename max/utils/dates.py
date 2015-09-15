@@ -50,7 +50,7 @@ def date_filter_parser(date_filter):
     exact = not before and not after
 
     date_filter = date_filter.lstrip('-').lstrip('+')
-    result = re.search(r'(\d{4})[^\d]*(\d{2})*[^\d]*(\d{2})*', date_filter)
+    result = re.search(r'(\d{4})[^\d]*(\d{1,2})*[^\d]*(\d{1,2})*', date_filter)
 
     date1 = [0, 0, 0]
     date2 = [0, 0, 0]

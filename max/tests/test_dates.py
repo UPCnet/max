@@ -62,6 +62,29 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(query['$lte'].minute, 59)
         self.assertEqual(query['$lte'].second, 59)
 
+    def test_exact_month_of_year_without_zero_padding(self):
+        """
+        """
+        query = date_filter_parser('2014-2')
+
+        self.assertIn('$gte', query)
+        self.assertIn('$lte', query)
+        self.assertEqual(len(query), 2)
+
+        self.assertEqual(query['$gte'].year, 2014)
+        self.assertEqual(query['$gte'].month, 2)
+        self.assertEqual(query['$gte'].day, 1)
+        self.assertEqual(query['$gte'].hour, 0)
+        self.assertEqual(query['$gte'].minute, 0)
+        self.assertEqual(query['$gte'].second, 0)
+
+        self.assertEqual(query['$lte'].year, 2014)
+        self.assertEqual(query['$lte'].month, 2)
+        self.assertEqual(query['$lte'].day, 28)
+        self.assertEqual(query['$lte'].hour, 23)
+        self.assertEqual(query['$lte'].minute, 59)
+        self.assertEqual(query['$lte'].second, 59)
+
     def test_exact_day_of_month_of_year(self):
         """
         """
@@ -81,6 +104,29 @@ class FunctionalTests(unittest.TestCase):
         self.assertEqual(query['$lte'].year, 2014)
         self.assertEqual(query['$lte'].month, 2)
         self.assertEqual(query['$lte'].day, 27)
+        self.assertEqual(query['$lte'].hour, 23)
+        self.assertEqual(query['$lte'].minute, 59)
+        self.assertEqual(query['$lte'].second, 59)
+
+    def test_exact_day_of_month_of_year_without_zero_padding(self):
+        """
+        """
+        query = date_filter_parser('2014-02-1')
+
+        self.assertIn('$gte', query)
+        self.assertIn('$lte', query)
+        self.assertEqual(len(query), 2)
+
+        self.assertEqual(query['$gte'].year, 2014)
+        self.assertEqual(query['$gte'].month, 2)
+        self.assertEqual(query['$gte'].day, 1)
+        self.assertEqual(query['$gte'].hour, 0)
+        self.assertEqual(query['$gte'].minute, 0)
+        self.assertEqual(query['$gte'].second, 0)
+
+        self.assertEqual(query['$lte'].year, 2014)
+        self.assertEqual(query['$lte'].month, 2)
+        self.assertEqual(query['$lte'].day, 1)
         self.assertEqual(query['$lte'].hour, 23)
         self.assertEqual(query['$lte'].minute, 59)
         self.assertEqual(query['$lte'].second, 59)
