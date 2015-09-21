@@ -76,7 +76,7 @@ RESOURCES['context_tags'] = dict(route='/contexts/{hash}/tags', category='Contex
 RESOURCES['context_tag'] = dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag', traverse='/contexts/{hash}')
 
 RESOURCES['conversations'] = dict(route='/conversations', category='Conversations', name='Conversations', traverse='/conversations')
-#RESOURCES['conversations_active'] = dict(route='/conversations/active', category='Conversations', name='Active conversations', traverse='/conversations')
+RESOURCES['conversations_active'] = dict(route='/conversations/active', category='Conversations', name='Active conversations', traverse='/conversations')
 RESOURCES['conversation'] = dict(route='/conversations/{id}', category='Conversations', name='Conversation', traverse='/conversations/{id}')
 RESOURCES['conversation_owner'] = dict(route='/conversations/{id}/owner', category='Conversations', name='Conversation owner', traverse='/conversations/{id}')
 RESOURCES['conversation_avatar'] = dict(route='/conversations/{id}/avatar', filesystem=True, category='Conversations', name='Conversation avatar', traverse='/conversations/{id}')

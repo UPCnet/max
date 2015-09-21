@@ -21,6 +21,7 @@ from max.security.permissions import purge_conversations
 from max.security.permissions import transfer_ownership
 from max.security.permissions import view_conversation
 from max.security.permissions import view_conversation_subscription
+from max.utils import searchParams
 
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -356,4 +357,28 @@ def transferConversationOwnership(conversation, request):
     previous_owner.grantPermission(subscription, 'unsubscribe')
 
     handler = JSONResourceEntity(request, conversation.flatten())
+    return handler.buildResponse()
+
+
+@endpoint(route_name='conversations_active', request_method='GET', permission=list_conversations)
+def getActiveConversations(message, request):
+    """
+        Get active conversations inspecting messages
+    """
+    is_head = request.method == 'HEAD'
+    messages = request.db.messages.search({'verb': 'post'}, flatten=1, count=is_head, **searchParams(request))
+
+    if not is_head:
+        conversations = {}
+        for message in messages:
+            if message['contexts'][0]['id'] not in conversations:
+                conversations[message['contexts'][0]['id']] = message['contexts'][0]
+
+        results = []
+        for conversation in conversations:
+            results.append(conversations[conversation])
+    else:
+        results = messages
+
+    handler = JSONResourceRoot(request, results, stats=is_head)
     return handler.buildResponse()

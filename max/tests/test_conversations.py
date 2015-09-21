@@ -1184,3 +1184,36 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         # HEAD
         res = self.testapp.head('/messages', oauth2Header(test_manager), status=200)
         self.assertEqual(res.headers['X-totalItems'], '1')
+
+    def test_get_active_conversations(self):
+        """
+            Given a conversation between two plain users
+            When a restricted user retrieves the active conversations
+            I get them
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations/active', '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 1)
+
+        # With query date
+        now = datetime.datetime.now()
+        before = now - datetime.timedelta(weeks=6)
+        res = self.testapp.get('/conversations/active?date_filter={}'.format(now.year), '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 1)
+
+        res = self.testapp.get('/conversations/active?date_filter={}-{}'.format(before.year, before.month), '', oauth2Header(test_manager), status=200)
+        self.assertEqual(len(res.json), 0)
+
+        # HEAD
+        res = self.testapp.head('/conversations/active', oauth2Header(test_manager), status=200)
+        self.assertEqual(res.headers['X-totalItems'], '1')
