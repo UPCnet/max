@@ -366,19 +366,19 @@ def getActiveConversations(message, request):
         Get active conversations inspecting messages
     """
     is_head = request.method == 'HEAD'
-    messages = request.db.messages.search({'verb': 'post'}, flatten=1, count=is_head, **searchParams(request))
+    messages = request.db.messages.search({'verb': 'post'}, flatten=1, **searchParams(request))
 
-    if not is_head:
-        conversations = {}
-        for message in messages:
-            if message['contexts'][0]['id'] not in conversations:
-                conversations[message['contexts'][0]['id']] = message['contexts'][0]
+    conversations = {}
+    for message in messages:
+        if message['contexts'][0]['id'] not in conversations:
+            conversations[message['contexts'][0]['id']] = message['contexts'][0]
 
-        results = []
-        for conversation in conversations:
-            results.append(conversations[conversation])
-    else:
-        results = messages
+    results = []
+    for conversation in conversations:
+        results.append(conversations[conversation])
+
+    if is_head:
+        results = len(results)
 
     handler = JSONResourceRoot(request, results, stats=is_head)
     return handler.buildResponse()
