@@ -182,14 +182,80 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         username = 'usuarimoltllarg'
         self.create_user(username)
         query = {'username': 'usuarimoltll'}
-        res = self.testapp.get('/people', json.dumps(query), oauth2Header(username), status=200)
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result[0].get('username', ''), username)
 
         query = {'username': 'usuarimo'}
-        res = self.testapp.get('/people', json.dumps(query), oauth2Header(username), status=200)
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
         result = json.loads(res.text)
         self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_username_full(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'sheldon.cooper'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_username_starting(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'sheldon'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_username_ending(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'cooper'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_username_partial(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'don.coop'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_displayName_with_case(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'Cooper'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_displayName_accented(self):
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'Coupé'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(result[0].get('username', ''), username)
+
+    def test_search_users_filter_displayName_non_accented(self):
+        """
+            Accented username or displayname parts can only be searched with the accent provided.
+        """
+        username = 'sheldon.cooper'
+        self.create_user(username, displayName='Sheldon Cooper Coupé')
+        query = {'username': 'Coupe'}
+        res = self.testapp.get('/people', query, oauth2Header(username), status=200)
+        result = json.loads(res.text)
+
+        self.assertEqual(len(result), 0)
 
     def test_get_all_users_with_regex_weird(self):
         username1 = 'victor.fernandez'

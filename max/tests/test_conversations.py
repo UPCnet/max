@@ -593,7 +593,8 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             And I am not the owner of the conversation
             When i try to leave the conversation
             Then I am no longer in the conversation
-            And the conversation is tagged as archive
+            And the user still exists
+            And the conversation is not tagged as archive
         """
         from .mockers import message as creation_message
         sender = 'messi'
@@ -608,7 +609,36 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 2)
-        self.assertIn('archive', res.json['tags'])
+        self.assertNotIn('archive', res.json['tags'])
+        self.assertEqual(res.json['displayName'], recipient)
+        return conversation_id, sender, recipient
+
+    def test_post_message_to_two_people_conversation_previously_left_one_rejoins(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am not the owner of the conversation
+            And i previously left the conversation
+            When the owner text me again
+            Then I auto-rejoin the the conversation
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
+
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('archive', res.json['tags'])
         self.assertEqual(res.json['displayName'], recipient)
         return conversation_id, sender, recipient
 

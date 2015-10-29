@@ -59,6 +59,7 @@ def postMessage2Conversation(conversations, request):
     """
         Add a new conversation
     """
+    import ipdb;ipdb.set_trace()
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
     data = request.decoded_payload
@@ -315,8 +316,9 @@ def leaveConversation(conversation, request):
         conversation['participants'] = [user for user in conversation['participants'] if user['username'] != actor['username']]
         save_context = True
 
-    # Tag conversations that will be left as 1 participant only as archived
-    if len(conversation['participants']) == 2:
+    # Tag group conversations that will be left as 1 participant only as archived
+    # non-group conversations will not be archived if someone leaves
+    if len(conversation['participants']) == 2 and 'group' in conversation['tags']:
         conversation.setdefault('tags', [])
         if 'archive' not in conversation['tags']:
             conversation['tags'].append('archive')
