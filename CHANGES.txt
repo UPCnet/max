@@ -1,11 +1,14 @@
 CHANGELOG
 =========
 
-5.3.3 (unreleased)
+5.3.3 (2015-10-29)
 ------------------
 
-- Nothing changed yet.
-
+* Fix is_head request [Victor Fernandez de Alba]
+* Implemented second endpoint required for new version of stats. /conversations/active [Victor Fernandez de Alba]
+* New endpoint for getting the overall messages (filtered) [Victor Fernandez de Alba]
+* Fix date filter format, allowing now 01 and 1 month format [Victor Fernandez de Alba]
+* Var mismatch [Carles Bruguera]
 
 5.3.2 (2015-07-07)
 ------------------
