@@ -71,7 +71,6 @@ def rebuildSubscriptions(context, request):
     for user in users:
         for subscription in user.get('subscribedTo', []):
             if subscription['hash'] not in existing_contexts:
-                print user.username, subscription["displayName"]
                 fake_deleted_context = Context.from_object(request, subscription)
                 user.removeSubscription(fake_deleted_context)
             else:
