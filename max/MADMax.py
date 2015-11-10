@@ -205,7 +205,6 @@ class MADMaxCollection(object):
             search_query.update(keywords_query)
 
         if username:
-            print username
             # Filter the query to only objects containing certain hashtags
             username_query = {
                 "$or": [
