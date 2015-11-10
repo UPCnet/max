@@ -59,7 +59,6 @@ def postMessage2Conversation(conversations, request):
     """
         Add a new conversation
     """
-    import ipdb;ipdb.set_trace()
     # We are forced the check and extract the context of the conversation here,
     # We can't initialize the activity first, because it would fail (chiken-egg stuff)
     data = request.decoded_payload
