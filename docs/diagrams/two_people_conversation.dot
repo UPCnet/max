@@ -1,0 +1,41 @@
+#!dot
+digraph {
+    labelloc=top
+    splines=polyline
+
+    graph [fontname = "courier" fontsize=18 pad=1];
+    node [fontname = "courier" fontsize=12];
+    edge [fontname = "courier"];
+
+    status_active[shape="box" style=filled fillcolor=yellow label="Conversa activa []"]
+    status_singled[shape="box" style=filled fillcolor=yellow label="Conversa activa [single]"]
+    status_archived[shape="box" style=filled fillcolor=yellow label="Conversa inactiva [archived]"]
+
+    start[shape="box", style=rounded label="Es crea una conversa entre A i B"]
+    user_left[shape="box", style=rounded label="Usuari A marxa de conversa"]
+
+    user_rejoins[shape="box", style=rounded label="usuari A entra de nou"]
+    user_reinvited[shape="box", style=rounded label="Usuari A és afegit de nou"]
+
+    user_a_deleted_from_active[shape="box", style=rounded label="Usuari A és esborrat"]
+    user_a_deleted_from_singled[shape="box", style=rounded label="Usuari A és esborrat"]
+    user_a_recreated[shape="box", style=rounded label="Usuari A és creat de nou"]
+
+    start -> status_active;
+    status_active -> user_left;
+    user_left -> status_singled;
+    status_singled -> user_rejoins;
+    status_singled -> user_reinvited;
+    user_reinvited -> status_active;
+    user_rejoins -> status_active;
+
+    status_singled -> user_a_deleted_from_singled;
+    user_a_deleted_from_singled -> status_archived;
+
+    status_active -> user_a_deleted_from_active;
+    user_a_deleted_from_active -> status_archived;
+
+    status_archived -> user_a_recreated;
+    user_a_recreated -> status_singled;
+
+}

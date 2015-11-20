@@ -475,13 +475,62 @@ class User(MADBase):
 
         return actor
 
+    def getConversations(self):
+        """
+            Get user conversations
+        """
+        # List subscribed conversations, and use it to make the query
+        # This way we can filter 2-people conversations that have been archived
+        subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in self.request.actor.get('talkingIn', [])]
+
+        query = {'participants.username': self['username'],
+                 'objectType': 'conversation',
+                 '_id': {'$in': subscribed_conversations}
+                 }
+
+        conversations_search = self.request.db.conversations.search(query, sort_by_field="published")
+
+        return conversations_search
+
     def _after_insert_object(self, oid, notifications=True):
         """
             Create user exchanges just after user creation on the database
         """
+        query = {
+            'objectType': 'conversation',
+            'participants.username': self['username']
+        }
+
+        conversations_search = self.request.db.conversations.search(query)
+        for conversation in conversations_search:
+            if len(conversation['participants']) == 2:
+                if 'group' not in conversation['tags']:
+                    if 'archive' in conversation['tags']:
+                        conversation['tags'].remove('archive')
+                        conversation['tags'].append('single')
+                        conversation.save()
+
         if notifications:
             notifier = RabbitNotifications(self.request)
             notifier.add_user(self['username'])
+
+    def _before_delete(self):
+        """
+            Executed before an object removal
+            Override to provide custom behaviour on delete
+        """
+        query = {
+            'objectType': 'conversation',
+            'participants.username': self['username']
+        }
+
+        conversations_search = self.request.db.conversations.search(query)
+        for conversation in conversations_search:
+            self.removeSubscription(conversation)
+            if 'single' in conversation['tags']:
+                conversation['tags'].remove('single')
+                conversation['tags'].append('archive')
+                conversation.save()
 
     def _after_delete(self):
         """

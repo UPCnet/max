@@ -8,6 +8,7 @@ from max.utils import searchParams
 from max.security.permissions import add_message
 from max.security.permissions import list_messages
 from max.security.permissions import view_message
+from max.MADMax import MADMaxCollection
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
@@ -55,6 +56,15 @@ def add_message(conversation, request):
                       'verb': 'post',
                       'contexts': [conversation]
                       }
+
+    if 'single' in message_params['contexts'][0]['tags']:
+        users = MADMaxCollection(request, 'users', query_key='username')
+        for participant in message_params['contexts'][0]['participants']:
+            user = users[participant['username']]
+            if user.getSubscription(conversation) is None:
+                user.addSubscription(conversation)
+                conversation['tags'].remove('single')
+                conversation.save()
 
     # Initialize a Message (Activity) object from the request
     newmessage = Message.from_request(request, rest_params=message_params)

@@ -591,10 +591,10 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             And a conversation between me and another user
             And I am not the owner of the conversation
-            When i try to leave the conversation
+            When I try to leave the conversation
             Then I am no longer in the conversation
             And the user still exists
-            And the conversation is not tagged as archive
+            And the conversation is tagged as single
         """
         from .mockers import message as creation_message
         sender = 'messi'
@@ -609,7 +609,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 2)
-        self.assertNotIn('archive', res.json['tags'])
+        self.assertIn('single', res.json['tags'])
         self.assertEqual(res.json['displayName'], recipient)
         return conversation_id, sender, recipient
 
@@ -618,9 +618,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
             Given a plain user
             And a conversation between me and another user
             And I am not the owner of the conversation
-            And i previously left the conversation
-            When the owner text me again
-            Then I auto-rejoin the the conversation
+            And I previously left the conversation
+            When I text me again
+            Then I auto-rejoin to the conversation
         """
         from .mockers import message as creation_message
         sender = 'messi'
@@ -634,13 +634,503 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
 
-        #res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
-        #res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
+        conversation_id = res.json['contexts'][0]['id']
 
-        #self.assertEqual(len(res.json['participants']), 2)
-        #self.assertNotIn('archive', res.json['tags'])
-        #self.assertEqual(res.json['displayName'], recipient)
-        #return conversation_id, sender, recipient
+        message = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
+
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+        self.assertEqual(message.json['creator'], recipient)
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_post_message_to_two_people_conversation_previously_left_another_rejoins(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user left the conversation
+            When the owner text me again
+            Then another user auto-rejoin to the conversation
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        message = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+        self.assertEqual(message.json['creator'], sender)
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_user_leaves_to_two_people_conversation_other_participant_send_messages(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user leaves the conversation
+            When the owner text me again
+            Then another user auto-rejoin to the conversation
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), '', oauth2Header(recipient), status=200)
+        self.assertEqual(len(res.json), 2)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_user_leaves_to_two_people_conversation_other_participant_send_message_by_username(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user leaves the conversation
+            When the owner text me again
+            Then another user auto-rejoin to the conversation
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_user_leaves_to_two_people_conversation_test_manager_send_message_by_username(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user leave the conversation
+            When the manager text me again
+            Then another user auto-rejoin to the conversation
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(test_manager, conversation_id), json.dumps(message2), oauth2Header(test_manager), status=201)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_owner_out_user_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When I out the other user the conversation
+            Then Error the owner not have permission
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(sender), status=403)
+
+    def test_delete_user_previously_leave_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user left the conversation
+            When the other user is deleted
+            Then two people conversations are archived
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=400)
+
+    def test_delete_user_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When the other user is deleted
+            Then two people conversations are archived
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=400)
+
+    def test_delete_user_unsubscribe_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When the other user is deleted
+            Then user is unsubscribe to the conversation
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=400)
+
+    def test_delete_user_unsubscribe_group_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When the other user is deleted
+            Then user is unsubscribe to the conversations
+        """
+        from .mockers import group_message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 3)
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertIn(recipient2, participant_usernames)
+
+        self.testapp.delete('/people/{}'.format(recipient2), headers=oauth2Header(test_manager), status=204)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        participant_usernames = [user['username'] for user in res.json['participants']]
+        self.assertNotIn(recipient2, participant_usernames)
+        self.assertNotIn('archive', res.json['tags'])
+
+        self.testapp.get('/people/{}/conversations/{}'.format(sender, conversation_id), '', oauth2Header(sender), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=400)
+
+    def test_after_delete_user_start_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When the other user is deleted
+            And I create a new conversation with the user deleted
+            Then return Error the user not exist
+        """
+        from .mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=404)
+
+    def test_after_delete_user_add_message_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            When the other user is deleted
+            And I create a new message the conversation
+            Then return Error the user not exist
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=403)
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=403)
+
+    def test_after_delete_user_add_message_group_conversation_archived(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When a users are deleted
+            And the group conversation is archived
+            And I create a new message to the conversation archived
+            Then return Error the user not exist
+        """
+        from .mockers import group_message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        self.testapp.delete('/people/{}'.format(recipient2), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=403)
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=403)
+
+    def test_add_participant_to_group_conversation_archived(self):
+        """
+            Given a plain user
+            And a conversation between me and other people
+            And I am the owner of the conversation
+            When a user leaves the conversation
+            And the group conversation is archived
+            And I add a participant to conversation
+            Then the group conversation is not archived
+        """
+        from .mockers import group_message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=403)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(sender), status=201)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('archive', res.json['tags'])
+
+    def test_user_deleted_reappear_remove_tag_archive_in_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And the other user is deleted
+            When the other user is recreated
+            Then remove tag archive
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+
+        self.create_user(recipient)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertNotIn('archive', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+
+    def test_user_deleted_reappear_in_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And the other user is deleted
+            When the other user is recreated
+            Then add tag single to the conversation
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+        self.assertNotIn('single', res.json['tags'])
+
+        self.create_user(recipient)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertNotIn('archive', res.json['tags'])
+        self.assertIn('single', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
+
+    def test_user_deleted_reappear_before_user_leaves_to_two_people_conversation(self):
+        """
+            Given a plain user
+            And a conversation between me and another user
+            And I am the owner of the conversation
+            And previously another user leaves the conversation
+            And previously another user is deleted
+            When the other user is recreated
+            Then add tag single to the conversation
+        """
+        from .mockers import message as creation_message
+        from .mockers import message2
+        sender = 'messi'
+        recipient = 'xavi'
+
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = res.json['contexts'][0]['id']
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertIn('single', res.json['tags'])
+
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertIn('archive', res.json['tags'])
+        self.assertNotIn('single', res.json['tags'])
+
+        self.create_user(recipient)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertNotIn('archive', res.json['tags'])
+        self.assertIn('single', res.json['tags'])
+
+        self.testapp.post('/people/{}/conversations/{}/messages'.format(sender, conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.post('/conversations/{}/messages'.format(conversation_id), json.dumps(message2), oauth2Header(sender), status=201)
+        self.testapp.get('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=200)
 
     def test_user_leaves_conversation(self):
         """
@@ -700,6 +1190,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         conversation_id = res.json['contexts'][0]['id']
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertNotIn('archive', res.json['tags'])
+
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
         self.assertEqual(len(res.json['participants']), 1)

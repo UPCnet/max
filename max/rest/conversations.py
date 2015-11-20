@@ -35,14 +35,8 @@ def getConversations(conversations, request):
     """
     # List subscribed conversations, and use it to make the query
     # This way we can filter 2-people conversations that have been archived
-    subscribed_conversations = [ObjectId(subscription.get('id')) for subscription in request.actor.get('talkingIn', [])]
 
-    query = {'participants.username': request.actor['username'],
-             'objectType': 'conversation',
-             '_id': {'$in': subscribed_conversations}
-             }
-
-    conversations_search = conversations.search(query, sort_by_field="published")
+    conversations_search = request.actor.getConversations()
 
     def conversations_info():
         for conversation in conversations_search:
@@ -101,6 +95,13 @@ def postMessage2Conversation(conversations, request):
             'participants.username': {
                 '$all': request_participants}
         })
+
+        if current_conversation and 'single' in current_conversation['tags']:
+                for participant in participants:
+                    if participants[participant].getSubscription(current_conversation) is None:
+                        participants[participant].addSubscription(current_conversation)
+                        current_conversation['tags'].remove('single')
+                        current_conversation.save()
 
     if current_conversation is None:
         # Initialize a conversation (context) object from the request, overriding the object using the context
@@ -309,22 +310,7 @@ def leaveConversation(conversation, request):
     # Unsubscribe leaving participant ALWAYS
     actor.removeSubscription(conversation)
 
-    save_context = False
-    # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
-    if len(conversation['participants']) >= 2 and 'group' in conversation.get('tags', []):
-        conversation['participants'] = [user for user in conversation['participants'] if user['username'] != actor['username']]
-        save_context = True
-
-    # Tag group conversations that will be left as 1 participant only as archived
-    # non-group conversations will not be archived if someone leaves
-    if len(conversation['participants']) == 2 and 'group' in conversation['tags']:
-        conversation.setdefault('tags', [])
-        if 'archive' not in conversation['tags']:
-            conversation['tags'].append('archive')
-            save_context = True
-
-    if save_context:
-        conversation.save()
+    conversation._after_subscription_remove(actor['username'])
 
     return HTTPNoContent()
 

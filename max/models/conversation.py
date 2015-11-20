@@ -75,7 +75,7 @@ class Conversation(BaseContext):
                 acl.append((Allow, self.request.authenticated_userid, view_conversation))
                 acl.append((Allow, self.request.authenticated_userid, list_messages))
 
-            if 'write' in subscription.get('permissions', []) and is_self_operation(self.request):
+            if 'write' in subscription.get('permissions', []) and is_self_operation(self.request) and 'archive' not in self['tags']:
                 acl.append((Allow, self.request.authenticated_userid, add_message))
 
             if 'unsubscribe' in subscription.get('permissions', []) and is_self_operation(self.request):
@@ -174,6 +174,32 @@ class Conversation(BaseContext):
         """
             Removes rabbitmq bindings after new subscription
         """
+        save_context = False
+
+        # Remove leaving participant from participants list ONLY for group conversations of >=2 participants
+        if len(self['participants']) >= 2 and 'group' in self.get('tags', []):
+            self['participants'] = [user for user in self['participants'] if user['username'] != self.request.actor['username']]
+            save_context = True
+
+        # Tag no-group conversations that will be left as 1 participant only as single
+        if len(self['participants']) == 2:
+            self.setdefault('tags', [])
+            if 'group' not in self['tags']:
+                if 'single' not in self['tags']:
+                    self['tags'].append('single')
+                    save_context = True
+
+        # Tag group conversations that will be left as 1 participant only as archived
+        if len(self['participants']) == 1:
+            self.setdefault('tags', [])
+            if 'group' in self['tags']:
+                if 'archive' not in self['tags']:
+                    self['tags'].append('archive')
+                    save_context = True
+
+        if save_context:
+            self.save()
+
         notifier = RabbitNotifications(self.request)
         notifier.unbind_user_from_conversation(self, username)
 
