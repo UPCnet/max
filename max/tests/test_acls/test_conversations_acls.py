@@ -524,7 +524,7 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.post('/people/{}/conversations/{}'.format(recipient3, cid), '', oauth2Header(recipient2), status=403)
 
-    # Delete participant to conversation tests
+    # Delete participant to group conversation tests
 
     def test_delete_participant_as_manager(self):
         """
@@ -618,6 +618,95 @@ class ConversationsACLTests(unittest.TestCase, MaxTestBase):
         self.create_user(recipient2)
 
         res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(recipient), status=204)
+
+    # Delete participant to two people conversation tests
+
+    def test_delete_participant_as_manager_in_two_people_conversation(self):
+        """
+            Given i'm a Manager
+            When I try to delete a new participant from an existing conversation
+            Then I succeed
+        """
+        from max.tests.mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(test_manager), status=204)
+
+    def test_delete_participant_as_owner_in_two_people_conversation(self):
+        """
+            Given i'm a regular user
+            And i'm the owner of the conversation
+            When I try to delete a participant from an existing conversation
+            Then I get a Forbidden Exception
+        """
+        from max.tests.mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(sender), status=403)
+
+    def test_delete_participant_as_participant_in_two_people_conversation(self):
+        """
+            Given i'm a regular user
+            And i'm a regular conversation participant
+            When I try to delete a participant from an existing conversation
+            Then I get a Forbidden Exception
+        """
+        from max.tests.mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(recipient), status=403)
+
+    def test_leave_as_owner_in_two_people_conversation(self):
+        """
+            Given i'm the owner of the conversation
+            When I try to leave an existing conversation
+            Then I get a Forbidden Exception
+        """
+        from max.tests.mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        cid = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(sender, cid), '', oauth2Header(sender), status=204)
+
+    def test_leave_in_two_people_conversation(self):
+        """
+            Given i'm a regular user
+            When I try to leave an existing conversation
+            Then I succeed
+        """
+        from max.tests.mockers import message as creation_message
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         cid = str(res.json['contexts'][0]['id'])
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, cid), '', oauth2Header(recipient), status=204)

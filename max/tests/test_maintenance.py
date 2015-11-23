@@ -150,6 +150,104 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.get('/conversations/{}/messages'.format(conversation_id), "", oauth2Header(sender), status=200)
         self.assertEqual(res.json[0]['contexts'][0]['displayName'], 'Changed Name')
 
+    def test_maintenance_conversations_group_one_participant(self):
+        from .mockers import group_message as message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        recipient2 = 'shakira'
+        self.create_user(sender)
+        self.create_user(recipient)
+        self.create_user(recipient2)
+
+        res = self.testapp.post('/conversations', json.dumps(message), oauth2Header(sender), status=201)
+        conversation_id = str(res.json['contexts'][0]['id'])
+
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient2, conversation_id), '', oauth2Header(recipient2), status=204)
+
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 1)
+        self.assertIn('archive', res.json['tags'])
+
+    def test_maintenance_two_people_conversations(self):
+        from .mockers import message as creation_message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = str(res.json['contexts'][0]['id'])
+
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+
+    def test_maintenance_two_people_conversations_one_leave_conversation(self):
+        from .mockers import message as creation_message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = str(res.json['contexts'][0]['id'])
+        self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
+
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertIn('single', res.json['tags'])
+
+    def test_maintenance_two_people_conversations_one_user_deleted(self):
+        from .mockers import message as creation_message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = str(res.json['contexts'][0]['id'])
+        self.testapp.delete('/people/{}'.format(recipient), headers=oauth2Header(test_manager), status=204)
+
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertIn('archive', res.json['tags'])
+
+    def test_maintenance_two_people_conversations_tagged_archived(self):
+        from .mockers import message as creation_message
+
+        sender = 'messi'
+        recipient = 'xavi'
+        self.create_user(sender)
+        self.create_user(recipient)
+
+        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
+        conversation_id = str(res.json['contexts'][0]['id'])
+
+        # Hard modify two people conversation directly on mongo to simulate archive in tags
+        conversations = self.exec_mongo_query('conversations', 'find', {})
+        conversation = conversations[0]
+        conversation['tags'] = ['archive']
+        self.exec_mongo_query('conversations', 'update', {'_id': conversation['_id']}, conversation)
+
+        self.testapp.post('/admin/maintenance/conversations', "", oauth2Header(test_manager), status=200)
+
+        res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(sender), status=200)
+        self.assertEqual(len(res.json['participants']), 2)
+        self.assertNotIn('single', res.json['tags'])
+
     def test_maintenance_users(self):
         username = 'messi'
         self.create_user(username)

@@ -16,6 +16,7 @@ from datetime import datetime
 import glob
 import os
 import re
+from collections import defaultdict
 
 
 @endpoint(route_name='maintenance_keywords', request_method='POST', permission=do_maintenance)
@@ -96,19 +97,6 @@ def rebuildConversationSubscriptions(context, request):
         if True not in [isinstance(a, dict) for a in conversation['participants']]:
             conversation['participants'] = [{'username': a, 'displayName': a, 'objectType': 'person'} for a in conversation['participants']]
 
-        conversation['tags'] = []
-        # If we have less than two participants, we'll treat this conversation
-        # as an archived group conversation
-        if len(conversation['participants']) < 2:
-            conversation['tags'].append('archive')
-            conversation['tags'].append('group')
-        # Conversations od 2+ get the group tag
-        if len(conversation['participants']) > 2:
-            conversation['tags'].append('group')
-
-        # all the other conversations of 2, get no tag so will be
-        # treated as two people conversations
-
         conversation.save()
 
         conversation.updateUsersSubscriptions(force_update=True)
@@ -116,6 +104,7 @@ def rebuildConversationSubscriptions(context, request):
 
         existing_conversations[str(conversation['_id'])] = conversation
 
+    subscribed_users_by_conversation = {}
     users = request.db.users.search({'talkingIn.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('talkingIn', []):
@@ -127,8 +116,50 @@ def rebuildConversationSubscriptions(context, request):
                 # if subscription has an ancient plain username list, update and save it
                 if True not in [isinstance(a, dict) for a in subscription['participants']]:
                     subscription['participants'] = existing_conversations[subscription['id']]['participants']
+            subscribed_users_by_conversation.setdefault(subscription['id'], [])
+            subscribed_users_by_conversation[subscription['id']].append(user['username'])
+
         user.updateConversationParticipants(force_update=True)
         user.save()
+
+    existing_users = request.db.users.search({}, show_fields={'username': True, '_id': False})
+    existing_users_set = set([a['username'] for a in existing_users])
+
+    conversations = request.db.conversations.dump()
+    for conversation in conversations:
+        conversation_participants_usernames = [user['username'] for user in conversation['participants']]
+        conversation_subscribed_usernames = subscribed_users_by_conversation[str(conversation['_id'])]
+
+        not_subscribed = set(conversation_participants_usernames) - set(conversation_subscribed_usernames)
+        deleted_participants = set(not_subscribed) - existing_users_set
+
+        all_participants_subscribed = len(conversation_participants_usernames) == len(conversation_subscribed_usernames)
+        all_participants_exist = len(deleted_participants) == 0
+        if 'single' in conversation['tags']:
+            conversation['tags'].remove('single')
+        if 'archive' in conversation['tags']:
+            conversation['tags'].remove('archive')
+
+        # Conversations od 2+ get the group tag
+        if len(conversation['participants']) > 2:
+            if 'group' not in conversation['tags']:
+                conversation['tags'].append('group')
+        # Two people conversation and not group:
+        # tag single: if not all participants subscribed by all exist
+        # tag archive: if not all participants exist
+        elif len(conversation['participants']) == 2 and 'group' not in conversation['tags']:
+            if all_participants_subscribed:
+                pass
+            elif not all_participants_subscribed and all_participants_exist:
+                conversation['tags'].append('single')
+            elif not all_participants_subscribed and not all_participants_exist:
+                conversation['tags'].append('archive')
+        # Tag archive: if group conversation only 1 participant
+        elif 'group' in conversation['tags'] and len(conversation['participants']) == 1:
+            conversation['tags'].append('archive')
+
+        conversation.save()
+
     handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
 

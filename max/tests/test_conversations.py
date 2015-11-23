@@ -634,10 +634,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         self.testapp.delete('/people/{}/conversations/{}'.format(recipient, conversation_id), '', oauth2Header(recipient), status=204)
 
-        res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
+        message = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        message = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(recipient), status=201)
         res = self.testapp.get('/conversations/{}'.format(conversation_id), '', oauth2Header(recipient), status=200)
 
         self.assertEqual(len(res.json['participants']), 2)
