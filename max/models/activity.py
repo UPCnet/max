@@ -207,6 +207,11 @@ class BaseActivity(MADBase):
         """
         self.delete_from_list('replies', {'id': commentid})
         self['replies'] = [comment for comment in self['replies'] if comment.get('id', comment.get('_id')) != commentid]
+        if self['replies'] == []:
+            self['lastComment'] = self['_id']
+        else:
+            self['lastComment'] = ObjectId(str(self['replies'][-1]['id']))
+
         self.setKeywords()
         self.save()
         # XXX TODO Update hastags
