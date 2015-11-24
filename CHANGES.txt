@@ -1,11 +1,16 @@
 CHANGELOG
 =========
 
-5.3.4 (unreleased)
+5.3.4 (2015-11-24)
 ------------------
 
-- Nothing changed yet.
-
+* Order sorted by last comment publish date when delete comment [Pilar Marinas]
+* Maintenance conversations [Pilar Marinas]
+* Two people conversation [Pilar Marinas]
+* Remove print [Carles Bruguera]
+* Fix failing tests [Carles Bruguera]
+* Remove ipdb [Carles Bruguera]
+* WIP Fix conversations user leaves 2-user conv. [Carles Bruguera]
 
 5.3.3 (2015-10-29)
 ------------------
