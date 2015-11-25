@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from max.MADMax import MADMaxCollection
 from max.models import Message
+from max.rabbitmq import RabbitNotifications
 from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
-from max.utils.dicts import flatten
-from max.utils import searchParams
 from max.security.permissions import add_message
 from max.security.permissions import list_messages
 from max.security.permissions import view_message
-from max.MADMax import MADMaxCollection
+from max.utils import searchParams
+from max.utils.dicts import flatten
 
 from pyramid.httpexceptions import HTTPGone
 from pyramid.response import Response
@@ -65,6 +66,9 @@ def add_message(conversation, request):
                 user.addSubscription(conversation)
                 conversation['tags'].remove('single')
                 conversation.save()
+                notifier = RabbitNotifications(request)
+                notifier.add_conversation(conversation)
+
 
     # Initialize a Message (Activity) object from the request
     newmessage = Message.from_request(request, rest_params=message_params)
