@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.5 (unreleased)
+5.3.5 (2015-11-25)
 ------------------
 
-- Nothing changed yet.
-
+* Fix notification when rejoining single conversation [Carles Bruguera]
 
 5.3.4 (2015-11-24)
 ------------------
