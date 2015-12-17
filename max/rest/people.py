@@ -35,9 +35,12 @@ def getVisibleUsers(users, request):
     """
     query = {}
 
+    search_params = searchParams(request)
     filter_fields = ["username", "displayName", "objectType", 'subscribedTo']
-    found_users = users.search(query, show_fields=filter_fields, sort_by_field="username", flatten=0, **searchParams(request))
+    if asbool(search_params.get('twitter_enabled', False)):
+        filter_fields.append("twitterUsername")
 
+    found_users = users.search(query, show_fields=filter_fields, sort_by_field="username", flatten=0, **search_params)
     # Filter user results. User
 
     filtered_users = [user for user in found_users if request.actor.is_allowed_to_see(user)]
