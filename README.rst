@@ -17,4 +17,4 @@ moment, sorry for the inconvenience)::
 
 And the development buildout::
 
-    https://github.com/UPCnet/maxserver.devel
+    https://github.com/UPCnet/maxserver
