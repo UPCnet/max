@@ -42,6 +42,7 @@ manage_security = 'Manage security settings'
 do_maintenance = 'Execute maintenance tasks'
 view_server_settings = 'View detailed server settings'
 
+view_timeline = 'View user timeline activities'
 list_conversations = 'List conversations'
 add_conversation = 'Add conversation'
 add_conversation_for_others = 'Add conversation without oneself'

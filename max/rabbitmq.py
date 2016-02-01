@@ -143,7 +143,8 @@ class RabbitNotifications(object):
             "action": "add",
             "object": "activity",
             "data": {
-                'text': activity['object'].get('content', '')
+                'text': activity['object'].get('content', ''),
+                'activityid': str(activity['_id'])
             }
         })
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])
@@ -161,9 +162,11 @@ class RabbitNotifications(object):
                 'displayname': self.request.actor['displayName'],
             },
             "action": "add",
-            "object": "activity",
+            "object": "comment",
             "data": {
-                'text': comment['content']
+                'text': comment['content'],
+                'activityid': str(activity['_id']),
+                'commentid': comment['id']
             }
         })
         self.client.send('activity', json.dumps(message.packed), activity['contexts'][0]['hash'])

@@ -4,7 +4,7 @@ from max import LAST_AUTHORS_LIMIT
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.rest.sorting import sorted_query
-from max.security.permissions import list_activities
+from max.security.permissions import view_timeline
 
 
 def timelineQuery(actor):
@@ -52,7 +52,7 @@ def timelineQuery(actor):
     return query
 
 
-@endpoint(route_name='timeline', request_method='GET', permission=list_activities)
+@endpoint(route_name='timeline', request_method='GET', permission=view_timeline)
 def getUserTimeline(user, request):
     """
         Get user timeline
@@ -65,7 +65,7 @@ def getUserTimeline(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='timeline_authors', request_method='GET', permission=list_activities)
+@endpoint(route_name='timeline_authors', request_method='GET', permission=view_timeline)
 def getUserTimelineAuthors(user, request):
     """
         Get timeline authors

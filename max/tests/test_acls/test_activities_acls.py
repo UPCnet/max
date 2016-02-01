@@ -180,15 +180,15 @@ class ActivitiesACLTests(unittest.TestCase, MaxTestBase):
     def test_get_all_activities_from_another_user(self):
         """
             Given i'm a regular user
-            When i try to get all activities from another user
-            I get a Forbidden Exception
+            When i try to get all activities from another user (public o from shared contexts)
+            I succeded
         """
         username = 'sheldon'
         other = 'penny'
         self.create_user(username)
         self.create_user(other)
 
-        self.testapp.get('/people/{}/activities'.format(other), "", headers=oauth2Header(username), status=403)
+        self.testapp.get('/people/{}/activities'.format(other), "", headers=oauth2Header(username), status=200)
 
     def test_get_all_activities_from_user_as_manager(self):
         """
