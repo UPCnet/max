@@ -245,6 +245,7 @@ Paràmetres de la UI
 * ``language`` - ``default: en`` - Idioma de la interfície, disposa dels
   literals traduïts en Català (ca), Anglès (en) i  Castellà(es).
 * ``hidePostboxOnTimeline`` - Amaga la caixa on s'escriu els missatges independenment de si es te permís d'escriure o no.
+* ``showSubscriptionList`` - ``default: false`` Mostra el desplegable de les comunitats on pots postejar. Només apareix al timeline.
 * ``literals`` - Objecte javascript per definir literals personalitzats per
   l'aplicació. Hi ha dos casos d'ús:
 
