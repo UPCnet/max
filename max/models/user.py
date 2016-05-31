@@ -461,6 +461,9 @@ class User(MADBase):
                         published=db_message.get('published', '')
                     )
 
+                    if isinstance(message['published'], datetime.datetime):
+                        message['published'] = message['published'].isoformat()
+
                     # Set object urls for media types
                     if message['objectType'] in ['file', 'image']:
                         message['fullURL'] = message_object.get('fullURL', '')
