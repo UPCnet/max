@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.7 (unreleased)
+5.3.7 (2016-07-26)
 ------------------
 
-- Nothing changed yet.
-
+* Include try isoformat [Pilar Marinas]
 
 5.3.6 (2016-07-26)
 ------------------
