@@ -1,11 +1,15 @@
 CHANGELOG
 =========
 
-5.3.6 (unreleased)
+5.3.6 (2016-07-26)
 ------------------
 
-- Nothing changed yet.
-
+* Resolve shortens url using bitly [Pilar Marinas]
+* Solucionar error json.dumps(request.actor.getInfo()) datetime [Pilar Marinas]
+* fixed Bootstrap 2 for updating templates [roberto.diaz]
+* Differentate between activity and comment notifications [Carles Bruguera]
+* Allow anyone to see others posted activities with security checks [Carles Bruguera]
+* Fix including twitterUsername on filtered searches [Carles Bruguera]
 
 5.3.5 (2015-11-25)
 ------------------
