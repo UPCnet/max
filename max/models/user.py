@@ -462,7 +462,10 @@ class User(MADBase):
                     )
 
                     if isinstance(message['published'], datetime.datetime):
-                        message['published'] = message['published'].isoformat()
+                        try:
+                            message['published'] = message['published'].isoformat()
+                        except:
+                            message['published'] = message['published']
 
                     # Set object urls for media types
                     if message['objectType'] in ['file', 'image']:
