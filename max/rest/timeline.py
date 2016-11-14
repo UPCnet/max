@@ -114,8 +114,12 @@ def getUserTimelineAuthors(user, request):
 
     for activity in feed_activities():
         if activity['actor']['username'] not in distinct_usernames:
-            distinct_authors.append(activity['actor'])
-            distinct_usernames.append(activity['actor']['username'])
+            query = {'username': activity['actor']['username']}
+            users = request.db.users.search(query, show_fields=["username"], sort_by_field="username", flatten=1)
+            user = users.get()
+            if user != []:
+                distinct_authors.append(activity['actor'])
+                distinct_usernames.append(activity['actor']['username'])
 
         if len(distinct_usernames) == author_limit:
             break
