@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-5.3.8 (unreleased)
+5.3.8 (2016-11-16)
 ------------------
 
-- Nothing changed yet.
-
+* Merge remote-tracking branch 'origin/develop' [Pilar Marinas]
+* Quitar del context authors los usuarios borrados para que no aparezcan en el portlet de Personas de la Comunidad [Pilar Marinas]
+* Quitar del User Timeline authors los usuarios borrados para que no aparezcan en el portlet de Personas [Pilar Marinas]
 
 5.3.7 (2016-07-26)
 ------------------
