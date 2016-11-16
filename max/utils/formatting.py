@@ -6,7 +6,11 @@ import urllib2
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
-FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+# Inicialmente Carles habia puesto este regex FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
+# pero nos da problemas con la url: http://www.businessinsider.com/r-for-egypts-entrepreneurs-going-green-makes-business-sense-2016-6
+# Hemos dejado este regex en FIND_URL_KEYWORDS_REGEX para el findKeywords que no tenemos claro para que sirve
+FIND_URL_REGEX = r'((https?\:\/\/)|(www\.))(\S+)'
+FIND_URL_KEYWORDS_REGEX = r'((https?\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?'
 FIND_HASHTAGS_REGEX = r'(\s|^)#{1}([\w\-\_\.%s]+)' % UNICODE_ACCEPTED_CHARS
 FIND_KEYWORDS_REGEX = r'(\s|^)(?:#|\'|\"|\w\')?([\w\-\_\.%s]{3,})[\"\']?' % UNICODE_ACCEPTED_CHARS
 
@@ -48,7 +52,7 @@ def findKeywords(text):
         Keywords are stored in lowercase.
     """
     _text = text.lower()
-    stripped_urls = re.sub(FIND_URL_REGEX, '', _text)
+    stripped_urls = re.sub(FIND_URL_KEYWORDS_REGEX, '', _text)
     keywords = [kw.groups()[1] for kw in re.finditer(FIND_KEYWORDS_REGEX, stripped_urls)]
     return keywords
 

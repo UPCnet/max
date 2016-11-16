@@ -331,13 +331,12 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(carrot_message['o'], 'a')
         self.assertEqual(carrot_message['u']['u'], creator)
         self.assertEqual(carrot_message['u']['d'], creator)
-        self.assertEqual(carrot_message['d']['text'].encode('utf-8'), activity['object']['content'])
-
+        self.assertEqual(carrot_message['d']['text'], activity['object']['content'])
         carrot_message, haigha_message = messages_to_push_queue[1]
 
         self.assertEqual(haigha_message.delivery_info['routing_key'], '{}'.format(cid))
         self.assertEqual(carrot_message['a'], 'a')
-        self.assertEqual(carrot_message['o'], 'a')
+        self.assertEqual(carrot_message['o'], 't')
         self.assertEqual(carrot_message['u']['u'], creator)
         self.assertEqual(carrot_message['u']['d'], creator)
-        self.assertEqual(carrot_message['d']['text'].encode('utf-8'), comment['object']['content'])
+        self.assertEqual(carrot_message['d']['text'], comment['object']['content'])

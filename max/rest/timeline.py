@@ -4,7 +4,7 @@ from max import LAST_AUTHORS_LIMIT
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.rest.sorting import sorted_query
-from max.security.permissions import list_activities
+from max.security.permissions import view_timeline
 
 
 def timelineQuery(actor):
@@ -52,7 +52,7 @@ def timelineQuery(actor):
     return query
 
 
-@endpoint(route_name='timeline', request_method='GET', permission=list_activities)
+@endpoint(route_name='timeline', request_method='GET', permission=view_timeline)
 def getUserTimeline(user, request):
     """
         Get user timeline
@@ -65,7 +65,7 @@ def getUserTimeline(user, request):
     return handler.buildResponse()
 
 
-@endpoint(route_name='timeline_authors', request_method='GET', permission=list_activities)
+@endpoint(route_name='timeline_authors', request_method='GET', permission=view_timeline)
 def getUserTimelineAuthors(user, request):
     """
         Get timeline authors
@@ -114,8 +114,12 @@ def getUserTimelineAuthors(user, request):
 
     for activity in feed_activities():
         if activity['actor']['username'] not in distinct_usernames:
-            distinct_authors.append(activity['actor'])
-            distinct_usernames.append(activity['actor']['username'])
+            query = {'username': activity['actor']['username']}
+            users = request.db.users.search(query, show_fields=["username"], sort_by_field="username", flatten=1)
+            user = users.get()
+            if user != []:
+                distinct_authors.append(activity['actor'])
+                distinct_usernames.append(activity['actor']['username'])
 
         if len(distinct_usernames) == author_limit:
             break

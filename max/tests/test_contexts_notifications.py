@@ -148,4 +148,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result.get('object', None).get('objectType', None), 'comment')
         self.assertEqual(result.get('object', None).get('inReplyTo', None)[0].get('id'), str(activity.get('id')))
 
-        return url_hash, username, user_status_context, user_comment
+        # add information needed by rabbit tests
+
+        return url_hash, username, activity, result

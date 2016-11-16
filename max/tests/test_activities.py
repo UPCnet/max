@@ -311,15 +311,6 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result[0].get('object', None).get('objectType', None), 'note')
 
-    def test_get_activity_not_me(self):
-        from .mockers import user_status
-        username = 'messi'
-        username_not_me = 'xavi'
-        self.create_user(username)
-        self.create_user(username_not_me)
-        self.create_activity(username_not_me, user_status)
-        res = self.testapp.get('/people/%s/activities' % username_not_me, "", oauth2Header(username), status=403)
-
     def test_get_activities(self):
         from .mockers import context_query
         from .mockers import user_status_context
@@ -540,3 +531,51 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(len(res.json), 1)
         self.assertNotIn('_keywords', res.json[0]['object'])
 
+    def test_get_generated_activities_from_another_user(self):
+        """
+            Given a plain user
+            When i search for the generated activities of another user
+            Then i get only the ones posted contextless
+            And the ones posted to shared contexts
+            And the ones posted on public-readable contexts
+            And i don't get any posted on a non-shared context
+            And i don't get any posted by other users but the requested
+        """
+        from .mockers import user_status, user_status_context, user_status_contextA, user_status_contextB
+        from .mockers import subscribe_context, subscribe_contextA, subscribe_contextB
+        from .mockers import create_context, create_contextA, create_contextB
+        username1 = 'sheldon'
+        username2 = 'penny'
+        username3 = 'leonard'
+        context_permissions = {'write': 'subscribed', 'read': 'subscribed'}
+
+        self.create_user(username1)
+        self.create_user(username2)
+        self.create_user(username3)
+        self.create_context(create_context, permissions=context_permissions)
+        self.create_context(create_contextA, permissions=context_permissions)
+        self.create_context(create_contextB)
+
+        # Shared context betweetn user 1 and 2 and 3
+        self.admin_subscribe_user_to_context(username1, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
+        self.admin_subscribe_user_to_context(username3, subscribe_context)
+
+        # Contexts only visible by user 1, but B is read-public
+        self.admin_subscribe_user_to_context(username1, subscribe_contextA)
+        self.admin_subscribe_user_to_context(username1, subscribe_contextB)
+
+        self.create_activity(username1, user_status)
+        self.create_activity(username1, user_status_context)
+        self.create_activity(username1, user_status_contextA)
+        self.create_activity(username1, user_status_contextB)
+
+        self.create_activity(username3, user_status)
+        self.create_activity(username3, user_status_context)
+
+        res = self.testapp.get('/people/%s/activities' % username1, "", oauth2Header(username2), status=200)
+
+        self.assertEqual(res.json[0]['contexts'][0]['url'], create_contextB['url'])
+        self.assertEqual(res.json[1]['contexts'][0]['url'], create_context['url'])
+        self.assertEqual(res.json[2].get('contexts'), None)
+        self.assertEqual(len(res.json), 3)

@@ -10,6 +10,7 @@ from max.security.permissions import add_activity
 from max.security.permissions import change_ownership
 from max.security.permissions import delete_token
 from max.security.permissions import list_activities
+from max.security.permissions import list_activities_unsubscribed
 from max.security.permissions import list_comments
 from max.security.permissions import list_tokens
 from max.security.permissions import modify_avatar
@@ -18,6 +19,7 @@ from max.security.permissions import modify_user
 from max.security.permissions import view_private_fields
 from max.security.permissions import view_subscriptions
 from max.security.permissions import view_user_profile
+from max.security.permissions import view_timeline
 from max.utils import getMaxModelByObjectType
 from max.utils.dicts import flatten
 
@@ -93,6 +95,8 @@ class User(MADBase):
     def __acl__(self):
         acl = [
             (Allow, Manager, list_activities),
+            (Allow, Manager, list_activities_unsubscribed),
+            (Allow, Manager, view_timeline),
             (Allow, Manager, add_activity),
             (Allow, Manager, view_subscriptions),
             (Allow, Manager, list_comments),
@@ -102,6 +106,7 @@ class User(MADBase):
             (Allow, Manager, list_tokens),
 
             (Allow, Owner, modify_user),
+            (Allow, Owner, view_timeline),
             (Allow, Owner, list_activities),
             (Allow, Owner, add_activity),
             (Allow, Owner, view_subscriptions),
@@ -111,6 +116,7 @@ class User(MADBase):
             (Allow, Owner, delete_token),
 
             (Allow, Authenticated, view_user_profile),
+            (Allow, Authenticated, list_activities),
         ]
 
         if is_self_operation(self.request):
@@ -454,6 +460,12 @@ class User(MADBase):
                         content=message_object.get('content', ''),
                         published=db_message.get('published', '')
                     )
+
+                    if isinstance(message['published'], datetime.datetime):
+                        try:
+                            message['published'] = message['published'].isoformat()
+                        except:
+                            message['published'] = message['published']
 
                     # Set object urls for media types
                     if message['objectType'] in ['file', 'image']:
