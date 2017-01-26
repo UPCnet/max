@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-5.3.9 (unreleased)
+5.3.9 (2017-01-26)
 ------------------
 
-- Nothing changed yet.
-
+* Merge remote-tracking branch 'origin/develop' [Pilar Marinas]
+* Solucionar query lenta [Pilar Marinas]
 
 5.3.8 (2016-11-16)
 ------------------
