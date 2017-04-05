@@ -68,8 +68,14 @@ def shortenURL(url, secure=False):
     # (localhost/ port not allowed in URI by bitly api)
     shortened_url = re.sub(r'(.*://)(localhost:[0-9]{4,5})(.*)', r'\1foo.bar\3', url)
 
-    bitly_username = 'maxclient'
-    bitly_api_key = 'R_33a0cbaa2d41c3957dc5a40a0b2c2760'
+    # Cuenta bitly antigua
+    # bitly_username = 'maxclient'
+    # bitly_api_key = 'R_33a0cbaa2d41c3957dc5a40a0b2c2760'
+
+    #Cuenta bitly nueva
+    bitly_username = 'maxclient2'
+    bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
+
 
     params = {'api_url': 'http://api.bitly.com',
               'login': 'apiKey=%s&login=%s' % (bitly_api_key, bitly_username),
