@@ -154,6 +154,7 @@ class MADMaxCollection(object):
         date_filter = kwargs.get('date_filter', None)
         show_fields = kwargs.get('show_fields', None)
         offset_field = kwargs.get('offset_field', None)
+        max_users = kwargs.get('max_users', None)
 
         sort_by_field = kwargs.get('sort_by_field', None)
         if sort_by_field:
@@ -164,7 +165,6 @@ class MADMaxCollection(object):
         # Depending on which of the two params is used, we'll determine
         # the direction of the filtering and store the actual offset
         # in its definitive variable query offset.
-
         if after or before:
             condition = after and '$gt' or '$lt'
             offset = after and after or before
@@ -172,10 +172,17 @@ class MADMaxCollection(object):
             # conflicting offset definition will get no offset
             offset = None
 
+        if max_users:
+            sort_direction=ASCENDING
+            sort_params = [(sort_by_field, sort_direction)]
+
         # If we have an offset defined, insert the filtering condition
         # on the search query.
         if offset:
-            default_offset_field = sort_params[0][0] if sort_params else '_id'
+            if max_users:
+                default_offset_field = 'displayName'
+            else:
+                default_offset_field = sort_params[0][0] if sort_params else '_id'
             offset_field = offset_field if offset_field else default_offset_field
             search_query.update({offset_field: {condition: offset}})
 
@@ -249,17 +256,23 @@ class MADMaxCollection(object):
 
         # Cursor is lazy, but better to execute search here for mental sanity
         self.setVisibleResultFields(show_fields)
-        cursor = self.collection.find(search_query, self.show_fields)
+
+        if max_users:
+            cursor = self.collection.find(search_query, self.show_fields, sort=[('displayName',1)], limit=limit)
+        else:
+            cursor = self.collection.find(search_query, self.show_fields)
+
+            # Sort the results
+            cursor = cursor.sort(sort_params)
+
+            if limit:
+                cursor = cursor.limit(limit + 1)
+
 
         # If it's a count search, return the cursor's count before sorting and limiting
         if count:
             return cursor.count()
 
-        # Sort the results
-        cursor = cursor.sort(sort_params)
-
-        if limit:
-            cursor = cursor.limit(limit + 1)
 
         # Unpack the lazy cursor,
         # Wrap the result in its Mad Class,
