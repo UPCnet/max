@@ -53,6 +53,12 @@ def add_message(conversation, request):
         The request.actor is the one "talking", either if it was the authenticated user,
         the rest username or the post body actor, in this order.
     """
+
+    try:
+        mobile = request.decoded_payload['object']['mobile']
+    except:
+        mobile = False
+
     message_params = {'actor': request.actor,
                       'verb': 'post',
                       'contexts': [conversation]
@@ -81,9 +87,15 @@ def add_message(conversation, request):
         newmessage['_id'] = ObjectId(message_oid)
         newmessage.process_file(request, message_file)
         newmessage.save()
+        if mobile:
+            notifier = RabbitNotifications(request)
+            notifier.add_conversation_message(conversation, newmessage)
     else:
         message_oid = newmessage.insert()
         newmessage['_id'] = message_oid
+        if mobile:
+            notifier = RabbitNotifications(request)
+            notifier.add_conversation_message(conversation, newmessage)
 
     handler = JSONResourceEntity(request, newmessage.flatten(), status_code=201)
     return handler.buildResponse()
