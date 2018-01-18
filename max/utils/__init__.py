@@ -64,16 +64,23 @@ def searchParams(request):
             params['limit'] = limit
 
     after = request.params.get('after')
+    max_users = request.params.get('max_users', False)
     if after:
         try:
-            params['after'] = ObjectId(after)
+            if max_users:
+                params['after'] = after
+            else:
+                params['after'] = ObjectId(after)
         except:
             raise InvalidSearchParams('after must be a valid ObjectId BSON identifier')
 
     before = request.params.get('before')
     if before:
         try:
-            params['before'] = ObjectId(before)
+            if max_users:
+                params['before'] = before
+            else:
+                params['before'] = ObjectId(before)
         except:
             raise InvalidSearchParams('before must be a valid ObjectId BSON identifier')
 
@@ -126,6 +133,10 @@ def searchParams(request):
     twitter_enabled = request.params.get('twitter_enabled')
     if twitter_enabled:
         params['twitter_enabled'] = twitter_enabled
+
+    max_users = request.params.get('max_users')
+    if max_users:
+        params['max_users'] = max_users
 
     return params
 

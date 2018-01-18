@@ -194,3 +194,32 @@ class RabbitNotifications(object):
         })
         self.client.send('conversations', json.dumps(message.packed), routing_key='{}.notifications'.format(conversation_id))
         #self.client.disconnect()
+
+    def add_conversation_message(self, conversation, newmessage):
+        """
+            Sends a Carrot (TM) notification of a new conversation creation
+        """
+        conversation_id = conversation.getIdentifier()
+        participants_usernames = [user['username'] for user in conversation['participants']]
+        self.client.conversations.create(conversation_id, users=participants_usernames)
+
+        # Send a conversation creation notification to rabbit
+        message = RabbitMessage()
+        message.prepare(self.message_defaults)
+
+        if newmessage['object']['objectType'] == 'note':
+            data_message = {'text': newmessage['object']['content'],'message_id': newmessage['_id']}
+        else:
+            data_message = {}
+
+        message.update({
+            "user": {
+                'username': self.request.actor['username'],
+                'displayname': self.request.actor['displayName'],
+            },
+            "action": "add",
+            "object": "message",
+            "data": data_message
+        })
+        self.client.send('conversations', json.dumps(message.packed), routing_key='{}.notifications'.format(conversation_id))
+        #self.client.disconnect()
