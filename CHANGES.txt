@@ -1,11 +1,13 @@
 CHANGELOG
 =========
 
-5.3.10 (unreleased)
+5.3.10 (2018-01-18)
 -------------------
 
-- Nothing changed yet.
-
+* Merge remote-tracking branch 'origin/develop' [Pilar Marinas]
+* Cambios para que funcione la nueva APP Utalk con notificaciones push Firebase [Pilar Marinas]
+* Modificar API people parametro max_users para paginar usuarios desde la APP [Pilar Marinas]
+* Nueva cuenta de bitly [Pilar Marinas]
 
 5.3.9 (2017-01-26)
 ------------------
