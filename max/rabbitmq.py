@@ -135,6 +135,12 @@ class RabbitNotifications(object):
         """
         message = RabbitMessage()
         message.prepare(self.message_defaults)
+
+        if activity['object']['objectType'] == 'image':
+            text = 'Add image'
+        else:
+            text = activity['object'].get('content', '')
+
         message.update({
             "user": {
                 'username': self.request.actor['username'],
@@ -143,7 +149,7 @@ class RabbitNotifications(object):
             "action": "add",
             "object": "activity",
             "data": {
-                'text': activity['object'].get('content', ''),
+                'text': text,
                 'activityid': str(activity['_id'])
             }
         })
