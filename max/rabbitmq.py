@@ -209,6 +209,8 @@ class RabbitNotifications(object):
 
         if newmessage['object']['objectType'] == 'note':
             data_message = {'text': newmessage['object']['content'],'message_id': newmessage['_id']}
+        elif newmessage['object']['objectType'] == 'image':
+            data_message = {'text': 'Add image', 'message_id': str(newmessage['_id'])}
         else:
             data_message = {}
 
