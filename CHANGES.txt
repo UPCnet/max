@@ -1,11 +1,15 @@
 CHANGELOG
 =========
 
-5.3.11 (unreleased)
+5.3.11 (2018-02-15)
 -------------------
 
-- Nothing changed yet.
-
+* Merge remote-tracking branch 'origin/develop' [Pilar Marinas]
+* Add actor in lastMessage [Pilar Marinas]
+* Display name of group in Push notification [Pilar Marinas]
+* Text Push Add image in activity [Pilar Marinas]
+* Text Push Add image [Pilar Marinas]
+* Solucionado error filtro actividades por usuario en el timeline [Pilar Marinas]
 
 5.3.10 (2018-01-18)
 -------------------
