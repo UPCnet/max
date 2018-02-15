@@ -135,6 +135,12 @@ class RabbitNotifications(object):
         """
         message = RabbitMessage()
         message.prepare(self.message_defaults)
+
+        if activity['object']['objectType'] == 'image':
+            text = 'Add image'
+        else:
+            text = activity['object'].get('content', '')
+
         message.update({
             "user": {
                 'username': self.request.actor['username'],
@@ -143,7 +149,7 @@ class RabbitNotifications(object):
             "action": "add",
             "object": "activity",
             "data": {
-                'text': activity['object'].get('content', ''),
+                'text': text,
                 'activityid': str(activity['_id'])
             }
         })
@@ -183,15 +189,36 @@ class RabbitNotifications(object):
         # Send a conversation creation notification to rabbit
         message = RabbitMessage()
         message.prepare(self.message_defaults)
-        message.update({
-            "user": {
-                'username': self.request.actor['username'],
-                'displayname': self.request.actor['displayName'],
-            },
-            "action": "add",
-            "object": "conversation",
-            "data": {}
-        })
+
+        if conversation['tags'] == ['group']:
+            text_last_message = conversation.lastMessage()
+            if text_last_message['objectType'] == 'note':
+                data_message = {'text': text_last_message['content'], 'conversation_id': conversation_id, 'creator': self.request.actor['displayName'] }
+            elif text_last_message['objectType'] == 'image':
+                data_message = {'text': 'Add image', 'conversation_id': conversation_id, 'creator': self.request.actor['displayName']}
+            else:
+                data_message = {}
+
+            message.update({
+                "user": {
+                    'username': conversation['displayName'],
+                    'displayname': conversation['displayName'],
+                },
+                "action": "add",
+                "object": "conversation",
+                "data": data_message
+            })
+        else:
+            data_message = {}
+            message.update({
+                "user": {
+                    'username': self.request.actor['username'],
+                    'displayname': self.request.actor['displayName'],
+                },
+                "action": "add",
+                "object": "conversation",
+                "data": data_message
+            })
         self.client.send('conversations', json.dumps(message.packed), routing_key='{}.notifications'.format(conversation_id))
         #self.client.disconnect()
 
@@ -209,6 +236,8 @@ class RabbitNotifications(object):
 
         if newmessage['object']['objectType'] == 'note':
             data_message = {'text': newmessage['object']['content'],'message_id': newmessage['_id']}
+        elif newmessage['object']['objectType'] == 'image':
+            data_message = {'text': 'Add image', 'message_id': str(newmessage['_id'])}
         else:
             data_message = {}
 

@@ -248,7 +248,7 @@ class MADMaxCollection(object):
 
         # Catch mixed unoptimal $or queries and reformulate
         if '$or' in search_query and len(search_query.keys()) > 1:
-            mixed_specs = {key: value for key, value in search_query.items() if key != '$or'}
+            mixed_specs = {key: value for key, value in search_query.items() if key != '$or' and key != 'actor.username'}
             for spec in search_query['$or']:
                 spec.update(mixed_specs)
             for spec in mixed_specs:

@@ -124,10 +124,16 @@ class Conversation(BaseContext):
 
         message = MADMaxCollection(self.request, 'messages').last(query, flatten=True)
 
+        if message['actor']['displayName'] != '':
+            name_actor = message['actor']['displayName']
+        else:
+            name_actor = message['actor']['username']
+
         lastMessage = {
             'published': message['published'],
             'content': message['object'].get('content', ''),
-            'objectType': message['object']['objectType']
+            'objectType': message['object']['objectType'],
+            'actor': name_actor
         }
 
         # Set object urls for media types

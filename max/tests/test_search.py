@@ -247,6 +247,47 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
         self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
 
+    def test_timeline_user_filter_activities_by_other_actor_and_not_permission_in_community(self):
+        """
+        """
+        from .mockers import create_context, create_contextA
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        username2 = 'xavi'
+        self.create_user(username2)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note="second")
+
+        res = self.testapp.get('/people/%s/timeline?actor=%s' % (username2, username), '', oauth2Header(username2), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 0)
+
+    def test_timeline_user_filter_activities_by_other_actor_and_have_permission_community(self):
+        """
+        """
+        from .mockers import create_context, create_contextA
+        from .mockers import subscribe_context, user_status_context
+
+        username = 'messi'
+        self.create_user(username)
+        username2 = 'xavi'
+        self.create_user(username2)
+        self.create_context(create_context, permissions=dict(read='public', write='subscribed', subscribe='restricted', invite='restricted'))
+        self.admin_subscribe_user_to_context(username, subscribe_context)
+        self.admin_subscribe_user_to_context(username2, subscribe_context)
+        self.create_activity(username, user_status_context)
+        self.create_activity(username, user_status_context, note="second")
+
+        res = self.testapp.get('/people/%s/timeline?actor=%s' % (username2, username), '', oauth2Header(username2), status=200)
+        result = json.loads(res.text)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].get('actor', None).get('username'), 'messi')
+        self.assertEqual(result[1].get('actor', None).get('username'), 'messi')
+
     def test_contexts_search(self):
         """
             Given an admin user
