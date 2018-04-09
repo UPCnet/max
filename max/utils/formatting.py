@@ -25,7 +25,7 @@ def formatMessageEntities(request, text):
         url = matchobj.group(0)
         return shortenURL(url, secure=request.url.startswith('https://'))
 
-    shortened = re.sub(FIND_URL_REGEX, shorten, text)
+    shortened = re.sub(FIND_URL_REGEX, shorten, text, flags=re.IGNORECASE)
 
     return shortened
 
