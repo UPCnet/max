@@ -25,5 +25,5 @@ def stripHTMLTags(text):
         Strips unwanted html tags. Allows bleach defaults except li, ol and ul
     """
 
-    ALLOWED_TAGS = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'strong']
+    ALLOWED_TAGS = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'strong', 'u']
     return bleach.clean(text, strip=True, tags=ALLOWED_TAGS)
