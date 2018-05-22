@@ -1,11 +1,12 @@
 CHANGELOG
 =========
 
-5.3.12 (unreleased)
+5.3.12 (2018-05-22)
 -------------------
 
-- Nothing changed yet.
-
+* Permitir etiqueta <u> (subrayar) en la actividad [iago.lopez]
+* Cambiar limite de participantes en una conversacion a 50 (antes 20) [iago.lopez]
+* Ignorecase shorten url Http [Pilar Marinas]
 
 5.3.11 (2018-02-15)
 -------------------
