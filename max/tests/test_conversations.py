@@ -553,7 +553,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
         res = self.testapp.post('/conversations', json.dumps(creation_message), oauth2Header(sender), status=201)
         conversation_id = res.json['contexts'][0]['id']
 
-        limit = 20
+        limit = 50
         for i in range(limit - 3):
             newusername = 'user{}'.format(i)
             self.create_user(newusername)
