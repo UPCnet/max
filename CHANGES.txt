@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.13 (unreleased)
+5.3.13 (2018-05-25)
 -------------------
 
-- Nothing changed yet.
-
+* Comento que al borrar el usuario no borre sus exchanges del rabbit [Pilar Marinas]
 
 5.3.12 (2018-05-22)
 -------------------
