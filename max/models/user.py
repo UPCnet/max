@@ -535,7 +535,6 @@ class User(MADBase):
             'objectType': 'conversation',
             'participants.username': self['username']
         }
-
         conversations_search = self.request.db.conversations.search(query)
         for conversation in conversations_search:
             self.removeSubscription(conversation)
@@ -548,5 +547,17 @@ class User(MADBase):
         """
             Deletes user exchanges just after user is deleted.
         """
-        notifier = RabbitNotifications(self.request)
-        notifier.delete_user(self['username'])
+        # Comento que al borrar el usuario no borre sus exchanges del rabbit
+        # para que no haya problemas con este usuario ens otras instancias
+        #notifier = RabbitNotifications(self.request)
+        #notifier.delete_user(self['username'])
+
+        # Mientras no solucionamos lo anterior, como los routing key de activity no se borraban
+        # y nos podia dar error al intentar notificar a ese usuario
+        # borro los contextos a los que esta subscrito este usuario en este MAX
+        from max.models import Context
+
+        for subscription in self['subscribedTo']:
+            fake_deleted_context = Context.from_object(self.request, subscription)
+            self.removeSubscription(fake_deleted_context)
+
