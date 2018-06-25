@@ -7,6 +7,7 @@ from max.rest import JSONResourceEntity
 from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.security.permissions import do_maintenance
+from max.rabbitmq import RabbitNotifications
 
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -68,6 +69,12 @@ def rebuildSubscriptions(context, request):
         context.updateContextActivities(force_update=True)
         existing_contexts[context['hash']] = context
 
+        #Creates a binding between user exchanges and a context
+        notifier = RabbitNotifications(request)
+        if context.get('notifications', False):
+            for user in context.subscribedUsers():
+                notifier.bind_user_to_context(context, user['username'])
+
     users = request.db.users.search({'subscribedTo.0': {'$exists': True}})
     for user in users:
         for subscription in user.get('subscribedTo', []):
@@ -126,39 +133,67 @@ def rebuildConversationSubscriptions(context, request):
     existing_users_set = set([a['username'] for a in existing_users])
 
     conversations = request.db.conversations.dump()
-    for conversation in conversations:
-        conversation_participants_usernames = [user['username'] for user in conversation['participants']]
-        conversation_subscribed_usernames = subscribed_users_by_conversation[str(conversation['_id'])]
+    try:
+        for conversation in conversations:
+            conversation_participants_usernames = [user['username'] for user in conversation['participants']]
+            conversation_subscribed_usernames = subscribed_users_by_conversation[str(conversation['_id'])]
 
-        not_subscribed = set(conversation_participants_usernames) - set(conversation_subscribed_usernames)
-        deleted_participants = set(not_subscribed) - existing_users_set
+            not_subscribed = set(conversation_participants_usernames) - set(conversation_subscribed_usernames)
+            deleted_participants = set(not_subscribed) - existing_users_set
 
-        all_participants_subscribed = len(conversation_participants_usernames) == len(conversation_subscribed_usernames)
-        all_participants_exist = len(deleted_participants) == 0
-        if 'single' in conversation['tags']:
-            conversation['tags'].remove('single')
-        if 'archive' in conversation['tags']:
-            conversation['tags'].remove('archive')
+            all_participants_subscribed = len(conversation_participants_usernames) == len(conversation_subscribed_usernames)
+            all_participants_exist = len(deleted_participants) == 0
+            if 'single' in conversation['tags']:
+                conversation['tags'].remove('single')
+            if 'archive' in conversation['tags']:
+                conversation['tags'].remove('archive')
 
-        # Conversations od 2+ get the group tag
-        if len(conversation['participants']) > 2:
-            if 'group' not in conversation['tags']:
-                conversation['tags'].append('group')
-        # Two people conversation and not group:
-        # tag single: if not all participants subscribed by all exist
-        # tag archive: if not all participants exist
-        elif len(conversation['participants']) == 2 and 'group' not in conversation['tags']:
-            if all_participants_subscribed:
-                pass
-            elif not all_participants_subscribed and all_participants_exist:
-                conversation['tags'].append('single')
-            elif not all_participants_subscribed and not all_participants_exist:
+            # Conversations od 2+ get the group tag
+            if len(conversation['participants']) > 2:
+                if 'group' not in conversation['tags']:
+                    conversation['tags'].append('group')
+            # Two people conversation and not group:
+            # tag single: if not all participants subscribed by all exist
+            # tag archive: if not all participants exist
+            elif len(conversation['participants']) == 2 and 'group' not in conversation['tags']:
+                if all_participants_subscribed:
+                    pass
+                elif not all_participants_subscribed and all_participants_exist:
+                    conversation['tags'].append('single')
+                elif not all_participants_subscribed and not all_participants_exist:
+                    conversation['tags'].append('archive')
+            # Tag archive: if group conversation only 1 participant
+            elif 'group' in conversation['tags'] and len(conversation['participants']) == 1:
                 conversation['tags'].append('archive')
-        # Tag archive: if group conversation only 1 participant
-        elif 'group' in conversation['tags'] and len(conversation['participants']) == 1:
-            conversation['tags'].append('archive')
 
-        conversation.save()
+            # Creates a binding only users subscribed in conversation
+            notifier = RabbitNotifications(request)
+            for participant in conversation_subscribed_usernames:
+                notifier.bind_user_to_conversation(conversation, participant)
+
+            conversation.save()
+    except:
+        # Si hi ha alguna conversa on el owner no estigui subscrit a la conversa
+        # el que fem es afegir com a owner un dels membres que estigui subscrit
+        # i creem els bindings dels usuaris subscrits.
+        # He fet això perque en local tenia un grup on el propietari no estaba subscrit i petava
+        if conversation['_owner'] not in conversation_subscribed_usernames:
+            conversation['_owner'] = conversation_subscribed_usernames[0]
+            conversation.save()
+
+
+            # Give hability to add new users to the new owner
+            user = request.db.users.search({'username': str(conversation_subscribed_usernames[0])})
+            user.request.actor.grantPermission(subscription, 'invite', permanent=True)
+            user.request.actor.grantPermission(subscription, 'kick', permanent=True)
+            user.request.actor.revokePermission(subscription, 'unsubscribe', permanent=True)
+
+            # Creates a binding only users subscribed in conversation
+            notifier = RabbitNotifications(request)
+            for participant in conversation_subscribed_usernames:
+                notifier.bind_user_to_conversation(conversation, participant)
+
+            conversation.save()
 
     handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
@@ -177,6 +212,11 @@ def rebuildUser(context, request):
         if user['_owner'] != user['username']:
             user['_owner'] = user['username']
             user.save()
+
+        # Create exchange publish and subscribe in Rabbit
+        # Hemos visto que si el usuario ya esta creado no pasa nada y si no existe crea los exchanges
+        notifier = RabbitNotifications(request)
+        notifier.add_user(user['username'])
 
     handler = JSONResourceRoot(request, [])
     return handler.buildResponse()
