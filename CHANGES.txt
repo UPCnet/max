@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-5.3.14 (unreleased)
+5.3.14 (2018-06-25)
 -------------------
 
-- Nothing changed yet.
-
+* Endpoints create exchange user, bindings conversations and subscriptions [Pilar Marinas]
+* modificar limite de participantes en una conversacion a 50 (antes 20) en test [Pilar Marinas]
 
 5.3.13 (2018-05-25)
 -------------------
