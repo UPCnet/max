@@ -8,6 +8,7 @@ from max.rest import JSONResourceRoot
 from max.rest import endpoint
 from max.security.permissions import do_maintenance
 from max.rabbitmq import RabbitNotifications
+from max import maxlogger
 
 from pyramid.httpexceptions import HTTPNoContent
 
@@ -18,7 +19,6 @@ import glob
 import os
 import re
 from collections import defaultdict
-
 
 @endpoint(route_name='maintenance_keywords', request_method='POST', permission=do_maintenance)
 def rebuildKeywords(context, request):
@@ -86,6 +86,7 @@ def rebuildSubscriptions(context, request):
                 subscription.pop('grants', None)
         user.save()
     handler = JSONResourceRoot(request, [])
+    maxlogger.warning("Finalizado rebuildSubscriptions (crea los bindings de los usuarios subscritos en un contexto, si no los tiene): " + str(handler.buildResponse()._status) + " realizado el: " + datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     return handler.buildResponse()
 
 
@@ -196,6 +197,7 @@ def rebuildConversationSubscriptions(context, request):
             conversation.save()
 
     handler = JSONResourceRoot(request, [])
+    maxlogger.warning("Finalizado rebuildConversationSubscriptions (crea los bindings de los usuarios subscritos en una conversa, si no los tiene): " + str(handler.buildResponse()._status) + " realizado el: " + datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     return handler.buildResponse()
 
 
@@ -219,6 +221,7 @@ def rebuildUser(context, request):
         notifier.add_user(user['username'])
 
     handler = JSONResourceRoot(request, [])
+    maxlogger.warning("Finalizado rebuildUser (crea exchanges de los usuarios que no existan en el Rabbit): " + str(handler.buildResponse()._status) + " realizado el: " + datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     return handler.buildResponse()
 
 
