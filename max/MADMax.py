@@ -180,7 +180,7 @@ class MADMaxCollection(object):
         # on the search query.
         if offset:
             if max_users:
-                default_offset_field = 'displayName'
+                default_offset_field = 'username'
             else:
                 default_offset_field = sort_params[0][0] if sort_params else '_id'
             offset_field = offset_field if offset_field else default_offset_field
@@ -258,10 +258,9 @@ class MADMaxCollection(object):
         self.setVisibleResultFields(show_fields)
 
         if max_users:
-            cursor = self.collection.find(search_query, self.show_fields, sort=[('displayName',1)], limit=limit)
+            cursor = self.collection.find(search_query, self.show_fields, sort=[('username', 1)], limit=limit)
         else:
             cursor = self.collection.find(search_query, self.show_fields)
-
             # Sort the results
             cursor = cursor.sort(sort_params)
 

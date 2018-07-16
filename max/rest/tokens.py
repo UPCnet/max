@@ -64,6 +64,11 @@ def add_device_token(tokens, request):
 
         Adds a new user device linked to a user. If the token already exists for any user, we'll assume that the new
         user is using the old user's device, so we'll delete all the previous tokens and replace them with the new one.
+
+        16/07/2018 Si este WS nos devuelve un 404 y no entra, es que no tenemos en el nginx del max el /tokens
+                   la nueva APP Utalk lo utiliza
+                   la antigua utiliza el fix_deprecated_add_token
+                   POST /people/{username}/device/{platform}/{token}
     """
     newtoken = Token.from_request(request)
 
@@ -103,6 +108,11 @@ def view_platform_user_tokens(user, request):
 def deleteUserDevice(token, request):
     """
         Delete user device token
+
+        16/07/2018 Si este WS nos devuelve un 404 y no entra, es que no tenemos en el nginx del max el /tokens
+                   la nueva APP Utalk lo utiliza
+                   la antigua utiliza el fix_deprecated_add_token
+                   POST /people/{username}/device/{platform}/{token}
     """
     token.delete()
     return HTTPNoContent()
