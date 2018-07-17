@@ -30,7 +30,9 @@ def getPushTokensForConversation(tokens, request):
     usernames = [user['username'] for user in users]
 
     if usernames:
-        user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
+        # Modifico el limit a -1 para que me devuelva todos los usuarios de la mongo no solo el limite de 10
+        # user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
+        user_tokens = tokens.search({'_owner': {'$in': usernames}}, {'limit': -1})
 
     handler = JSONResourceRoot(request, formatted_tokens(user_tokens))
     return handler.buildResponse()
@@ -51,7 +53,9 @@ def getPushTokensForContext(tokens, request):
     usernames = [user['username'] for user in users]
 
     if usernames:
-        user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
+        # Modifico el limit a -1 para que me devuelva todos los usuarios de la mongo no solo el limite de 10
+        # user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
+        user_tokens = tokens.search({'_owner': {'$in': usernames}}, {'limit': -1})
 
     handler = JSONResourceRoot(request, formatted_tokens(user_tokens))
     return handler.buildResponse()
