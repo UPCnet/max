@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-5.3.16 (unreleased)
+5.3.16 (2018-07-18)
 -------------------
 
-- Nothing changed yet.
-
+* Modifico el limite en el getPushTokens para que me devuelva todos los usuarios no solo 10 [Pilar Marinas]
+* Ordenamos la paginación de usuarios por username [Pilar Marinas]
 
 5.3.15 (2018-06-27)
 -------------------
