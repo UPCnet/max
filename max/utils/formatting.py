@@ -3,6 +3,7 @@ import json
 import re
 import requests
 import urllib2
+from max.resources import getMAXSettings
 
 UNICODE_ACCEPTED_CHARS = u'áéíóúàèìòùïöüçñ'
 
@@ -23,7 +24,11 @@ def formatMessageEntities(request, text):
 
     def shorten(matchobj):
         url = matchobj.group(0)
-        return shortenURL(url, secure=request.url.startswith('https://'))
+        settings = getMAXSettings(request)
+        bitly_username = settings.get('max_bitly_username', '')
+        bitly_api_key = settings.get('max_bitly_api_key', '')
+
+        return shortenURL(url, bitly_username, bitly_api_key, secure=request.url.startswith('https://'))
 
     shortened = re.sub(FIND_URL_REGEX, shorten, text, flags=re.IGNORECASE)
 
@@ -57,7 +62,7 @@ def findKeywords(text):
     return keywords
 
 
-def shortenURL(url, secure=False):
+def shortenURL(url, bitly_username, bitly_api_key, secure=False):
     """
         Shortens a url using bitly API. Keeps the original url in case
         something goes wrong with the api call
@@ -67,15 +72,6 @@ def shortenURL(url, secure=False):
     # to allow bitly shortening in development environments
     # (localhost/ port not allowed in URI by bitly api)
     shortened_url = re.sub(r'(.*://)(localhost:[0-9]{4,5})(.*)', r'\1foo.bar\3', url)
-
-    # Cuenta bitly antigua
-    # bitly_username = 'maxclient'
-    # bitly_api_key = 'R_33a0cbaa2d41c3957dc5a40a0b2c2760'
-
-    #Cuenta bitly nueva
-    bitly_username = 'maxclient2'
-    bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
-
 
     params = {'api_url': 'http://api.bitly.com',
               'login': 'apiKey=%s&login=%s' % (bitly_api_key, bitly_username),
