@@ -265,3 +265,21 @@ class Image(File):
     objectType = 'Image'
     schema = deepcopy(File.schema)
     schema['thumbURL'] = {}
+
+    def __init__(self, request, data, creating=True):
+        """
+        """
+        self.request = request
+        self.creating = creating
+        self.data = data
+        if creating:
+            self.processFields()
+            self.data['content'] = formatMessageEntities(request, self.data.get('content', ''))
+            hashtags = findHashtags(self.data['content'])
+            if hashtags:
+                self.data['_hashtags'] = hashtags
+            self.setKeywords()
+        self.update(self.data)
+
+    def setKeywords(self):
+        self['_keywords'] = findKeywords(self.data['content'])

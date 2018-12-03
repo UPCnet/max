@@ -81,7 +81,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         http_mock_bitly(status=500)
         url = 'http://example.com'
-        newurl = shortenURL(url)
+        bitly_username = 'maxclient2'
+        bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
+        newurl = shortenURL(url, bitly_username, bitly_api_key)
         self.assertEqual(url, newurl)
 
     @httpretty.activate
@@ -90,7 +92,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         http_mock_bitly(status=500, body="invalid json")
         url = 'http://example.com'
-        newurl = shortenURL(url)
+        bitly_username = 'maxclient2'
+        bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
+        newurl = shortenURL(url, bitly_username, bitly_api_key)
         self.assertEqual(url, newurl)
 
     @httpretty.activate
@@ -99,7 +103,9 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         http_mock_bitly()
         url = 'http://example.com'
-        newurl = shortenURL(url)
+        bitly_username = 'maxclient2'
+        bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
+        newurl = shortenURL(url, bitly_username, bitly_api_key)
         self.assertEqual(newurl, "http://shortened.url")
 
     @httpretty.activate
@@ -108,5 +114,7 @@ class FunctionalTests(unittest.TestCase, MaxTestBase):
 
         http_mock_bitly()
         url = 'http://example.com'
-        newurl = shortenURL(url, secure=True)
+        bitly_username = 'maxclient2'
+        bitly_api_key = 'R_1123ce7d9aea4d699f65af02912c048e'
+        newurl = shortenURL(url, bitly_username, bitly_api_key, secure=True)
         self.assertEqual(newurl, "https://shortened.url")
