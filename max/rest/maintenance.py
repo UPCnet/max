@@ -97,6 +97,15 @@ def rebuildConversationSubscriptions(context, request):
 
         Performs sanity checks on existing subscriptions
     """
+    conversations = request.db.conversations.dump()
+    for conversation in conversations:
+        query = {'contexts.id': str(conversation['_id'])}
+        messages = request.db.messages.search(query)
+        have_messages = True if len(list(messages)) else False
+        if not have_messages:
+           maxlogger.warning("rebuildConversationSubscriptions: No tiene mensajes y borramos la conversa: " + str(conversation['_id']) + " realizado el: " + datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+           conversation.delete()
+
     existing_conversations = {}
     conversations = request.db.conversations.dump()
     for conversation in conversations:
