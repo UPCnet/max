@@ -385,6 +385,21 @@ class MaxTestBase(object):
         res = self.testapp.delete('/contexts/%s/subscriptions/%s' % (chash, username), {}, oauth2Header(auth_user), status=expect)
         return res
 
+    def admin_unsubscribepush_user_from_context(self, username, chash, expect=201):
+        """
+            UnSubscribes an user to a context as himself
+        """
+        res = self.testapp.post('/contexts/%s/unsubscriptionpush/%s' % (chash, username), {}, oauth2Header(test_manager), status=expect)
+        return res
+
+    def user_subscribepush_user_from_context(self, username, chash, auth_user=None, expect=204):
+        """
+            UnSubscribes an user to a context as himself
+        """
+        auth_user = username if auth_user is None else auth_user
+        res = self.testapp.delete('/contexts/%s/subscriptionpush/%s' % (chash, username), {}, oauth2Header(auth_user), status=expect)
+        return res
+
     def exec_mongo_query(self, collection, method, query, action={}):
         conn = pymongo.MongoClient('mongodb://localhost:27017')
         db = conn['tests']

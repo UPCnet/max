@@ -91,6 +91,13 @@ class BaseContext(MADBase):
         subscribed_users = self.mdb_collection.database.users.find(criteria)
         return [user for user in subscribed_users]
 
+    def unSubscribedPushUsers(self):
+        """
+        """
+        criteria = {'{}.{}'.format(self.user_unsubscription_storage_push, self.unique.lstrip('_')): self.getIdentifier()}
+        subscribed_users = self.mdb_collection.database.users.find(criteria)
+        return [user for user in subscribed_users]
+
     def prepareUserSubscription(self):
         """
         """
@@ -265,6 +272,19 @@ class BaseContext(MADBase):
             if users_to_delete == [] or user['username'] in users_to_delete:
                 user.removeSubscription(self)
 
+    def removeUnsubscriptionPush(self, users_to_delete=[]):
+        """
+            Removes all users subscribed to the context, or only specifiyed
+            user if userd_to_delete is provided
+        """
+        usersdb = MADMaxCollection(self.request, 'users')
+        criteria = {'{}.{}'.format(self.user_unsubscription_storage_push, self.unique.lstrip('_')): self.getIdentifier()}
+        users = usersdb.search(criteria)
+
+        for user in users:
+            if users_to_delete == [] or user['username'] in users_to_delete:
+                user.removeUnsubscriptionPush(self)
+
     def removeActivities(self, logical=False):
         """
             Removes all activity posted to a context. If logical is set to True
@@ -320,6 +340,7 @@ class Context(BaseContext):
     collection = 'contexts'
     unique = 'hash'
     user_subscription_storage = 'subscribedTo'
+    user_unsubscription_storage_push = 'unsubscribedToPush'
     activity_storage = 'activity'
     schema = dict(BaseContext.schema)
     schema['hash'] = {}

@@ -77,6 +77,11 @@ class User(MADBase):
             'edit': modify_immutable_fields,
             'default': []
         },
+        'unsubscribedToPush': {
+            'view': view_subscriptions,
+            'edit': modify_immutable_fields,
+            'default': []
+        },
         'talkingIn': {
             'view': view_subscriptions,
             'edit': modify_immutable_fields,
@@ -172,11 +177,26 @@ class User(MADBase):
         self.add_to_list(context.user_subscription_storage, subscription, safe=False)
         context._after_subscription_add(self['username'])
 
+    def addUnsubscriptionPush(self, context):
+        """
+            Unsubscribes Push the user to the context
+        """
+        subscription = context.prepareUserSubscription()
+        self.add_to_list(context.user_unsubscription_storage_push, subscription, safe=False)
+        context._after_subscription_add(self['username'])
+
     def removeSubscription(self, context):
         """
             Unsubscribes the user from the context
         """
         self.delete_from_list(context.user_subscription_storage, {context.unique.lstrip('_'): context.getIdentifier()})
+        context._after_subscription_remove(self['username'])
+
+    def removeUnsubscriptionPush(self, context):
+        """
+            Subscribes Push the user from the context
+        """
+        self.delete_from_list(context.user_unsubscription_storage_push, {context.unique.lstrip('_'): context.getIdentifier()})
         context._after_subscription_remove(self['username'])
 
     def modifyUser(self, properties):
@@ -354,6 +374,20 @@ class User(MADBase):
         temp_context = ContextClass.from_object(self.request, context)
 
         for subscription in self.get(temp_context.user_subscription_storage, []):
+            if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
+                return subscription
+
+    def getUnSubscriptionPush(self, context):
+        """
+        """
+        subscription_object_type = context.get('objectType', None)
+        if subscription_object_type is None:
+            return None
+
+        ContextClass = getMaxModelByObjectType(subscription_object_type)
+        temp_context = ContextClass.from_object(self.request, context)
+
+        for subscription in self.get(temp_context.user_unsubscription_storage_push, []):
             if subscription.get(temp_context.unique.lstrip('_')) == str(temp_context[temp_context.unique]):
                 return subscription
 

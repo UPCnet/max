@@ -50,12 +50,15 @@ def getPushTokensForContext(tokens, request):
 
     user_tokens = []
     users = ctxt.subscribedUsers()
+    users_unsubscribepush = ctxt.unSubscribedPushUsers()
     usernames = [user['username'] for user in users]
+    usernames_unsubscribepush= [user['username'] for user in users_unsubscribepush]
+    usernames_to_notify = [e for e in usernames if e not in usernames_unsubscribepush]
 
-    if usernames:
+    if usernames_to_notify:
         # Modifico el limit a -1 para que me devuelva todos los usuarios de la mongo no solo el limite de 10
         # user_tokens = tokens.search({'_owner': {'$in': usernames}}, **searchParams(request))
-        user_tokens = tokens.search({'_owner': {'$in': usernames}}, {'limit': -1})
+        user_tokens = tokens.search({'_owner': {'$in': usernames_to_notify}}, {'limit': -1})
 
     handler = JSONResourceRoot(request, formatted_tokens(user_tokens))
     return handler.buildResponse()

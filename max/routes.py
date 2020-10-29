@@ -38,6 +38,7 @@ RESOURCES['timeline'] = dict(route='/people/{username}/timeline', category='Acti
 RESOURCES['timeline_authors'] = dict(route='/people/{username}/timeline/authors', category='Activities', name='User Timeline authors', traverse='/people/{username}')
 RESOURCES['user_comments'] = dict(route='/people/{username}/comments', category='Comments', name='User comments', traverse='/people/{username}')
 RESOURCES['subscriptions'] = dict(route='/people/{username}/subscriptions', category='Subscriptions', name='User subscriptions', traverse='/people/{username}')
+RESOURCES['unsubscriptionpush'] = dict(route='/people/{username}/unsubscriptionpush', category='Subscriptions', name='User unsubscriptionsPush', traverse='/people/{username}')
 RESOURCES['user_tokens'] = dict(route='/people/{username}/tokens', category='Tokens', name='User device tokens', traverse='/people/{username}')
 RESOURCES['user_platform_tokens'] = dict(route='/people/{username}/tokens/platforms/{platform}', category='Tokens', name='User device tokens by platform', traverse='/people/{username}')
 
@@ -72,6 +73,9 @@ RESOURCES['context_comments'] = dict(route='/contexts/{hash}/comments', category
 RESOURCES['context_activities_authors'] = dict(route='/contexts/{hash}/activities/authors', category='Activities', name='Context authors', traverse='/contexts/{hash}')
 RESOURCES['context_subscriptions'] = dict(route='/contexts/{hash}/subscriptions', category='Contexts', name='Users subscribed to context', traverse='/contexts/{hash}')
 RESOURCES['context_subscription'] = dict(route='/contexts/{hash}/subscriptions/{username}', category='Contexts', name='User subscription', traverse='/contexts/{hash}')
+RESOURCES['context_users_unsubscriptionpush'] = dict(route='/contexts/{hash}/unsubscriptionpush', category='Contexts', name='Users unsubscribed push to context', traverse='/contexts/{hash}')
+RESOURCES['context_unsubscriptionpush'] = dict(route='/contexts/{hash}/unsubscriptionpush/{username}', category='Contexts', name='User unsubscribed push', traverse='/contexts/{hash}')
+RESOURCES['context_subscriptionpush'] = dict(route='/contexts/{hash}/subscriptionpush/{username}', category='Contexts', name='User subscription push', traverse='/contexts/{hash}')
 RESOURCES['context_tags'] = dict(route='/contexts/{hash}/tags', category='Contexts', name='Context tags', traverse='/contexts/{hash}')
 RESOURCES['context_tag'] = dict(route='/contexts/{hash}/tags/{tag}', category='Contexts', name='Context tag', traverse='/contexts/{hash}')
 

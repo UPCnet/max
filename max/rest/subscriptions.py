@@ -61,8 +61,59 @@ def unsubscribe(context, request):
         raise ObjectNotFound('{} is not susbcribed to {}'.format(request.actor, context['hash']))
 
     context.removeUserSubscriptions(users_to_delete=[request.actor_username])
+    context.removeUnsubscriptionPush(users_to_delete=[request.actor_username])
     return HTTPNoContent()
 
+
+@endpoint(route_name='context_unsubscriptionpush', request_method='POST', permission=add_subscription)
+def unsubscribepush(context, request):
+    """
+        Unsubscribes Push the user to the context
+    """
+    actor = request.actor
+    rest_params = {'object': context,
+                   'verb': 'subscribe'}
+
+    # Initialize a Activity object from the request
+    newactivity = Activity.from_request(request, rest_params=rest_params)
+
+    # Check if user is already subscribed
+    if 'unsubscribedToPush' in actor:
+        subscribed_contexts_hashes = [a['hash'] for a in actor['unsubscribedToPush']]
+    else:
+        subscribed_contexts_hashes = []
+    if newactivity['object'].getHash() in subscribed_contexts_hashes:
+        # If user already subscribed, send a 200 code and retrieve the original subscribe activity
+        # post when user was subscribed. This way in th return data we'll have the date of subscription
+        code = 200
+        activities = MADMaxCollection(request, 'activity')
+        query = {'verb': 'subscribe', 'object.url': newactivity['object']['url'], 'actor.username': actor['username']}
+        newactivity = activities.last(query)  # Pick the last one, so we get the last time user subscribed (in cas a unsbuscription occured sometime...)
+
+    else:
+        actor.addUnsubscriptionPush(context)
+
+        # If user wasn't created, 201 will show that the subscription has just been added
+        code = 201
+        newactivity_oid = newactivity.insert()  # Insert a subscribe activity
+        newactivity['_id'] = newactivity_oid
+    handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
+    return handler.buildResponse()
+
+@endpoint(route_name='context_subscriptionpush', request_method='DELETE', permission=remove_subscription)
+def subscribepush(context, request):
+    """
+        Subscribes Push the user from the context
+    """
+    user = request.actor
+
+    subscribed_contexts_hashes = [a['hash'] for a in user['unsubscribedToPush']]
+    if context['hash'] in subscribed_contexts_hashes:
+        context.removeUnsubscriptionPush(users_to_delete=[request.actor_username])
+    else:
+        raise ObjectNotFound('{} is not unsubscribedToPush to {}'.format(request.actor, context['hash']))
+
+    return HTTPNoContent()
 
 @endpoint(route_name='context_subscriptions', request_method='GET', permission=view_subscriptions)
 def getContextSubscriptions(context, request):
@@ -86,6 +137,23 @@ def getContextSubscriptions(context, request):
     handler = JSONResourceRoot(request, format_subscriptions())
     return handler.buildResponse()
 
+@endpoint(route_name='context_users_unsubscriptionpush', request_method='GET', permission=view_subscriptions)
+def getContextUnSubscriptionsPush(context, request):
+    """
+        Get all users UnSubscriptionsPush to context
+    """
+    found_users = request.db.users.search({"unsubscribedToPush.hash": context['hash']}, flatten=0, show_fields=["username", "unsubscribedToPush"], **searchParams(request))
+
+    def format_subscriptions():
+        for user in found_users:
+            subscription = {
+                'username': user['username']
+            }
+            yield subscription
+
+    handler = JSONResourceRoot(request, format_subscriptions())
+    return handler.buildResponse()
+
 
 @endpoint(route_name='subscriptions', request_method='GET', permission=view_subscriptions)
 def getUserSubscriptions(user, request):
@@ -93,6 +161,28 @@ def getUserSubscriptions(user, request):
         Get all user subscriptions
     """
     subscriptions = user.get('subscribedTo', [])
+
+    search_params = searchParams(request)
+    tags = set(search_params.pop('tags', []))
+
+    # XXX Whhen refactoring subscriptions storage to a different collection
+    # Change this for a search on subscriptions collection
+    if tags:
+        filtered_subscriptions = []
+        for subscription in subscriptions:
+            if tags.intersection(set(subscription.get('tags', []))) == tags:
+                filtered_subscriptions.append(subscription)
+        subscriptions = filtered_subscriptions
+
+    handler = JSONResourceRoot(request, subscriptions)
+    return handler.buildResponse()
+
+@endpoint(route_name='unsubscriptionpush', request_method='GET', permission=view_subscriptions)
+def getUserUnSubscriptionsPush(user, request):
+    """
+        Get all user unSubscriptionsPush
+    """
+    subscriptions = user.get('unsubscribedToPush', [])
 
     search_params = searchParams(request)
     tags = set(search_params.pop('tags', []))
