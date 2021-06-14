@@ -136,10 +136,13 @@ class RabbitNotifications(object):
         message = RabbitMessage()
         message.prepare(self.message_defaults)
 
-        if activity['object']['objectType'] == 'image':
-            text = 'Add image'
-        else:
-            text = activity['object'].get('content', '')
+        # OJO Comento este if ya que si se envia un texto con imagen en la push sale solo el
+        # literal Imatge y no el texto. Como veo que desde uTalk no te deja enviar imagenes sin texto
+        # creo que no sera un problema
+        # if activity['object']['objectType'] == 'image':
+        #     text = 'Add image'
+        # else:
+        text = activity['object'].get('content', '')
 
         message.update({
             "user": {
