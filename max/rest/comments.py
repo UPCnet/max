@@ -120,22 +120,25 @@ def addActivityComment(activity, request):
     del comment['inReplyTo']
     activity.addComment(comment)
 
-    community_url = activity['contexts'][0]['url']
-    site_url = '/'.join(str(community_url).split('/')[:-1])
-    url = site_url + '/api/notifymail'
+    try:
+        community_url = activity['contexts'][0]['url']
+        site_url = '/'.join(str(community_url).split('/')[:-1])
+        url = site_url + '/api/notifymail'
 
-    payload = {"community_url": community_url,
-               "community_name": activity['contexts'][0]['displayName'],
-               "actor_displayName": comment['actor']['displayName'],
-               "activity_content": comment['content'],
-               "content_type": comment['objectType']}
+        payload = {"community_url": community_url,
+                   "community_name": activity['contexts'][0]['displayName'],
+                   "actor_displayName": comment['actor']['displayName'],
+                   "activity_content": comment['content'],
+                   "content_type": comment['objectType']}
 
 
-    headers={'X-Oauth-Username': request.auth_headers[1],
-             'X-Oauth-Token': request.auth_headers[0],
-             'X-Oauth-Scope': request.auth_headers[2]}
+        headers={'X-Oauth-Username': request.auth_headers[1],
+                 'X-Oauth-Token': request.auth_headers[0],
+                 'X-Oauth-Scope': request.auth_headers[2]}
 
-    res = requests.post(url, headers=headers, data=payload, verify=False)
+        res = requests.post(url, headers=headers, data=payload, verify=False)
+    except:
+        pass
 
     handler = JSONResourceEntity(request, newactivity.flatten(), status_code=code)
     return handler.buildResponse()
