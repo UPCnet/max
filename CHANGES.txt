@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-5.3.20 (unreleased)
+5.3.20 (2021-06-15)
 -------------------
 
-- Nothing changed yet.
-
+* Solucionar tests [Pilar Marinas]
+* Notify by mail activity and comment [Pilar Marinas]
 
 5.3.19 (2020-10-29)
 -------------------
