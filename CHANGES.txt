@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.21 (unreleased)
+5.3.21 (2021-06-21)
 -------------------
 
-- Nothing changed yet.
-
+* Notify by mail text and image in activity [Pilar Marinas]
 
 5.3.20 (2021-06-15)
 -------------------
