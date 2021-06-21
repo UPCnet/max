@@ -244,34 +244,48 @@ def addContextActivity(context, request):
             activity_oid = newactivity.insert()
             newactivity['_id'] = ObjectId(activity_oid)
 
-            try:
-                text_activity = newactivity['object']['content']
-                if u'He afegit' in text_activity[0:15] or \
-                   u'He añadido' in text_activity[0:15] or \
-                   u'I\'ve added' in text_activity[0:15]:
-                    notifymail = False
+        try:
+            text_activity = newactivity['object']['content']
+            if u'He afegit' in text_activity[0:15] or \
+               u'He añadido' in text_activity[0:15] or \
+               u'I\'ve added' in text_activity[0:15]:
+                notifymail = False
+            else:
+                notifymail = True
+
+            if notifymail:
+                # Notify activity by email
+                community_url = newactivity['contexts'][0]['url']
+                site_url = '/'.join(str(community_url).split('/')[:-1])
+                url = site_url + '/api/notifymail'
+                #import ipdb;ipdb.set_trace()
+
+                if newactivity['object']['objectType'] == 'image':
+                    image = {"thumbURL": newactivity['object']['thumbURL'],
+                             "filename": newactivity['object']['filename'],
+                             "mimetye": newactivity['object']['mimetype'],
+                             "objectType": newactivity['object']['objectType']}
                 else:
-                    notifymail = True
+                    image = {"thumbURL": '',
+                             "filename": '',
+                             "mimetye": '',
+                             "objectType": newactivity['object']['objectType']}
 
-                if notifymail:
-                    # Notify activity by email
-                    community_url = newactivity['contexts'][0]['url']
-                    site_url = '/'.join(str(community_url).split('/')[:-1])
-                    url = site_url + '/api/notifymail'
+                payload = {"community_url": community_url,
+                           "community_name": newactivity['contexts'][0]['displayName'],
+                           "actor_displayName": newactivity['actor']['displayName'],
+                           "activity_content": newactivity['object']['content'],
+                           "content_type": newactivity['objectType']}
 
-                    payload = {"community_url": community_url,
-                               "community_name": newactivity['contexts'][0]['displayName'],
-                               "actor_displayName": newactivity['actor']['displayName'],
-                               "activity_content": newactivity['object']['content'],
-                               "content_type": newactivity['objectType']}
+                payload.update(image)
 
-                    headers={'X-Oauth-Username': request.auth_headers[1],
-                             'X-Oauth-Token': request.auth_headers[0],
-                             'X-Oauth-Scope': request.auth_headers[2]}
+                headers={'X-Oauth-Username': request.auth_headers[1],
+                         'X-Oauth-Token': request.auth_headers[0],
+                         'X-Oauth-Scope': request.auth_headers[2]}
 
-                    res = requests.post(url, headers=headers, data=payload, verify=False)
-            except:
-                pass
+                res = requests.post(url, headers=headers, data=payload, verify=False)
+        except:
+            pass
 
     handler = JSONResourceEntity(request, newactivity.flatten(squash=['keywords']), status_code=code)
     return handler.buildResponse()
