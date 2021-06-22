@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.22 (unreleased)
+5.3.22 (2021-06-22)
 -------------------
 
-- Nothing changed yet.
-
+* Notify comments by mail [Pilar Marinas]
 
 5.3.21 (2021-06-21)
 -------------------
