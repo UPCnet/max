@@ -129,7 +129,11 @@ def addActivityComment(activity, request):
                    "community_name": activity['contexts'][0]['displayName'],
                    "actor_displayName": comment['actor']['displayName'],
                    "activity_content": comment['content'],
-                   "content_type": comment['objectType']}
+                   "content_type": comment['objectType'],
+                   "thumbURL": '',
+                   "filename": '',
+                   "mimetye": '',
+                   "objectType": comment['objectType']}
 
 
         headers={'X-Oauth-Username': request.auth_headers[1],
