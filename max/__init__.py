@@ -10,6 +10,8 @@ except ImportError:
 else:
     GEVENT_AVAILABLE = True
 
+from gevent.monkey import patch_all
+patch_all()
 
 from max import debug
 from max import mongoprobe
@@ -100,9 +102,10 @@ def main(*args, **settings):
     auth_enabled = asbool(settings.get('mongodb.auth', False))
     mongodb_uri = settings.get('mongodb.hosts') if cluster_enabled else settings['mongodb.url']
 
+    # En la nueva version de mongo no funciona el use_greenlets
     conn = mongodb.get_connection(
         mongodb_uri,
-        use_greenlets=GEVENT_AVAILABLE,
+        #use_greenlets=GEVENT_AVAILABLE,
         cluster=settings.get('mongodb.replica_set', None))
     db = mongodb.get_database(
         conn,

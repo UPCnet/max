@@ -485,7 +485,10 @@ class User(MADBase):
                         "published": {"$last": "$published"}
                     }}
                 ]
-                messages = messages_collection.aggregate(pipeline)['result']
+
+                # En la nueva version mongo esto no funciona
+                # messages = messages_collection.aggregate(pipeline)['result']
+                messages = [ a for a in messages_collection.aggregate(pipeline) ]
 
                 def format_message(db_message):
                     message_object = db_message.get('object', {})
