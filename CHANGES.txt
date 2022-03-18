@@ -1,11 +1,10 @@
 CHANGELOG
 =========
 
-5.3.23 (unreleased)
+5.3.23 (2022-03-18)
 -------------------
 
-- Nothing changed yet.
-
+* Cambios para que funcione la nueva version de mongo [Pilar Marinas]
 
 5.3.22 (2021-06-22)
 -------------------
