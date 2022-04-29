@@ -9,6 +9,7 @@ CONTRIBUTORS = open(os.path.join(here, 'CONTRIBUTORS.rst')).read()
 
 requires = [
     'setuptools',
+    'ipdb',
     'pyramid',
     'pyramid_tm',
     'pyramid_debugtoolbar',
