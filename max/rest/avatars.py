@@ -51,8 +51,13 @@ def postUserAvatar(user, request):
     medium = ImageOps.fit(image, LARGE_SIZE, method=Image.ANTIALIAS, centering=(0, 0))
     medium.save(file_path, 'PNG')
 
-    return Response("Uploaded", status_int=201)
+    # return Response("Uploaded", status_int=201)
+    import json
+    response_payload = json.dumps({'Image': 'updated'})
+    response = Response(response_payload, status_int=201)
+    response.content_type = 'application/json'
 
+    return response
 
 @endpoint(route_name='avatar', request_method='GET')
 @endpoint(route_name='avatar_sizes', request_method='GET')
