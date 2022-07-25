@@ -131,7 +131,13 @@ def getMessageFileAttachment(message, request):
     file_data, mimetype = message.getFile()
 
     if file_data is not None:
-        response = Response(file_data, status_int=200)
+        from_app = request.headers.get('X-From', 'None') # app or None
+        if from_app == 'App':
+            pdf = b64encode(file_data)
+            mimetype = 'application/base64'
+            response = Response(pdf, status_int=200)
+        else:
+            response = Response(file_data, status_int=200)
         response.content_type = mimetype
         filename = message['object'].get('filename', message['_id'])
         response.headers.add('Content-Disposition', 'attachment; filename={}'.format(filename))
