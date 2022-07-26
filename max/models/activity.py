@@ -311,7 +311,11 @@ class BaseActivity(MADBase):
             if not os.path.exists(path):
                 os.makedirs(path)
             r_file = open(path + '/' + filename, 'w')
-            r_file.write(activity_file.file.read())
+            try:
+                r_file.write(activity_file.file.read())
+            except:
+                from base64 import decodestring
+                r_file.write(decodestring(activity_file.file))
             r_file.close()
 
             full_endpoint_name = 'image/full' if file_type == 'image' else 'file/download'
