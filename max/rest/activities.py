@@ -205,7 +205,7 @@ def addContextActivity(context, request):
     }
     # Initialize a Activity object from the request
     newactivity = Activity.from_request(request, rest_params=rest_params)
-
+    
     # Search if there's any activity from the same user with
     # the same actor in the last minute
 
@@ -258,17 +258,16 @@ def addContextActivity(context, request):
                 community_url = newactivity['contexts'][0]['url']
                 site_url = '/'.join(str(community_url).split('/')[:-1])
                 url = site_url + '/api/notifymail'
-                #import ipdb;ipdb.set_trace()
 
                 if newactivity['object']['objectType'] == 'image':
                     image = {"thumbURL": newactivity['object']['thumbURL'],
                              "filename": newactivity['object']['filename'],
-                             "mimetye": newactivity['object']['mimetype'],
+                             "mimetype": newactivity['object']['mimetype'],
                              "objectType": newactivity['object']['objectType']}
                 else:
                     image = {"thumbURL": '',
                              "filename": '',
-                             "mimetye": '',
+                             "mimetype": '',
                              "objectType": newactivity['object']['objectType']}
 
                 payload = {"community_url": community_url,
@@ -403,7 +402,13 @@ def getActivityFileAttachment(activity, request):
     file_data, mimetype = activity.getFile()
 
     if file_data is not None:
-        response = Response(file_data, status_int=200)
+        from_app = request.headers.get('X-From-Utalk', 'None') # app or None
+        if from_app == 'App':
+            pdf = b64encode(file_data)
+            mimetype = 'application/base64'
+            response = Response(pdf, status_int=200)
+        else:
+            response = Response(file_data, status_int=200)
         response.content_type = mimetype
         filename = activity['object'].get('filename', activity['_id'])
         response.headers.add('Content-Disposition', 'attachment; filename={}'.format(filename))
