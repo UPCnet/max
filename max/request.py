@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from wsgiref.simple_server import WSGIRequestHandler
 from max.MADMax import MADMaxDB
 from max.exceptions import Unauthorized
 from max.exceptions import UnknownUserError
@@ -30,7 +31,11 @@ def extract_post_data(request):
         request_body = request.body
     except:
         request_body = None
-
+    try:
+        have_file = json.loads(request_body, object_hook=json_util.object_hook)['data']['file']
+    except:
+        have_file = False
+    
     if 'multipart/form-data' in request.content_type:
         try:
             json_data = json.loads(request.params.get('json_data'), object_hook=json_util.object_hook)
@@ -38,6 +43,10 @@ def extract_post_data(request):
                 json_data['object']['file'] = request.params.get('file')
         except:
             pass
+    elif 'application/json' in request.content_type and have_file:
+        from base64 import b64decode
+        json_data = json.loads(json.loads(request_body, object_hook=json_util.object_hook)['data']['json_data'])
+        json_data['object']['file'] = b64decode(have_file)
 
     elif 'multipart/form-data' not in request.content_type and request_body:
 
