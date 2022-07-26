@@ -131,7 +131,7 @@ def getMessageFileAttachment(message, request):
     file_data, mimetype = message.getFile()
 
     if file_data is not None:
-        from_app = request.headers.get('X-From', 'None') # app or None
+        from_app = request.headers.get('X-From-Utalk', 'None') # app or None
         if from_app == 'App':
             pdf = b64encode(file_data)
             mimetype = 'application/base64'
