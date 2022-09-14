@@ -1,11 +1,17 @@
 CHANGELOG
 =========
 
-5.3.25 (unreleased)
+5.3.25 (2022-09-14)
 -------------------
 
-- Nothing changed yet.
-
+* Renombrar cabecera a X-From-Utalk [alberto.duran]
+* Si hay fichero, decodifica la activity de base64 y la esribe con la imagen/fichero [alberto.duran]
+* Mira si el post contiene un fichero y si lo tiene, lo decodifica de base64 [alberto.duran]
+* Incrementar límite de participantes en una conversación [alberto.duran]
+* Añadir cabecera X-From=App para monitorizar peticiones desde la App(Activities) [alberto.duran]
+* Añadir cabecera X-From=App para monitorizar peticiones desde la App [alberto.duran]
+* Merge branch 'develop' of github.com:UPCnet/max into develop [alberto.duran]
+* Cambiar respuesta de string a json para /avatar [alberto.duran]
 
 5.3.24 (2022-04-29)
 -------------------
