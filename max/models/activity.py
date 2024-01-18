@@ -197,7 +197,17 @@ class BaseActivity(MADBase):
 
         self.save()
 
-        notify = self.get('contexts', [{}])[0].get('notifications', False)
+        # Modificamos el comportamiento de la notificación push de comentarios.
+        # Hasta ahora si cuando creas la actividad tienes marcado el que notifique las push de actividad y comentario,
+        # todos los comentarios que hagas de esa actividad se envía la notificación push aunque luego lo desactives
+        # y al contrario, si cuando creas la actividad no esta marcado que notifique las push, aunque lo actives no lo notifica.
+
+        # Ahora miramos la comunidad para ver si esta activado o no para enviar la notificación push.
+        contexts = self.mdb_collection.database.contexts.find({'hash': self.get("contexts")[0]['hash']})
+        for context in contexts:
+            notify = context.get('notifications', False)
+
+        #notify = self.get('contexts', [{}])[0].get('notifications', False)
         if notify in ['comments']:
             notifier = RabbitNotifications(self.request)
             notifier.notify_context_activity_comment(self, comment)
