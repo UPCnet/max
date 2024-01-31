@@ -31,7 +31,7 @@ test_requires = ['WebTest', 'mock', 'robotsuite', 'pyramid_robot']
 docs_requires = ['manuel', 'pygments', 'sphinx_bootstrap_theme']
 
 setup(name='max',
-      version='5.3.26',
+      version='5.3.27.dev0',
       description='Activity Stream and Subscription Enhanced Engine (Motor d\'Activitat i subscripcions eXtes)',
       long_description=README + '\n\n' + CHANGES + '\n\n' + CONTRIBUTORS,
       classifiers=[
