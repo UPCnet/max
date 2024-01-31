@@ -1,11 +1,11 @@
 CHANGELOG
 =========
 
-5.3.26 (unreleased)
+5.3.26 (2024-01-31)
 -------------------
 
-- Nothing changed yet.
-
+* Modificamos el comportamiento de la notificación push de comentarios [Pilar Marinas]
+* Añadir ficheros a la conversacion para notificar al rabbit [Alberto Durán]
 
 5.3.25 (2022-09-14)
 -------------------
